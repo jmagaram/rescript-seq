@@ -3,7 +3,12 @@ open Belt
 let filter = _ => true
 
 let summary =
-  await [Extras__ArrayTests.tests, Extras__OptionTests.tests, Extras__ResultTests.allTests]
+  await [
+    Extras__CmpTests.tests,
+    Extras__ArrayTests.tests,
+    Extras__OptionTests.tests,
+    Extras__ResultTests.allTests,
+  ]
   ->Array.concatMany
   ->Extras__Test.runSuite(~filter)
 
