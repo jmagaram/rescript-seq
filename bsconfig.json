@@ -1,5 +1,5 @@
 {
-  "name": "rescript-extras",
+  "name": "@jmagaram/rescript-extras",
   "sources": [
     {
       "dir": "src",
