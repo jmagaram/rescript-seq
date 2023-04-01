@@ -44,3 +44,11 @@ let fromError = r =>
   | Ok(_) => None
   | Error(err) => Some(err)
   }
+
+let fromTryCatch = f => {
+  try {
+    Some(f())
+  } catch {
+  | _ => None
+  }
+}

@@ -16,6 +16,8 @@ Additional modules:
 
 Existential quanitifiers **isSomeAnd** and **isNoneOr**.
 
+Create an option from a function that may fail using **fromTryCatch**.
+
 Combine two options with **concat**, where `None` functions like a zero.
 
 "Add" an option to a regular value using **fold** and **foldBack**.
@@ -45,3 +47,9 @@ Inspired by `fp-ts`, a `Task` is a lazy promise. Transform it before execution w
 ## Cmp and CmpUtilities
 
 The `Cmp.t` is the `('a,'a) => int` comparison function. Comparison utilities such as as **eq**, **neq**, **lt**, **gte**, **min**, **max**, etc. General a comparator **fromMap** or **reverse** the direction.
+
+**Functors** to add sorting and equality functions to custom data types.
+
+## Test runner
+
+Super-simple test runner. Make tests using **make** and **makeAsync**. Run them using **runSuite**.

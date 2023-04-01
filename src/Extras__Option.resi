@@ -6,3 +6,4 @@ let fold: (option<'a>, ('b, 'a) => 'b, 'b) => 'b
 let foldBack: ('a, ('b, 'a) => 'a, option<'b>) => 'a
 let fromOk: result<'a, 'b> => option<'a>
 let fromError: result<'a, 'b> => option<'b>
+let fromTryCatch: (unit => 'a) => option<'a>

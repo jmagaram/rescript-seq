@@ -1,6 +1,7 @@
 let expectEq = (~title, ~expectation, ~a, ~b) =>
   Extras__Test.make(~category="Option", ~title, ~expectation, ~predicate=() => a() == b)
 
+module T = Extras__Test
 module O = Extras__Option
 
 let add = (a, b) => a + b
@@ -115,5 +116,20 @@ let tests = [
     ~expectation="when Ok => None",
     ~a=() => Ok(5)->O.fromError,
     ~b=None,
+  ),
+  T.make(
+    ~category="Option",
+    ~title="fromTryCatch",
+    ~expectation="when throw, return as None",
+    ~predicate=() => {
+      let r = O.fromTryCatch(() => Js.Exn.raiseError("banana"))
+      r->Belt.Option.isNone
+    },
+  ),
+  T.make(
+    ~category="Option",
+    ~title="fromTryCatch",
+    ~expectation="when not throw, return result as Some",
+    ~predicate=() => O.fromTryCatch(() => 3) == Some(3),
   ),
 ]
