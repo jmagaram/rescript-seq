@@ -7,6 +7,12 @@ type t = {
   predicate: unit => promise<bool>,
 }
 
+type summary = {
+  pass: int,
+  fail: int,
+  ran: int,
+}
+
 let stringCmp = (x: string, y: string) => x < y ? -1 : x > y ? 1 : 0
 let cmp = (a, b) => stringCmp(a.category ++ a.title, b.category ++ b.title)
 
@@ -62,8 +68,15 @@ let runSuite = async (~filter=_ => true, tests) => {
     failed->Array.forEach(((_, t)) => `FAIL  ${t->toString}`->log)
   }
   logSection("SUMMARY")
-  log(`PASS : ${succeeded->Array.length->Int.toString}`)
-  log(`FAIL : ${failed->Array.length->Int.toString}`)
-  log(`RAN  : ${results->Array.length->Int.toString}`)
+  let summary = {
+    pass: succeeded->Array.length,
+    fail: failed->Array.length,
+    ran: succeeded->Array.length + failed->Array.length,
+  }
+
+  log(`PASS : ${summary.pass->Int.toString}`)
+  log(`FAIL : ${summary.fail->Int.toString}`)
+  log(`RAN  : ${summary.ran->Int.toString}`)
   log("")
+  summary
 }

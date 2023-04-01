@@ -9,4 +9,10 @@ let makeAsync: (
   ~predicate: unit => promise<bool>,
 ) => t
 
-let runSuite: (~filter: t => bool=?, array<t>) => promise<unit>
+type summary = {
+  pass: int,
+  fail: int,
+  ran: int,
+}
+
+let runSuite: (~filter: t => bool=?, array<t>) => promise<summary>
