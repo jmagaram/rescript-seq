@@ -35,7 +35,7 @@ let tests = [
   expectEqual(
     ~title="isNoneOr",
     ~expectation="when Some and condition not met => false",
-    ~a=() => Some(3)->OptionEx.isNoneOr(i => i == 9999999999),
-    ~b=true,
+    ~a=() => Some(3)->OptionEx.isNoneOr(i => i == 9999),
+    ~b=false,
   ),
 ]
