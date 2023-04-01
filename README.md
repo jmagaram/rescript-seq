@@ -11,4 +11,5 @@ Includes extensions to:
 Additional modules:
 
 - Cmp
+- CmpUtilities
 - Task
