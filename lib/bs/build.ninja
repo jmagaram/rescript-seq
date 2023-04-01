@@ -1,0 +1,45 @@
+rescript = 1
+rule astj
+  command = /Users/justinmagaram/Source/rescript-extras/node_modules/rescript/darwinarm64/bsc.exe  -bs-v 10.1.4  -absname -bs-ast -o $out $i
+o src/Extras.ast : astj ../../src/Extras.res
+rule deps
+  command = /Users/justinmagaram/Source/rescript-extras/node_modules/rescript/darwinarm64/bsb_helper.exe -hash 20f28263ff4f1dec603d37b7504a3d20 $in
+  restat = 1
+o src/Extras.d : deps src/Extras.ast
+rule mij
+  command = /Users/justinmagaram/Source/rescript-extras/node_modules/rescript/darwinarm64/bsc.exe -I src   -bs-package-name rescript-extras -bs-package-output es6:$in_d:.bs.js $i
+  dyndep = 1
+  restat = 1
+o src/Extras.cmj src/Extras.cmi ../../src/Extras.bs.js : mij src/Extras.ast
+o src/TestEx.ast : astj ../../src/TestEx.res
+o src/TestEx.d : deps src/TestEx.ast src/TestEx.iast
+o src/TestEx.iast : astj ../../src/TestEx.resi
+rule mi
+  command = /Users/justinmagaram/Source/rescript-extras/node_modules/rescript/darwinarm64/bsc.exe -I src   $i
+  dyndep = 1
+  restat = 1
+o src/TestEx.cmi : mi src/TestEx.iast
+rule mj
+  command = /Users/justinmagaram/Source/rescript-extras/node_modules/rescript/darwinarm64/bsc.exe -bs-read-cmi -I src   -bs-package-name rescript-extras -bs-package-output es6:$in_d:.bs.js $i
+  dyndep = 1
+  restat = 1
+o src/TestEx.cmj ../../src/TestEx.bs.js : mj src/TestEx.ast src/TestEx.cmi
+o src/OptionEx.ast : astj ../../src/OptionEx.res
+o src/OptionEx.d : deps src/OptionEx.ast src/OptionEx.iast
+o src/OptionEx.iast : astj ../../src/OptionEx.resi
+o src/OptionEx.cmi : mi src/OptionEx.iast
+o src/OptionEx.cmj ../../src/OptionEx.bs.js : mj src/OptionEx.ast src/OptionEx.cmi
+o src/ResultEx.ast : astj ../../src/ResultEx.res
+o src/ResultEx.d : deps src/ResultEx.ast src/ResultEx.iast
+o src/ResultEx.iast : astj ../../src/ResultEx.resi
+o src/ResultEx.cmi : mi src/ResultEx.iast
+o src/ResultEx.cmj ../../src/ResultEx.bs.js : mj src/ResultEx.ast src/ResultEx.cmi
+o src/TestSuite.ast : astj ../../src/TestSuite.res
+o src/TestSuite.d : deps src/TestSuite.ast
+o src/TestSuite.cmj src/TestSuite.cmi ../../src/TestSuite.bs.js : mij src/TestSuite.ast
+o src/OptionExTests.ast : astj ../../src/OptionExTests.res
+o src/OptionExTests.d : deps src/OptionExTests.ast
+o src/OptionExTests.cmj src/OptionExTests.cmi ../../src/OptionExTests.bs.js : mij src/OptionExTests.ast
+o src/ResultExTests.ast : astj ../../src/ResultExTests.res
+o src/ResultExTests.d : deps src/ResultExTests.ast
+o src/ResultExTests.cmj src/ResultExTests.cmi ../../src/ResultExTests.bs.js : mij src/ResultExTests.ast
