@@ -90,4 +90,30 @@ let tests = [
     ~a=() => 3->O.foldBack(add, Some(4)),
     ~b=7,
   ),
+  expectEq(~title="toArray", ~expectation="when None => empty", ~a=() => None->O.toArray, ~b=[]),
+  expectEq(
+    ~title="toArray",
+    ~expectation="when Some => array of one item",
+    ~a=() => Some(4)->O.toArray,
+    ~b=[4],
+  ),
+  expectEq(~title="fromOk", ~expectation="when Ok => Some", ~a=() => Ok(5)->O.fromOk, ~b=Some(5)),
+  expectEq(
+    ~title="fromOk",
+    ~expectation="when Error => None",
+    ~a=() => Error(5)->O.fromOk,
+    ~b=None,
+  ),
+  expectEq(
+    ~title="fromError",
+    ~expectation="when Error => Some",
+    ~a=() => Error(5)->O.fromError,
+    ~b=Some(5),
+  ),
+  expectEq(
+    ~title="fromError",
+    ~expectation="when Ok => None",
+    ~a=() => Ok(5)->O.fromError,
+    ~b=None,
+  ),
 ]
