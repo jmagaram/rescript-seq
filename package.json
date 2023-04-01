@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "type": "module",
   "description": "Useful general-purpose utility functions and modules for ReScript projects.",
+  "keywords": [
+    "rescript"
+  ],
   "main": "index.js",
   "scripts": {
     "test": "node src/TestSuite.bs.js",
