@@ -19,7 +19,7 @@ let mapError = (t, m) => {
 
 external toExn: Js.Promise2.error => exn = "%identity"
 
-let toResult = t =>
+let toPromise = t =>
   t.promise()
   ->Promise.then(i => Ok(i)->Promise.resolve)
   ->Promise.catch(e => e->toExn->t.onError->Error->Promise.resolve)

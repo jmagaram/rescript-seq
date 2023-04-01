@@ -10,7 +10,7 @@ let tests = [
     ~expectation="when promise succeeds => Ok",
     ~predicate=async () => {
       let lazyPromise = () => Promise.resolve(8)
-      let result = await lazyPromise->Task.make->Task.map(i => i * 2)->Task.toResult
+      let result = await lazyPromise->Task.make->Task.map(i => i * 2)->Task.toPromise
       result == Ok(16)
     },
   ),
@@ -23,7 +23,7 @@ let tests = [
         Js.Exn.raiseError("failed")->ignore
         await Promise.resolve(true)
       }
-      let result = await lazyPromise->Task.make->Task.toResult
+      let result = await lazyPromise->Task.make->Task.toPromise
       result->Belt.Result.isError
     },
   ),
@@ -36,7 +36,7 @@ let tests = [
         Js.Exn.raiseError("failed")->ignore
         await Promise.resolve(true)
       }
-      let result = await lazyPromise->Task.make->Task.mapError(_ => "banana")->Task.toResult
+      let result = await lazyPromise->Task.make->Task.mapError(_ => "banana")->Task.toPromise
       result == Error("banana")
     },
   ),
@@ -55,7 +55,7 @@ let tests = [
         ->Task.mapError(_ => 2)
         ->Task.mapError(i => i * 2)
         ->Task.mapError(i => i * 2)
-        ->Task.toResult
+        ->Task.toPromise
       result == Error(8)
     },
   ),
