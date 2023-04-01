@@ -46,5 +46,3 @@ let error = r =>
   | Ok(_) => None
   | Error(e) => Some(e)
   }
-
-// let toOption = ok
