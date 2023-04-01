@@ -1,7 +1,7 @@
 let expectEq = (~title, ~expectation, ~a, ~b) =>
-  TestEx.make(~category="Option", ~title, ~expectation, ~predicate=() => a() == b)
+  Extras__Test.make(~category="Option", ~title, ~expectation, ~predicate=() => a() == b)
 
-module O = OptionEx
+module O = Extras__Option
 
 let add = (a, b) => a + b
 

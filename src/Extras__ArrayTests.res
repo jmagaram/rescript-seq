@@ -1,7 +1,10 @@
+module T = Extras__Test
+module A = Extras__Array
+
 let fromSeed = {
   let make = (expectation, seed, generator, expected) =>
-    TestEx.make(~category="Array", ~title="fromSeed", ~expectation, ~predicate=() =>
-      seed->ArrayEx.fromSeed(generator) == expected
+    T.make(~category="Array", ~title="fromSeed", ~expectation, ~predicate=() =>
+      seed->A.fromSeed(generator) == expected
     )
   [
     ("multiplicative", 1, i => i < 100 ? Some(i, i * 2) : None, [1, 2, 4, 8, 16, 32, 64]),
@@ -14,19 +17,19 @@ let fromSeed = {
 
 let fromOneValue = {
   let make = (expectation, predicate) =>
-    TestEx.make(~category="Array", ~title="fromOneValue", ~expectation, ~predicate)
+    T.make(~category="Array", ~title="fromOneValue", ~expectation, ~predicate)
   [
-    ("if primitive => array of primitive", () => 3->ArrayEx.fromOneValue == [3]),
-    ("if array => array of array", () => [1, 2, 3]->ArrayEx.fromOneValue == [[1, 2, 3]]),
+    ("if primitive => array of primitive", () => 3->A.fromOneValue == [3]),
+    ("if array => array of array", () => [1, 2, 3]->A.fromOneValue == [[1, 2, 3]]),
   ]->Belt.Array.map(((expectation, predicate)) => make(expectation, predicate))
 }
 
 let fromOption = {
   let make = (expectation, predicate) =>
-    TestEx.make(~category="Array", ~title="fromOption", ~expectation, ~predicate)
+    T.make(~category="Array", ~title="fromOption", ~expectation, ~predicate)
   [
-    ("if None => empty", () => None->ArrayEx.fromOption == []),
-    ("if Some => array of one value", () => Some(3)->ArrayEx.fromOption == [3]),
+    ("if None => empty", () => None->A.fromOption == []),
+    ("if Some => array of one value", () => Some(3)->A.fromOption == [3]),
   ]->Belt.Array.map(((expectation, predicate)) => make(expectation, predicate))
 }
 

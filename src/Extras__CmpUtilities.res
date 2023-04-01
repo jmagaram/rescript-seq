@@ -1,4 +1,4 @@
-module Cmp = CmpEx
+module Cmp = Extras__Cmp
 
 module type Equality = {
   type t
@@ -19,10 +19,10 @@ module type Ordering = {
 module MakeEquals = (
   C: {
     type domain
-    let cmp: CmpEx.t<domain>
+    let cmp: Cmp.t<domain>
   },
 ): (Equality with type t := C.domain) => {
-  let eq = C.cmp->CmpEx.eq
+  let eq = C.cmp->Cmp.eq
   let neq = C.cmp->Cmp.neq
 }
 
