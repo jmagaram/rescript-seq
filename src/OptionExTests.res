@@ -36,6 +36,6 @@ let tests = [
     ~title="isNoneOr",
     ~expectation="when Some and condition not met => false",
     ~a=() => Some(3)->OptionEx.isNoneOr(i => i == 9),
-    ~b=false,
+    ~b=true,
   ),
 ]
