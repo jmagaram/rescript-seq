@@ -6,6 +6,7 @@ Includes extensions to:
 
 - Option
 - Result
+- Array
 
 Additional modules:
 
