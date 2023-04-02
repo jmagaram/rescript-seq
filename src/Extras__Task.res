@@ -3,7 +3,7 @@ module Promise = Js.Promise2
 
 type t<'ok, 'error> = unit => promise<result<'ok, 'error>>
 
-external toExn: Js.Promise2.error => exn = "%identity"
+external toExn: Promise.error => exn = "%identity"
 
 let make = (p, ()) =>
   p()
