@@ -1,6 +1,6 @@
 # Rescript Extras
 
-General-purpose functions and modules for [Rescript](https://rescript-lang.org) projects. Includes extensions to `Option`, `Result`, and `Array` as well as additional module `Cmp`, `CmpUtilities`, `Task`, and `Test`.
+General-purpose modules for [Rescript](https://rescript-lang.org) projects. Includes extensions to `Option`, `Result`, and `Array`. Provides a lazy-promise `Task`, comparison utilities in `Cmp`, and a very simple test runner `Test`.
 
 ## Install
 
