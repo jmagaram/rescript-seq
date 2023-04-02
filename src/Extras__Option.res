@@ -52,3 +52,9 @@ let fromTryCatch = f => {
   | _ => None
   }
 }
+
+let map2 = (a, b, m) =>
+  switch (a, b) {
+  | (Some(a), Some(b)) => Some(m(a, b))
+  | _ => None
+  }

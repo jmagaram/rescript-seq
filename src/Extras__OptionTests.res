@@ -132,4 +132,25 @@ let tests = [
     ~expectation="when not throw, return result as Some",
     ~predicate=() => O.fromTryCatch(() => 3) == Some(3),
   ),
+  T.make(~category="Option", ~title="map2", ~expectation="when both None => None", ~predicate=() =>
+    O.map2(None, None, add) == None
+  ),
+  T.make(
+    ~category="Option",
+    ~title="map2",
+    ~expectation="when both Some => Some with map args",
+    ~predicate=() => O.map2(Some(1), Some(5), add) == Some(6),
+  ),
+  T.make(
+    ~category="Option",
+    ~title="map2",
+    ~expectation="when one is Some => None",
+    ~predicate=() => O.map2(Some(1), None, add) == None,
+  ),
+  T.make(
+    ~category="Option",
+    ~title="map2",
+    ~expectation="when one is Some => None",
+    ~predicate=() => O.map2(None, Some(1), add) == None,
+  ),
 ]
