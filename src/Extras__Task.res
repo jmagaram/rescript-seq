@@ -1,17 +1,22 @@
-module Result = Belt.Result
 module Promise = Js.Promise2
 
-type t<'ok, 'error> = unit => promise<result<'ok, 'error>>
+type t<'a> = unit => promise<'a>
 
-external toExn: Promise.error => exn = "%identity"
+external toExn: 'a => exn = "%identity"
 
-let make = (p, ()) =>
-  p()
-  ->Promise.then(r => Ok(r)->Promise.resolve)
-  ->Promise.catch(e => e->toExn->Error->Promise.resolve)
+let makeInfallible = (~promise, ~onError, ()) =>
+  promise()->Promise.catch(e => e->toExn->onError->Promise.resolve)
 
-let map = (t, f, ()) => t()->Promise.then(r => r->Result.map(f)->Promise.resolve)
+let make = (promise, ()) => {
+  promise()
+  ->Promise.then(ok => Ok(ok)->Promise.resolve)
+  ->Promise.catch(err => err->toExn->Error->Promise.resolve)
+}
+
+let map = (t, f, ()) => t()->Promise.then(r => f(r)->Promise.resolve)
 
 let mapError = (t, f, ()) => t()->Promise.then(r => r->Extras__Result.mapError(f)->Promise.resolve)
+
+let flatMap = (t, m, ()) => t()->Promise.then(r => m(r)())
 
 let toPromise = t => t()

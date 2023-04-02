@@ -3,80 +3,61 @@ module Task = Extras__Task
 module Promise = Js.Promise2
 module Option = Belt.Option
 
+exception BadInput
+
 let tests = [
   T.makeAsync(
     ~category="Task",
-    ~title="toResult",
-    ~expectation="when promise succeeds => Ok",
+    ~title="make",
+    ~expectation="when promise succeeds, return value",
     ~predicate=async () => {
-      let lazyPromise = () => Promise.resolve("elephant")
-      let result = await lazyPromise->Task.make->Task.toPromise
-      result == Ok("elephant")
+      let result =
+        await Task.makeInfallible(
+          ~promise=() => Promise.resolve("elephant"),
+          ~onError=_ => "banana",
+        )->Task.toPromise
+      result == "elephant"
     },
   ),
   T.makeAsync(
     ~category="Task",
     ~title="map",
-    ~expectation="when promise succeeds => Ok with mapping",
+    ~expectation="when promise succeeds, return value mapped",
     ~predicate=async () => {
-      let lazyPromise = () => Promise.resolve(2)
       let result =
-        await lazyPromise
-        ->Task.make
+        await Task.makeInfallible(~promise=() => Promise.resolve(2), ~onError=_ => -99)
         ->Task.map(i => i * 2)
         ->Task.map(i => i * 3)
         ->Task.map(i => `It is ${i->Belt.Int.toString}`)
         ->Task.toPromise
-      result == Ok("It is 12")
+      result == "It is 12"
     },
   ),
   T.makeAsync(
     ~category="Task",
-    ~title="toResult",
-    ~expectation="when promise fails => Error",
+    ~title="makeResult",
+    ~expectation="when promise succeeds, return Ok",
     ~predicate=async () => {
-      let lazyPromise = async () => {
-        Js.Exn.raiseError("failed")->ignore
-        await Promise.resolve(true)
-      }
-      let result = await lazyPromise->Task.make->Task.toPromise
+      let result = await Task.make(() => Promise.resolve(11))->Task.toPromise
+      result == Ok(11)
+    },
+  ),
+  T.makeAsync(
+    ~category="Task",
+    ~title="makeResult",
+    ~expectation="when promise fails, return Error",
+    ~predicate=async () => {
+      let result = await Task.make(() => Promise.reject(BadInput))->Task.toPromise
       result->Belt.Result.isError
     },
   ),
   T.makeAsync(
     ~category="Task",
-    ~title="mapError",
-    ~expectation="when promise fails => Error with mapping",
+    ~title="makeResult",
+    ~expectation="when promise fails, ensure exn details inside Error",
     ~predicate=async () => {
-      let lazyPromise = async () => {
-        Js.Exn.raiseError("failed")->ignore
-        await Promise.resolve(true)
-      }
-      let result =
-        await lazyPromise
-        ->Task.make
-        ->Task.mapError(_ => 2)
-        ->Task.mapError(i => i * 3)
-        ->Task.toPromise
-      result == Error(6)
+      let result = await Task.make(() => Promise.reject(BadInput))->Task.toPromise
+      result == Error(BadInput)
     },
   ),
-  // T.makeAsync(
-  //   ~category="Task",
-  //   ~title="mapError",
-  //   ~expectation="when promise fails, receive original error to map",
-  //   ~predicate=async () => {
-  //     let lazyPromise = async () => {
-  //       Js.Exn.raiseError("failed")->ignore
-  //       await Promise.resolve(true)
-  //     }
-  //     let result =
-  //       await lazyPromise
-  //       ->Task.make
-  //       ->Task.mapError(i => i->Js.Exn.asJsExn->Option.flatMap(e => e->Js.Exn.message))
-  //       ->Task.toPromise
-  //     Js.Console.log(result)
-  // result == Error(Some("elephant"))
-  // },
-  // ),
 ]

@@ -1,5 +1,7 @@
-type t<'ok, 'err>
-let make: (unit => promise<'ok>) => t<'ok, exn>
-let map: (t<'okA, 'err>, 'okA => 'okB) => t<'okB, 'err>
-let mapError: (t<'ok, 'errA>, 'errA => 'errB) => t<'ok, 'errB>
-let toPromise: t<'ok, 'err> => promise<result<'ok, 'err>>
+type t<'a>
+let makeInfallible: (~promise: unit => promise<'a>, ~onError: exn => 'a) => t<'a>
+let make: (unit => promise<'a>) => t<result<'a, exn>>
+let map: (t<'a>, 'a => 'b) => t<'b>
+let flatMap: (t<'a>, 'a => t<'b>) => t<'b>
+let mapError: (t<result<'a, 'errA>>, 'errA => 'errB) => t<result<'a, 'errB>>
+let toPromise: t<'a> => promise<'a>
