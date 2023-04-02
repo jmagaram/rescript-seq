@@ -1,6 +1,16 @@
 # Rescript Extras
 
-Useful general-purpose functions and modules for [Rescript](https://rescript-lang.org) projects. Includes extensions to `Option`, `Result`, and `Array` as well as additional module `Cmp`, `CmpUtilities`, `Task`, and `Test`.
+General-purpose functions and modules for [Rescript](https://rescript-lang.org) projects. Includes extensions to `Option`, `Result`, and `Array` as well as additional module `Cmp`, `CmpUtilities`, `Task`, and `Test`.
+
+## Install
+
+1. `npm install @jmagaram/rescript-extras`
+2. Add `@jmagaram/rescript-extras` to `bs-dependencies` in your `bsconfig.json`
+3. In your code, `module E = Extras`
+
+## Task
+
+Inspired by `fp-ts`, a `Task` is a lazy promise. Transform it before execution with **`map`** and **`mapError`**. When ready to execute, call **`toPromise`**.
 
 ## Option
 
@@ -30,10 +40,6 @@ Transform the error with **`mapError`**.
 
 Create a result from a function that may fail with **`fromTryCatch`**.
 
-## Task
-
-Inspired by `fp-ts`, a `Task` is a lazy promise. Transform it before execution with **`map`** and **`mapError`**. When ready to use it, call **`toPromise`**.
-
 ## Cmp and CmpUtilities
 
 The `Cmp.t` is the `('a,'a) => int` comparison function. Comparison utilities such as as **`eq`**, **`neq`**, **`lt`**, **`gte`**, **`min`**, **`max`**, etc. General a comparator **`fromMap`** or **`reverse`** the direction.
@@ -43,7 +49,3 @@ The `Cmp.t` is the `('a,'a) => int` comparison function. Comparison utilities su
 ## Test runner
 
 Super-simple test runner. Make tests using **`make`** and **`makeAsync`**. Run them using **`runSuite`**.
-
-## Install
-
-For now this is only hosted on GitHub - haven't figured out how to get it on npmjs.com yet. You can create an `.npmrc` file in the root of your project with `@jmagaram:registry=https://npm.pkg.github.com` it in. Then add `@jmagaram/rescript-extras` to your `package.json` file.
