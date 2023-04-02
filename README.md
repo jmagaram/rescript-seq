@@ -10,7 +10,7 @@ General-purpose modules for [Rescript](https://rescript-lang.org) projects. Incl
 
 ## Task
 
-Inspired by `fp-ts`, a `Task` is a lazy promise. Transform it before execution with **`map`** and **`mapError`**. When ready to execute, call **`toPromise`**.
+Inspired by [TaskEither in fp-ts](https://gcanti.github.io/fp-ts/modules/TaskEither.ts.html), a `Task` is a lazy promise that always returns an `Error` or an `Ok` and never throws. Just like a regular `result`, transform it before execution with **`map`** and **`mapError`**. When ready to execute, call **`toPromise`**.
 
 ## Option
 
