@@ -43,3 +43,7 @@ The `Cmp.t` is the `('a,'a) => int` comparison function. Comparison utilities su
 ## Test runner
 
 Super-simple test runner. Make tests using **`make`** and **`makeAsync`**. Run them using **`runSuite`**.
+
+## Install
+
+For now this is only hosted on GitHub - haven't figured out how to get it on npmjs.com yet. You can create an `.npmrc` file in the root of your project with `@jmagaram:registry=https://npm.pkg.github.com` it in. Then add `@jmagaram/rescript-extras` to your `package.json` file.
