@@ -17,8 +17,5 @@
   "license": "ISC",
   "dependencies": {
     "rescript": "^10.1.4"
-  },
-  "publishConfig": {
-    "@jmagaram:registry": "https://npm.pkg.github.com"
   }
 }
