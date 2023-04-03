@@ -17,6 +17,4 @@ let map = (t, f, ()) => t()->Promise.then(r => f(r)->Promise.resolve)
 let mapError = (t, f, ()) => t()->Promise.then(r => r->Extras__Result.mapError(f)->Promise.resolve)
 let mapOk = (t, f, ()) => t()->Promise.then(r => r->Belt.Result.map(f)->Promise.resolve)
 
-let flatMap = (t, m, ()) => t()->Promise.then(r => m(r)())
-
 let toPromise = t => t()
