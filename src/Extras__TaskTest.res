@@ -14,16 +14,16 @@ let makeTest = (~title, ~expectation, ~a, ~b) =>
 
 let tests = [
   makeTest(
-    ~title="make",
+    ~title="makeResult",
     ~expectation="when promise succeeds, return Ok",
-    ~a=() => Task.make(~promise=() => Promise.resolve(11), ~onError=_ => 3),
+    ~a=() => Task.makeResult(~promise=() => Promise.resolve(11), ~onError=_ => 3),
     ~b=Ok(11),
   ),
   makeTest(
-    ~title="make",
+    ~title="makeResult",
     ~expectation="when promise fails with ReScript exception, return Error with onError processing exn",
     ~a=() =>
-      Task.make(
+      Task.makeResult(
         ~promise=() => Promise.resolve("abc")->Promise.then(_ => raise(OutOfRange(4))),
         ~onError=e =>
           switch e {
@@ -34,10 +34,10 @@ let tests = [
     ~b=Error(8),
   ),
   makeTest(
-    ~title="make",
+    ~title="makeResult",
     ~expectation="when promise fails with JavaScript exception, return Error with onError processing exn",
     ~a=() =>
-      Task.make(
+      Task.makeResult(
         ~promise=() => Promise.resolve("abc")->Promise.then(_ => Js.Exn.raiseError("failure!")),
         ~onError=e =>
           switch e->message {
@@ -48,16 +48,16 @@ let tests = [
     ~b=Error(99),
   ),
   makeTest(
-    ~title="makeInfallible",
+    ~title="makeNeverFail",
     ~expectation="when promise succeeds, return value",
-    ~a=() => Task.makeInfallible(~promise=() => Promise.resolve(11), ~onError=_ => 3),
+    ~a=() => Task.makeNeverFail(~promise=() => Promise.resolve(11), ~onError=_ => 3),
     ~b=11,
   ),
   makeTest(
-    ~title="makeInfallible",
+    ~title="makeNeverFail",
     ~expectation="when promise fails with ReScript exception, return value after onError processes exn",
     ~a=() =>
-      Task.makeInfallible(
+      Task.makeNeverFail(
         ~promise=() => Promise.resolve(888)->Promise.then(_ => raise(OutOfRange(4))),
         ~onError=e =>
           switch e {
@@ -68,10 +68,10 @@ let tests = [
     ~b=8,
   ),
   makeTest(
-    ~title="makeInfallible",
+    ~title="makeNeverFail",
     ~expectation="when promise fails with JavaScript exception, return value after onError processes exn",
     ~a=() =>
-      Task.makeInfallible(
+      Task.makeNeverFail(
         ~promise=() => Promise.resolve(-76)->Promise.then(_ => Js.Exn.raiseError("failure!")),
         ~onError=e =>
           switch e->message {
@@ -85,7 +85,7 @@ let tests = [
     ~title="map",
     ~expectation="when promise succeeds, return value mapped",
     ~a=() =>
-      Task.makeInfallible(~promise=() => Promise.resolve(2), ~onError=_ => -99)
+      Task.makeNeverFail(~promise=() => Promise.resolve(2), ~onError=_ => -99)
       ->Task.map(i => i * 2)
       ->Task.map(i => i * 3)
       ->Task.map(i => `It is ${i->Belt.Int.toString}`),
@@ -95,14 +95,16 @@ let tests = [
     ~title="mapOk",
     ~expectation="when promise succeeds, return Ok mapped",
     ~a=() =>
-      Task.make(~promise=() => Promise.resolve(11), ~onError=_ => "abc")->Task.mapOk(i => i * 2),
+      Task.makeResult(~promise=() => Promise.resolve(11), ~onError=_ => "abc")->Task.mapOk(i =>
+        i * 2
+      ),
     ~b=Ok(22),
   ),
   makeTest(
     ~title="mapError",
     ~expectation="when promise fails, return Error mapped",
     ~a=() =>
-      Task.make(
+      Task.makeResult(
         ~promise=() => Promise.resolve(11)->Promise.then(_ => raise(OutOfRange(4))),
         ~onError=_ => 3,
       )

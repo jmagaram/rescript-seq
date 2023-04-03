@@ -4,10 +4,10 @@ type t<'a> = unit => promise<'a>
 
 external toExn: 'a => exn = "%identity"
 
-let makeInfallible = (~promise, ~onError, ()) =>
+let makeNeverFail = (~promise, ~onError, ()) =>
   promise()->Promise.catch(e => e->toExn->onError->Promise.resolve)
 
-let make = (~promise, ~onError, ()) =>
+let makeResult = (~promise, ~onError, ()) =>
   promise()
   ->Promise.then(ok => Ok(ok)->Promise.resolve)
   ->Promise.catch(err => err->toExn->onError->Error->Promise.resolve)
