@@ -7,6 +7,10 @@ type t = {
   predicate: unit => promise<bool>,
 }
 
+let category = i => i.category
+let title = i => i.title
+let expectation = i => i.expectation
+
 type summary = {
   pass: int,
   fail: int,

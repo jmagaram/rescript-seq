@@ -2,6 +2,10 @@ type t
 
 let make: (~category: string, ~title: string, ~expectation: string, ~predicate: unit => bool) => t
 
+let category: t => string
+let title: t => string
+let expectation: t => string
+
 let makeAsync: (
   ~category: string,
   ~title: string,
