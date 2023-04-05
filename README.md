@@ -24,7 +24,7 @@ Combine two options with **`concat`** and **`map2`**.
 
 Generate an array from a generator function using **`fromSeed`**, similar to `unfold` in other standard libraries.
 
-In pipeline mode, easily create an array **`fromOneValue`**
+Various utilities like **`pairwise`**, **`tail`**, **`head`**, **`tail`**, **`lastIndex`**, **`isEmpty`**, and **`fromOneValue`**
 
 ## Result
 

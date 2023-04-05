@@ -13,5 +13,15 @@
     }
   ],
   "suffix": ".bs.js",
-  "bs-dependencies": []
+  "bs-dependencies": [],
+  "gentypeconfig": {
+    "language": "typescript",
+    "shims": {},
+    "generatedFileExtension": ".gen.tsx",
+    "module": "es6",
+    "debug": {
+      "all": false,
+      "basic": false
+    }
+  }
 }

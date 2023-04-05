@@ -1,3 +1,5 @@
+module Array = Belt.Array
+
 let push = Js.Array2.push
 
 let fromSeed = (state, generator) => {
@@ -23,3 +25,30 @@ let fromOption = opt =>
   | None => []
   | Some(i) => fromOneValue(i)
   }
+
+let isEmpty = xs => xs->Array.length == 0
+
+let head = xs => xs->Array.get(0)
+
+let last = xs =>
+  switch xs->isEmpty {
+  | true => None
+  | false => xs->Array.get(xs->Array.length - 1)
+  }
+
+let tail = xs =>
+  switch xs->Array.sliceToEnd(1) {
+  | [] => None
+  | _ as tail => Some(tail)
+  }
+
+let lastIndex = xs => xs->Array.length->(i => i == 0 ? None : Some(i - 1))
+
+let pairwise = xs => {
+  switch xs->lastIndex {
+  | None
+  | Some(0) => []
+  | Some(last) =>
+    Array.init(last, i => (xs->Js.Array2.unsafe_get(i), xs->Js.Array2.unsafe_get(i + 1)))
+  }
+}

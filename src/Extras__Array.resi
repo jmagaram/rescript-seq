@@ -1,3 +1,9 @@
 let fromSeed: ('state, 'state => option<('a, 'state)>) => array<'a>
 let fromOption: option<'a> => array<'a>
 @val external fromOneValue: 'a => array<'a> = "Array.of"
+let isEmpty: array<'a> => bool
+let head: array<'a> => option<'a>
+let last: array<'a> => option<'a>
+let lastIndex: array<'a> => option<int>
+let tail: array<'a> => option<array<'a>>
+let pairwise: array<'a> => array<('a, 'a)>

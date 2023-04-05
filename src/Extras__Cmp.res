@@ -1,3 +1,4 @@
+@genType
 type t<'a> = ('a, 'a) => int
 
 let eval = (t, x, y) => t(x, y)

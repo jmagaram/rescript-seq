@@ -1,3 +1,4 @@
+@genType
 type t
 
 let make: (~category: string, ~title: string, ~expectation: string, ~predicate: unit => bool) => t
