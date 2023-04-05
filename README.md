@@ -26,9 +26,7 @@ An array that must have at least one item in it. All the usual functions like **
 
 ## Array
 
-Generate an array from a generator function using **`fromSeed`**, similar to `unfold` in other standard libraries.
-
-Various utilities like **`pairwise`**, **`tail`**, **`head`**, **`tail`**, **`lastIndex`**, **`isEmpty`**, **`prepend`**, and **`fromOneValue`**
+Generate an array from a generator function using **`fromSeed`**, similar to `unfold` in other standard libraries. Various utilities like **`pairwise`**, **`tail`**, **`head`**, **`tail`**, **`lastIndex`**, **`isEmpty`**, **`prepend`**, and **`fromOneValue`**
 
 ## Result
 
