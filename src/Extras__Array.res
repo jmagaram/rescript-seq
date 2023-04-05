@@ -53,3 +53,5 @@ let pairs = xs => {
     Array.init(last, i => (xs->Js.Array2.unsafe_get(i), xs->Js.Array2.unsafe_get(i + 1)))
   }
 }
+
+let prepend = (a, b) => Js.Array2.concat(b, a)

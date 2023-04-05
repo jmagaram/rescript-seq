@@ -8,3 +8,4 @@ let head: array<'a> => option<'a>
 let last: array<'a> => option<'a>
 let lastIndex: array<'a> => option<int>
 let pairs: array<'a> => array<('a, 'a)>
+let prepend: (array<'a>, array<'a>) => array<'a>

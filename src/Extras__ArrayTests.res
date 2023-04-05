@@ -87,6 +87,12 @@ let others = {
       ~a=() => [1, 2]->A.exactlyOneValue,
       ~b=None,
     ),
+    test(
+      ~title="prepend",
+      ~expect="concats to the beginning",
+      ~a=() => [3, 4, 5]->A.prepend([1, 2]),
+      ~b=[1, 2, 3, 4, 5],
+    ),
   ]
 }
 
