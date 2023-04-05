@@ -13,3 +13,5 @@ let last: t<'a> => 'a
 let reduce: (t<'a>, ('a, 'a) => 'a) => 'a
 let maxBy: (t<'a>, Cmp.t<'a>) => 'a
 let minBy: (t<'a>, Cmp.t<'a>) => 'a
+let concat: (t<'a>, t<'a>) => t<'a>
+let concatArray: (t<'a>, array<'a>) => t<'a>

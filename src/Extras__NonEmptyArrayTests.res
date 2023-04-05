@@ -66,4 +66,10 @@ let tests = [
     ~a=() => oneTwoThree->NEA.minBy((i, j) => i < j ? -1 : i > j ? 1 : 0),
     ~b=1,
   ),
+  expectEq(
+    ~title="concat",
+    ~expectation="",
+    ~a=() => oneTwoThree->NEA.concat(oneTwoThree)->NEA.toArray,
+    ~b=[1, 2, 3, 1, 2, 3],
+  ),
 ]

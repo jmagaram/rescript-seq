@@ -31,3 +31,6 @@ let reduce = (xs, f) =>
 
 let minBy = (xs, cmp) => xs->reduce((i, j) => Cmp.min(cmp, i, j))
 let maxBy = (xs, cmp) => xs->reduce((i, j) => Cmp.max(cmp, i, j))
+
+let concat = (a, b) => Js.Array2.concat(a->unwrap, b->unwrap)->NonEmptyArray
+let concatArray = (a, b) => Js.Array2.concat(a->unwrap, b)->NonEmptyArray
