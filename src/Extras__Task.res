@@ -1,5 +1,6 @@
 module Promise = Js.Promise2
 
+@genType
 type t<'a> = unit => promise<'a>
 
 external toExn: 'a => exn = "%identity"

@@ -1,3 +1,4 @@
+@genType
 type t = int
 external make: int => t = "%identity"
 external toInt: t => int = "%identity"

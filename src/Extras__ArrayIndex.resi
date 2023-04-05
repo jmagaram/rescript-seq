@@ -1,4 +1,4 @@
-@genType
+@genType.ignoreInterface
 type t
 external toInt: t => int = "%identity"
 external make: int => t = "%identity"
