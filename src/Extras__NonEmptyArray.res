@@ -16,6 +16,8 @@ external fromArrayUnsafe: array<'a> => t<'a> = "%identity"
 
 let fromArrayExn = xs => xs->fromArray->O.getExn
 
+let fromOneValue = v => [v]->fromArrayUnsafe
+
 external toArray: t<'a> => array<'a> = "%identity"
 
 let map = (xs, f) => xs->unwrap->Js.Array2.map(f)->NonEmptyArray

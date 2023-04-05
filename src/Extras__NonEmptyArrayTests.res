@@ -72,4 +72,10 @@ let tests = [
     ~a=() => oneTwoThree->NEA.concat(oneTwoThree)->NEA.toArray,
     ~b=[1, 2, 3, 1, 2, 3],
   ),
+  expectEq(
+    ~title="fromOneValue",
+    ~expectation="",
+    ~a=() => 4->NEA.fromOneValue->NEA.toArray,
+    ~b=[4],
+  ),
 ]

@@ -3,6 +3,7 @@ module Cmp = Extras__Cmp
 type t<'a>
 
 let fromArray: array<'a> => option<t<'a>>
+let fromOneValue: 'a => t<'a>
 external fromArrayUnsafe: array<'a> => t<'a> = "%identity"
 let fromArrayExn: array<'a> => t<'a>
 external toArray: t<'a> => array<'a> = "%identity"
