@@ -1,6 +1,6 @@
 # ReScript Extras
 
-General-purpose modules for [ReScript](https://rescript-lang.org) projects. Includes extensions to `Option`, `Result`, and `Array`. Provides a lazy-promise `Task` and `TaskResult`, comparison utilities in `Cmp`, and a very simple test runner `Test`. To install:
+General-purpose modules for [ReScript](https://rescript-lang.org) projects. Includes extensions to `Option`, `Result`, and `Array`. Provides a lazy-promise `Task` and `TaskResult`, `NonEmptyArray`, comparison utilities in `Cmp`, and a very simple test runner `Test`. To install:
 
 1. `npm install @jmagaram/rescript-extras`
 2. Add `@jmagaram/rescript-extras` to `bs-dependencies` in your `bsconfig.json`
@@ -19,6 +19,10 @@ Create an option from a function that may fail using **`fromTryCatch`**.
 Combine two options with **`concat`** and **`map2`**.
 
 "Add" an option to a regular value using **`fold`** and **`foldBack`**.
+
+## NonEmptyArray
+
+An array that must have at least one item in it. All the usual functions like **`reduce`**, **`maxBy`**, **`minBy`**, **`map`**, **`mapi`**, **`head`**, etc.
 
 ## Array
 
