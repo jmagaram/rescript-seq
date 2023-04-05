@@ -27,6 +27,13 @@ let fromOption = opt =>
   }
 
 let isEmpty = xs => xs->Array.length == 0
+let isNotEmpty = xs => xs->Array.length > 0
+
+let exactlyOneValue = xs =>
+  switch xs->Array.length {
+  | 1 => xs->Js.Array2.unsafe_get(0)->Some
+  | _ => None
+  }
 
 let head = xs => xs->Array.get(0)
 
@@ -36,15 +43,9 @@ let last = xs =>
   | false => xs->Array.get(xs->Array.length - 1)
   }
 
-let tail = xs =>
-  switch xs->Array.sliceToEnd(1) {
-  | [] => None
-  | _ as tail => Some(tail)
-  }
-
 let lastIndex = xs => xs->Array.length->(i => i == 0 ? None : Some(i - 1))
 
-let pairwise = xs => {
+let pairs = xs => {
   switch xs->lastIndex {
   | None
   | Some(0) => []
