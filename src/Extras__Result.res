@@ -35,13 +35,13 @@ let fromTryCatchWith = (f, m) => {
 
 let fromTryCatch = f => fromTryCatchWith(f, i => i)
 
-let ok = r =>
+let toOption = r =>
   switch r {
   | Ok(ok) => Some(ok)
   | Error(_) => None
   }
 
-let error = r =>
+let getError = r =>
   switch r {
   | Ok(_) => None
   | Error(e) => Some(e)

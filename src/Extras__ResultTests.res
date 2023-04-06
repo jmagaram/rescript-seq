@@ -75,29 +75,35 @@ let fromTryCatch = [
   ),
 ]
 
-let ok = [
-  expectEqual(~title="ok", ~expectation="when Ok, return Some", ~a=() => Ok(4)->R.ok, ~b=Some(4)),
+let toOption = [
   expectEqual(
-    ~title="ok",
+    ~title="toOption",
+    ~expectation="when Ok, return Some",
+    ~a=() => Ok(4)->R.toOption,
+    ~b=Some(4),
+  ),
+  expectEqual(
+    ~title="toOption",
     ~expectation="when Error, return None",
-    ~a=() => Error(4)->R.ok,
+    ~a=() => Error(4)->R.toOption,
     ~b=None,
   ),
 ]
 
-let error = [
+let getError = [
   expectEqual(
-    ~title="error",
+    ~title="getError",
     ~expectation="when Ok, return None",
-    ~a=() => Ok(4)->R.error,
+    ~a=() => Ok(4)->R.getError,
     ~b=None,
   ),
   expectEqual(
-    ~title="error",
+    ~title="getError",
     ~expectation="when Error, return Some",
-    ~a=() => Error(4)->R.error,
+    ~a=() => Error(4)->R.getError,
     ~b=Some(4),
   ),
 ]
 
-let allTests = [ok, error, fromTryCatch, fromArray, fromArrayMap, mapError]->Array.concatMany
+let allTests =
+  [toOption, getError, fromTryCatch, fromArray, fromArrayMap, mapError]->Array.concatMany
