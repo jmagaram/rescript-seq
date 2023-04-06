@@ -1,12 +1,43 @@
 module T = Extras__Test
 module C = Extras__Cmp
+module A = Belt.Array
 
 type person = {name: string, age: int}
 
 let inOrder = (cmp, a, b) => cmp(a, b) == -1 && cmp(b, a) == 1
 let isEqual = (cmp, a, b) => cmp(a, b) == 0 && cmp(b, a) == 0
 
-let tests = [
+let lessThanTests = (~small, ~big, ~cmp) => {
+  let make = (~title, ~isTrue) =>
+    T.make(~category="Cmp", ~title, ~expectation="when different", ~predicate=() => isTrue)
+  [
+    make(~title="lt", ~isTrue=C.lt(cmp, small, big)),
+    make(~title="lte", ~isTrue=C.lte(cmp, small, big)),
+    make(~title="gt", ~isTrue=C.gt(cmp, big, small)),
+    make(~title="gte", ~isTrue=C.gte(cmp, big, small)),
+    make(~title="neq", ~isTrue=C.neq(cmp, big, small)),
+    make(~title="eq", ~isTrue=C.eq(cmp, big, small) == false),
+    make(~title="min", ~isTrue=C.min(cmp, big, small) == small),
+    make(~title="max", ~isTrue=C.max(cmp, big, small) == big),
+  ]
+}
+
+let areSameTests = (~a, ~b, ~cmp) => {
+  let make = (~title, ~isTrue) =>
+    T.make(~category="Cmp", ~title, ~expectation="when same", ~predicate=() => isTrue)
+  [
+    make(~title="lt", ~isTrue=false == C.lt(cmp, a, b)),
+    make(~title="lte", ~isTrue=C.lte(cmp, a, b)),
+    make(~title="gt", ~isTrue=false == C.gt(cmp, a, b)),
+    make(~title="gte", ~isTrue=C.gte(cmp, a, b)),
+    make(~title="neq", ~isTrue=false == C.neq(cmp, a, b)),
+    make(~title="eq", ~isTrue=C.eq(cmp, a, b)),
+    make(~title="min", ~isTrue=C.min(cmp, a, b) == a),
+    make(~title="max", ~isTrue=C.max(cmp, a, b) == a),
+  ]
+}
+
+let otherTests = [
   T.make(~category="Cmp", ~title="fromMap", ~expectation="", ~predicate=() => {
     let target = C.fromMap(i => i.age, C.int)
     let bob = {name: "bob", age: 3}
@@ -28,3 +59,14 @@ let tests = [
     inOrder(C.bool, false, true) && isEqual(C.bool, false, false)
   }),
 ]
+
+let tests =
+  [
+    lessThanTests(~small=1, ~big=99, ~cmp=C.int),
+    lessThanTests(~small=1, ~big=99, ~cmp=C.int),
+    lessThanTests(~small="a", ~big="b", ~cmp=C.string),
+    areSameTests(~a=1.0, ~b=1.0, ~cmp=C.float),
+    areSameTests(~a=1, ~b=1, ~cmp=C.int),
+    areSameTests(~a="abc", ~b="abc", ~cmp=C.string),
+    otherTests,
+  ]->A.concatMany
