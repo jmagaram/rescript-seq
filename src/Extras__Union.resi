@@ -18,10 +18,6 @@ module Make4: (
   type b = P.B.t
   type c = P.C.t
   type d = P.D.t
-  let toA: 'a => option<a>
-  let toB: 'a => option<b>
-  let toC: 'a => option<c>
-  let toD: 'a => option<d>
   let fromA: a => t
   let fromB: b => t
   let fromC: c => t
@@ -43,9 +39,6 @@ module Make3: (
   type a = P.A.t
   type b = P.B.t
   type c = P.C.t
-  let toA: 'a => option<a>
-  let toB: 'a => option<b>
-  let toC: 'a => option<c>
   let fromA: a => t
   let fromB: b => t
   let fromC: c => t
@@ -63,8 +56,6 @@ module Make2: (
   type t
   type a = P.A.t
   type b = P.B.t
-  let toA: 'a => option<a>
-  let toB: 'a => option<b>
   let fromA: a => t
   let fromB: b => t
   let make: 'a => option<t>
