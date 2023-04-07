@@ -13,6 +13,7 @@ let summary =
     Extras__TaskResultTests.tests,
     Extras__NonEmptyArrayTests.tests,
     Extras__LiteralTests.tests,
+    Extras__UnionTests.tests,
   ]
   ->Array.concatMany
   ->Extras__Test.runSuite(~filter)
