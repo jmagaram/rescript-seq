@@ -39,9 +39,9 @@ module Make3: (
   type a = P.A.t
   type b = P.B.t
   type c = P.C.t
-  let fromA: a => t
-  let fromB: b => t
-  let fromC: c => t
+  external fromA: a => t = "%identity"
+  external fromB: b => t = "%identity"
+  external fromC: c => t = "%identity"
   let make: 'a => option<t>
   let match: ('a, ~onA: a => 'res, ~onB: b => 'res, ~onC: c => 'res) => 'res
   let equals: (t, t) => bool
@@ -56,8 +56,8 @@ module Make2: (
   type t
   type a = P.A.t
   type b = P.B.t
-  let fromA: a => t
-  let fromB: b => t
+  external fromA: a => t = "%identity"
+  external fromB: b => t = "%identity"
   let make: 'a => option<t>
   let match: ('a, ~onA: a => 'res, ~onB: b => 'res) => 'res
   let equals: (t, t) => bool
