@@ -14,22 +14,23 @@ Inspired by [TaskEither in fp-ts](https://gcanti.github.io/fp-ts/modules/TaskEit
 
 ReScript uses tagged unions to discriminate between kinds in a variant. The **`Union`** module provides functors to create **untagged** unions of 2, 3, or 4 items. Capabilities:
 
-- Discriminate on any programmable criteria, like `typeof`, `instance of`, lightweight shape detection (such as a tag), or full-blown validation with a JSON parsing library.
-- Can be used for purely untagged unions, as well as unions tagged differently than how ReScript does it.
+- Discriminate on any programmable criteria, like `typeof`, `instance of`, lightweight shape detection (such as a tag), or validation with a JSON parsing library.
+- Can be used with untagged unions or unions tagged differently than how ReScript does it.
+- All types can participate in a union, including literals.
 - Pattern matching
-- Custom equality implementation
+- Custom equality
 - Type safety
 
-The disadvantages over compiler support for this feature are:
+This implementation does not have any specific compiler support and so there are some limitations:
 
 - Pattern matching must rely on a `match` function, not the usual matching syntax.
-- Each case is distinguished a `A` | `B` | `C` | `D`, not terms the user defines. This can be fixed by extending or wrapping the module.
+- Each case is distinguished by `A` | `B` | `C` | `D`, not terms the user defines. This can be improved by extending or wrapping the module.
 - Literal support and functors are a bit cumbersome
 - No genType support
 
 ## Literal
 
-Functors to create **`Literal`** types of various kinds using functors like **`MakeString`** and **`MakeInt`**. Includes built-in literals for `True`, `False`, `Null`, and `Undefined`. You create literals from reference types and provide a custom equality operator. Type safe; if you have a type that requires a "yes" you can't just pass any string in.
+Functors to create **`Literal`** types of various kinds using **`MakeString`** and **`MakeInt`** and others. Includes built-in literals for `True`, `False`, `Null`, and `Undefined`. You create literals from reference types and provide a custom equality operator. Completely type safe because each literal is its own unique type; if you have a type that requires a "yes" you can't just provide a string.
 
 ## Option
 
