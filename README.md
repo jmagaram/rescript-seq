@@ -28,7 +28,7 @@ The disadvantages over compiler support for this feature are:
 
 ## Literal
 
-Functors to create **`Literal`** types of various kinds using functors like **`MakeString`** and **`MakeInt`**. Includes built-in literals for `True`, `False`, `Null`, and `Undefined`. You create literals from reference types and provide a custom equality operator.
+Functors to create **`Literal`** types of various kinds using functors like **`MakeString`** and **`MakeInt`**. Includes built-in literals for `True`, `False`, `Null`, and `Undefined`. You create literals from reference types and provide a custom equality operator. Type safe; if you have a type that requires a "yes" you can't just pass any string in.
 
 ## Option
 
