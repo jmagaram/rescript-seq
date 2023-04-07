@@ -23,9 +23,9 @@ type typeof = [
 ]
 
 /**
-`toUnknown` convert any type to `unknown`, forcing users of that value to test its contents before using it.
+`make` convert any type to `unknown`, forcing users of that value to test its contents before using it.
 */
-external toUnknown: 'a => unknown = "%identity"
+external make: 'a => unknown = "%identity"
 
 /**
 `typeof(value)` returns the underlying JavaScript type of `value` at runtime. **Note** null values return `object`. See [typeof on MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/typeof)

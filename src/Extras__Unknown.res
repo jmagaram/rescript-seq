@@ -1,7 +1,7 @@
 type unknown
 type t = unknown
 
-external toUnknown: 'a => unknown = "%identity"
+external make: 'a => unknown = "%identity"
 
 type typeof = [
   | #undefined
