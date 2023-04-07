@@ -12,13 +12,7 @@ Inspired by [TaskEither in fp-ts](https://gcanti.github.io/fp-ts/modules/TaskEit
 
 ## Option
 
-Existential quanitifiers **`isSomeAnd`** and **`isNoneOr`**.
-
-Create an option from a function that may fail using **`fromTryCatch`**.
-
-Combine two options with **`concat`** and **`map2`**.
-
-"Add" an option to a regular value using **`fold`** and **`foldBack`**.
+Existential quanitifiers **`isSomeAnd`** and **`isNoneOr`**. Create an option from a function that may fail using **`fromTryCatch`**. Combine two options with **`concat`** and **`map2`**. "Add" an option to a regular value using **`fold`** and **`foldBack`**. Lazy forms such as **`orElseWith`**.
 
 ## NonEmptyArray
 

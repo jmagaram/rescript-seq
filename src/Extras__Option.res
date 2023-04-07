@@ -58,3 +58,9 @@ let map2 = (a, b, m) =>
   | (Some(a), Some(b)) => Some(m(a, b))
   | _ => None
   }
+
+let orElseWith = (a, b) =>
+  switch a {
+  | Some(_) as a => a
+  | _ => b()
+  }

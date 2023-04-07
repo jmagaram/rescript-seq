@@ -153,4 +153,16 @@ let tests = [
     ~expectation="when one is Some => None",
     ~predicate=() => O.map2(None, Some(1), add) == None,
   ),
+  T.make(
+    ~category="Option",
+    ~title="orElseWith",
+    ~expectation="when first is Some, return it",
+    ~predicate=() => O.orElseWith(Some(1), () => Some(2)) == Some(1),
+  ),
+  T.make(
+    ~category="Option",
+    ~title="orElseWith",
+    ~expectation="when first is None, return lazy second",
+    ~predicate=() => O.orElseWith(None, () => Some(2)) == Some(2),
+  ),
 ]
