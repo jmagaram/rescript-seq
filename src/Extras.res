@@ -8,3 +8,4 @@ module Task = Extras__Task
 module TaskResult = Extras__TaskResult
 module Unknown = Extras__Unknown
 module Literal = Extras__Literal
+module Union = Extras__Union
