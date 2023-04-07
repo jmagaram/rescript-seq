@@ -8,7 +8,7 @@ module type Pattern = {
   let equals: (t, t) => bool
 }
 
-module PatternUtilities = (P: Pattern) => {
+module PatternTools = (P: Pattern) => {
   let make = x => x->Unknown.make->P.isTypeOf ? Some((Obj.magic(x): P.t)) : None
   let eq = (x, y) => x->make->Option.flatMap(x => y->make->Option.map(y => P.equals(x, y)))
 }
@@ -27,10 +27,10 @@ module Make4 = (
   type c = P.C.t
   type d = P.D.t
 
-  module A_Utils = PatternUtilities(P.A)
-  module B_Utils = PatternUtilities(P.B)
-  module C_Utils = PatternUtilities(P.C)
-  module D_Utils = PatternUtilities(P.D)
+  module A_Tools = PatternTools(P.A)
+  module B_Tools = PatternTools(P.B)
+  module C_Tools = PatternTools(P.C)
+  module D_Tools = PatternTools(P.D)
 
   let fromA = (value: a): t => Obj.magic(value)
   let fromB = (value: b): t => Obj.magic(value)
@@ -39,29 +39,29 @@ module Make4 = (
 
   let make = value =>
     value
-    ->A_Utils.make
+    ->A_Tools.make
     ->Option.map(fromA)
-    ->Option.orElse(value->B_Utils.make->Option.map(fromB))
-    ->Option.orElse(value->C_Utils.make->Option.map(fromC))
-    ->Option.orElse(value->D_Utils.make->Option.map(fromD))
+    ->Option.orElse(value->B_Tools.make->Option.map(fromB))
+    ->Option.orElse(value->C_Tools.make->Option.map(fromC))
+    ->Option.orElse(value->D_Tools.make->Option.map(fromD))
 
   let match = (value, ~onA, ~onB, ~onC, ~onD) =>
     switch value
-    ->A_Utils.make
+    ->A_Tools.make
     ->Option.map(onA)
-    ->Option.orElse(value->B_Utils.make->Option.map(onB))
-    ->Option.orElse(value->C_Utils.make->Option.map(onC))
-    ->Option.orElse(value->D_Utils.make->Option.map(onD)) {
+    ->Option.orElse(value->B_Tools.make->Option.map(onB))
+    ->Option.orElse(value->C_Tools.make->Option.map(onC))
+    ->Option.orElse(value->D_Tools.make->Option.map(onD)) {
     | Some(value) => value
     | None =>
       Js.Exn.raiseError("The value was unsafely cast and did not match any of the provided types.")
     }
 
   let equals = (x: t, y: t) =>
-    A_Utils.eq(x, y)
-    ->OptionEx.orElseWith(() => B_Utils.eq(x, y))
-    ->OptionEx.orElseWith(() => C_Utils.eq(x, y))
-    ->OptionEx.orElseWith(() => D_Utils.eq(x, y))
+    A_Tools.eq(x, y)
+    ->OptionEx.orElseWith(() => B_Tools.eq(x, y))
+    ->OptionEx.orElseWith(() => C_Tools.eq(x, y))
+    ->OptionEx.orElseWith(() => D_Tools.eq(x, y))
     ->Option.getWithDefault(false)
 }
 
