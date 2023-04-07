@@ -59,15 +59,15 @@ module MakeInt = (
 module MakeString = (
   C: {
     let value: string
-    let caseInsensitive: bool
     let trimmed: bool
+    let caseInsensitive: bool
   },
 ): (T with type domain := string) => {
   type t = string
   let normalize = {
     let trim = s => C.trimmed ? Js.String2.trim(s) : s
-    let toLowerCase = s => C.caseInsensitive ? Js.String2.toLocaleLowerCase(s) : s
-    s => s->trim->toLowerCase
+    let toLower = s => C.caseInsensitive ? Js.String2.toLocaleLowerCase(s) : s
+    s => s->trim->toLower
   }
   let value = C.value->normalize
   let isTypeOf = u =>
@@ -76,9 +76,3 @@ module MakeString = (
   let equals = (_x, _y) => true
   external unwrap: t => string = "%identity"
 }
-
-module Yes = MakeString({
-  let value = "yes"
-  let trimmed = true
-  let caseInsensitive = true
-})
