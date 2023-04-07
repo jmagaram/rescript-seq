@@ -4,14 +4,14 @@ module Unknown = Extras__Unknown
 
 module type Pattern = {
   type t
-  let isTypeOf: Unknown.t => bool // Accept 'a without error?
+  let isTypeOf: Unknown.t => bool
   let equals: (t, t) => bool
 }
 
-// module PatternUtilities = (P: Pattern) => {
-//   let toType = value => P.isTypeOf(value->Unknown.make) ? Some((Obj.magic(value): P.t)) : None
-//   let equals = (x: 'a, y: 'a) => true
-// }
+module PatternUtilities = (P: Pattern) => {
+  let make = x => x->Unknown.make->P.isTypeOf ? Some((Obj.magic(x): P.t)) : None
+  let eq = (x, y) => x->make->Option.flatMap(x => y->make->Option.map(y => P.equals(x, y)))
+}
 
 module Make4 = (
   P: {
@@ -27,10 +27,10 @@ module Make4 = (
   type c = P.C.t
   type d = P.D.t
 
-  let toA = value => P.A.isTypeOf(value->Unknown.make) ? Some((Obj.magic(value): a)) : None
-  let toB = value => P.B.isTypeOf(value->Unknown.make) ? Some((Obj.magic(value): b)) : None
-  let toC = value => P.C.isTypeOf(value->Unknown.make) ? Some((Obj.magic(value): c)) : None
-  let toD = value => P.D.isTypeOf(value->Unknown.make) ? Some((Obj.magic(value): d)) : None
+  module A_Utils = PatternUtilities(P.A)
+  module B_Utils = PatternUtilities(P.B)
+  module C_Utils = PatternUtilities(P.C)
+  module D_Utils = PatternUtilities(P.D)
 
   let fromA = (value: a): t => Obj.magic(value)
   let fromB = (value: b): t => Obj.magic(value)
@@ -39,29 +39,29 @@ module Make4 = (
 
   let make = value =>
     value
-    ->toA
+    ->A_Utils.make
     ->Option.map(fromA)
-    ->Option.orElse(value->toB->Option.map(fromB))
-    ->Option.orElse(value->toC->Option.map(fromC))
-    ->Option.orElse(value->toD->Option.map(fromD))
+    ->Option.orElse(value->B_Utils.make->Option.map(fromB))
+    ->Option.orElse(value->C_Utils.make->Option.map(fromC))
+    ->Option.orElse(value->D_Utils.make->Option.map(fromD))
 
   let match = (value, ~onA, ~onB, ~onC, ~onD) =>
     switch value
-    ->toA
+    ->A_Utils.make
     ->Option.map(onA)
-    ->Option.orElse(value->toB->Option.map(onB))
-    ->Option.orElse(value->toC->Option.map(onC))
-    ->Option.orElse(value->toD->Option.map(onD)) {
+    ->Option.orElse(value->B_Utils.make->Option.map(onB))
+    ->Option.orElse(value->C_Utils.make->Option.map(onC))
+    ->Option.orElse(value->D_Utils.make->Option.map(onD)) {
     | Some(value) => value
     | None =>
       Js.Exn.raiseError("The value was unsafely cast and did not match any of the provided types.")
     }
 
   let equals = (x: t, y: t) =>
-    OptionEx.map2(toA(x), toA(y), P.A.equals)
-    ->OptionEx.orElseWith(() => OptionEx.map2(toB(x), toB(y), P.B.equals))
-    ->OptionEx.orElseWith(() => OptionEx.map2(toC(x), toC(y), P.C.equals))
-    ->OptionEx.orElseWith(() => OptionEx.map2(toD(x), toD(y), P.D.equals))
+    A_Utils.eq(x, y)
+    ->OptionEx.orElseWith(() => B_Utils.eq(x, y))
+    ->OptionEx.orElseWith(() => C_Utils.eq(x, y))
+    ->OptionEx.orElseWith(() => D_Utils.eq(x, y))
     ->Option.getWithDefault(false)
 }
 
