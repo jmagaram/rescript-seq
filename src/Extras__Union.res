@@ -32,10 +32,10 @@ module Make4 = (
   module C_Tools = PatternTools(P.C)
   module D_Tools = PatternTools(P.D)
 
-  let fromA: a => t = Obj.magic
-  let fromB: b => t = Obj.magic
-  let fromC: c => t = Obj.magic
-  let fromD: d => t = Obj.magic
+  external fromA: a => t = "%identity"
+  external fromB: b => t = "%identity"
+  external fromC: c => t = "%identity"
+  external fromD: d => t = "%identity"
 
   let make = value =>
     value

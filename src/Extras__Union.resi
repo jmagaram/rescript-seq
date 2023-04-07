@@ -18,10 +18,10 @@ module Make4: (
   type b = P.B.t
   type c = P.C.t
   type d = P.D.t
-  let fromA: a => t
-  let fromB: b => t
-  let fromC: c => t
-  let fromD: d => t
+  external fromA: a => t = "%identity"
+  external fromB: b => t = "%identity"
+  external fromC: c => t = "%identity"
+  external fromD: d => t = "%identity"
   let make: 'a => option<t>
   let match: ('a, ~onA: a => 'res, ~onB: b => 'res, ~onC: c => 'res, ~onD: d => 'res) => 'res
   let equals: (t, t) => bool
