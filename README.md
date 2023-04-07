@@ -25,6 +25,7 @@ The disadvantages over compiler support for this feature are:
 - Pattern matching must rely on a `match` function, not the usual matching syntax.
 - Each case is distinguished a `A` | `B` | `C` | `D`, not terms the user defines. This can be fixed by extending or wrapping the module.
 - Literal support and functors are a bit cumbersome
+- No genType support
 
 ## Literal
 
