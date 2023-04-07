@@ -50,6 +50,10 @@ Create a result from a function that may fail with **`fromTryCatch`**.
 
 Transform an error with **`mapError`**.
 
+## Unknown
+
+Similar to the `Types` module, includes functions to safely inspect unknown values like **`toString`** and **`toInt`** that returns an option. Can inspect properties on objects as well. Not intended for full-featured JSON parsing.
+
 ## Cmp and CmpUtilities
 
 The `Cmp.t` is the `('a,'a) => int` comparison function. Comparison utilities such as as **`eq`**, **`neq`**, **`lt`**, **`gte`**, **`min`**, **`max`**, etc. General a comparator **`fromMap`** or **`reverse`** the direction.
