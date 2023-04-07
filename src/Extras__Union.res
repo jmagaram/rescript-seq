@@ -2,23 +2,18 @@ module Option = Belt.Option
 module OptionEx = Extras__Option
 module Unknown = Extras__Unknown
 
-// When authoring a guard, it should use Unknown.t. When using a guard (passing
-// a value in), it should accept anything since anything can safely be
-// converted. Is something like this possible in the type system?
-type guard = Unknown.t => bool
-
-module type Validated = {
+module type Variant = {
   type t
-  let isTypeOf: Unknown.t => bool
+  let isTypeOf: Unknown.t => bool // Accept 'a without error?
   let equals: (t, t) => bool
 }
 
 module Make4 = (
   P: {
-    module A: Validated
-    module B: Validated
-    module C: Validated
-    module D: Validated
+    module A: Variant
+    module B: Variant
+    module C: Variant
+    module D: Variant
   },
 ) => {
   type t
@@ -67,9 +62,9 @@ module Make4 = (
 
 module Make3 = (
   P: {
-    module A: Validated
-    module B: Validated
-    module C: Validated
+    module A: Variant
+    module B: Variant
+    module C: Variant
   },
 ) => {
   type t
@@ -112,8 +107,8 @@ module Make3 = (
 
 module Make2 = (
   P: {
-    module A: Validated
-    module B: Validated
+    module A: Variant
+    module B: Variant
   },
 ) => {
   type t
