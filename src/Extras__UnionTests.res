@@ -34,7 +34,7 @@ module Example = Union.Make4({
   module D = NegativeOne
 })
 
-let tests = [
+let weirdExampleTests = [
   Test.make(
     ~category="Union",
     ~title="make",
@@ -125,3 +125,22 @@ let tests = [
     },
   ),
 ]
+
+module StringVariant = {
+  type t = string
+  let isTypeOf = u => u->Unknown.toString->Option.isSome
+  let equals = (x, y) => Js.String2.localeCompare(x, y) == 0.0
+}
+
+module IntVariant = {
+  type t = int
+  let isTypeOf = u => u->Unknown.typeof == #number
+  let equals = (x: int, y: int) => x == y
+}
+
+module StringOrInt = Union.Make2({
+  module A = StringVariant
+  module B = IntVariant
+})
+
+let tests = [weirdExampleTests]->Belt.Array.concatMany
