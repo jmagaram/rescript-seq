@@ -2,18 +2,23 @@ module Option = Belt.Option
 module OptionEx = Extras__Option
 module Unknown = Extras__Unknown
 
-module type Variant = {
+module type Pattern = {
   type t
   let isTypeOf: Unknown.t => bool // Accept 'a without error?
   let equals: (t, t) => bool
 }
 
+// module PatternUtilities = (P: Pattern) => {
+//   let toType = value => P.isTypeOf(value->Unknown.make) ? Some((Obj.magic(value): P.t)) : None
+//   let equals = (x: 'a, y: 'a) => true
+// }
+
 module Make4 = (
   P: {
-    module A: Variant
-    module B: Variant
-    module C: Variant
-    module D: Variant
+    module A: Pattern
+    module B: Pattern
+    module C: Pattern
+    module D: Pattern
   },
 ) => {
   type t
@@ -62,9 +67,9 @@ module Make4 = (
 
 module Make3 = (
   P: {
-    module A: Variant
-    module B: Variant
-    module C: Variant
+    module A: Pattern
+    module B: Pattern
+    module C: Pattern
   },
 ) => {
   type t
@@ -107,8 +112,8 @@ module Make3 = (
 
 module Make2 = (
   P: {
-    module A: Variant
-    module B: Variant
+    module A: Pattern
+    module B: Pattern
   },
 ) => {
   type t

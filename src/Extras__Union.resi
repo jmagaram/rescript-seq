@@ -1,4 +1,4 @@
-module type Variant = {
+module type Pattern = {
   type t
   let isTypeOf: Extras__Unknown.t => bool
   let equals: (t, t) => bool
@@ -6,10 +6,10 @@ module type Variant = {
 
 module Make4: (
   P: {
-    module A: Variant
-    module B: Variant
-    module C: Variant
-    module D: Variant
+    module A: Pattern
+    module B: Pattern
+    module C: Pattern
+    module D: Pattern
   },
 ) =>
 {
@@ -29,9 +29,9 @@ module Make4: (
 
 module Make3: (
   P: {
-    module A: Variant
-    module B: Variant
-    module C: Variant
+    module A: Pattern
+    module B: Pattern
+    module C: Pattern
   },
 ) =>
 {
@@ -48,8 +48,8 @@ module Make3: (
 }
 module Make2: (
   P: {
-    module A: Variant
-    module B: Variant
+    module A: Pattern
+    module B: Pattern
   },
 ) =>
 {
