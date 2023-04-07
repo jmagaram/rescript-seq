@@ -1,6 +1,6 @@
 # ReScript Extras
 
-General-purpose modules for [ReScript](https://rescript-lang.org) projects. Includes extensions to `Option`, `Result`, and `Array`. Provides a lazy-promise `Task` and `TaskResult`, `NonEmptyArray`, comparison utilities in `Cmp`, and a very simple test runner `Test`. To install:
+General-purpose modules for [ReScript](https://rescript-lang.org) projects. Includes extensions to `Option`, `Result`, and `Array`. Provides a lazy-promise `Task` and `TaskResult`, `NonEmptyArray`, comparison utilities in `Cmp`, and a very simple test runner `Test`. Includes experimental `Union` functors that can create, discriminate, and pattern match on untagged unions and a `Literal` module for support. To install:
 
 1. `npm install @jmagaram/rescript-extras`
 2. Add `@jmagaram/rescript-extras` to `bs-dependencies` in your `bsconfig.json`
@@ -9,6 +9,26 @@ General-purpose modules for [ReScript](https://rescript-lang.org) projects. Incl
 ## Task and TaskResult
 
 Inspired by [TaskEither in fp-ts](https://gcanti.github.io/fp-ts/modules/TaskEither.ts.html), a `Task` is a lazy promise that never fails. A `TaskResult` is a lazy promise that always returns an `Error` or an `Ok`. Just like a regular `result`, you can transform it before execution with **`map`**, **`mapError`**, and **`flatMap`**. When ready to execute, call **`toPromise`**.
+
+## Union
+
+ReScript uses tagged unions to discriminate between kinds in a variant. The **`Union`** module provides functors to create **untagged** unions of 2, 3, or 4 items. Capabilities:
+
+- Discriminate on any programmable criteria, like `typeof`, `instance of`, lightweight shape detection (such as a tag), or full-blown validation with a JSON parsing library.
+- Can be used for purely untagged unions, as well as unions tagged differently than how ReScript does it.
+- Pattern matching
+- Custom equality implementation
+- Type safety
+
+The disadvantages over compiler support for this feature are:
+
+- Pattern matching must rely on a `match` function, not the usual matching syntax.
+- Each case is distinguished a `A` | `B` | `C` | `D`, not terms the user defines. This can be fixed by extending or wrapping the module.
+- Literal support and functors are a bit cumbersome
+
+## Literal
+
+Functors to create **`Literal`** types of various kinds using functors like **`MakeString`** and **`MakeInt`**. Includes built-in literals for `True`, `False`, `Null`, and `Undefined`. You create literals from reference types and provide a custom equality operator.
 
 ## Option
 
