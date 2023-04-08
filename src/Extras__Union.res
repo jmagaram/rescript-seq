@@ -29,7 +29,7 @@ module BoolPattern = {
 module StringPattern = {
   type t = string
   let isTypeOf = u => u->Unknown.typeof == #string
-  let equals = (x: string, y: string) => x === y
+  let equals = (x: string, y: string) => Js.String2.localeCompare(x, y) == 0.0
 }
 
 // https://stackoverflow.com/questions/643782/how-to-check-whether-an-object-is-a-date

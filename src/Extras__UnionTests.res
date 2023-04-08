@@ -6,6 +6,8 @@ module Option = Belt.Option
 module OptionEx = Extras__Option
 module Test = Extras__Test
 
+// Tests for basic Int, String, Date and other patterns
+
 let patternTests = {
   let test = (~title, ~guard, ~value, ~expected) =>
     Test.make(~category="UnionPatterns", ~title, ~expectation="", ~predicate=() =>
@@ -33,7 +35,8 @@ let patternTests = {
     test(~title="Date", ~guard=Union.DatePattern.isTypeOf, ~value="abc", ~expected=false),
   ]
 }
-
+// Tests for a weird union like this:
+//
 // A: | { success: true, count: int}
 // B: | { success: false, reason: string }
 // C: | null
@@ -62,38 +65,30 @@ module Example = Union.Make4({
   module D = NegativeOne
 })
 
-let weirdExampleTests = [
+let exampleTests = [
   Test.make(
     ~category="Union",
     ~title="make",
-    ~expectation="when is valid, return Some",
-    ~predicate=() => {
-      -1->Example.make->Option.isSome
-    },
+    ~expectation="when is valid negative 1, return Some",
+    ~predicate=() => -1->Example.make->Option.isSome,
   ),
   Test.make(
     ~category="Union",
     ~title="make",
-    ~expectation="when is not valid, return None",
-    ~predicate=() => {
-      -2->Example.make->Option.isNone
-    },
+    ~expectation="when is not valid 99, return None",
+    ~predicate=() => 99->Example.make->Option.isNone,
   ),
   Test.make(
     ~category="Union",
     ~title="make",
-    ~expectation="when is valid, return Some",
-    ~predicate=() => {
-      {"success": true, "count": 5}->Example.make->Option.isSome
-    },
+    ~expectation="when is valid success, return Some",
+    ~predicate=() => {"success": true, "count": 5}->Example.make->Option.isSome,
   ),
   Test.make(
     ~category="Union",
     ~title="make",
-    ~expectation="when is not valid, return None",
-    ~predicate=() => {
-      {"success": "yes"}->Example.make->Option.isNone
-    },
+    ~expectation="when is not valid success, return None",
+    ~predicate=() => {"success": "yes"}->Example.make->Option.isNone,
   ),
   Test.make(
     ~category="Union",
@@ -101,9 +96,7 @@ let weirdExampleTests = [
     ~expectation="can pattern match",
     ~predicate=() => {
       let v = -1->Example.make->Option.getExn
-      let result =
-        v->Example.match(~onA=_ => false, ~onB=_ => false, ~onC=_ => false, ~onD=_ => true)
-      result
+      v->Example.match(~onA=_ => false, ~onB=_ => false, ~onC=_ => false, ~onD=_ => true)
     },
   ),
   Test.make(
@@ -112,20 +105,18 @@ let weirdExampleTests = [
     ~expectation="can pattern match",
     ~predicate=() => {
       let v = {"success": true, "count": 17}->Example.make->Option.getExn
-      let result =
-        v->Example.match(
-          ~onA=i => i["count"] == 17,
-          ~onB=_ => false,
-          ~onC=_ => false,
-          ~onD=_ => false,
-        )
-      result
+      v->Example.match(
+        ~onA=i => i["count"] == 17,
+        ~onB=_ => false,
+        ~onC=_ => false,
+        ~onD=_ => false,
+      )
     },
   ),
   Test.make(
     ~category="Union",
     ~title="equality",
-    ~expectation="when same return true",
+    ~expectation="when same type and values return true",
     ~predicate=() => {
       let a = {"success": true, "count": 17}->Example.make->Option.getExn
       let b = {"success": true, "count": 17}->Example.make->Option.getExn
@@ -135,7 +126,7 @@ let weirdExampleTests = [
   Test.make(
     ~category="Union",
     ~title="equality",
-    ~expectation="when different return false",
+    ~expectation="when same type but different return false",
     ~predicate=() => {
       let a = {"success": true, "count": 17}->Example.make->Option.getExn
       let b = {"success": true, "count": 8}->Example.make->Option.getExn
@@ -145,7 +136,7 @@ let weirdExampleTests = [
   Test.make(
     ~category="Union",
     ~title="equality",
-    ~expectation="when different return false",
+    ~expectation="when different types return false",
     ~predicate=() => {
       let a = NegativeOne.value->Example.make->Option.getExn
       let b = {"success": false, "reason": "hmm..."}->Example.make->Option.getExn
@@ -154,21 +145,30 @@ let weirdExampleTests = [
   ),
 ]
 
-module StringPattern = {
-  type t = string
-  let isTypeOf = u => u->Unknown.toString->Option.isSome
-  let equals = (x, y) => Js.String2.localeCompare(x, y) == 0.0
-}
-
-module IntPattern = {
-  type t = int
-  let isTypeOf = u => u->Unknown.typeof == #number
-  let equals = (x: int, y: int) => x == y
-}
+// Simple StringOrInt
 
 module StringOrInt = Union.Make2({
-  module A = StringPattern
-  module B = IntPattern
+  module A = Union.StringPattern
+  module B = Union.IntPattern
 })
 
-let tests = [weirdExampleTests, patternTests]->Belt.Array.concatMany
+// ArrayIndex
+
+module ValidIndex: {
+  include Union.Pattern with type t = int
+  let make: int => option<t>
+} = {
+  type t = int
+  let isTypeOf = u => u->Unknown.toFloat->OptionEx.isSomeAnd(i => i >= 0.0)
+  let make = (n: int) => n >= 0 ? Some((Obj.magic(n): t)) : None
+  let equals = (x, y) => x === y
+}
+
+module ArrayIndex = Union.Make2({
+  module A = NegativeOne
+  module B = ValidIndex
+})
+
+// Return all the automated tests
+
+let tests = [exampleTests, patternTests]->Belt.Array.concatMany
