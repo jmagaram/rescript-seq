@@ -35,6 +35,21 @@ let tests = [
   ),
   makeTest(
     ~title="make",
+    ~expectation="when fails with ReScript exception, and initial error mapping is identity, can map error later",
+    ~a=() =>
+      TaskResult.make(
+        ~promise=() => Promise.resolve("abc")->Promise.then(_ => raise(OutOfRange(4))),
+        ~onError=e => e,
+      )->TaskResult.mapError(e =>
+        switch e {
+        | OutOfRange(n) => n * 2
+        | _ => -1
+        }
+      ),
+    ~b=Error(8),
+  ),
+  makeTest(
+    ~title="make",
     ~expectation="when fails with JavaScript exception, return Error with onError processing exn",
     ~a=() =>
       TaskResult.make(
@@ -44,6 +59,21 @@ let tests = [
           | Some("failure!") => 99
           | _ => -1
           },
+      ),
+    ~b=Error(99),
+  ),
+  makeTest(
+    ~title="make",
+    ~expectation="when fails with JavaScript exception, and initial error mapping is identity, can map error later",
+    ~a=() =>
+      TaskResult.make(
+        ~promise=() => Promise.resolve("abc")->Promise.then(_ => Js.Exn.raiseError("failure!")),
+        ~onError=e => e,
+      )->TaskResult.mapError(e =>
+        switch e->message {
+        | Some("failure!") => 99
+        | _ => -1
+        }
       ),
     ~b=Error(99),
   ),
