@@ -6,7 +6,9 @@ module Option = Belt.Option
 module OptionEx = Extras__Option
 module Test = Extras__Test
 
+// ================================================================================
 // Ensure basic int, string, date, and user-defined literals can be pattern matched
+// ================================================================================
 module PatternTests = {
   let makeTest = (~title, ~guard, ~ok, ~invalid1, ~invalid2, ~invalid3) =>
     Test.make(~category="Patterns", ~title, ~expectation="", ~predicate=() =>
@@ -28,6 +30,14 @@ module PatternTests = {
 
   let tests = {
     [
+      makeTest(
+        ~title="Null (null literal)",
+        ~guard=Literal.Null.isTypeOf,
+        ~ok=[Js.null->Obj.magic],
+        ~invalid1=false,
+        ~invalid2=33,
+        ~invalid3="abc",
+      ),
       makeTest(
         ~title="True (bool literal)",
         ~guard=Literal.True.isTypeOf,
@@ -88,7 +98,9 @@ module PatternTests = {
   }
 }
 
-// Really basic union of any string and the literal false
+// ================================================
+// Simple union of any string and the literal false
+// ================================================
 
 module StringOrFalseTests = {
   module StringOrFalse = {
@@ -97,10 +109,10 @@ module StringOrFalseTests = {
       module B = Literal.False
     })
 
-    // Convenience functions so you don't have to remember that A is string and B is false
+    // Convenience functions
     let fromString = fromA
-    let fromFalse = fromB
     let toString = toA
+    let fromFalse = fromB
     let toFalse = toB
     let match = (value, ~onString, ~onFalse) => matchAB(value, ~onA=onString, ~onB=onFalse)
   }
@@ -209,140 +221,141 @@ module StringOrFalseTests = {
   ]
 }
 
-// Tests for a weird union like this:
-//
+// ===========================================
+// Sophisticated union of this...
 // A: | { success: true, count: int}
 // B: | { success: false, reason: string }
 // C: | null
 // D: | -1
+// ===========================================
+module SophisticatedUnionTest = {
+  module Success = {
+    type t = {"success": Literal.True.t, "count": int}
+    let isTypeOf = u => u->Unknown.getBool("success")->OptionEx.isSomeAnd(v => v == true)
+    let equals = (x: t, y: t) => x["count"] == y["count"]
+  }
 
-module Success = {
-  type t = {"success": Literal.True.t, "count": int}
-  let isTypeOf = u => u->Unknown.getBool("success")->OptionEx.isSomeAnd(v => v == true)
-  let equals = (x: t, y: t) => x["count"] == y["count"]
+  module Failure = {
+    type t = {"success": Literal.False.t, "reason": string}
+    let isTypeOf = u => u->Unknown.getBool("success")->OptionEx.isSomeAnd(v => v == false)
+    let equals = (x: t, y: t) => x["reason"] == y["reason"]
+  }
+
+  module NegativeOne = Literal.MakeInt({
+    let value = -1
+  })
+
+  module Target = {
+    include Union.Make4({
+      module A = Success
+      module B = Failure
+      module C = Literal.Null
+      module D = NegativeOne
+    })
+
+    // Convenience functions
+    let fromSuccess = fromA
+    let toSuccess = toA
+    let fromFailure = fromB
+    let toFailure = toB
+    let fromNull = fromC
+    let toNull = toC
+    let fromNegativeOne = fromD
+    let toNegativeOne = toD
+    let match = (value, ~onSuccess, ~onFailure, ~onNull, ~onNegativeOne) =>
+      matchABCD(value, ~onA=onSuccess, ~onB=onFailure, ~onC=onNull, ~onD=onNegativeOne)
+  }
+
+  let tests = [
+    Test.make(
+      ~category="Union",
+      ~title="Sophisticated",
+      ~expectation="fromNegativeOne",
+      ~predicate=() => NegativeOne.value->Target.fromNegativeOne->Obj.magic == -1,
+    ),
+    Test.make(
+      ~category="Union",
+      ~title="Sophisticated",
+      ~expectation="fromSuccess",
+      ~predicate=() => {
+        let value = {"success": Literal.True.value, "count": 5}
+        value->Target.fromSuccess->Obj.magic == value
+      },
+    ),
+    Test.make(
+      ~category="Union",
+      ~title="Sophisticated",
+      ~expectation="make from NegativeOne => Some",
+      ~predicate=() => NegativeOne.value->Target.make->Obj.magic == Some(-1),
+    ),
+    Test.make(
+      ~category="Union",
+      ~title="Sophisticated",
+      ~expectation="make from invalid value like 34 => None",
+      ~predicate=() => 34->Target.make->Option.isNone,
+    ),
+    Test.make(
+      ~category="Union",
+      ~title="Sophisticated",
+      ~expectation="match on Success",
+      ~predicate=() =>
+        {"success": Literal.True.value, "count": 5}
+        ->Target.make
+        ->Option.getExn
+        ->Target.match(
+          ~onSuccess=i => i["count"] == 5,
+          ~onFailure=_ => false,
+          ~onNegativeOne=_ => false,
+          ~onNull=_ => false,
+        ),
+    ),
+    Test.make(
+      ~category="Union",
+      ~title="Sophisticated",
+      ~expectation="match on NegativeOne",
+      ~predicate=() =>
+        -1
+        ->Target.make
+        ->Option.getExn
+        ->Target.match(
+          ~onSuccess=_ => false,
+          ~onFailure=_ => false,
+          ~onNegativeOne=_ => true,
+          ~onNull=_ => false,
+        ),
+    ),
+    Test.make(
+      ~category="Union",
+      ~title="Sophisticated",
+      ~expectation="toNull when null => Some",
+      ~predicate=() => Literal.Null.value->Target.fromNull->Target.toNull->Option.isSome,
+    ),
+    Test.make(
+      ~category="Union",
+      ~title="Sophisticated",
+      ~expectation="toNull when something else => None",
+      ~predicate=() => NegativeOne.value->Target.fromNegativeOne->Target.toNull->Option.isNone,
+    ),
+    Test.make(
+      ~category="Union",
+      ~title="Sophisticated",
+      ~expectation="match on Null",
+      ~predicate=() =>
+        Literal.Null.value
+        ->Target.fromNull
+        ->Target.match(
+          ~onSuccess=_ => false,
+          ~onFailure=_ => false,
+          ~onNegativeOne=_ => false,
+          ~onNull=_ => true,
+        ),
+    ),
+  ]
 }
 
-module Failure = {
-  type t = {"success": Literal.False.t, "reason": string}
-  let isTypeOf = u => u->Unknown.getBool("success")->OptionEx.isSomeAnd(v => v == false)
-  let equals = (x: t, y: t) => x["reason"] == y["reason"]
-}
-
-module NegativeOne = Literal.MakeInt({
-  let value = -1
-})
-
-module Example = Union.Make4({
-  module A = Success
-  module B = Failure
-  module C = Literal.Null
-  module D = NegativeOne
-})
-
-let exampleTests = [
-  Test.make(
-    ~category="Union",
-    ~title="make",
-    ~expectation="when is valid negative 1, return Some",
-    ~predicate=() => -1->Example.make->Option.isSome,
-  ),
-  Test.make(
-    ~category="Union",
-    ~title="make",
-    ~expectation="when is not valid 99, return None",
-    ~predicate=() => 99->Example.make->Option.isNone,
-  ),
-  Test.make(
-    ~category="Union",
-    ~title="make",
-    ~expectation="when is valid success, return Some",
-    ~predicate=() => {"success": true, "count": 5}->Example.make->Option.isSome,
-  ),
-  Test.make(
-    ~category="Union",
-    ~title="make",
-    ~expectation="when is not valid success, return None",
-    ~predicate=() => {"success": "yes"}->Example.make->Option.isNone,
-  ),
-  Test.make(
-    ~category="Union",
-    ~title="pattern matching",
-    ~expectation="can pattern match",
-    ~predicate=() => {
-      let v = -1->Example.make->Option.getExn
-      v->Example.matchABCD(~onA=_ => false, ~onB=_ => false, ~onC=_ => false, ~onD=_ => true)
-    },
-  ),
-  Test.make(
-    ~category="Union",
-    ~title="pattern matching",
-    ~expectation="can pattern match",
-    ~predicate=() => {
-      let v = {"success": true, "count": 17}->Example.make->Option.getExn
-      v->Example.matchABCD(
-        ~onA=i => i["count"] == 17,
-        ~onB=_ => false,
-        ~onC=_ => false,
-        ~onD=_ => false,
-      )
-    },
-  ),
-  Test.make(
-    ~category="Union",
-    ~title="equality",
-    ~expectation="when same type and values return true",
-    ~predicate=() => {
-      let a = {"success": true, "count": 17}->Example.make->Option.getExn
-      let b = {"success": true, "count": 17}->Example.make->Option.getExn
-      Example.equals(a, b)
-    },
-  ),
-  Test.make(
-    ~category="Union",
-    ~title="equality",
-    ~expectation="when same type but different return false",
-    ~predicate=() => {
-      let a = {"success": true, "count": 17}->Example.make->Option.getExn
-      let b = {"success": true, "count": 8}->Example.make->Option.getExn
-      Example.equals(a, b) == false
-    },
-  ),
-  Test.make(
-    ~category="Union",
-    ~title="equality",
-    ~expectation="when different types return false",
-    ~predicate=() => {
-      let a = NegativeOne.value->Example.make->Option.getExn
-      let b = {"success": false, "reason": "hmm..."}->Example.make->Option.getExn
-      Example.equals(a, b) == false
-    },
-  ),
-]
-
-// Simple StringOrInt
-
-module StringOrInt = Union.Make2({
-  module A = Union.StringPattern
-  module B = Union.IntPattern
-})
-
-// ArrayIndex
-
-module ValidIndex: {
-  include Union.Pattern with type t = int
-  let make: int => option<t>
-} = {
-  type t = int
-  let isTypeOf = u => u->Unknown.toFloat->OptionEx.isSomeAnd(i => i >= 0.0)
-  let make = (n: int) => n >= 0 ? Some((Obj.magic(n): t)) : None
-  let equals = (x, y) => x === y
-}
-
-module ArrayIndex = Union.Make2({
-  module A = NegativeOne
-  module B = ValidIndex
-})
-
-// Return all the automated tests
-
-let tests = [StringOrFalseTests.tests, exampleTests, PatternTests.tests]->Belt.Array.concatMany
+let tests =
+  [
+    StringOrFalseTests.tests,
+    SophisticatedUnionTest.tests,
+    PatternTests.tests,
+  ]->Belt.Array.concatMany
