@@ -12,7 +12,7 @@ Inspired by [TaskEither in fp-ts](https://gcanti.github.io/fp-ts/modules/TaskEit
 
 ## Union
 
-ReScript uses tagged unions to discriminate between kinds in a variant. The **`Union`** module provides functors to create **untagged** unions of 2, 3, or 4 items. Capabilities:
+ReScript uses tagged unions to discriminate between kinds in a variant. The **`Union`** module provides functors to create **untagged** unions of 2, 3, or 4 items. See [usage examples](https://github.com/jmagaram/rescript-extras/blob/master/src/Extras__UnionTests.res). Capabilities:
 
 - Discriminate on any programmable criteria, like `typeof`, `instance of`, lightweight shape detection (such as a tag), or validation with a JSON parsing library.
 - Can be used with untagged unions or unions tagged differently than how ReScript does it.
