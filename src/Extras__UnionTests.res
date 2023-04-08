@@ -87,6 +87,128 @@ module PatternTests = {
     ]
   }
 }
+
+// Really basic union of any string and the literal false
+
+module StringOrFalseTests = {
+  module StringOrFalse = {
+    include Union.Make2({
+      module A = Union.StringPattern
+      module B = Literal.False
+    })
+
+    // Convenience functions so you don't have to remember that A is string and B is false
+    let fromString = fromA
+    let fromFalse = fromB
+    let toString = toA
+    let toFalse = toB
+    let matchT = (value, ~onString, ~onFalse) => match(value, ~onA=onString, ~onB=onFalse)
+  }
+
+  module SF = StringOrFalse
+
+  let tests = [
+    Test.make(
+      ~category="Union",
+      ~title="StringOrFalse",
+      ~expectation="fromString (safe assignment)",
+      ~predicate=() => "abc"->SF.fromString->SF.equals("abc"->Obj.magic),
+    ),
+    Test.make(
+      ~category="Union",
+      ~title="StringOrFalse",
+      ~expectation="fromFalse (safe assignment)",
+      ~predicate=() => Literal.False.value->SF.fromFalse->SF.equals(false->Obj.magic),
+    ),
+    Test.make(
+      ~category="Union",
+      ~title="StringOrFalse",
+      ~expectation="make from false => Some",
+      ~predicate=() => false->SF.make->OptionEx.isSomeAnd(v => v->Obj.magic == false),
+    ),
+    Test.make(
+      ~category="Union",
+      ~title="StringOrFalse",
+      ~expectation="make from true => None",
+      ~predicate=() => true->SF.make->Option.isNone,
+    ),
+    Test.make(
+      ~category="Union",
+      ~title="StringOrFalse",
+      ~expectation="make from string => Some",
+      ~predicate=() => "abc"->SF.make->OptionEx.isSomeAnd(v => v->Obj.magic == "abc"),
+    ),
+    Test.make(
+      ~category="Union",
+      ~title="StringOrFalse",
+      ~expectation="make from int => None",
+      ~predicate=() => 34->SF.make->Option.isNone,
+    ),
+    Test.make(
+      ~category="Union",
+      ~title="StringOrFalse",
+      ~expectation="match on string",
+      ~predicate=() =>
+        "abc"->SF.fromString->SF.matchT(~onString=i => i == "abc", ~onFalse=_ => false),
+    ),
+    Test.make(
+      ~category="Union",
+      ~title="StringOrFalse",
+      ~expectation="equals when both false => true",
+      ~predicate=() =>
+        SF.equals(Literal.False.value->SF.fromFalse, Literal.False.value->SF.fromFalse),
+    ),
+    Test.make(
+      ~category="Union",
+      ~title="StringOrFalse",
+      ~expectation="equals when both string and same string => true",
+      ~predicate=() => SF.equals("abc"->SF.fromString, "abc"->SF.fromString),
+    ),
+    Test.make(
+      ~category="Union",
+      ~title="StringOrFalse",
+      ~expectation="equals when both string but different => false",
+      ~predicate=() => false == SF.equals("abc"->SF.fromString, "xyz"->SF.fromString),
+    ),
+    Test.make(
+      ~category="Union",
+      ~title="StringOrFalse",
+      ~expectation="equals when one string and one false => false",
+      ~predicate=() => false == SF.equals("abc"->SF.fromString, Literal.False.value->SF.fromFalse),
+    ),
+    Test.make(
+      ~category="Union",
+      ~title="StringOrFalse",
+      ~expectation="equals when one string and one false => false",
+      ~predicate=() => false == SF.equals("abc"->SF.fromString, Literal.False.value->SF.fromFalse),
+    ),
+    Test.make(
+      ~category="Union",
+      ~title="StringOrFalse",
+      ~expectation="toString when string => Some",
+      ~predicate=() => "abc"->SF.fromString->SF.toString == Some("abc"),
+    ),
+    Test.make(
+      ~category="Union",
+      ~title="StringOrFalse",
+      ~expectation="toString when not string => None",
+      ~predicate=() => Literal.False.value->SF.fromFalse->SF.toString->Option.isNone,
+    ),
+    Test.make(
+      ~category="Union",
+      ~title="StringOrFalse",
+      ~expectation="toFalse when false => Some",
+      ~predicate=() => Literal.False.value->SF.fromFalse->SF.toFalse == Some(Literal.False.value),
+    ),
+    Test.make(
+      ~category="Union",
+      ~title="StringOrFalse",
+      ~expectation="toFalse when not false => None",
+      ~predicate=() => "abc"->SF.fromString->SF.toFalse->Option.isNone,
+    ),
+  ]
+}
+
 // Tests for a weird union like this:
 //
 // A: | { success: true, count: int}
@@ -223,4 +345,4 @@ module ArrayIndex = Union.Make2({
 
 // Return all the automated tests
 
-let tests = [exampleTests, PatternTests.tests]->Belt.Array.concatMany
+let tests = [StringOrFalseTests.tests, exampleTests, PatternTests.tests]->Belt.Array.concatMany

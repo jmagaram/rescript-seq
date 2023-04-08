@@ -44,6 +44,91 @@ module PatternTools = (P: Pattern) => {
   let eq = (x, y) => x->make->Option.flatMap(x => y->make->Option.map(y => P.equals(x, y)))
 }
 
+module Make2 = (
+  P: {
+    module A: Pattern
+    module B: Pattern
+  },
+) => {
+  type t
+  type a = P.A.t
+  type b = P.B.t
+
+  module A_Tools = PatternTools(P.A)
+  module B_Tools = PatternTools(P.B)
+
+  external fromA: a => t = "%identity"
+  external fromB: b => t = "%identity"
+
+  let toA = A_Tools.make
+  let toB = B_Tools.make
+
+  let make = value =>
+    value->A_Tools.make->Option.map(fromA)->Option.orElse(value->B_Tools.make->Option.map(fromB))
+
+  let match = (value, ~onA, ~onB) =>
+    switch value
+    ->A_Tools.make
+    ->Option.map(onA)
+    ->Option.orElse(value->B_Tools.make->Option.map(onB)) {
+    | Some(value) => value
+    | None =>
+      Js.Exn.raiseError("The value was unsafely cast and did not match any of the provided types.")
+    }
+
+  let equals = (x: t, y: t) =>
+    A_Tools.eq(x, y)->OptionEx.orElseWith(() => B_Tools.eq(x, y))->Option.getWithDefault(false)
+}
+
+module Make3 = (
+  P: {
+    module A: Pattern
+    module B: Pattern
+    module C: Pattern
+  },
+) => {
+  type t
+  type a = P.A.t
+  type b = P.B.t
+  type c = P.C.t
+
+  module A_Tools = PatternTools(P.A)
+  module B_Tools = PatternTools(P.B)
+  module C_Tools = PatternTools(P.C)
+
+  external fromA: a => t = "%identity"
+  external fromB: b => t = "%identity"
+  external fromC: c => t = "%identity"
+
+  let toA = A_Tools.make
+  let toB = B_Tools.make
+  let toC = C_Tools.make
+
+  let make = value =>
+    value
+    ->A_Tools.make
+    ->Option.map(fromA)
+    ->Option.orElse(value->B_Tools.make->Option.map(fromB))
+    ->Option.orElse(value->C_Tools.make->Option.map(fromC))
+
+  let match = (value, ~onA, ~onB, ~onC) =>
+    switch value
+    ->A_Tools.make
+    ->Option.map(onA)
+    ->Option.orElse(value->B_Tools.make->Option.map(onB))
+    ->Option.orElse(value->C_Tools.make->Option.map(onC)) {
+    | Some(value) => value
+    | None =>
+      Js.Exn.raiseError("The value was unsafely cast and did not match any of the provided types.")
+    }
+
+  let equals = (x: t, y: t) =>
+    A_Tools.eq(x, y)
+    ->OptionEx.orElseWith(() => B_Tools.eq(x, y))
+    ->OptionEx.orElseWith(() => C_Tools.eq(x, y))
+    ->Option.getWithDefault(false)
+}
+
 module Make4 = (
   P: {
     module A: Pattern
@@ -67,6 +152,11 @@ module Make4 = (
   external fromB: b => t = "%identity"
   external fromC: c => t = "%identity"
   external fromD: d => t = "%identity"
+
+  let toA = A_Tools.make
+  let toB = B_Tools.make
+  let toC = C_Tools.make
+  let toD = D_Tools.make
 
   let make = value =>
     value
@@ -94,82 +184,4 @@ module Make4 = (
     ->OptionEx.orElseWith(() => C_Tools.eq(x, y))
     ->OptionEx.orElseWith(() => D_Tools.eq(x, y))
     ->Option.getWithDefault(false)
-}
-
-module Make3 = (
-  P: {
-    module A: Pattern
-    module B: Pattern
-    module C: Pattern
-  },
-) => {
-  type t
-  type a = P.A.t
-  type b = P.B.t
-  type c = P.C.t
-
-  module A_Tools = PatternTools(P.A)
-  module B_Tools = PatternTools(P.B)
-  module C_Tools = PatternTools(P.C)
-
-  external fromA: a => t = "%identity"
-  external fromB: b => t = "%identity"
-  external fromC: c => t = "%identity"
-
-  let make = value =>
-    value
-    ->A_Tools.make
-    ->Option.map(fromA)
-    ->Option.orElse(value->B_Tools.make->Option.map(fromB))
-    ->Option.orElse(value->C_Tools.make->Option.map(fromC))
-
-  let match = (value, ~onA, ~onB, ~onC) =>
-    switch value
-    ->A_Tools.make
-    ->Option.map(onA)
-    ->Option.orElse(value->B_Tools.make->Option.map(onB))
-    ->Option.orElse(value->C_Tools.make->Option.map(onC)) {
-    | Some(value) => value
-    | None =>
-      Js.Exn.raiseError("The value was unsafely cast and did not match any of the provided types.")
-    }
-
-  let equals = (x: t, y: t) =>
-    A_Tools.eq(x, y)
-    ->OptionEx.orElseWith(() => B_Tools.eq(x, y))
-    ->OptionEx.orElseWith(() => C_Tools.eq(x, y))
-    ->Option.getWithDefault(false)
-}
-
-module Make2 = (
-  P: {
-    module A: Pattern
-    module B: Pattern
-  },
-) => {
-  type t
-  type a = P.A.t
-  type b = P.B.t
-
-  module A_Tools = PatternTools(P.A)
-  module B_Tools = PatternTools(P.B)
-
-  external fromA: a => t = "%identity"
-  external fromB: b => t = "%identity"
-
-  let make = value =>
-    value->A_Tools.make->Option.map(fromA)->Option.orElse(value->B_Tools.make->Option.map(fromB))
-
-  let match = (value, ~onA, ~onB) =>
-    switch value
-    ->A_Tools.make
-    ->Option.map(onA)
-    ->Option.orElse(value->B_Tools.make->Option.map(onB)) {
-    | Some(value) => value
-    | None =>
-      Js.Exn.raiseError("The value was unsafely cast and did not match any of the provided types.")
-    }
-
-  let equals = (x: t, y: t) =>
-    A_Tools.eq(x, y)->OptionEx.orElseWith(() => B_Tools.eq(x, y))->Option.getWithDefault(false)
 }

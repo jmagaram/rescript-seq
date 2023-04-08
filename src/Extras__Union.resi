@@ -10,28 +10,31 @@ module BoolPattern: Pattern with type t = bool
 module StringPattern: Pattern with type t = string
 module DatePattern: Pattern with type t = Js.Date.t
 
-module Make4: (
+module Make2: (
   P: {
     module A: Pattern
     module B: Pattern
-    module C: Pattern
-    module D: Pattern
   },
 ) =>
-{
-  type t
-  type a = P.A.t
-  type b = P.B.t
-  type c = P.C.t
-  type d = P.D.t
-  external fromA: a => t = "%identity"
-  external fromB: b => t = "%identity"
-  external fromC: c => t = "%identity"
-  external fromD: d => t = "%identity"
-  let make: 'a => option<t>
-  let match: ('a, ~onA: a => 'res, ~onB: b => 'res, ~onC: c => 'res, ~onD: d => 'res) => 'res
-  let equals: (t, t) => bool
-}
+(
+  {
+    type t
+    type a
+    type b
+
+    external fromA: a => t = "%identity"
+    external fromB: b => t = "%identity"
+
+    let toA: t => option<a>
+    let toB: t => option<b>
+
+    let make: 'a => option<t>
+    let match: (t, ~onA: a => 'res, ~onB: b => 'res) => 'res
+    let equals: (t, t) => bool
+  }
+    with type a = P.A.t
+    and type b = P.B.t
+)
 
 module Make3: (
   P: {
@@ -40,32 +43,64 @@ module Make3: (
     module C: Pattern
   },
 ) =>
-{
-  type t
-  type a = P.A.t
-  type b = P.B.t
-  type c = P.C.t
-  external fromA: a => t = "%identity"
-  external fromB: b => t = "%identity"
-  external fromC: c => t = "%identity"
-  let make: 'a => option<t>
-  let match: ('a, ~onA: a => 'res, ~onB: b => 'res, ~onC: c => 'res) => 'res
-  let equals: (t, t) => bool
-}
+(
+  {
+    type t
+    type a
+    type b
+    type c
 
-module Make2: (
+    external fromA: a => t = "%identity"
+    external fromB: b => t = "%identity"
+    external fromC: c => t = "%identity"
+
+    let toA: t => option<a>
+    let toB: t => option<b>
+    let toC: t => option<c>
+
+    let make: 'a => option<t>
+    let match: (t, ~onA: a => 'res, ~onB: b => 'res, ~onC: c => 'res) => 'res
+    let equals: (t, t) => bool
+  }
+    with type a = P.A.t
+    and type b = P.B.t
+    and type c = P.C.t
+)
+
+module Make4: (
   P: {
     module A: Pattern
     module B: Pattern
+    module C: Pattern
+    module D: Pattern
   },
 ) =>
-{
-  type t
-  type a = P.A.t
-  type b = P.B.t
-  external fromA: a => t = "%identity"
-  external fromB: b => t = "%identity"
-  let make: 'a => option<t>
-  let match: ('a, ~onA: a => 'res, ~onB: b => 'res) => 'res
-  let equals: (t, t) => bool
-}
+(
+  {
+    type t
+    type a
+    type b
+    type c
+    type d
+
+    external fromA: a => t = "%identity"
+    external fromB: b => t = "%identity"
+    external fromC: c => t = "%identity"
+    external fromD: d => t = "%identity"
+
+    let toA: t => option<a>
+    let toB: t => option<b>
+    let toC: t => option<c>
+    let toD: t => option<d>
+
+    let make: 'a => option<t>
+    let match: (t, ~onA: a => 'res, ~onB: b => 'res, ~onC: c => 'res, ~onD: d => 'res) => 'res
+    let equals: (t, t) => bool
+  }
+    with type a = P.A.t
+    and type b = P.B.t
+    and type c = P.C.t
+    and type d = P.D.t
+)
+
+// match rename as matchOn or matchABC
