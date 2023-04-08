@@ -223,7 +223,6 @@ module StringOrFalseTests = {
 }
 
 // ===========================================
-// Sophisticated union of this...
 // A: | { success: true, count: int}
 // B: | { success: false, reason: string }
 // C: | null
