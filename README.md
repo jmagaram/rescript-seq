@@ -1,6 +1,6 @@
 # ReScript Extras
 
-General-purpose modules for [ReScript](https://rescript-lang.org) projects. Includes extensions to `Option`, `Result`, and `Array`. Provides a lazy-promise `Task` and `TaskResult`, `NonEmptyArray`, comparison utilities in `Cmp`, and a very simple test runner `Test`. Includes experimental `Union` functors that can create, discriminate, and pattern match on untagged unions and a `Literal` module for support. To install:
+General-purpose modules for [ReScript](https://rescript-lang.org) projects. Includes extensions to `Option`, `Result`, and `Array`. Provides a lazy-promise `Task` and `TaskResult`, `NonEmptyArray`, comparison utilities in `Cmp`, and a very simple test runner `Test`. Includes `Union` functors to create, discriminate, and pattern match on untagged unions of any kind using any programmable criteria. The `Literal` module makes it easy to create type-safe types for single values that can be used in unions and elsewhere.To install:
 
 1. `npm install @jmagaram/rescript-extras`
 2. Add `@jmagaram/rescript-extras` to `bs-dependencies` in your `bsconfig.json`
@@ -47,11 +47,7 @@ Generate an array from a generator function using **`fromSeed`**, similar to `un
 
 ## Result
 
-Convert an array of results to a single result using **`fromArray`** and **`fromArrayMap`**.
-
-Create a result from a function that may fail with **`fromTryCatch`**.
-
-Transform an error with **`mapError`**.
+Convert an array of results to a single result using **`fromArray`** and **`fromArrayMap`**. Create a result from a function that may fail with **`fromTryCatch`**. Transform an error with **`mapError`**.
 
 ## Unknown
 
