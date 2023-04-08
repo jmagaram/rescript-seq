@@ -14,17 +14,16 @@ Inspired by [TaskEither in fp-ts](https://gcanti.github.io/fp-ts/modules/TaskEit
 
 ReScript uses tagged unions to discriminate between kinds in a variant. The **`Union`** module provides functors to create **untagged** unions of 2, 3, or 4 items. See [usage examples](https://github.com/jmagaram/rescript-extras/blob/master/src/Extras__UnionTests.res). Capabilities:
 
-- Discriminate on any programmable criteria, like `typeof`, `instance of`, lightweight shape detection (such as a tag), or validation with a JSON parsing library.
+- Discriminate (pattern match) on any programmable criteria, like `typeof`, `instance of`, lightweight shape detection (such as a tag), or validation with a JSON parsing library.
 - Can be used with untagged unions or unions tagged differently than how ReScript does it.
 - All types can participate in a union, including literals.
-- Pattern matching
 - Custom equality
 - Type safety
 
 This implementation does not have any specific compiler support and so there are some limitations:
 
 - Pattern matching must rely on a `match` function, not the usual matching syntax.
-- Each case is distinguished by `A` | `B` | `C` | `D`, not terms the user defines. This can be improved by extending or wrapping the module.
+- Each case is distinguished by `A` | `B` | `C` | `D`, not terms the user defines. This can be improved by extending or wrapping the module. See the [test file for examples](https://github.com/jmagaram/rescript-extras/blob/master/src/Extras__UnionTests.res).
 - Literal support and functors are a bit cumbersome
 - No genType support
 - No recursive type definition
