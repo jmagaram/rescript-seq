@@ -44,7 +44,7 @@ external toFunctionUnsafe: 'a => function = "%identity"
 
 let isNull: 'a => bool = %raw(`function (a) { return a === null }`)
 let isUndefined: 'a => bool = %raw(`function (a) { return a === undefined }`)
-let isNullOrUndefined: 'a => bool = %raw(`function (a) { return a === undefined  || a === undefined }`)
+let isNullOrUndefined: 'a => bool = %raw(`function (a) { return a === null || a === undefined }`)
 
 let classify = value => {
   switch typeof(value) {
