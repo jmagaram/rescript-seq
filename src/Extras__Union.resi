@@ -4,11 +4,11 @@ module type Pattern = {
   let equals: (t, t) => bool
 }
 
-module IntPattern: Pattern
-module FloatPattern: Pattern
-module BoolPattern: Pattern
-module StringPattern: Pattern
-module DatePattern: Pattern
+module IntPattern: Pattern with type t = int
+module FloatPattern: Pattern with type t = float
+module BoolPattern: Pattern with type t = bool
+module StringPattern: Pattern with type t = string
+module DatePattern: Pattern with type t = Js.Date.t
 
 module Make4: (
   P: {
