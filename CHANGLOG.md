@@ -7,3 +7,7 @@
 - Add convenience functions to pattern match on a single case, like `toA` and `toB`.
 - Fix bug in basic int, string, float, etc. patterns that made them unusable because the types were abstract.
 - Fix bug where matching input could be anything but should have been just the union type.
+
+### Other
+
+- Fix bug in `Unknown.isNullOrUndefined`; only checked for undefined

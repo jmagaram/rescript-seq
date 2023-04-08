@@ -5,6 +5,7 @@ module Unknown = Extras__Unknown
 module Option = Belt.Option
 module OptionEx = Extras__Option
 module Test = Extras__Test
+module ArrayEx = Extras__Array
 
 // ================================================================================
 // Ensure basic int, string, date, and user-defined literals can be pattern matched
@@ -272,6 +273,9 @@ module SophisticatedUnionTest = {
       ~title="Sophisticated",
       ~expectation="fromNegativeOne",
       ~predicate=() => NegativeOne.value->Target.fromNegativeOne->Obj.magic == -1,
+    ),
+    Test.make(~category="Union", ~title="Sophisticated", ~expectation="fromNull", ~predicate=() =>
+      Literal.Null.value->Target.fromNull->Obj.magic == Js.null
     ),
     Test.make(
       ~category="Union",
