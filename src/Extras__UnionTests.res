@@ -65,7 +65,7 @@ module PatternTests = {
       ),
       makeTest(
         ~title="Int",
-        ~guard=Union.IntPattern.isTypeOf,
+        ~guard=Union.Patterns.Int.isTypeOf,
         ~ok=[1, -1, 34, Int32.max_int],
         ~invalid1="abc",
         ~invalid2=false,
@@ -73,7 +73,7 @@ module PatternTests = {
       ),
       makeTest(
         ~title="String",
-        ~guard=Union.StringPattern.isTypeOf,
+        ~guard=Union.Patterns.String.isTypeOf,
         ~ok=["abc", "", "   a b c"],
         ~invalid1=false,
         ~invalid2=43,
@@ -81,7 +81,7 @@ module PatternTests = {
       ),
       makeTest(
         ~title="Bool",
-        ~guard=Union.BoolPattern.isTypeOf,
+        ~guard=Union.Patterns.Bool.isTypeOf,
         ~ok=[true, false],
         ~invalid1=43,
         ~invalid2="abc",
@@ -89,7 +89,7 @@ module PatternTests = {
       ),
       makeTest(
         ~title="Date",
-        ~guard=Union.DatePattern.isTypeOf,
+        ~guard=Union.Patterns.Date.isTypeOf,
         ~ok=[Js.Date.now()->Js.Date.fromFloat],
         ~invalid1="abc",
         ~invalid2=3,
@@ -106,7 +106,7 @@ module PatternTests = {
 module StringOrFalseTests = {
   module StringOrFalse = {
     include Union.Make2({
-      module A = Union.StringPattern
+      module A = Union.Patterns.String
       module B = Literal.False
     })
 

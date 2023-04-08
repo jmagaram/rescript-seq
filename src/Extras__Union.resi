@@ -1,15 +1,20 @@
+// Defines a single case in an untagged union
 module type Pattern = {
   type t
   let isTypeOf: Extras__Unknown.t => bool
   let equals: (t, t) => bool
 }
 
-module IntPattern: Pattern with type t = int
-module FloatPattern: Pattern with type t = float
-module BoolPattern: Pattern with type t = bool
-module StringPattern: Pattern with type t = string
-module DatePattern: Pattern with type t = Js.Date.t
+// Used for pattern matching basic types
+module Patterns: {
+  module Int: Pattern with type t = int
+  module Float: Pattern with type t = float
+  module Bool: Pattern with type t = bool
+  module String: Pattern with type t = string
+  module Date: Pattern with type t = Js.Date.t
+}
 
+// Make a union of 2 types
 module Make2: (
   P: {
     module A: Pattern
@@ -29,13 +34,14 @@ module Make2: (
     let toB: t => option<b>
 
     let make: 'a => option<t>
-    let matchAB: (t, ~onA: a => 'res, ~onB: b => 'res) => 'res
+    let matchAB: (t, ~onA: a => 'x, ~onB: b => 'x) => 'x
     let equals: (t, t) => bool
   }
     with type a = P.A.t
     and type b = P.B.t
 )
 
+// Make a union of 3 types
 module Make3: (
   P: {
     module A: Pattern
@@ -59,7 +65,7 @@ module Make3: (
     let toC: t => option<c>
 
     let make: 'a => option<t>
-    let matchABC: (t, ~onA: a => 'res, ~onB: b => 'res, ~onC: c => 'res) => 'res
+    let matchABC: (t, ~onA: a => 'x, ~onB: b => 'x, ~onC: c => 'x) => 'x
     let equals: (t, t) => bool
   }
     with type a = P.A.t
@@ -67,6 +73,7 @@ module Make3: (
     and type c = P.C.t
 )
 
+// Make a union of 4 types
 module Make4: (
   P: {
     module A: Pattern
@@ -94,7 +101,7 @@ module Make4: (
     let toD: t => option<d>
 
     let make: 'a => option<t>
-    let matchABCD: (t, ~onA: a => 'res, ~onB: b => 'res, ~onC: c => 'res, ~onD: d => 'res) => 'res
+    let matchABCD: (t, ~onA: a => 'x, ~onB: b => 'x, ~onC: c => 'x, ~onD: d => 'x) => 'x
     let equals: (t, t) => bool
   }
     with type a = P.A.t
