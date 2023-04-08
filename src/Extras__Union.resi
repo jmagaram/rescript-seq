@@ -29,7 +29,7 @@ module Make2: (
     let toB: t => option<b>
 
     let make: 'a => option<t>
-    let match: (t, ~onA: a => 'res, ~onB: b => 'res) => 'res
+    let matchAB: (t, ~onA: a => 'res, ~onB: b => 'res) => 'res
     let equals: (t, t) => bool
   }
     with type a = P.A.t
@@ -59,7 +59,7 @@ module Make3: (
     let toC: t => option<c>
 
     let make: 'a => option<t>
-    let match: (t, ~onA: a => 'res, ~onB: b => 'res, ~onC: c => 'res) => 'res
+    let matchABC: (t, ~onA: a => 'res, ~onB: b => 'res, ~onC: c => 'res) => 'res
     let equals: (t, t) => bool
   }
     with type a = P.A.t
@@ -94,7 +94,7 @@ module Make4: (
     let toD: t => option<d>
 
     let make: 'a => option<t>
-    let match: (t, ~onA: a => 'res, ~onB: b => 'res, ~onC: c => 'res, ~onD: d => 'res) => 'res
+    let matchABCD: (t, ~onA: a => 'res, ~onB: b => 'res, ~onC: c => 'res, ~onD: d => 'res) => 'res
     let equals: (t, t) => bool
   }
     with type a = P.A.t
@@ -102,5 +102,3 @@ module Make4: (
     and type c = P.C.t
     and type d = P.D.t
 )
-
-// match rename as matchOn or matchABC

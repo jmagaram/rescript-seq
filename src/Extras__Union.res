@@ -66,7 +66,7 @@ module Make2 = (
   let make = value =>
     value->A_Tools.make->Option.map(fromA)->Option.orElse(value->B_Tools.make->Option.map(fromB))
 
-  let match = (value, ~onA, ~onB) =>
+  let matchAB = (value, ~onA, ~onB) =>
     switch value
     ->A_Tools.make
     ->Option.map(onA)
@@ -111,7 +111,7 @@ module Make3 = (
     ->Option.orElse(value->B_Tools.make->Option.map(fromB))
     ->Option.orElse(value->C_Tools.make->Option.map(fromC))
 
-  let match = (value, ~onA, ~onB, ~onC) =>
+  let matchABC = (value, ~onA, ~onB, ~onC) =>
     switch value
     ->A_Tools.make
     ->Option.map(onA)
@@ -166,7 +166,7 @@ module Make4 = (
     ->Option.orElse(value->C_Tools.make->Option.map(fromC))
     ->Option.orElse(value->D_Tools.make->Option.map(fromD))
 
-  let match = (value, ~onA, ~onB, ~onC, ~onD) =>
+  let matchABCD = (value, ~onA, ~onB, ~onC, ~onD) =>
     switch value
     ->A_Tools.make
     ->Option.map(onA)

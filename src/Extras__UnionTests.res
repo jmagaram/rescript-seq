@@ -102,7 +102,7 @@ module StringOrFalseTests = {
     let fromFalse = fromB
     let toString = toA
     let toFalse = toB
-    let matchT = (value, ~onString, ~onFalse) => match(value, ~onA=onString, ~onB=onFalse)
+    let match = (value, ~onString, ~onFalse) => matchAB(value, ~onA=onString, ~onB=onFalse)
   }
 
   module SF = StringOrFalse
@@ -149,7 +149,7 @@ module StringOrFalseTests = {
       ~title="StringOrFalse",
       ~expectation="match on string",
       ~predicate=() =>
-        "abc"->SF.fromString->SF.matchT(~onString=i => i == "abc", ~onFalse=_ => false),
+        "abc"->SF.fromString->SF.match(~onString=i => i == "abc", ~onFalse=_ => false),
     ),
     Test.make(
       ~category="Union",
@@ -270,7 +270,7 @@ let exampleTests = [
     ~expectation="can pattern match",
     ~predicate=() => {
       let v = -1->Example.make->Option.getExn
-      v->Example.match(~onA=_ => false, ~onB=_ => false, ~onC=_ => false, ~onD=_ => true)
+      v->Example.matchABCD(~onA=_ => false, ~onB=_ => false, ~onC=_ => false, ~onD=_ => true)
     },
   ),
   Test.make(
@@ -279,7 +279,7 @@ let exampleTests = [
     ~expectation="can pattern match",
     ~predicate=() => {
       let v = {"success": true, "count": 17}->Example.make->Option.getExn
-      v->Example.match(
+      v->Example.matchABCD(
         ~onA=i => i["count"] == 17,
         ~onB=_ => false,
         ~onC=_ => false,
