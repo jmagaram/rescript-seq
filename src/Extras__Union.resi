@@ -52,6 +52,7 @@ module Make3: (
   let match: ('a, ~onA: a => 'res, ~onB: b => 'res, ~onC: c => 'res) => 'res
   let equals: (t, t) => bool
 }
+
 module Make2: (
   P: {
     module A: Pattern
