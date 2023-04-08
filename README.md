@@ -27,6 +27,7 @@ This implementation does not have any specific compiler support and so there are
 - Each case is distinguished by `A` | `B` | `C` | `D`, not terms the user defines. This can be improved by extending or wrapping the module.
 - Literal support and functors are a bit cumbersome
 - No genType support
+- No recursive type definition
 
 ## Literal
 
