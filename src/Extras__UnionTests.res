@@ -6,34 +6,86 @@ module Option = Belt.Option
 module OptionEx = Extras__Option
 module Test = Extras__Test
 
-// Tests for basic Int, String, Date and other patterns
-
-let patternTests = {
-  let test = (~title, ~guard, ~value, ~expected) =>
-    Test.make(~category="UnionPatterns", ~title, ~expectation="", ~predicate=() =>
-      expected == value->Unknown.make->guard
+// Ensure basic int, string, date, and user-defined literals can be pattern matched
+module PatternTests = {
+  let makeTest = (~title, ~guard, ~ok, ~invalid1, ~invalid2, ~invalid3) =>
+    Test.make(~category="Patterns", ~title, ~expectation="", ~predicate=() =>
+      true == ok->Js.Array2.every(i => i->Unknown.make->guard) &&
+      false == invalid1->Unknown.make->guard &&
+      false == invalid2->Unknown.make->guard &&
+      false == invalid3->Unknown.make->guard
     )
-  [
-    test(~title="Int", ~guard=Union.IntPattern.isTypeOf, ~value=43, ~expected=true),
-    test(~title="Int", ~guard=Union.IntPattern.isTypeOf, ~value="abc", ~expected=false),
-    test(~title="String", ~guard=Union.StringPattern.isTypeOf, ~value="abc", ~expected=true),
-    test(~title="String", ~guard=Union.StringPattern.isTypeOf, ~value=false, ~expected=false),
-    test(~title="Bool", ~guard=Union.BoolPattern.isTypeOf, ~value=true, ~expected=true),
-    test(~title="Bool", ~guard=Union.BoolPattern.isTypeOf, ~value="abc", ~expected=false),
-    test(
-      ~title="Date",
-      ~guard=Union.DatePattern.isTypeOf,
-      ~value=Js.Date.now()->Js.Date.fromFloat,
-      ~expected=true,
-    ),
-    test(
-      ~title="Date",
-      ~guard=Union.DatePattern.isTypeOf,
-      ~value=Js.Date.fromString("abc"),
-      ~expected=false,
-    ),
-    test(~title="Date", ~guard=Union.DatePattern.isTypeOf, ~value="abc", ~expected=false),
-  ]
+
+  module Negative1 = Literal.MakeInt({
+    let value = -1
+  })
+
+  module Yes = Literal.MakeString({
+    let value = "yes"
+    let trimmed = true
+    let caseInsensitive = true
+  })
+
+  let tests = {
+    [
+      makeTest(
+        ~title="True (bool literal)",
+        ~guard=Literal.True.isTypeOf,
+        ~ok=[true, Literal.True.value->Obj.magic],
+        ~invalid1=false,
+        ~invalid2=33,
+        ~invalid3="abc",
+      ),
+      makeTest(
+        ~title="Yes (string literal)",
+        ~guard=Yes.isTypeOf,
+        ~ok=["yes", "  YES", "  yEs"],
+        ~invalid1="no",
+        ~invalid2=33,
+        ~invalid3=false,
+      ),
+      makeTest(
+        ~title="Negative1 (int literal)",
+        ~guard=Negative1.isTypeOf,
+        ~ok=[-1],
+        ~invalid1=0,
+        ~invalid2=3.4,
+        ~invalid3="abc",
+      ),
+      makeTest(
+        ~title="Int",
+        ~guard=Union.IntPattern.isTypeOf,
+        ~ok=[1, -1, 34, Int32.max_int],
+        ~invalid1="abc",
+        ~invalid2=false,
+        ~invalid3={"a": 1},
+      ),
+      makeTest(
+        ~title="String",
+        ~guard=Union.StringPattern.isTypeOf,
+        ~ok=["abc", "", "   a b c"],
+        ~invalid1=false,
+        ~invalid2=43,
+        ~invalid3=4.3,
+      ),
+      makeTest(
+        ~title="Bool",
+        ~guard=Union.BoolPattern.isTypeOf,
+        ~ok=[true, false],
+        ~invalid1=43,
+        ~invalid2="abc",
+        ~invalid3=4.3,
+      ),
+      makeTest(
+        ~title="Date",
+        ~guard=Union.DatePattern.isTypeOf,
+        ~ok=[Js.Date.now()->Js.Date.fromFloat],
+        ~invalid1="abc",
+        ~invalid2=3,
+        ~invalid3=Js.Date.fromString("abc"),
+      ),
+    ]
+  }
 }
 // Tests for a weird union like this:
 //
@@ -171,4 +223,4 @@ module ArrayIndex = Union.Make2({
 
 // Return all the automated tests
 
-let tests = [exampleTests, patternTests]->Belt.Array.concatMany
+let tests = [exampleTests, PatternTests.tests]->Belt.Array.concatMany
