@@ -1,11 +1,20 @@
-// Defines a single case in an untagged union
+// Defines a single case in an untagged union.
 module type Pattern = {
+  // The underlying type. Can be a primitive like `string`, a reference type
+  // like a JavaScript error, an array, or basically anything.
   type t
+
+  // The `isTypeOf` function determines whether a specific value can safely be
+  // assigned to type `t`. Use any critieria such as `typeof`, `instanceof`, or
+  // inspecting the properties of the object.
   let isTypeOf: Extras__Unknown.t => bool
+
+  // Determines whether two instances of the type are equal. Can provide
+  // optimized behavior over a deep recursive compare.
   let equals: (t, t) => bool
 }
 
-// Used for pattern matching basic types
+// Pattern matching basic types
 module Patterns: {
   module Int: Pattern with type t = int
   module Float: Pattern with type t = float
