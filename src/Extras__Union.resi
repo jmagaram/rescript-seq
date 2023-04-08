@@ -4,6 +4,12 @@ module type Pattern = {
   let equals: (t, t) => bool
 }
 
+module IntPattern: Pattern
+module FloatPattern: Pattern
+module BoolPattern: Pattern
+module StringPattern: Pattern
+module DatePattern: Pattern
+
 module Make4: (
   P: {
     module A: Pattern

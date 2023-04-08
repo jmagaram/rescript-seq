@@ -6,6 +6,34 @@ module Option = Belt.Option
 module OptionEx = Extras__Option
 module Test = Extras__Test
 
+let patternTests = {
+  let test = (~title, ~guard, ~value, ~expected) =>
+    Test.make(~category="UnionPatterns", ~title, ~expectation="", ~predicate=() =>
+      expected == value->Unknown.make->guard
+    )
+  [
+    test(~title="Int", ~guard=Union.IntPattern.isTypeOf, ~value=43, ~expected=true),
+    test(~title="Int", ~guard=Union.IntPattern.isTypeOf, ~value="abc", ~expected=false),
+    test(~title="String", ~guard=Union.StringPattern.isTypeOf, ~value="abc", ~expected=true),
+    test(~title="String", ~guard=Union.StringPattern.isTypeOf, ~value=false, ~expected=false),
+    test(~title="Bool", ~guard=Union.BoolPattern.isTypeOf, ~value=true, ~expected=true),
+    test(~title="Bool", ~guard=Union.BoolPattern.isTypeOf, ~value="abc", ~expected=false),
+    test(
+      ~title="Date",
+      ~guard=Union.DatePattern.isTypeOf,
+      ~value=Js.Date.now()->Js.Date.fromFloat,
+      ~expected=true,
+    ),
+    test(
+      ~title="Date",
+      ~guard=Union.DatePattern.isTypeOf,
+      ~value=Js.Date.fromString("abc"),
+      ~expected=false,
+    ),
+    test(~title="Date", ~guard=Union.DatePattern.isTypeOf, ~value="abc", ~expected=false),
+  ]
+}
+
 // A: | { success: true, count: int}
 // B: | { success: false, reason: string }
 // C: | null
@@ -143,4 +171,4 @@ module StringOrInt = Union.Make2({
   module B = IntPattern
 })
 
-let tests = [weirdExampleTests]->Belt.Array.concatMany
+let tests = [weirdExampleTests, patternTests]->Belt.Array.concatMany
