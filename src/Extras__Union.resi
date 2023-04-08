@@ -14,7 +14,9 @@ module type Pattern = {
   let equals: (t, t) => bool
 }
 
-// Pattern matching basic types
+// Pattern matching basic types. Literal types built with the Literal module,
+// such as `true`, `null`, `-1`, and `"yes"`, are also patterns that can
+// participate in a union.
 module Patterns: {
   module Int: Pattern with type t = int
   module Float: Pattern with type t = float
