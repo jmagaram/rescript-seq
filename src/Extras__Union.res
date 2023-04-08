@@ -140,6 +140,7 @@ module Make3 = (
     ->OptionEx.orElseWith(() => C_Tools.eq(x, y))
     ->Option.getWithDefault(false)
 }
+
 module Make2 = (
   P: {
     module A: Pattern
