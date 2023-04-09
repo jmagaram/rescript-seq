@@ -195,6 +195,61 @@ module FancyUnionTest = {
   }
 }
 
+// ===========================================
+// A: | (float, float) // 2-d
+// B: | (float, float, float) // 3-d
+// ===========================================
+module PointTests = {
+  module Point = Union.Make2({
+    module A = {
+      type t = (float, float)
+      let isTypeOf = u =>
+        // lightweight validation; just check length
+        Js.Array2.isArray(u) && Js.Array2.length((Obj.magic(u): array<Unknown.t>)) == 2
+      let equals = (x: t, y: t) => x == y
+    }
+    module B = {
+      type t = (float, float, float)
+      let isTypeOf = u =>
+        // lightweight validation; just check length
+        Js.Array2.isArray(u) && Js.Array2.length((Obj.magic(u): array<Unknown.t>)) == 3
+      let equals = (x: t, y: t) => x == y
+    }
+  })
+
+  let test = (~expectation, ~predicate) =>
+    Test.make(~category="Union", ~title="Point", ~expectation, ~predicate)
+
+  let tests = [
+    test(~expectation="make from 2d => Some", ~predicate=() =>
+      [1.0, 1.0]->Point.make->Option.isSome
+    ),
+    test(~expectation="make from 3d => Some", ~predicate=() =>
+      [1.0, 1.0, 1.0]->Point.make->Option.isSome
+    ),
+    test(~expectation="make from 4d => None", ~predicate=() =>
+      [1.0, 1.0, 1.0, 1.0]->Point.make->Option.isNone
+    ),
+    test(~expectation="make from empty => None", ~predicate=() => []->Point.make->Option.isNone),
+    test(~expectation="make from string => None", ~predicate=() =>
+      "abc"->Point.make->Option.isNone
+    ),
+    test(~expectation="match on 2d", ~predicate=() => {
+      let p = (1.0, 1.0)
+      p->Point.fromA->Point.matchAB(~onA=i => i === p, ~onB=_ => false)
+    }),
+    test(~expectation="match on 3d", ~predicate=() => {
+      let p = (1.0, 1.0, 1.0)
+      p->Point.fromB->Point.matchAB(~onA=_ => false, ~onB=i => i === p)
+    }),
+    test(~expectation="match on 3d", ~predicate=() => {
+      (2.0, 3.0, 4.0)
+      ->Point.fromB
+      ->Point.matchAB(~onA=_ => false, ~onB=((x, y, z)) => x === 2.0 && y === 3.0 && z === 4.0)
+    }),
+  ]
+}
+
 // ================================================================================
 // Ensure basic int, string, date, and user-defined literals can be pattern matched
 // ================================================================================
@@ -288,4 +343,9 @@ module PatternTests = {
 }
 
 let tests =
-  [StringOrFalseTests.tests, FancyUnionTest.tests, PatternTests.tests]->Belt.Array.concatMany
+  [
+    StringOrFalseTests.tests,
+    FancyUnionTest.tests,
+    PointTests.tests,
+    PatternTests.tests,
+  ]->Belt.Array.concatMany
