@@ -94,7 +94,7 @@ module StringOrFalseTests = {
 // C: | null
 // D: | -1
 // ===========================================
-module SophisticatedUnionTest = {
+module FancyUnionTest = {
   module Success = {
     type t = {"success": Literal.True.t, "count": int}
     let isTypeOf = u => u->Unknown.getBool("success")->OptionEx.isSomeAnd(v => v == true)
@@ -111,6 +111,7 @@ module SophisticatedUnionTest = {
     let value = -1
   })
 
+  // This is the union under test, with some convenience functions added.
   module Target = {
     include Union.Make4({
       module A = Success
@@ -121,53 +122,38 @@ module SophisticatedUnionTest = {
 
     // Convenience functions
     let fromSuccess = fromA
-    let toSuccess = toA
     let fromFailure = fromB
-    let toFailure = toB
     let fromNull = fromC
-    let toNull = toC
     let fromNegativeOne = fromD
+    let toSuccess = toA
+    let toFailure = toB
+    let toNull = toC
     let toNegativeOne = toD
     let match = (value, ~onSuccess, ~onFailure, ~onNull, ~onNegativeOne) =>
       matchABCD(value, ~onA=onSuccess, ~onB=onFailure, ~onC=onNull, ~onD=onNegativeOne)
   }
 
-  let tests = [
-    Test.make(
-      ~category="Union",
-      ~title="Sophisticated",
-      ~expectation="fromNegativeOne",
-      ~predicate=() => NegativeOne.value->Target.fromNegativeOne->Obj.magic == -1,
-    ),
-    Test.make(~category="Union", ~title="Sophisticated", ~expectation="fromNull", ~predicate=() =>
-      Literal.Null.value->Target.fromNull->Obj.magic == Js.null
-    ),
-    Test.make(
-      ~category="Union",
-      ~title="Sophisticated",
-      ~expectation="fromSuccess",
-      ~predicate=() => {
+  let tests = {
+    let test = (~expectation, ~predicate) =>
+      Test.make(~category="Union", ~title="Fancy", ~expectation, ~predicate)
+    [
+      test(~expectation="fromNegativeOne", ~predicate=() =>
+        NegativeOne.value->Target.fromNegativeOne->Obj.magic == -1
+      ),
+      test(~expectation="fromNull", ~predicate=() =>
+        Literal.Null.value->Target.fromNull->Obj.magic == Js.null
+      ),
+      test(~expectation="fromSuccess", ~predicate=() => {
         let value = {"success": Literal.True.value, "count": 5}
         value->Target.fromSuccess->Obj.magic == value
-      },
-    ),
-    Test.make(
-      ~category="Union",
-      ~title="Sophisticated",
-      ~expectation="make from NegativeOne => Some",
-      ~predicate=() => NegativeOne.value->Target.make->Obj.magic == Some(-1),
-    ),
-    Test.make(
-      ~category="Union",
-      ~title="Sophisticated",
-      ~expectation="make from invalid value like 34 => None",
-      ~predicate=() => 34->Target.make->Option.isNone,
-    ),
-    Test.make(
-      ~category="Union",
-      ~title="Sophisticated",
-      ~expectation="match on Success",
-      ~predicate=() =>
+      }),
+      test(~expectation="make from NegativeOne => Some", ~predicate=() =>
+        NegativeOne.value->Target.make->Obj.magic == Some(-1)
+      ),
+      test(~expectation="make from invalid value like 34 => None", ~predicate=() =>
+        34->Target.make->Option.isNone
+      ),
+      test(~expectation="match on Success", ~predicate=() =>
         {"success": Literal.True.value, "count": 5}
         ->Target.make
         ->Option.getExn
@@ -176,13 +162,9 @@ module SophisticatedUnionTest = {
           ~onFailure=_ => false,
           ~onNegativeOne=_ => false,
           ~onNull=_ => false,
-        ),
-    ),
-    Test.make(
-      ~category="Union",
-      ~title="Sophisticated",
-      ~expectation="match on NegativeOne",
-      ~predicate=() =>
+        )
+      ),
+      test(~expectation="match on NegativeOne", ~predicate=() =>
         -1
         ->Target.make
         ->Option.getExn
@@ -191,25 +173,15 @@ module SophisticatedUnionTest = {
           ~onFailure=_ => false,
           ~onNegativeOne=_ => true,
           ~onNull=_ => false,
-        ),
-    ),
-    Test.make(
-      ~category="Union",
-      ~title="Sophisticated",
-      ~expectation="toNull when null => Some",
-      ~predicate=() => Literal.Null.value->Target.fromNull->Target.toNull->Option.isSome,
-    ),
-    Test.make(
-      ~category="Union",
-      ~title="Sophisticated",
-      ~expectation="toNull when something else => None",
-      ~predicate=() => NegativeOne.value->Target.fromNegativeOne->Target.toNull->Option.isNone,
-    ),
-    Test.make(
-      ~category="Union",
-      ~title="Sophisticated",
-      ~expectation="match on Null",
-      ~predicate=() =>
+        )
+      ),
+      test(~expectation="toNull when null => Some", ~predicate=() =>
+        Literal.Null.value->Target.fromNull->Target.toNull->Option.isSome
+      ),
+      test(~expectation="toNull when something else => None", ~predicate=() =>
+        NegativeOne.value->Target.fromNegativeOne->Target.toNull->Option.isNone
+      ),
+      test(~expectation="match on Null", ~predicate=() =>
         Literal.Null.value
         ->Target.fromNull
         ->Target.match(
@@ -217,9 +189,10 @@ module SophisticatedUnionTest = {
           ~onFailure=_ => false,
           ~onNegativeOne=_ => false,
           ~onNull=_ => true,
-        ),
-    ),
-  ]
+        )
+      ),
+    ]
+  }
 }
 
 // ================================================================================
@@ -315,8 +288,4 @@ module PatternTests = {
 }
 
 let tests =
-  [
-    StringOrFalseTests.tests,
-    SophisticatedUnionTest.tests,
-    PatternTests.tests,
-  ]->Belt.Array.concatMany
+  [StringOrFalseTests.tests, FancyUnionTest.tests, PatternTests.tests]->Belt.Array.concatMany
