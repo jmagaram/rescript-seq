@@ -35,7 +35,7 @@ let tests = [
   ),
   makeTest(
     ~title="make",
-    ~expectation="when fails with ReScript exception, and initial error mapping is identity, can map error later",
+    ~expectation="when fails with ReScript exception, can map error later",
     ~a=() =>
       TaskResult.make(
         ~promise=() => Promise.resolve("abc")->Promise.then(_ => raise(OutOfRange(4))),
@@ -64,7 +64,7 @@ let tests = [
   ),
   makeTest(
     ~title="make",
-    ~expectation="when fails with JavaScript exception, and initial error mapping is identity, can map error later",
+    ~expectation="when fails with JavaScript exception, can map error later",
     ~a=() =>
       TaskResult.make(
         ~promise=() => Promise.resolve("abc")->Promise.then(_ => Js.Exn.raiseError("failure!")),
