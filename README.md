@@ -27,6 +27,11 @@ This implementation does not utilize any special compiler support and so there a
 - No genType support
 - No recursive type definition
 
+**Note:** It is possible to create untagged unions with a library like
+[rescript-struct](https://github.com/DZakh/rescript-struct) and not use the functors defined in this package. See the [usage examples](https://github.com/jmagaram/rescript-extras/blob/master/src/Extras__UnionTests.res) for a comparision of the two approaches. This works very well and avoids abstractions, but requires a bit more code.
+
+**Note:** The Rescript compiler also has a new feature for untagged unions that works great with pattern matching support. There are limitations on which types can be included in the union, pattern matching is not customizable, and custom equality is not provided.
+
 ## Literal
 
 Functors to create **`Literal`** types of various kinds using **`MakeString`** and **`MakeInt`** and others. Includes built-in literals for `True`, `False`, `Null`, and `Undefined`. You can create literals from reference types, and provide a custom equality operator to do things like case-insensitive string comparison. This implementation is completely type safe because each literal is its own unique type; you can't just cast any string to a "yes" for example.
