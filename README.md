@@ -30,7 +30,7 @@ This implementation does not utilize any special compiler support and so there a
 **Note:** It is possible to create untagged unions with a library like
 [rescript-struct](https://github.com/DZakh/rescript-struct) and not use the functors defined in this package. See the [usage examples](https://github.com/jmagaram/rescript-extras/blob/master/src/Extras__UnionTests.res) for a comparision of the two approaches. This works very well and avoids abstractions, but requires a bit more code.
 
-**Note:** The Rescript compiler also has a new feature for untagged unions that works great with pattern matching support. There are limitations on which types can be included in the union, pattern matching is not customizable, and custom equality is not provided.
+**Note:** The Rescript compiler also has a new feature for untagged unions that works great with pattern matching support. There are limitations on which types can be included in the union, literal support is very nice, pattern matching is not customizable, and custom equality is not provided.
 
 ## Literal
 
