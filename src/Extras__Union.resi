@@ -1,3 +1,12 @@
+// This module provides functors to create tagged or untagged unions of 2, 3, or
+// 4 items. Each union has a custom equality operator and functions for creation
+// and pattern matching. There are limitations to this approach. There are also
+// reasonable alternatives to achieve a similar thing, such as using a JSON
+// parsing library like rescript-struct or the the untagged union support built
+// into the compiler. For more details, see the README at
+// https://github.com/jmagaram/rescript-extras and consult some of the examples
+// in the test file.
+
 // Defines a single case in an untagged union.
 module type Pattern = {
   // The underlying type. Can be a primitive like `string`, a reference type
