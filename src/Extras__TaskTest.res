@@ -8,15 +8,19 @@ exception OutOfRange(int)
 @get external errorMessage: 'a => option<string> = "message"
 
 let taskTests = {
+  let makeSucceeds = (~success, ~onError) =>
+    Task.make(~promise=() => Promise.resolve(success), ~onError=_ => onError)
+
   let makeTest = (~title, ~expectation, ~a, ~b) =>
     T.makeAsync(~category="Task", ~title, ~expectation, ~predicate=async () =>
       await a()->Task.toPromise == b
     )
+
   [
     makeTest(
       ~title="make",
       ~expectation="when succeeds, return value",
-      ~a=() => Task.make(~promise=() => Promise.resolve(11), ~onError=_ => 3),
+      ~a=() => makeSucceeds(~success=11, ~onError=-1),
       ~b=11,
     ),
     makeTest(
@@ -51,7 +55,7 @@ let taskTests = {
       ~title="map",
       ~expectation="return value mapped",
       ~a=() =>
-        Task.make(~promise=() => Promise.resolve(2), ~onError=_ => -99)
+        makeSucceeds(~success=2, ~onError=-99)
         ->Task.map(i => i * 2)
         ->Task.map(i => i * 3)
         ->Task.map(i => `It is ${i->Belt.Int.toString}`),
@@ -64,9 +68,7 @@ let taskTests = {
       ~predicate=async () => {
         let saw = ref(-1)
         let t =
-          Task.make(~promise=() => Promise.resolve(99), ~onError=_ => -1)
-          ->Task.spy(v => saw := v)
-          ->Task.map(i => i * 2)
+          makeSucceeds(~success=99, ~onError=-1)->Task.spy(v => saw := v)->Task.map(i => i * 2)
         let _ignore = await t->Task.toPromise
         saw.contents == 99
       },
@@ -75,15 +77,19 @@ let taskTests = {
 }
 
 let taskResultTests = {
+  let makeSucceeds = (~success, ~onError) =>
+    Task.Result.make(~promise=() => Promise.resolve(success), ~onError=_ => onError)
+
   let makeTest = (~title, ~expectation, ~a, ~b) =>
     T.makeAsync(~category="Task.Result", ~title, ~expectation, ~predicate=async () =>
       await a()->Task.toPromise == b
     )
+
   [
     makeTest(
       ~title="make",
       ~expectation="when succeeds, return Ok",
-      ~a=() => Task.Result.make(~promise=() => Promise.resolve(11), ~onError=_ => "abc"),
+      ~a=() => makeSucceeds(~success=11, ~onError="error"),
       ~b=Ok(11),
     ),
     makeTest(
@@ -148,7 +154,7 @@ let taskResultTests = {
       ~title="mapOk",
       ~expectation="when succeeds, return Ok mapped",
       ~a=() =>
-        Task.Result.make(~promise=() => Promise.resolve(11), ~onError=_ => "abc")
+        makeSucceeds(~success=11, ~onError="abc")
         ->Task.Result.mapOk(i => i * 2)
         ->Task.Result.mapOk(i => i * 5),
       ~b=Ok(11 * 2 * 5),
@@ -169,7 +175,7 @@ let taskResultTests = {
       ~title="flatMap",
       ~expectation="when succeeds, return Ok",
       ~a=() =>
-        Task.Result.make(~promise=() => Promise.resolve(11), ~onError=_ => 3)
+        makeSucceeds(~success=11, ~onError=-1)
         ->Task.Result.flatMap(i => i == 11 ? Ok(88) : Error(-1))
         ->Task.Result.flatMap(i => i == 88 ? Ok(65) : Error(-1)),
       ~b=Ok(65),
@@ -178,7 +184,7 @@ let taskResultTests = {
       ~title="flatMap",
       ~expectation="when fails eventually, return first Error",
       ~a=() =>
-        Task.Result.make(~promise=() => Promise.resolve(11), ~onError=_ => 3)
+        makeSucceeds(~success=11, ~onError=3)
         ->Task.Result.flatMap(i => i == 11 ? Ok(88) : Error(-1))
         ->Task.Result.flatMap(i => i == 88 ? Error(1234) : Ok(-1))
         ->Task.Result.flatMap(_ => Error(55)),
@@ -199,8 +205,7 @@ let taskResultTests = {
     makeTest(
       ~title="toOption",
       ~expectation="when succeeds, return Some",
-      ~a=() =>
-        Task.Result.make(~promise=() => Promise.resolve(11), ~onError=_ => 3)->Task.Result.toOption,
+      ~a=() => makeSucceeds(~success=11, ~onError=3)->Task.Result.toOption,
       ~b=Some(11),
     ),
     makeTest(
