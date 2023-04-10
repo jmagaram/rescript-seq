@@ -260,33 +260,30 @@ module PointTests = {
 
 // =============================================================================
 // Use type-safe JSON parsing to determine the shape and validity of each choice
-// in the union. Using RescriptStruct for the example below.
+// in the union. ONLY USING RescriptStruct here to see how it compares to using
+// the Union module in this library. Attempting to build a union with easy-to-use
+// constructors, equality, and pattern matching.
 //
 // A: | string // between 5 and 10 chacters long
 // B: | int    // non-negative
 // C: | { "x": int, "y": int }
 // =============================================================================
 
-module JsonParserTests = {
+module OnlyRescriptStructTests = {
   open RescriptStruct
 
   module ShortString = {
     @unboxed type t = Short(string)
-    let struct = S.string()->S.String.min(3)->S.String.max(10)
-    let isTypeOf = u => u->S.parseAnyWith(struct)->Result.isOk
-    let make = s =>
-      switch s->S.parseAnyWith(struct) {
-      | Ok(s) => Some(Short(s))
-      | _ => None
-      }
+    let struct =
+      S.string()->S.String.min(3)->S.String.max(10)->S.transform(~parser=v => Short(v), ())
+    let make = s => s->S.parseAnyWith(struct)->ResultEx.toOption
     let equals = (x: t, y: t) => x === y
   }
 
   module NonNegativeInt = {
     @unboxed type t = NonNegative(int)
-    let struct = S.int()->S.Int.min(0)
-    let isTypeOf = u => u->S.parseAnyWith(struct)->Result.isOk
-    let make = n => n >= 0 ? Some((Obj.magic(n): t)) : None
+    let struct = S.int()->S.Int.min(0)->S.transform(~parser=v => NonNegative(v), ())
+    let make = n => n->S.parseAnyWith(struct)->ResultEx.toOption
     let equals = (x: t, y: t) => x === y
   }
 
@@ -296,15 +293,43 @@ module JsonParserTests = {
       x: o->S.field("x", S.int()),
       y: o->S.field("y", S.int()),
     })
-    let isTypeOf = u => u->S.parseAnyWith(struct)->Result.isOk
     let make = (x, y) => {x, y}
     let equals = (a: t, b: t) => a.x === b.x && a.y === b.y
   }
 
-  // Without the Union module, here is how you could build an untagged union just
-  // using the RescriptStruct library. Looks pretty good and simple.
-  module TargetBuiltManually = {
+  module type TargetType = {
     type t
+
+    external fromNonNegativeInt: NonNegativeInt.t => t = "%identity"
+    external fromShortString: ShortString.t => t = "%identity"
+    external fromPoint: Point.t => t = "%identity"
+
+    let toPoint: t => option<Point.t>
+    let toNonNegativeInt: t => option<NonNegativeInt.t>
+    let toShortString: t => option<ShortString.t>
+
+    let make: 'a => option<t>
+
+    let match: (
+      t,
+      ~onPoint: Point.t => 'a,
+      ~onInt: NonNegativeInt.t => 'a,
+      ~onString: ShortString.t => 'a,
+    ) => 'a
+
+    let equals: (t, t) => bool
+  }
+
+  module Target: TargetType = {
+    type t
+
+    let makeUnsafe = (i): t => Obj.magic(i)
+
+    let unionStruct: S.t<t> = S.union([
+      Point.struct->S.transform(~parser=makeUnsafe, ()),
+      ShortString.struct->S.transform(~parser=makeUnsafe, ()),
+      NonNegativeInt.struct->S.transform(~parser=makeUnsafe, ()),
+    ])
 
     external fromNonNegativeInt: NonNegativeInt.t => t = "%identity"
     external fromShortString: ShortString.t => t = "%identity"
@@ -314,43 +339,33 @@ module JsonParserTests = {
     let toShortString = (i: t) => i->S.parseAnyWith(ShortString.struct)->ResultEx.toOption
     let toNonNegativeInt = (i: t) => i->S.parseAnyWith(NonNegativeInt.struct)->ResultEx.toOption
 
-    let makeUnsafe = (i): t => Obj.magic(i)
-    let make = i =>
-      toPoint(i)
-      ->Option.map(makeUnsafe)
-      ->OptionEx.orElseWith(() => toShortString(i)->Option.map(makeUnsafe))
-      ->OptionEx.orElseWith(() => toNonNegativeInt(i)->Option.map(makeUnsafe))
+    let make = i => i->S.parseAnyWith(unionStruct)->ResultEx.toOption
 
-    let match = (value, ~onPoint, ~onInt, ~onShortString) => {
+    let match = (value, ~onPoint, ~onInt, ~onString) => {
       let result =
         toPoint(value)
         ->Option.map(onPoint)
         ->OptionEx.orElseWith(() => toNonNegativeInt(value)->Option.map(onInt))
-        ->OptionEx.orElseWith(() => toShortString(value)->Option.map(onShortString))
+        ->OptionEx.orElseWith(() => toShortString(value)->Option.map(onString))
       switch result {
-      | Some(_) => result
+      | Some(v) => v
       | None => Js.Exn.raiseError("Unsafely cast value; did not pattern match.")
       }
     }
-  }
 
-  module Target = {
-    include Union.Make3({
-      module A = ShortString
-      module B = NonNegativeInt
-      module C = Point
-    })
-    let fromString = fromA
-    let fromNonNegativeInt = fromB
-    let fromPoint = fromC
-    let toString = toA
-    let toNonNegativeInt = toB
-    let toPoint = toC
-    let match = (~onString, ~onInt, ~onPoint) => matchABC(~onA=onString, ~onB=onInt, ~onC=onPoint)
+    let equalsBy = (f, eq, x, y) =>
+      f(x)->Option.map(x => f(y)->Option.mapWithDefault(false, y => eq(x, y)))
+
+    let equals = (x, y) => {
+      equalsBy(toPoint, Point.equals, x, y)
+      ->OptionEx.orElseWith(() => equalsBy(toNonNegativeInt, NonNegativeInt.equals, x, y))
+      ->OptionEx.orElseWith(() => equalsBy(toShortString, ShortString.equals, x, y))
+      ->Option.getWithDefault(false)
+    }
   }
 
   let test = (~expectation, ~predicate) =>
-    Test.make(~category="Union", ~title="JSON Parsing", ~expectation, ~predicate)
+    Test.make(~category="Union", ~title="Use RescriptStruct exclusively", ~expectation, ~predicate)
 
   let tests = [
     test(~expectation="make from short string => Some", ~predicate=() =>
@@ -376,11 +391,7 @@ module JsonParserTests = {
     ),
     test(~expectation="make from point => Some with exact same instance", ~predicate=() => {
       let p = Point.make(2, 3)
-      p
-      ->Target.make
-      ->Option.getExn
-      ->Target.toPoint
-      ->Option.mapWithDefault(false, instance => instance === p)
+      Obj.magic(p->Target.fromPoint) === p
     }),
     test(~expectation="match on point", ~predicate=() => {
       Point.make(2, 3)
@@ -394,7 +405,94 @@ module JsonParserTests = {
       ->Option.getExn
       ->Target.match(~onString=_ => false, ~onInt=i => i == NonNegative(16), ~onPoint=_ => false)
     }),
+    test(~expectation="equality of int", ~predicate=() =>
+      Target.equals(
+        NonNegativeInt.make(1)->Option.getExn->Target.fromNonNegativeInt,
+        NonNegativeInt.make(1)->Option.getExn->Target.fromNonNegativeInt,
+      )
+    ),
+    test(~expectation="equality of int", ~predicate=() =>
+      false ==
+        Target.equals(
+          NonNegativeInt.make(1)->Option.getExn->Target.fromNonNegativeInt,
+          NonNegativeInt.make(2)->Option.getExn->Target.fromNonNegativeInt,
+        )
+    ),
+    test(~expectation="equality of int and string", ~predicate=() =>
+      false ==
+        Target.equals(
+          NonNegativeInt.make(1)->Option.getExn->Target.fromNonNegativeInt,
+          ShortString.make("abcde")->Option.getExn->Target.fromShortString,
+        )
+    ),
+    test(~expectation="equality of point", ~predicate=() =>
+      Target.equals(Point.make(1, 2)->Target.fromPoint, Point.make(1, 2)->Target.fromPoint)
+    ),
+    test(~expectation="equality of point", ~predicate=() =>
+      false == Target.equals(Point.make(1, 2)->Target.fromPoint, Point.make(9, 9)->Target.fromPoint)
+    ),
   ]
+}
+
+// =============================================================================
+// Use type-safe JSON parsing to determine the shape and validity of each choice
+// in the union. But putting each option together using the Union module of this
+// library.
+//
+// A: | string // between 5 and 10 chacters long
+// B: | int    // non-negative
+// C: | { "x": int, "y": int }
+// =============================================================================
+// 92 lines : Using RescriptStruct exclusively with explicit module type
+// 70 lines : Using RescriptStruct exclusively without module type
+// 44 lines : Using Union module defined in this package
+// =============================================================================
+
+module WithHelpFromRescriptStruct = {
+  open RescriptStruct
+
+  module ShortString = {
+    @unboxed type t = Short(string)
+    let struct =
+      S.string()->S.String.min(3)->S.String.max(10)->S.transform(~parser=v => Short(v), ())
+    let make = (s: string) => s->S.parseAnyWith(struct)->ResultEx.toOption
+    let isTypeOf = (s: Unknown.t) => s->S.parseAnyWith(struct)->Result.isOk
+    let equals = (x: t, y: t) => x === y
+  }
+
+  module NonNegativeInt = {
+    @unboxed type t = NonNegative(int)
+    let struct = S.int()->S.Int.min(0)->S.transform(~parser=v => NonNegative(v), ())
+    let make = (n: int) => n->S.parseAnyWith(struct)->ResultEx.toOption
+    let isTypeOf = (s: Unknown.t) => s->S.parseAnyWith(struct)->Result.isOk
+    let equals = (x: t, y: t) => x === y
+  }
+
+  module Point = {
+    type t = {x: int, y: int}
+    let struct = S.object(o => {
+      x: o->S.field("x", S.int()),
+      y: o->S.field("y", S.int()),
+    })
+    let make = (x, y) => {x, y}
+    let isTypeOf = (s: Unknown.t) => s->S.parseAnyWith(struct)->Result.isOk
+    let equals = (a: t, b: t) => a.x === b.x && a.y === b.y
+  }
+
+  module Target = {
+    include Union.Make3({
+      module A = ShortString
+      module B = NonNegativeInt
+      module C = Point
+    })
+    let fromString = fromA
+    let fromNonNegativeInt = fromB
+    let fromPoint = fromC
+    let toString = toA
+    let toNonNegativeInt = toB
+    let toPoint = toC
+    let match = (~onString, ~onInt, ~onPoint) => matchABC(~onA=onString, ~onB=onInt, ~onC=onPoint)
+  }
 }
 
 // ================================================================================
@@ -495,6 +593,6 @@ let tests =
     StringOrFalseTests.tests,
     FancyUnionTest.tests,
     PointTests.tests,
-    JsonParserTests.tests,
+    OnlyRescriptStructTests.tests,
     PatternTests.tests,
   ]->Belt.Array.concatMany
