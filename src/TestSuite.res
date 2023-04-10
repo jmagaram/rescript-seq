@@ -27,11 +27,6 @@ Ex.TaskResult.make(~promise=() => Ex.Test.runSuite(tests, ~filter), ~onError=e =
   | _ => Some("Could not run the test suite, or an unexpected failure.")
   }
 )
+->Ex.Task.forEach(Option.forEach(_, msg => Js.Exn.raiseError(msg)))
 ->Ex.Task.toPromise
-->Promise.then(i =>
-  switch i {
-  | Some(errorMessage) => Js.Exn.raiseError(errorMessage)
-  | _ => ()->Promise.resolve
-  }
-)
 ->ignore

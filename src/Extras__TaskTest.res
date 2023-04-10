@@ -56,4 +56,18 @@ let tests = [
       ->Task.map(i => `It is ${i->Belt.Int.toString}`),
     ~b="It is 12",
   ),
+  T.makeAsync(
+    ~category="Task",
+    ~title="spy",
+    ~expectation="spy function is executed",
+    ~predicate=async () => {
+      let saw = ref(-1)
+      let t =
+        Task.make(~promise=() => Promise.resolve(99), ~onError=_ => -1)
+        ->Task.spy(v => saw := v)
+        ->Task.map(i => i * 2)
+      let _ignore = await t->Task.toPromise
+      saw.contents == 99
+    },
+  ),
 ]
