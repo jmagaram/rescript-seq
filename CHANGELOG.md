@@ -1,3 +1,7 @@
+## Version 0.14.0
+
+- Move `TaskResult` into a submodule of `Task` for usability
+
 ## Version 0.13.0
 
 - Switch to `commonjs` module format; supposedly this works better for Rescript libraries

@@ -5,7 +5,6 @@ module Cmp = Extras__Cmp
 module CmpUtilities = Extras__CmpUtilities
 module Test = Extras__Test
 module Task = Extras__Task
-module TaskResult = Extras__TaskResult
 module Unknown = Extras__Unknown
 module Literal = Extras__Literal
 module Union = Extras__Union
