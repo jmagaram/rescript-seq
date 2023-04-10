@@ -2,6 +2,7 @@
 
 - Switch to `commonjs` module format; supposedly this works better for Rescript libraries
 - Examples of using [rescript-struct](https://github.com/DZakh/rescript-struct) for unions, and compared to using functors in this package.
+- Add `mapBoth` to `TaskResult`
 
 ## Version 0.12.0
 
