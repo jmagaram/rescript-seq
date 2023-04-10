@@ -8,7 +8,7 @@ General-purpose modules for [ReScript](https://rescript-lang.org) projects. Incl
 
 ## Task and TaskResult
 
-Inspired by [TaskEither in fp-ts](https://gcanti.github.io/fp-ts/modules/TaskEither.ts.html), a `Task` is a lazy promise that never fails. A `TaskResult` is a lazy promise that always returns an `Error` or an `Ok`. Just like a regular `result`, you can transform it before execution with **`map`**, **`mapError`**, and **`flatMap`**. When ready to execute, call **`toPromise`**.
+Inspired by [TaskEither in fp-ts](https://gcanti.github.io/fp-ts/modules/TaskEither.ts.html), a `Task` is a lazy promise that never fails. The `Task.Result` works with lazy promises that always return an `Error` or an `Ok`. Just like a regular `result`, you can transform it before execution with **`map`**, **`mapError`**, **`flatMap`**, and **`toOption`**. When ready to execute, call **`toPromise`**.
 
 ## Union
 
