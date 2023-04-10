@@ -1,6 +1,6 @@
 # ReScript Extras
 
-General-purpose modules for [ReScript](https://rescript-lang.org) projects. Includes extensions to `Option`, `Result`, and `Array`. Also a lazy-promise `Task` and `TaskResult`, `NonEmptyArray`, comparison utilities in `Cmp`, and a very simple test runner `Test`. Use `Union` and `Literal` functors to create and pattern match on tagged and untagged discriminated unions (choice types) of any kind, which can be helpful for interop with JavaScript libraries. To install:
+General-purpose modules for [ReScript](https://rescript-lang.org) projects. Includes extensions to `Option`, `Result`, and `Array`. Also a lazy-promise `Task` and `TaskResult`, `NonEmptyArray`, comparison utilities in `Cmp`, and a simple test runner `Test`. Use `Union` and `Literal` functors to create and pattern match on tagged and untagged discriminated unions of any kind, which can be helpful for interop with JavaScript libraries. To install:
 
 1. `npm install @jmagaram/rescript-extras`
 2. Add `@jmagaram/rescript-extras` to `bs-dependencies` in your `bsconfig.json`
@@ -12,17 +12,15 @@ Inspired by [TaskEither in fp-ts](https://gcanti.github.io/fp-ts/modules/TaskEit
 
 ## Union
 
-The **`Union`** module provides functors to create tagged or untagged discriminated unions of 2, 3, or 4 items. This is useful for interop with JavaScript libraries that produce or expect simple types like `string | number` and more complex types where the choices are tagged differently than how ReScript does it. See [usage examples](https://github.com/jmagaram/rescript-extras/blob/master/src/Extras__UnionTests.res). Capabilities:
+The **`Union`** module provides functors to create tagged and untagged discriminated unions of 2, 3, or 4 items. This is useful for interop with JavaScript libraries that produce or expect simple types like `string | number` and more complex types where the choices are tagged differently than how ReScript does it. See [usage examples](https://github.com/jmagaram/rescript-extras/blob/master/src/Extras__UnionTests.res). Capabilities:
 
-- Discriminate (pattern match) on any programmable criteria, like `typeof`, `instance of`, lightweight shape detection (such as a tag), or validation with a JSON parsing library.
+- Discriminate (pattern match) on any programmable criteria, like `typeof`, `instance of`, lightweight shape detection (such as a tag), or parsing with a JSON parsing library.
 - All types can participate in a union, including literals.
 - Custom equality
-- Type safety
 
 This implementation does not utilize any special compiler support and so there are some limitations:
 
-- Pattern matching must rely on a `match` function, not the usual matching syntax.
-- Each case is distinguished by `A` | `B` | `C` | `D`. This can be easily improved by extending or wrapping the produced module; see the [test file for examples](https://github.com/jmagaram/rescript-extras/blob/master/src/Extras__UnionTests.res).
+- Pattern matching must rely on a `match` function, not the usual matching syntax.Each case is distinguished by `A` | `B` | `C` | `D`. This can be easily improved by extending or wrapping the produced module; see the [test file for examples](https://github.com/jmagaram/rescript-extras/blob/master/src/Extras__UnionTests.res).
 - Literal support and functors are a bit cumbersome
 - No genType support
 - No recursive type definition
@@ -30,7 +28,7 @@ This implementation does not utilize any special compiler support and so there a
 **Note:** It is possible to create untagged unions with a library like
 [rescript-struct](https://github.com/DZakh/rescript-struct) and not use the functors defined in this package. See the [usage examples](https://github.com/jmagaram/rescript-extras/blob/master/src/Extras__UnionTests.res) for a comparision of the two approaches. This works very well and avoids abstractions, but requires a bit more code.
 
-**Note:** The Rescript compiler also has a new feature for untagged unions that works great with pattern matching support. There are limitations on which types can be included in the union, literal support is very nice, pattern matching is not customizable, and custom equality is not provided.
+**Note:** The Rescript compiler has a new feature for untagged unions that works great with pattern matching support. There are limitations on which types can be included in the union, literal support is very nice, pattern matching is not customizable, and custom equality is not provided.
 
 ## Literal
 
