@@ -12,6 +12,13 @@ let make = (~promise, ~onError) =>
 
 let mapError = (t, f) => t->Task.map(r => r->Extras__Result.mapError(f))
 let mapOk = (t, f) => t->Task.map(r => r->Result.map(f))
+let mapBoth = (t, ~ok, ~error) =>
+  t->Task.map(r =>
+    switch r {
+    | Ok(i) => ok(i)
+    | Error(i) => error(i)
+    }
+  )
 let flatMap = (t, f) => t->Task.map(r => r->Result.flatMap(f))
 
 let toPromise = t => t->Task.toPromise

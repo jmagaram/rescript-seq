@@ -2,6 +2,7 @@ module T = Extras__Test
 module Task = Extras__Task
 module TaskResult = Extras__TaskResult
 module Promise = Js.Promise2
+module ResultEx = Extras__Result
 
 exception OutOfRange(int)
 
@@ -10,6 +11,10 @@ exception OutOfRange(int)
 let makeTest = (~title, ~expectation, ~a, ~b) =>
   T.makeAsync(~category="TaskResult", ~title, ~expectation, ~predicate=async () =>
     await a()->TaskResult.toPromise == b
+  )
+let makeTaskTest = (~title, ~expectation, ~a, ~b) =>
+  T.makeAsync(~category="TaskResult", ~title, ~expectation, ~predicate=async () =>
+    await a()->Task.toPromise == b
   )
 
 let tests = [
@@ -97,6 +102,26 @@ let tests = [
       ->TaskResult.mapError(i => i * 2)
       ->TaskResult.mapError(i => i + 9),
     ~b=Error(3 * 2 + 9),
+  ),
+  makeTaskTest(
+    ~title="mapBoth",
+    ~expectation="when error",
+    ~a=() =>
+      TaskResult.make(
+        ~promise=() => Promise.resolve(11)->Promise.then(_ => raise(OutOfRange(4))),
+        ~onError=_ => "error",
+      )->TaskResult.mapBoth(~ok=_ => "ok", ~error=e => e),
+    ~b="error",
+  ),
+  makeTaskTest(
+    ~title="mapBoth",
+    ~expectation="when ok",
+    ~a=() =>
+      TaskResult.make(~promise=() => Promise.resolve(11), ~onError=_ => -1)->TaskResult.mapBoth(
+        ~ok=i => i,
+        ~error=i => i,
+      ),
+    ~b=11,
   ),
   makeTest(
     ~title="flatMap",
