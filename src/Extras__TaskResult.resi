@@ -1,7 +1,7 @@
 module Task = Extras__Task
 
 @genType
-type t<'ok, 'err> = Task.t<result<'ok, 'err>>
+type t<'ok, 'err> = Extras__Task.t<result<'ok, 'err>>
 
 let make: (~promise: unit => promise<'a>, ~onError: exn => 'b) => t<'a, 'b>
 
