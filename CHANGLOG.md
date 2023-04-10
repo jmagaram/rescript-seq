@@ -1,3 +1,8 @@
+## Version 0.13.0
+
+- Switch to `commonjs` module format; supposedly this works better for Rescript libraries
+- Examples of using [rescript-struct](https://github.com/DZakh/rescript-struct) for unions, and compared to using functors in this package.
+
 ## Version 0.12.0
 
 ### Union
