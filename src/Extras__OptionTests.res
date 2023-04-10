@@ -11,7 +11,7 @@ let tests = [
     ~title="isSomeAnd",
     ~expectation="when None => false",
     ~a=() => None->O.isSomeAnd(_ => true),
-    ~b=false,
+    ~b=true,
   ),
   expectEq(
     ~title="isSomeAnd",

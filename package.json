@@ -1,7 +1,7 @@
 {
   "name": "@jmagaram/rescript-extras",
   "version": "0.12.0",
-  "type": "module",
+  "module": "",
   "description": "Useful general-purpose utility functions and modules for ReScript projects.",
   "keywords": [
     "rescript"
@@ -9,13 +9,14 @@
   "main": "index.js",
   "scripts": {
     "test": "node src/TestSuite.bs.js",
-    "res:build": "rescript",
-    "res:dev": "rescript build -w",
+    "res:build": "rescript build -with-deps",
+    "res:dev": "rescript build -with-deps -w",
     "res:clean": "rescript clean"
   },
   "author": "Justin Magaram",
   "license": "ISC",
   "dependencies": {
-    "rescript": "^10.1.4"
+    "rescript": "^10.1.4",
+    "rescript-struct": "^4.0.0"
   }
 }

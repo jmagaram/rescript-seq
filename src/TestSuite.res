@@ -1,10 +1,12 @@
 open Belt
 module Test = Extras__Test
+module Ex = Extras
+module Promise = Js.Promise2
 
 let filter = _ => true
 
-let summary =
-  await [
+let tests =
+  [
     Extras__CmpTests.tests,
     Extras__ArrayTests.tests,
     Extras__OptionTests.tests,
@@ -15,10 +17,21 @@ let summary =
     Extras__LiteralTests.tests,
     Extras__UnionTests.tests,
     Extras__UnknownTests.tests,
-  ]
-  ->Array.concatMany
-  ->Extras__Test.runSuite(~filter)
+  ]->Array.concatMany
 
-if summary.fail > 0 {
-  Js.Exn.raiseError(`Failed tests: ${summary.fail->Int.toString}`)
-}
+Ex.TaskResult.make(~promise=() => Ex.Test.runSuite(tests, ~filter), ~onError=e => e)
+->Ex.Task.map(i =>
+  switch i {
+  | Ok(s) if s.fail == 0 => None
+  | Ok(s) if s.fail > 0 => Some(`Tests failed: ${s.fail->Int.toString}`)
+  | _ => Some("Could not run the test suite, or an unexpected failure.")
+  }
+)
+->Ex.Task.toPromise
+->Promise.then(i =>
+  switch i {
+  | Some(errorMessage) => Js.Exn.raiseError(errorMessage)
+  | _ => ()->Promise.resolve
+  }
+)
+->ignore

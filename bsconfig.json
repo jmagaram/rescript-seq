@@ -8,12 +8,12 @@
   ],
   "package-specs": [
     {
-      "module": "es6",
+      "module": "commonjs",
       "in-source": true
     }
   ],
   "suffix": ".bs.js",
-  "bs-dependencies": [],
+  "bs-dependencies": ["rescript-struct"],
   "gentypeconfig": {
     "language": "typescript",
     "shims": {},
