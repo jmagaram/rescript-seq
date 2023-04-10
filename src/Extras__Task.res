@@ -11,3 +11,5 @@ let make = (~promise, ~onError, ()) =>
 let map = (t, f, ()) => t()->Promise.then(r => f(r)->Promise.resolve)
 
 let toPromise = t => t()
+
+let forEach = (t, f) => t->map(f)
