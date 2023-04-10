@@ -4,6 +4,7 @@
 - Examples of using [rescript-struct](https://github.com/DZakh/rescript-struct) for unions, and compared to using functors in this package.
 - Add `TaskResult.mapBoth`
 - Add `Task.spy`
+- Fix genType bug with `TaskResult.t`
 
 ## Version 0.12.0
 
