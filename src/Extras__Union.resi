@@ -1,9 +1,7 @@
-// This module provides functors to create tagged or untagged unions of 2, 3, or
-// 4 items. Each union has a custom equality operator and functions for creation
-// and pattern matching. There are alternatives to achieve a similar thing, such
-// as using a JSON parsing library like rescript-struct or the the untagged
-// union support built into the compiler. For more details, see the README at
-// https://github.com/jmagaram/rescript-extras and consult the examples in
+// This module provides functors to create tagged or untagged unions 4 items.
+// Each union has a custom equality operator and functions for creation and
+// pattern matching. For more details and alternatives see the README at
+// https://github.com/jmagaram/rescript-extras and view the code examples in
 // https://github.com/jmagaram/rescript-extras/blob/master/src/Extras__UnionTests.res.
 
 // Defines a single case in an untagged union.
@@ -22,7 +20,7 @@ module type Pattern = {
   let equals: (t, t) => bool
 }
 
-// Pattern matching basic types. Literal types built with the Literal module,
+// Pattern matching for basic types. Literals built with the Literal module,
 // such as `true`, `null`, `-1`, and `"yes"`, are also patterns that can
 // participate in a union.
 module Patterns: {
