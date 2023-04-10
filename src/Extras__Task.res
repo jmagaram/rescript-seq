@@ -29,11 +29,11 @@ module Result = {
       ~onError=e => Error(onError(e)),
     )
 
-  let mapError = (t, f) => t->map(r => r->RX.mapError(f))
+  let mapError = (t, f) => t->map(RX.mapError(_, f))
 
-  let mapOk = (t, f) => t->map(r => r->R.map(f))
+  let mapOk = (t, f) => t->map(R.map(_, f))
 
-  let flatMap = (t, f) => t->map(r => r->R.flatMap(f))
+  let flatMap = (t, f) => t->map(R.flatMap(_, f))
 
   let toOption = t => t->map(RX.toOption)
 }
