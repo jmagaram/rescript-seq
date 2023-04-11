@@ -2,7 +2,6 @@ module Unknown = Extras__Unknown
 module OptionEx = Extras__Option
 module Option = Belt.Option
 
-// Immutable with value-based equality
 module type T = {
   type t
   type domain

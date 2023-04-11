@@ -15,6 +15,7 @@ let tests =
     Extras__NonEmptyArrayTests.tests,
     Extras__LiteralTests.tests,
     Extras__UnionTests.tests,
+    Extras__PatternTests.tests,
     Extras__UnknownTests.tests,
   ]->Array.concatMany
 

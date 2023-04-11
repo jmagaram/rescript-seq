@@ -1,62 +1,19 @@
 module Option = Belt.Option
 module OptionEx = Extras__Option
-module Unknown = Extras__Unknown
-
-module type Pattern = {
-  type t
-  let isTypeOf: unknown => bool
-  let equals: (t, t) => bool
-}
-
-module Patterns = {
-  module Int = {
-    type t = int
-    let isTypeOf = u => u->Unknown.typeof == #number
-    let equals = (x: int, y: int) => x === y
-  }
-
-  module Float = {
-    type t = float
-    let isTypeOf = u => u->Unknown.typeof == #number
-    let equals = (x: float, y: float) => x === y
-  }
-
-  module Bool = {
-    type t = bool
-    let isTypeOf = u => u->Unknown.typeof == #boolean
-    let equals = (x: bool, y: bool) => x === y
-  }
-
-  module String = {
-    type t = string
-    let isTypeOf = u => u->Unknown.typeof == #string
-    let equals = (x: string, y: string) => Js.String2.localeCompare(x, y) == 0.0
-  }
-
-  // https://stackoverflow.com/questions/643782/how-to-check-whether-an-object-is-a-date
-  module Date = {
-    type t = Js.Date.t
-    let isTypeOf: 'a => bool = %raw(`function (a) { return (!isNaN(a) && (a instanceof Date) && (typeof a.getMonth === 'function')) }`)
-    let equals = (x: Js.Date.t, y: Js.Date.t) => x == y
-  }
-}
-module PatternTools = (P: Pattern) => {
-  let make = x => x->Unknown.make->P.isTypeOf ? Some((Obj.magic(x): P.t)) : None
-  let eq = (x, y) => x->make->Option.flatMap(x => y->make->Option.map(y => P.equals(x, y)))
-}
+module Pattern = Extras__Pattern
 
 module Make2 = (
   P: {
-    module A: Pattern
-    module B: Pattern
+    module A: Pattern.T
+    module B: Pattern.T
   },
 ) => {
   type t
   type a = P.A.t
   type b = P.B.t
 
-  module A_Tools = PatternTools(P.A)
-  module B_Tools = PatternTools(P.B)
+  module A_Tools = Pattern.MakeTools(P.A)
+  module B_Tools = Pattern.MakeTools(P.B)
 
   external fromA: a => t = "%identity"
   external fromB: b => t = "%identity"
@@ -83,9 +40,9 @@ module Make2 = (
 
 module Make3 = (
   P: {
-    module A: Pattern
-    module B: Pattern
-    module C: Pattern
+    module A: Pattern.T
+    module B: Pattern.T
+    module C: Pattern.T
   },
 ) => {
   type t
@@ -93,9 +50,9 @@ module Make3 = (
   type b = P.B.t
   type c = P.C.t
 
-  module A_Tools = PatternTools(P.A)
-  module B_Tools = PatternTools(P.B)
-  module C_Tools = PatternTools(P.C)
+  module A_Tools = Pattern.MakeTools(P.A)
+  module B_Tools = Pattern.MakeTools(P.B)
+  module C_Tools = Pattern.MakeTools(P.C)
 
   external fromA: a => t = "%identity"
   external fromB: b => t = "%identity"
@@ -132,10 +89,10 @@ module Make3 = (
 
 module Make4 = (
   P: {
-    module A: Pattern
-    module B: Pattern
-    module C: Pattern
-    module D: Pattern
+    module A: Pattern.T
+    module B: Pattern.T
+    module C: Pattern.T
+    module D: Pattern.T
   },
 ) => {
   type t
@@ -144,10 +101,10 @@ module Make4 = (
   type c = P.C.t
   type d = P.D.t
 
-  module A_Tools = PatternTools(P.A)
-  module B_Tools = PatternTools(P.B)
-  module C_Tools = PatternTools(P.C)
-  module D_Tools = PatternTools(P.D)
+  module A_Tools = Pattern.MakeTools(P.A)
+  module B_Tools = Pattern.MakeTools(P.B)
+  module C_Tools = Pattern.MakeTools(P.C)
+  module D_Tools = Pattern.MakeTools(P.D)
 
   external fromA: a => t = "%identity"
   external fromB: b => t = "%identity"
@@ -184,5 +141,70 @@ module Make4 = (
     ->OptionEx.orElseWith(() => B_Tools.eq(x, y))
     ->OptionEx.orElseWith(() => C_Tools.eq(x, y))
     ->OptionEx.orElseWith(() => D_Tools.eq(x, y))
+    ->Option.getWithDefault(false)
+}
+
+module Make5 = (
+  P: {
+    module A: Pattern.T
+    module B: Pattern.T
+    module C: Pattern.T
+    module D: Pattern.T
+    module E: Pattern.T
+  },
+) => {
+  type t
+  type a = P.A.t
+  type b = P.B.t
+  type c = P.C.t
+  type d = P.D.t
+  type e = P.E.t
+
+  module A_Tools = Pattern.MakeTools(P.A)
+  module B_Tools = Pattern.MakeTools(P.B)
+  module C_Tools = Pattern.MakeTools(P.C)
+  module D_Tools = Pattern.MakeTools(P.D)
+  module E_Tools = Pattern.MakeTools(P.E)
+
+  external fromA: a => t = "%identity"
+  external fromB: b => t = "%identity"
+  external fromC: c => t = "%identity"
+  external fromD: d => t = "%identity"
+  external fromE: e => t = "%identity"
+
+  let toA = A_Tools.make
+  let toB = B_Tools.make
+  let toC = C_Tools.make
+  let toD = D_Tools.make
+  let toE = E_Tools.make
+
+  let make = value =>
+    value
+    ->A_Tools.make
+    ->Option.map(fromA)
+    ->Option.orElse(value->B_Tools.make->Option.map(fromB))
+    ->Option.orElse(value->C_Tools.make->Option.map(fromC))
+    ->Option.orElse(value->D_Tools.make->Option.map(fromD))
+    ->Option.orElse(value->E_Tools.make->Option.map(fromE))
+
+  let matchABCDE = (value, ~onA, ~onB, ~onC, ~onD, ~onE) =>
+    switch value
+    ->A_Tools.make
+    ->Option.map(onA)
+    ->Option.orElse(value->B_Tools.make->Option.map(onB))
+    ->Option.orElse(value->C_Tools.make->Option.map(onC))
+    ->Option.orElse(value->D_Tools.make->Option.map(onD))
+    ->Option.orElse(value->E_Tools.make->Option.map(onE)) {
+    | Some(value) => value
+    | None =>
+      Js.Exn.raiseError("The value was unsafely cast and did not match any of the provided types.")
+    }
+
+  let equals = (x: t, y: t) =>
+    A_Tools.eq(x, y)
+    ->OptionEx.orElseWith(() => B_Tools.eq(x, y))
+    ->OptionEx.orElseWith(() => C_Tools.eq(x, y))
+    ->OptionEx.orElseWith(() => D_Tools.eq(x, y))
+    ->OptionEx.orElseWith(() => E_Tools.eq(x, y))
     ->Option.getWithDefault(false)
 }

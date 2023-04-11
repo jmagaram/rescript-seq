@@ -1,6 +1,7 @@
 ## Version 0.20.0
 
 - Use the built-in `unknown` type
+- Move `Pattern` to a top-level module, not inside the `Union` module.
 
 ## Version 0.19.0
 

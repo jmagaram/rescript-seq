@@ -8,3 +8,4 @@ module Task = Extras__Task
 module Unknown = Extras__Unknown
 module Literal = Extras__Literal
 module Union = Extras__Union
+module Pattern = Extras__Pattern

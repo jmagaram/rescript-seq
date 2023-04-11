@@ -1,3 +1,7 @@
+// Defines a type with a single value, like -1, "yes", and true. These are
+// particular useful when defining unions. For example, a tagged union might
+// have a "shape" property with values for "circle" | "square". These can't be
+// any strings - they must be one of the predefined values.
 module type T = {
   type t
   type domain
@@ -8,6 +12,9 @@ module type T = {
   external unwrap: t => domain = "%identity"
 }
 
+// Give a specific type and value, constructs a Literal module for that value.
+// This functor only works for immutable values where membership in the type is
+// tested with the strict equality === operator.
 module Make: (
   C: {
     type domain
