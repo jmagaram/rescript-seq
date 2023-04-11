@@ -547,8 +547,21 @@ module LazinessTests = {
     test(~expectation="3 make from bool => Some", ~predicate=() =>
       true->IntOrBoolOrString.make->OptionEx.isSomeAnd(v => Obj.magic(v) == true)
     ),
+    test(~expectation="3 match from int", ~predicate=() =>
+      1
+      ->IntOrBoolOrString.fromA
+      ->IntOrBoolOrString.matchABC(~onA=i => i == 1, ~onB=_ => false, ~onC=_ => false)
+    ),
+    test(~expectation="3 match from bool", ~predicate=() =>
+      true
+      ->IntOrBoolOrString.fromB
+      ->IntOrBoolOrString.matchABC(~onA=_ => false, ~onB=b => b == true, ~onC=_ => false)
+    ),
     test(~expectation="2 make from int => Some", ~predicate=() =>
       1->IntOrString.make->OptionEx.isSomeAnd(v => Obj.magic(v) == 1)
+    ),
+    test(~expectation="2 match from int", ~predicate=() =>
+      1->IntOrString.fromA->IntOrString.matchAB(~onA=i => i == 1, ~onB=_ => false)
     ),
   ]
 }

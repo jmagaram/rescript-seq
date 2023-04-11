@@ -31,7 +31,7 @@ module Make2 = (
     switch value
     ->A_Tools.make
     ->Option.map(onA)
-    ->Option.orElse(value->B_Tools.make->Option.map(onB)) {
+    ->OptionEx.orElseWith(() => value->B_Tools.make->Option.map(onB)) {
     | Some(value) => value
     | None =>
       Js.Exn.raiseError("The value was unsafely cast and did not match any of the provided types.")
@@ -76,8 +76,8 @@ module Make3 = (
     switch value
     ->A_Tools.make
     ->Option.map(onA)
-    ->Option.orElse(value->B_Tools.make->Option.map(onB))
-    ->Option.orElse(value->C_Tools.make->Option.map(onC)) {
+    ->OptionEx.orElseWith(() => value->B_Tools.make->Option.map(onB))
+    ->OptionEx.orElseWith(() => value->C_Tools.make->Option.map(onC)) {
     | Some(value) => value
     | None =>
       Js.Exn.raiseError("The value was unsafely cast and did not match any of the provided types.")
@@ -131,9 +131,9 @@ module Make4 = (
     switch value
     ->A_Tools.make
     ->Option.map(onA)
-    ->Option.orElse(value->B_Tools.make->Option.map(onB))
-    ->Option.orElse(value->C_Tools.make->Option.map(onC))
-    ->Option.orElse(value->D_Tools.make->Option.map(onD)) {
+    ->OptionEx.orElseWith(() => value->B_Tools.make->Option.map(onB))
+    ->OptionEx.orElseWith(() => value->C_Tools.make->Option.map(onC))
+    ->OptionEx.orElseWith(() => value->D_Tools.make->Option.map(onD)) {
     | Some(value) => value
     | None =>
       Js.Exn.raiseError("The value was unsafely cast and did not match any of the provided types.")
@@ -194,10 +194,10 @@ module Make5 = (
     switch value
     ->A_Tools.make
     ->Option.map(onA)
-    ->Option.orElse(value->B_Tools.make->Option.map(onB))
-    ->Option.orElse(value->C_Tools.make->Option.map(onC))
-    ->Option.orElse(value->D_Tools.make->Option.map(onD))
-    ->Option.orElse(value->E_Tools.make->Option.map(onE)) {
+    ->OptionEx.orElseWith(() => value->B_Tools.make->Option.map(onB))
+    ->OptionEx.orElseWith(() => value->C_Tools.make->Option.map(onC))
+    ->OptionEx.orElseWith(() => value->D_Tools.make->Option.map(onD))
+    ->OptionEx.orElseWith(() => value->E_Tools.make->Option.map(onE)) {
     | Some(value) => value
     | None =>
       Js.Exn.raiseError("The value was unsafely cast and did not match any of the provided types.")
