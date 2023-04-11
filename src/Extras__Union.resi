@@ -1,18 +1,28 @@
-// This module provides functors to create tagged or untagged unions 4 items.
-// Each union has a custom equality operator and functions for creation and
-// pattern matching. For more details and alternatives see the README at
-// https://github.com/jmagaram/rescript-extras and view the code examples in
-// https://github.com/jmagaram/rescript-extras/blob/master/tests/Extras__UnionTests.res.
+/**
+This module provides functors to create tagged or untagged unions of 2, 3, or 4 items. Here is a
+simple one. This new module includes the type StringOrFalse.t, safe constructors, pattern matching
+and a custom efficient equality function. You can build unions using any types and with unlimited
+ability to discriminate using typeof, instanceof, or a JSON parsing library.
 
-// Defines a single case in an untagged union.
+module StringOrFalse = Union.Make2({
+    module A = Union.Patterns.String
+    module B = Literal.False
+})
+
+For more details and alternatives see:
+- README at https://github.com/jmagaram/rescript-extras 
+- Code examples https://github.com/jmagaram/rescript-extras/blob/master/tests/Extras__UnionTests.res
+
+*/
 module type Pattern = {
-  // The underlying type. Can be a primitive like `string`, a reference type
-  // like a JavaScript error, an array, or basically anything.
+  // Each choice in a union is represented by a `Pattern` like this. The type
+  // can be a primitive like a string or int, an array, an object, or basically
+  // anything.
   type t
 
   // The `isTypeOf` function determines whether a specific value can safely be
-  // assigned to type `t`. Use any critieria such as `typeof`, `instanceof`, or
-  // inspecting the properties of the object.
+  // assigned to type `t`. Use any critieria such as `typeof`, `instanceof`,
+  // lightly inspecting the object for various properties, or a JSON parser.
   let isTypeOf: Extras__Unknown.t => bool
 
   // Determines whether two instances of the type are equal. Can provide
