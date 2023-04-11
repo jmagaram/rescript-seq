@@ -529,7 +529,7 @@ module LazinessTests = {
   })
 
   let test = (~expectation, ~predicate) =>
-    Test.make(~category="Union", ~title="Use RescriptStruct exclusively", ~expectation, ~predicate)
+    Test.make(~category="Union", ~title="Lazy evaluation", ~expectation, ~predicate)
 
   let tests = [
     test(~expectation="4 make from int => Some", ~predicate=() =>
