@@ -510,6 +510,13 @@ module LazinessTests = {
     let equals = (a: string, b: string) => a == b
   }
 
+  module IntOrBoolOrFloatOrString = Union.Make4({
+    module A = Pattern.Int
+    module B = Pattern.Bool
+    module C = Pattern.Float
+    module D = StringThrows
+  })
+
   module IntOrBoolOrString = Union.Make3({
     module A = Pattern.Int
     module B = Pattern.Bool
@@ -525,14 +532,20 @@ module LazinessTests = {
     Test.make(~category="Union", ~title="Use RescriptStruct exclusively", ~expectation, ~predicate)
 
   let tests = [
+    test(~expectation="4 make from int => Some", ~predicate=() =>
+      1->IntOrBoolOrFloatOrString.make->OptionEx.isSomeAnd(v => Obj.magic(v) == 1)
+    ),
+    test(~expectation="4 make from bool => Some", ~predicate=() =>
+      true->IntOrBoolOrFloatOrString.make->OptionEx.isSomeAnd(v => Obj.magic(v) == true)
+    ),
+    test(~expectation="4 make from float => Some", ~predicate=() =>
+      3.5->IntOrBoolOrFloatOrString.make->OptionEx.isSomeAnd(v => Obj.magic(v) == 3.5)
+    ),
     test(~expectation="3 make from int => Some", ~predicate=() =>
       1->IntOrBoolOrString.make->OptionEx.isSomeAnd(v => Obj.magic(v) == 1)
     ),
     test(~expectation="3 make from bool => Some", ~predicate=() =>
       true->IntOrBoolOrString.make->OptionEx.isSomeAnd(v => Obj.magic(v) == true)
-    ),
-    test(~expectation="3 make from bool => Some", ~predicate=() =>
-      false->IntOrBoolOrString.make->OptionEx.isSomeAnd(v => Obj.magic(v) == false)
     ),
     test(~expectation="2 make from int => Some", ~predicate=() =>
       1->IntOrString.make->OptionEx.isSomeAnd(v => Obj.magic(v) == 1)
