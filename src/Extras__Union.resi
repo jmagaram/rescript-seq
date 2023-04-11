@@ -2,7 +2,7 @@
 // Each union has a custom equality operator and functions for creation and
 // pattern matching. For more details and alternatives see the README at
 // https://github.com/jmagaram/rescript-extras and view the code examples in
-// https://github.com/jmagaram/rescript-extras/blob/master/src/Extras__UnionTests.res.
+// https://github.com/jmagaram/rescript-extras/blob/master/tests/Extras__UnionTests.res.
 
 // Defines a single case in an untagged union.
 module type Pattern = {

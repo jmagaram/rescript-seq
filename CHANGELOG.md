@@ -1,3 +1,8 @@
+## Version 0.19.0
+
+- Move tests into separate folder and not included in package
+- Only includes files needed in package
+
 ## Version 0.14.0
 
 - Move `TaskResult` into a submodule of `Task` for usability

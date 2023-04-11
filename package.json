@@ -1,6 +1,6 @@
 {
   "name": "@jmagaram/rescript-extras",
-  "version": "0.14.0",
+  "version": "0.19.0",
   "module": "",
   "description": "Useful general-purpose utility functions and modules for ReScript projects.",
   "keywords": [
@@ -8,7 +8,7 @@
   ],
   "main": "index.js",
   "scripts": {
-    "test": "node src/TestSuite.bs.js",
+    "test": "node tests/TestSuite.bs.js",
     "res:build": "rescript build -with-deps",
     "res:dev": "rescript build -with-deps -w",
     "res:clean": "rescript clean"
@@ -18,5 +18,11 @@
   "dependencies": {
     "rescript": "^10.1.4",
     "rescript-struct": "^4.0.0"
-  }
+  },
+  "files": [
+    "bsconfig.json",
+    "src/**/*.res",
+    "src/**/*.resi",
+    "src/**/*.gen.tsx"
+  ]
 }

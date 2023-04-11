@@ -12,7 +12,7 @@ Inspired by [TaskEither in fp-ts](https://gcanti.github.io/fp-ts/modules/TaskEit
 
 ## Union
 
-The **`Union`** module provides functors to create tagged and untagged discriminated unions of 2, 3, or 4 items. This is useful for interop with JavaScript libraries that produce or expect simple types like `string | number` and more complex types where the choices are tagged differently than how ReScript does it. See [usage examples](https://github.com/jmagaram/rescript-extras/blob/master/src/Extras__UnionTests.res). Capabilities:
+The **`Union`** module provides functors to create tagged and untagged discriminated unions of 2, 3, or 4 items. This is useful for interop with JavaScript libraries that produce or expect simple types like `string | number` and more complex types where the choices are tagged differently than how ReScript does it. See [usage examples](https://github.com/jmagaram/rescript-extras/blob/master/tests/Extras__UnionTests.res). Capabilities:
 
 - Discriminate (pattern match) on any programmable criteria, like `typeof`, `instance of`, lightweight shape detection (such as a tag), or parsing with a JSON parsing library.
 - All types can participate in a union, including literals.
@@ -20,13 +20,13 @@ The **`Union`** module provides functors to create tagged and untagged discrimin
 
 This implementation does not utilize any special compiler support and so there are some limitations:
 
-- Pattern matching must rely on a `match` function, not the usual matching syntax.Each case is distinguished by `A` | `B` | `C` | `D`. This can be easily improved by extending or wrapping the produced module; see the [test file for examples](https://github.com/jmagaram/rescript-extras/blob/master/src/Extras__UnionTests.res).
+- Pattern matching must rely on a `match` function, not the usual matching syntax.Each case is distinguished by `A` | `B` | `C` | `D`. This can be easily improved by extending or wrapping the produced module; see the [test file for examples](https://github.com/jmagaram/rescript-extras/blob/master/tests/Extras__UnionTests.res).
 - Literal support and functors are a bit cumbersome
 - No genType support
 - No recursive type definition
 
 **Note:** It is possible to create untagged unions with a library like
-[rescript-struct](https://github.com/DZakh/rescript-struct) and not use the functors defined in this package. See the [usage examples](https://github.com/jmagaram/rescript-extras/blob/master/src/Extras__UnionTests.res) for a comparision of the two approaches. This works very well and avoids abstractions, but requires a bit more code.
+[rescript-struct](https://github.com/DZakh/rescript-struct) and not use the functors defined in this package. See the [usage examples](https://github.com/jmagaram/rescript-extras/blob/master/tests/Extras__UnionTests.res) for a comparision of the two approaches. This works very well and avoids abstractions, but requires a bit more code.
 
 **Note:** The Rescript compiler has a new feature for untagged unions that works great with pattern matching support. There are limitations on which types can be included in the union, literal support is very nice, pattern matching is not customizable, and custom equality is not provided.
 
