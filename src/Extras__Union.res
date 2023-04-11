@@ -21,10 +21,8 @@ module Make2 = (
   let toA = A_Tools.make
   let toB = B_Tools.make
 
-  let make = value =>
-    (Obj.magic(value->A_Tools.make): option<t>)->OptionEx.orElseWith((): option<t> =>
-      Obj.magic(value->B_Tools.make)
-    )
+  let make: 'a => option<t> = value =>
+    value->A_Tools.make->Obj.magic->OptionEx.orElseWith(() => value->B_Tools.make->Obj.magic)
 
   let matchAB = (value, ~onA, ~onB) =>
     switch value
@@ -64,10 +62,12 @@ module Make3 = (
   let toB = B_Tools.make
   let toC = C_Tools.make
 
-  let make = value =>
-    (Obj.magic(value->A_Tools.make): option<t>)
-    ->OptionEx.orElseWith((): option<t> => Obj.magic(value->B_Tools.make))
-    ->OptionEx.orElseWith((): option<t> => Obj.magic(value->C_Tools.make))
+  let make: 'a => option<t> = value =>
+    value
+    ->A_Tools.make
+    ->Obj.magic
+    ->OptionEx.orElseWith(() => value->B_Tools.make->Obj.magic)
+    ->OptionEx.orElseWith(() => value->C_Tools.make->Obj.magic)
 
   let matchABC = (value, ~onA, ~onB, ~onC) =>
     switch value
@@ -116,11 +116,13 @@ module Make4 = (
   let toC = C_Tools.make
   let toD = D_Tools.make
 
-  let make = value =>
-    (Obj.magic(value->A_Tools.make): option<t>)
-    ->OptionEx.orElseWith((): option<t> => Obj.magic(value->B_Tools.make))
-    ->OptionEx.orElseWith((): option<t> => Obj.magic(value->C_Tools.make))
-    ->OptionEx.orElseWith((): option<t> => Obj.magic(value->D_Tools.make))
+  let make: 'a => option<t> = value =>
+    value
+    ->A_Tools.make
+    ->Obj.magic
+    ->OptionEx.orElseWith(() => value->B_Tools.make->Obj.magic)
+    ->OptionEx.orElseWith(() => value->C_Tools.make->Obj.magic)
+    ->OptionEx.orElseWith(() => value->D_Tools.make->Obj.magic)
 
   let matchABCD = (value, ~onA, ~onB, ~onC, ~onD) =>
     switch value
@@ -176,12 +178,14 @@ module Make5 = (
   let toD = D_Tools.make
   let toE = E_Tools.make
 
-  let make = value =>
-    (Obj.magic(value->A_Tools.make): option<t>)
-    ->OptionEx.orElseWith((): option<t> => Obj.magic(value->B_Tools.make))
-    ->OptionEx.orElseWith((): option<t> => Obj.magic(value->C_Tools.make))
-    ->OptionEx.orElseWith((): option<t> => Obj.magic(value->D_Tools.make))
-    ->OptionEx.orElseWith((): option<t> => Obj.magic(value->E_Tools.make))
+  let make: 'a => option<t> = value =>
+    value
+    ->A_Tools.make
+    ->Obj.magic
+    ->OptionEx.orElseWith(() => value->B_Tools.make->Obj.magic)
+    ->OptionEx.orElseWith(() => value->C_Tools.make->Obj.magic)
+    ->OptionEx.orElseWith(() => value->D_Tools.make->Obj.magic)
+    ->OptionEx.orElseWith(() => value->E_Tools.make->Obj.magic)
 
   let matchABCDE = (value, ~onA, ~onB, ~onC, ~onD, ~onE) =>
     switch value
