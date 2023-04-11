@@ -208,7 +208,7 @@ module PointTests = {
     type t = (float, float)
     let isTypeOf = u =>
       // lightweight validation; just check length
-      Js.Array2.isArray(u) && Js.Array2.length((Obj.magic(u): array<Unknown.t>)) == 2
+      Js.Array2.isArray(u) && Js.Array2.length((Obj.magic(u): array<unknown>)) == 2
     let equals = (x: t, y: t) => x == y
   }
 
@@ -216,7 +216,7 @@ module PointTests = {
     type t = (float, float, float)
     let isTypeOf = u =>
       // lightweight validation; just check length
-      Js.Array2.isArray(u) && Js.Array2.length((Obj.magic(u): array<Unknown.t>)) == 3
+      Js.Array2.isArray(u) && Js.Array2.length((Obj.magic(u): array<unknown>)) == 3
     let equals = (x: t, y: t) => x == y
   }
 
@@ -456,7 +456,7 @@ module WithHelpFromRescriptStruct = {
     let struct =
       S.string()->S.String.min(3)->S.String.max(10)->S.transform(~parser=v => Short(v), ())
     let make = (s: string) => s->S.parseAnyWith(struct)->ResultEx.toOption
-    let isTypeOf = (s: Unknown.t) => s->S.parseAnyWith(struct)->Result.isOk
+    let isTypeOf = (s: unknown) => s->S.parseAnyWith(struct)->Result.isOk
     let equals = (x: t, y: t) => x === y
   }
 
@@ -464,7 +464,7 @@ module WithHelpFromRescriptStruct = {
     @unboxed type t = NonNegative(int)
     let struct = S.int()->S.Int.min(0)->S.transform(~parser=v => NonNegative(v), ())
     let make = (n: int) => n->S.parseAnyWith(struct)->ResultEx.toOption
-    let isTypeOf = (s: Unknown.t) => s->S.parseAnyWith(struct)->Result.isOk
+    let isTypeOf = (s: unknown) => s->S.parseAnyWith(struct)->Result.isOk
     let equals = (x: t, y: t) => x === y
   }
 
@@ -475,7 +475,7 @@ module WithHelpFromRescriptStruct = {
       y: o->S.field("y", S.int()),
     })
     let make = (x, y) => {x, y}
-    let isTypeOf = (s: Unknown.t) => s->S.parseAnyWith(struct)->Result.isOk
+    let isTypeOf = (s: unknown) => s->S.parseAnyWith(struct)->Result.isOk
     let equals = (a: t, b: t) => a.x === b.x && a.y === b.y
   }
 

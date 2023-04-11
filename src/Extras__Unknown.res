@@ -1,4 +1,3 @@
-type unknown
 type t = unknown
 
 external make: 'a => unknown = "%identity"

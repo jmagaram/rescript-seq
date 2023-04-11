@@ -1,7 +1,7 @@
 module type T = {
   type t
   type domain
-  let isTypeOf: Extras__Unknown.t => bool
+  let isTypeOf: unknown => bool
   let parse: 'a => option<t>
   let equals: (t, t) => bool
   let value: t

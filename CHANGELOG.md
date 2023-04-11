@@ -1,3 +1,7 @@
+## Version 0.20.0
+
+- Use the built-in `unknown` type
+
 ## Version 0.19.0
 
 - Move tests into separate folder and not included in package

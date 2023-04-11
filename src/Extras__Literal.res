@@ -6,7 +6,7 @@ module Option = Belt.Option
 module type T = {
   type t
   type domain
-  let isTypeOf: Unknown.t => bool
+  let isTypeOf: unknown => bool
   let parse: 'a => option<t>
   let equals: (t, t) => bool
   let value: t

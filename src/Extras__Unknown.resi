@@ -5,7 +5,6 @@ Utilities for classifying and safely using JavaScript values at runtime.
 /**
 An abstract representation for values whose contents are a mystery, or at least not 100% guaranteed to be what you expect. A value of type `unknown` could be undefined, null, a number, string, function, or any other JavaScript type. To safely use an `unknown` value use the functions in this module to test and classify it as its true underlying type.
 */
-type unknown
 type t = unknown
 
 /**

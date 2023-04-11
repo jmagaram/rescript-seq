@@ -4,7 +4,7 @@ module Unknown = Extras__Unknown
 
 module type Pattern = {
   type t
-  let isTypeOf: Unknown.t => bool
+  let isTypeOf: unknown => bool
   let equals: (t, t) => bool
 }
 

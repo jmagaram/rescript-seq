@@ -23,7 +23,7 @@ module type Pattern = {
   // The `isTypeOf` function determines whether a specific value can safely be
   // assigned to type `t`. Use any critieria such as `typeof`, `instanceof`,
   // lightly inspecting the object for various properties, or a JSON parser.
-  let isTypeOf: Extras__Unknown.t => bool
+  let isTypeOf: unknown => bool
 
   // Determines whether two instances of the type are equal. Can provide
   // optimized behavior over a deep recursive compare.
