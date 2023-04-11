@@ -496,10 +496,55 @@ module WithHelpFromRescriptStruct = {
   }
 }
 
+// ==================================================================
+// Laziness tests; making sure parsing is done on an as-needed basis.
+// ==================================================================
+
+module LazinessTests = {
+  module StringThrows: Extras__Pattern.T = {
+    type t = string
+    let isTypeOf = (_: unknown) => {
+      Js.Exn.raiseError("Tried to parse a string.")->ignore
+      true
+    }
+    let equals = (a: string, b: string) => a == b
+  }
+
+  module IntOrBoolOrString = Union.Make3({
+    module A = Pattern.Int
+    module B = Pattern.Bool
+    module C = StringThrows
+  })
+
+  module IntOrString = Union.Make2({
+    module A = Pattern.Int
+    module B = StringThrows
+  })
+
+  let test = (~expectation, ~predicate) =>
+    Test.make(~category="Union", ~title="Use RescriptStruct exclusively", ~expectation, ~predicate)
+
+  let tests = [
+    test(~expectation="3 make from int => Some", ~predicate=() =>
+      1->IntOrBoolOrString.make->OptionEx.isSomeAnd(v => Obj.magic(v) == 1)
+    ),
+    test(~expectation="3 make from bool => Some", ~predicate=() =>
+      true->IntOrBoolOrString.make->OptionEx.isSomeAnd(v => Obj.magic(v) == true)
+    ),
+    test(~expectation="3 make from bool => Some", ~predicate=() =>
+      false->IntOrBoolOrString.make->OptionEx.isSomeAnd(v => Obj.magic(v) == false)
+    ),
+    test(~expectation="2 make from int => Some", ~predicate=() =>
+      1->IntOrString.make->OptionEx.isSomeAnd(v => Obj.magic(v) == 1)
+    ),
+  ]
+}
+
 let tests =
   [
     StringOrFalseTests.tests,
     FancyUnionTest.tests,
     PointTests.tests,
     OnlyRescriptStructTests.tests,
+    LazinessTests.tests,
   ]->Belt.Array.concatMany

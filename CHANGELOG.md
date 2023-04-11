@@ -2,6 +2,7 @@
 
 - Use the built-in `unknown` type
 - Move `Pattern` to a top-level module, not inside the `Union` module.
+- Lazy parsing in unions; only do enough until find a match
 
 ## Version 0.19.0
 

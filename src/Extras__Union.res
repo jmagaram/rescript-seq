@@ -22,7 +22,10 @@ module Make2 = (
   let toB = B_Tools.make
 
   let make = value =>
-    value->A_Tools.make->Option.map(fromA)->Option.orElse(value->B_Tools.make->Option.map(fromB))
+    value
+    ->A_Tools.make
+    ->Option.map(fromA)
+    ->OptionEx.orElseWith(() => value->B_Tools.make->Option.map(fromB))
 
   let matchAB = (value, ~onA, ~onB) =>
     switch value
@@ -66,8 +69,8 @@ module Make3 = (
     value
     ->A_Tools.make
     ->Option.map(fromA)
-    ->Option.orElse(value->B_Tools.make->Option.map(fromB))
-    ->Option.orElse(value->C_Tools.make->Option.map(fromC))
+    ->OptionEx.orElseWith(() => value->B_Tools.make->Option.map(fromB))
+    ->OptionEx.orElseWith(() => value->C_Tools.make->Option.map(fromC))
 
   let matchABC = (value, ~onA, ~onB, ~onC) =>
     switch value
@@ -120,9 +123,9 @@ module Make4 = (
     value
     ->A_Tools.make
     ->Option.map(fromA)
-    ->Option.orElse(value->B_Tools.make->Option.map(fromB))
-    ->Option.orElse(value->C_Tools.make->Option.map(fromC))
-    ->Option.orElse(value->D_Tools.make->Option.map(fromD))
+    ->OptionEx.orElseWith(() => value->B_Tools.make->Option.map(fromB))
+    ->OptionEx.orElseWith(() => value->C_Tools.make->Option.map(fromC))
+    ->OptionEx.orElseWith(() => value->D_Tools.make->Option.map(fromD))
 
   let matchABCD = (value, ~onA, ~onB, ~onC, ~onD) =>
     switch value
@@ -182,10 +185,10 @@ module Make5 = (
     value
     ->A_Tools.make
     ->Option.map(fromA)
-    ->Option.orElse(value->B_Tools.make->Option.map(fromB))
-    ->Option.orElse(value->C_Tools.make->Option.map(fromC))
-    ->Option.orElse(value->D_Tools.make->Option.map(fromD))
-    ->Option.orElse(value->E_Tools.make->Option.map(fromE))
+    ->OptionEx.orElseWith(() => value->B_Tools.make->Option.map(fromB))
+    ->OptionEx.orElseWith(() => value->C_Tools.make->Option.map(fromC))
+    ->OptionEx.orElseWith(() => value->D_Tools.make->Option.map(fromD))
+    ->OptionEx.orElseWith(() => value->E_Tools.make->Option.map(fromE))
 
   let matchABCDE = (value, ~onA, ~onB, ~onC, ~onD, ~onE) =>
     switch value
