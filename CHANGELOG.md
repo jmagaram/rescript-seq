@@ -1,6 +1,8 @@
 ## Version 0.21.0
 
 - Make `Task.t` not abstract
+- `Option.map2`, `Option.map3`, `Option.map4` and test cleanup
+- `Option.flatten`
 
 ## Version 0.20.0
 

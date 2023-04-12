@@ -5,6 +5,8 @@ module T = Extras__Test
 module O = Extras__Option
 
 let add = (a, b) => a + b
+let add3 = (a, b, c) => a + b + c
+let add4 = (a, b, c, d) => a + b + c + d
 
 let tests = [
   expectEq(
@@ -132,37 +134,76 @@ let tests = [
     ~expectation="when not throw, return result as Some",
     ~predicate=() => O.fromTryCatch(() => 3) == Some(3),
   ),
-  T.make(~category="Option", ~title="map2", ~expectation="when both None => None", ~predicate=() =>
-    O.map2(None, None, add) == None
-  ),
-  T.make(
-    ~category="Option",
+  expectEq(
     ~title="map2",
-    ~expectation="when both Some => Some with map args",
-    ~predicate=() => O.map2(Some(1), Some(5), add) == Some(6),
+    ~expectation="when 0/2 Some => None",
+    ~a=() => O.map2(None, None, add),
+    ~b=None,
   ),
-  T.make(
-    ~category="Option",
+  expectEq(
     ~title="map2",
-    ~expectation="when one is Some => None",
-    ~predicate=() => O.map2(Some(1), None, add) == None,
+    ~expectation="when 2/2 Some => Some with map args",
+    ~a=() => O.map2(Some(1), Some(5), add),
+    ~b=Some(6),
   ),
-  T.make(
-    ~category="Option",
+  expectEq(
     ~title="map2",
-    ~expectation="when one is Some => None",
-    ~predicate=() => O.map2(None, Some(1), add) == None,
+    ~expectation="when 1/2 is Some => None",
+    ~a=() => O.map2(Some(1), None, add),
+    ~b=None,
   ),
-  T.make(
-    ~category="Option",
+  expectEq(
+    ~title="map2",
+    ~expectation="when 1/2 is Some => None",
+    ~a=() => O.map2(None, Some(1), add),
+    ~b=None,
+  ),
+  expectEq(
+    ~title="map3",
+    ~expectation="when 3/3 is Some => Some with map args",
+    ~a=() => O.map3(Some(1), Some(5), Some(9), add3),
+    ~b=Some(15),
+  ),
+  expectEq(
+    ~title="map3",
+    ~expectation="when 2/3 is Some => None",
+    ~a=() => O.map3(Some(1), None, Some(5), add3),
+    ~b=None,
+  ),
+  expectEq(
+    ~title="map3",
+    ~expectation="when 1/3 is Some => None",
+    ~a=() => O.map3(None, Some(1), None, add3),
+    ~b=None,
+  ),
+  expectEq(
+    ~title="map3",
+    ~expectation="when 0/3 is Some => None",
+    ~a=() => O.map3(None, None, None, add3),
+    ~b=None,
+  ),
+  expectEq(
     ~title="orElseWith",
     ~expectation="when first is Some, return it",
-    ~predicate=() => O.orElseWith(Some(1), () => Some(2)) == Some(1),
+    ~a=() => O.orElseWith(Some(1), () => Some(2)),
+    ~b=Some(1),
   ),
-  T.make(
-    ~category="Option",
+  expectEq(
     ~title="orElseWith",
     ~expectation="when first is None, return lazy second",
-    ~predicate=() => O.orElseWith(None, () => Some(2)) == Some(2),
+    ~a=() => O.orElseWith(None, () => Some(2)),
+    ~b=Some(2),
+  ),
+  expectEq(
+    ~title="flatten",
+    ~expectation="when Some Some => Some",
+    ~a=() => Some(Some(4))->O.flatten,
+    ~b=Some(4),
+  ),
+  expectEq(
+    ~title="flatten",
+    ~expectation="when Some None => None",
+    ~a=() => Some(None)->O.flatten,
+    ~b=None,
   ),
 ]

@@ -59,8 +59,26 @@ let map2 = (a, b, m) =>
   | _ => None
   }
 
+let map3 = (a, b, c, m) =>
+  switch (a, b, c) {
+  | (Some(a), Some(b), Some(c)) => Some(m(a, b, c))
+  | _ => None
+  }
+
+let map4 = (a, b, c, d, m) =>
+  switch (a, b, c, d) {
+  | (Some(a), Some(b), Some(c), Some(d)) => Some(m(a, b, c, d))
+  | _ => None
+  }
+
 let orElseWith = (a, b) =>
   switch a {
   | Some(_) as a => a
   | _ => b()
+  }
+
+let flatten = o =>
+  switch o {
+  | Some(Some(_) as r) => r
+  | _ => None
   }
