@@ -5,6 +5,7 @@ module Promise = Js.Promise2
 
 let filter = _ => true
 let onlyShowFailures = true
+let throwOnSuiteFailure = true
 
 let tests =
   [
@@ -31,6 +32,7 @@ Ex.Task.Result.make(
   | _ => Some("Could not run the test suite, or an unexpected failure.")
   }
 )
+->Ex.Task.map(i => throwOnSuiteFailure ? i : None)
 ->Ex.Task.forEach(Option.forEach(_, msg => Js.Exn.raiseError(msg)))
 ->Ex.Task.toPromise
 ->ignore
