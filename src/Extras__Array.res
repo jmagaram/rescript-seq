@@ -69,3 +69,5 @@ let filterSomeWith = (xs, f) => {
 }
 
 let filterSome = xs => xs->filterSomeWith((value, _) => value)
+
+let indexed = xs => xs->Js.Array2.mapi((v, i) => (v, i))

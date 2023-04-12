@@ -4,6 +4,7 @@
 - `Option.map2`, `Option.map3`, `Option.map4` and test cleanup
 - `Option.flatten`
 - `Array.filterSome` and `Array.filterSomeWith`
+- `Array.indexed`
 - Option to only show test failures
 
 ## Version 0.20.0

@@ -129,6 +129,12 @@ let others = {
       ~a=() => ["a", "b", "c"]->A.filterSomeWith((value, _) => value === "b" ? Some("bb") : None),
       ~b=["bb"],
     ),
+    test(
+      ~title="indexed",
+      ~expect="make tuples of item and the associated index",
+      ~a=() => ["a", "b", "c"]->A.indexed,
+      ~b=[("a", 0), ("b", 1), ("c", 2)],
+    ),
   ]
 }
 
