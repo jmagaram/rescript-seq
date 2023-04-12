@@ -1,3 +1,7 @@
+## Version 0.21.0
+
+- Make `Task.t` not abstract
+
 ## Version 0.20.0
 
 - Use the built-in `unknown` type
