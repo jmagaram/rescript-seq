@@ -16,7 +16,17 @@ let fromSeed = {
 }
 
 let test = (~title, ~expect, ~a, ~b) =>
-  T.make(~category="Array", ~title, ~expectation=expect, ~predicate=() => a() == b)
+  T.make(~category="Array", ~title, ~expectation=expect, ~predicate=() => {
+    let m = a()
+    let n = b
+    if m != n {
+      Js.Console.log("")
+      Js.Console.log(`== NOT EQUAL : ${title} ==`)
+      Js.Console.log2("a: ", m)
+      Js.Console.log2("b: ", n)
+    }
+    m == n
+  })
 
 let others = {
   [
@@ -92,6 +102,32 @@ let others = {
       ~expect="concats to the beginning",
       ~a=() => [3, 4, 5]->A.prepend([1, 2]),
       ~b=[1, 2, 3, 4, 5],
+    ),
+    test(~title="filterSome", ~expect="when empty => []", ~a=() => []->A.filterSome, ~b=[]),
+    test(
+      ~title="filterSome",
+      ~expect="when one Some(x) => [x]",
+      ~a=() => [Some(3)]->A.filterSome,
+      ~b=[3],
+    ),
+    test(~title="filterSome", ~expect="when one None => []", ~a=() => [None]->A.filterSome, ~b=[]),
+    test(
+      ~title="filterSome",
+      ~expect="keep just the Some values",
+      ~a=() => [None, Some(1), Some(2), None]->A.filterSome,
+      ~b=[1, 2],
+    ),
+    test(
+      ~title="filterSomeWith",
+      ~expect="can filter by index",
+      ~a=() => ["a", "b", "c"]->A.filterSomeWith((_, inx) => inx === 1 ? Some("bb") : None),
+      ~b=["bb"],
+    ),
+    test(
+      ~title="filterSomeWith",
+      ~expect="can filter by value",
+      ~a=() => ["a", "b", "c"]->A.filterSomeWith((value, _) => value === "b" ? Some("bb") : None),
+      ~b=["bb"],
     ),
   ]
 }

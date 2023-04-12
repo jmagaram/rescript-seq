@@ -55,3 +55,17 @@ let pairs = xs => {
 }
 
 let prepend = (a, b) => Js.Array2.concat(b, a)
+
+let filterSomeWith = (xs, f) => {
+  let result = []
+  for i in 0 to Js.Array2.length(xs) - 1 {
+    let item = xs->Js.Array2.unsafe_get(i)
+    switch f(item, i) {
+    | None => ()
+    | Some(i) => result->Js.Array2.push(i)->ignore
+    }
+  }
+  result
+}
+
+let filterSome = xs => xs->filterSomeWith((value, _) => value)
