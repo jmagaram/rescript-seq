@@ -50,7 +50,7 @@ let run = async i => {
 
 let toString = i => `${i.category} | ${i.title} | ${i.expectation}`
 
-let runSuite = async (~filter=_ => true, tests) => {
+let runSuite = async (~filter=_ => true, ~onlyShowFailures=false, tests) => {
   let log = Js.Console.log
   let logSection = n => {
     log("")
@@ -63,7 +63,7 @@ let runSuite = async (~filter=_ => true, tests) => {
     ->Array.map(i => i->run)
     ->Js.Promise2.all
   let (succeeded, failed) = results->Array.partition(((r, _)) => r)
-  if succeeded->Array.length > 0 {
+  if succeeded->Array.length > 0 && !onlyShowFailures {
     logSection("SUCCEEDED")
     succeeded->Array.forEach(((_, t)) => `PASS ${t->toString}`->log)
   }

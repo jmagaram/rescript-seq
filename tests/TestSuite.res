@@ -4,6 +4,7 @@ module Ex = Extras
 module Promise = Js.Promise2
 
 let filter = _ => true
+let onlyShowFailures = true
 
 let tests =
   [
@@ -19,7 +20,10 @@ let tests =
     Extras__UnknownTests.tests,
   ]->Array.concatMany
 
-Ex.Task.Result.make(~promise=() => Ex.Test.runSuite(tests, ~filter), ~onError=e => e)
+Ex.Task.Result.make(
+  ~promise=() => Ex.Test.runSuite(tests, ~filter, ~onlyShowFailures),
+  ~onError=e => e,
+)
 ->Ex.Task.map(i =>
   switch i {
   | Ok(s) if s.fail == 0 => None

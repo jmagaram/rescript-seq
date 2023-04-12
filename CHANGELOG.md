@@ -3,6 +3,8 @@
 - Make `Task.t` not abstract
 - `Option.map2`, `Option.map3`, `Option.map4` and test cleanup
 - `Option.flatten`
+- `Array.permute`
+- Option to only show test failures
 
 ## Version 0.20.0
 

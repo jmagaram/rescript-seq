@@ -20,4 +20,4 @@ type summary = {
   ran: int,
 }
 
-let runSuite: (~filter: t => bool=?, array<t>) => promise<summary>
+let runSuite: (~filter: t => bool=?, ~onlyShowFailures: bool=?, array<t>) => promise<summary>
