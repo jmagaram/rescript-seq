@@ -9,6 +9,7 @@
   "main": "index.js",
   "scripts": {
     "test": "node tests/TestSuite.bs.js",
+    "test:local": "NODE_ENV=development node tests/TestSuite.bs.js",
     "res:build": "rescript build -with-deps",
     "res:dev": "rescript build -with-deps -w",
     "res:clean": "rescript clean"
