@@ -15,8 +15,10 @@ Inspired by [TaskEither in fp-ts](https://gcanti.github.io/fp-ts/modules/TaskEit
 The **`Union`** module provides functors to create tagged and untagged discriminated unions of 2, 3, 4, or 5 items. This is useful for interop with JavaScript libraries that produce or expect simple types like `string | number` and more complex types where the choices are tagged differently than how ReScript does it. See [usage examples](https://github.com/jmagaram/rescript-extras/blob/master/tests/Extras__UnionTests.res). Capabilities:
 
 - Discriminate (pattern match) on any programmable criteria, like `typeof`, `instance of`, lightweight shape detection (such as a tag), or parsing with a JSON parsing library.
-- All types can participate in a union, including literals.
+- All types can participate in a union.
 - Custom equality
+- Literal values like `True`, `False`, `-1`, and custom via `MakeString`, `MakeInt`, etc.
+- Built-in support for `Int`, `String`, `Bool`, `Float`, `Option`, `Nullable`, `Null`, and tuples of length 2 and 3
 
 This implementation does not utilize any special compiler support and so there are some limitations:
 
