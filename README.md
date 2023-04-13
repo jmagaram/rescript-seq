@@ -38,7 +38,7 @@ Functors to create **`Literal`** types of various kinds using **`MakeString`** a
 
 ## Option
 
-Existential quanitifiers **`isSomeAnd`** and **`isNoneOr`**. Create an option from a function that may fail using **`fromTryCatch`**. Combine two options with **`concat`** and **`map2`**. "Add" an option to a regular value using **`fold`** and **`foldBack`**. Includes lazy forms such as **`orElseWith`**.
+Existential quanitifiers **`isSomeAnd`** and **`isNoneOr`**. Create an option from a function that may fail using **`fromTryCatch`**. Combine options with **`concat`**, **`map2`**, **`map3`**, and **`map4`**. "Add" an option to a regular value using **`fold`** and **`foldBack`**. Includes lazy forms such as **`orElseWith`**.
 
 ## NonEmptyArray
 
