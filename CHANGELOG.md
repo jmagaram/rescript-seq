@@ -5,6 +5,7 @@
 - `Option.flatten`
 - `Array.filterSome` and `Array.filterSomeWith`
 - `Array.indexed`
+- `Array.permute`
 - Option to only show test failures
 
 ## Version 0.20.0
