@@ -22,7 +22,7 @@ The **`Union`** module provides functors to create tagged and untagged discrimin
 
 This implementation does not utilize any special compiler support and so there are some limitations:
 
-- Pattern matching must rely on a `match` function, not the usual matching syntax.Each case is distinguished by `A` | `B` | `C` | `D`. This can be easily improved by extending or wrapping the produced module; see the [test file for examples](https://github.com/jmagaram/rescript-extras/blob/master/tests/Extras__UnionTests.res).
+- Pattern matching must rely on a `match` function, not the usual matching syntax. Each case is distinguished by `A` | `B` | `C` | `D`. This can be easily improved by extending or wrapping the produced module; see the [test file for examples](https://github.com/jmagaram/rescript-extras/blob/master/tests/Extras__UnionTests.res).
 - Literal support and functors are a bit cumbersome
 - No genType support
 - No recursive type definition
