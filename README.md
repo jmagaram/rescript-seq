@@ -17,8 +17,8 @@ The **`Union`** module provides functors to create tagged and untagged discrimin
 - Discriminate (pattern match) on any programmable criteria, like `typeof`, `instance of`, lightweight shape detection (such as a tag), or parsing with a JSON parsing library.
 - All types can participate in a union.
 - Custom equality
-- Literal values like `True`, `False`, `-1`, and custom via `MakeString`, `MakeInt`, etc.
-- Built-in support for `Int`, `String`, `Bool`, `Float`, `Option`, `Nullable`, `Null`, and tuples of length 2 and 3
+- Literal values like `Null`, `Undefined`, `True`, `False`, `-1`, and custom literals via `MakeString`, `MakeInt`, etc.
+- Built-in support for `Int`, `String`, `Bool`, `Float`, `option<t>`, `nullable<t>`, `null<t>`, and tuples of length 2 and 3
 
 This implementation does not utilize any special compiler support and so there are some limitations:
 
