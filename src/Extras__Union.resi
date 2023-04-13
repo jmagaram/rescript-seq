@@ -1,4 +1,4 @@
-/**
+/*
 This module provides functors to create tagged or untagged unions of 2, 3, 4, or 5 items. Here is a
 simple one. This creates a module that includes the type StringOrFalse.t, safe constructors, pattern 
 matching, and a custom equality function. You can build unions using any types, and with unlimited
@@ -18,8 +18,9 @@ For more details:
 - Examples https://github.com/jmagaram/rescript-extras/blob/master/tests/Extras__UnionTests.res
 - Patterns https://github.com/jmagaram/rescript-extras/blob/master/Extras__Pattern.resi 
 - Literals https://github.com/jmagaram/rescript-extras/blob/master/Extras__Literal.resi 
-
 */
+
+/** Creates a union of 2 types */
 module Make2: (
   P: {
     module A: Extras__Pattern.T
@@ -46,6 +47,7 @@ module Make2: (
     and type b = P.B.t
 )
 
+/** Create a union of 3 types */
 module Make3: (
   P: {
     module A: Extras__Pattern.T
@@ -77,6 +79,7 @@ module Make3: (
     and type c = P.C.t
 )
 
+/** Create a union of 4 types */
 module Make4: (
   P: {
     module A: Extras__Pattern.T
@@ -113,6 +116,7 @@ module Make4: (
     and type d = P.D.t
 )
 
+/** Create a union of 5 types */
 module Make5: (
   P: {
     module A: Extras__Pattern.T
