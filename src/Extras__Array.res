@@ -69,31 +69,3 @@ let filterSomeWith = (xs, f) => {
 }
 
 let filterSome = xs => xs->filterSomeWith((value, _) => value)
-
-let indexed = xs => xs->Js.Array2.mapi((v, i) => (v, i))
-
-let permute = (xs: array<'a>, ~length) => {
-  module Set = Belt.Set.Int
-  let rec go = usedInx => {
-    let used = usedInx->Set.size
-    let need = length - used
-    let available = xs->Js.Array2.length - used
-    switch need > available || need == 0 {
-    | true => []
-    | false =>
-      xs
-      ->Js.Array2.mapi((head, inx) => {
-        switch usedInx->Set.has(inx) {
-        | true => []
-        | false =>
-          switch need {
-          | 1 => [[head]]
-          | _ => go(usedInx->Set.add(inx))->Belt.Array.map(t => [head]->Js.Array2.concat(t))
-          }
-        }
-      })
-      ->Belt.Array.flatMap(i => i)
-    }
-  }
-  go(Set.empty)
-}
