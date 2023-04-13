@@ -1,4 +1,4 @@
-/*
+/***
 This module provides functors to create tagged or untagged unions of 2, 3, 4, or 5 items. Here is a
 simple one. This creates a module that includes the type StringOrFalse.t, safe constructors, pattern 
 matching, and a custom equality function. You can build unions using any types, and with unlimited
