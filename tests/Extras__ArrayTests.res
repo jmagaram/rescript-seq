@@ -28,6 +28,11 @@ let test = (~title, ~expect, ~a, ~b) =>
     m == n
   })
 
+let concatSort = (xxs: array<array<'a>>, stringify: 'a => string) =>
+  xxs
+  ->Js.Array2.map(xs => xs->Js.Array2.map(stringify)->Js.Array2.joinWith(""))
+  ->Js.Array2.sortInPlace
+
 let others = {
   [
     test(
@@ -134,6 +139,43 @@ let others = {
       ~expect="make tuples of item and the associated index",
       ~a=() => ["a", "b", "c"]->A.indexed,
       ~b=[("a", 0), ("b", 1), ("c", 2)],
+    ),
+    test(~title="permute", ~expect="when empty => [[]]", ~a=() => []->A.permute(~length=0), ~b=[]),
+    test(
+      ~title="permute",
+      ~expect="when one item => [[x]]",
+      ~a=() => [1]->A.permute(~length=1),
+      ~b=[[1]],
+    ),
+    test(
+      ~title="permute",
+      ~expect="when [12] => [12,21]",
+      ~a=() => [1, 2]->A.permute(~length=2)->concatSort(Belt.Int.toString),
+      ~b=["12", "21"],
+    ),
+    test(
+      ~title="permute",
+      ~expect="when [123] => [123,132,213,231,312,321]",
+      ~a=() => [1, 2, 3]->A.permute(~length=3)->concatSort(Belt.Int.toString),
+      ~b=["123", "132", "213", "231", "312", "321"],
+    ),
+    test(
+      ~title="permute",
+      ~expect="when [123] and length 2 => [12,13,21,23,31,32]",
+      ~a=() => [1, 2, 3]->A.permute(~length=2)->concatSort(Belt.Int.toString),
+      ~b=["12", "13", "21", "23", "31", "32"],
+    ),
+    test(
+      ~title="permute",
+      ~expect="when [123] and length 1 => [1,2,3]",
+      ~a=() => [1, 2, 3]->A.permute(~length=1)->concatSort(Belt.Int.toString),
+      ~b=["1", "2", "3"],
+    ),
+    test(
+      ~title="permute",
+      ~expect="when [123] and length 0 => []",
+      ~a=() => [1, 2, 3]->A.permute(~length=0)->concatSort(Belt.Int.toString),
+      ~b=[],
     ),
   ]
 }
