@@ -91,6 +91,25 @@ module StringOrFalseTests = {
   }
 }
 
+// =====================
+// Other simple examples
+// =====================
+
+// option<string> | int
+module StringOptionOrInt = Union.Make2({
+  module A = Pattern.MakeOption(Pattern.String)
+  module B = Pattern.Int
+})
+
+// (string, bool) | int
+module TupleOrString = Union.Make2({
+  module A = Pattern.MakeTuple2({
+    module A = Pattern.String
+    module B = Pattern.Bool
+  })
+  module B = Pattern.Int
+})
+
 // ===========================================
 // A: | { success: true, count: int}
 // B: | { success: false, reason: string }
