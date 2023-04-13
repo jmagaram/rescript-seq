@@ -22,6 +22,45 @@ module type T = {
 }
 
 /**
+Given a `Pattern.T`, construct a pattern corresponding to an option of that
+type. An option maps to `undefined | T`
+*/
+module MakeOption: (P: T) => (T with type t = option<P.t>)
+
+/**
+Given a `Pattern.T`, construct a pattern corresponding to a `null | undefined |
+t` of that type.
+*/
+module MakeNullable: (P: T) => (T with type t = Js.Nullable.t<P.t>)
+
+/**
+Given a `Pattern.T`, construct a pattern corresponding to a `null | t` of that
+type.
+*/
+module MakeNull: (P: T) => (T with type t = Js.Null.t<P.t>)
+
+/**
+Given two patterns, construct a tuple pattern (array of length 2).
+*/
+module MakeTuple2: (
+  P: {
+    module A: T
+    module B: T
+  },
+) => (T with type t = (P.A.t, P.B.t))
+
+/**
+Given three patterns, construct a tuple pattern (array of length 3).
+*/
+module MakeTuple3: (
+  P: {
+    module A: T
+    module B: T
+    module C: T
+  },
+) => (T with type t = (P.A.t, P.B.t, P.C.t))
+
+/**
 Given a `Pattern.T`, constructs some utility functions.
 */
 module MakeTools: (P: T) =>

@@ -13,7 +13,7 @@ let isLocalDevelopment = () => {
 }
 
 let filter = _ => true
-let onlyShowFailures = true
+let onlyShowFailures = false
 let throwIfAnyTestFails = !isLocalDevelopment()
 
 let tests =

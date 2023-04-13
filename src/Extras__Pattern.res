@@ -7,6 +7,82 @@ module type T = {
   let equals: (t, t) => bool
 }
 
+module MakeOption = (P: T) => {
+  type t = option<P.t>
+  let isTypeOf = v =>
+    switch v->Unknown.isUndefined {
+    | true => true
+    | false => P.isTypeOf(v)
+    }
+  let equals = (a, b) => Option.eq(a, b, P.equals)
+}
+
+module MakeNullable = (P: T) => {
+  type t = Js.Nullable.t<P.t>
+  let isTypeOf = (v: unknown) =>
+    switch v->Unknown.isNullOrUndefined {
+    | true => true
+    | false => P.isTypeOf(v->Unknown.make)
+    }
+  let equals = (a: t, b: t) => {
+    switch Unknown.isNull(a) {
+    | true => Unknown.isNull(b)
+    | false =>
+      switch Unknown.isUndefined(a) {
+      | true => Unknown.isUndefined(b)
+      | false => !Unknown.isNullOrUndefined(b) && P.equals(a->Obj.magic, b->Obj.magic)
+      }
+    }
+  }
+}
+
+module MakeNull = (P: T) => {
+  type t = Js.Null.t<P.t>
+  let isTypeOf = (v: unknown) =>
+    switch v->Unknown.isNull {
+    | true => true
+    | false => P.isTypeOf(v->Unknown.make)
+    }
+  let equals = (a: t, b: t) =>
+    switch a->Unknown.isNull {
+    | true => b->Unknown.isNull
+    | false => !(b->Unknown.isNull) && P.equals(a->Obj.magic, b->Obj.magic)
+    }
+}
+
+module MakeTuple2 = (
+  P: {
+    module A: T
+    module B: T
+  },
+) => {
+  type t = (P.A.t, P.B.t)
+  let isTypeOf = (u: unknown) =>
+    u->Js.Array2.isArray &&
+    u->Obj.magic->Js.Array2.length == 2 &&
+    P.A.isTypeOf(u->Obj.magic->Js.Array2.unsafe_get(0)) &&
+    P.B.isTypeOf(u->Obj.magic->Js.Array2.unsafe_get(1))
+  let equals = ((a1, b1): t, (a2, b2): t) => P.A.equals(a1, a2) && P.B.equals(b1, b2)
+}
+
+module MakeTuple3 = (
+  P: {
+    module A: T
+    module B: T
+    module C: T
+  },
+) => {
+  type t = (P.A.t, P.B.t, P.C.t)
+  let isTypeOf = (u: unknown) =>
+    u->Js.Array2.isArray &&
+    u->Obj.magic->Js.Array2.length == 3 &&
+    P.A.isTypeOf(u->Obj.magic->Js.Array2.unsafe_get(0)) &&
+    P.B.isTypeOf(u->Obj.magic->Js.Array2.unsafe_get(1)) &&
+    P.C.isTypeOf(u->Obj.magic->Js.Array2.unsafe_get(2))
+  let equals = ((a1, b1, c1): t, (a2, b2, c2): t) =>
+    P.A.equals(a1, a2) && P.B.equals(b1, b2) && P.C.equals(c1, c2)
+}
+
 module MakeTools = (P: T) => {
   let make = x => x->Unknown.make->P.isTypeOf ? Some((Obj.magic(x): P.t)) : None
   let eq = (x, y) => x->make->Option.flatMap(x => y->make->Option.map(y => P.equals(x, y)))

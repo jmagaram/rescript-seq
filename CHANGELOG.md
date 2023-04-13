@@ -4,6 +4,11 @@
 - `Option.map2`, `Option.map3`, `Option.map4` and test cleanup
 - `Option.flatten`
 - `Array.filterSome` and `Array.filterSomeWith`
+- For untagged unions
+  - `Pattern.MakeOption` - Turn any pattern into a `t | undefined`
+  - `Pattern.MakeNullable` - Turn any pattern into a `t | undefined | null`
+  - `Pattern.MakeNull` - Turn any pattern into a `t | null`
+  - `Pattern.MakeTuple2` and `Pattern.MakeTuple3`
 - Option to only show test failures
 
 ## Version 0.20.0
