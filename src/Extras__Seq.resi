@@ -11,6 +11,7 @@ let replicate: (~count: int, ~value: 'a) => t<'a>
 // range, step, etc.
 
 // Transform
+let append: (t<'a>, t<'a>) => t<'a>
 let flatMap: (t<'a>, 'a => t<'b>) => t<'b>
 
 // Consume and export

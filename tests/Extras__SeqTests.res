@@ -75,6 +75,30 @@ let oneTwoThree = S.init(~count=3, ~initializer=(~index) => index + 1)
 
 let transforming = [
   areEqual(
+    ~title="append",
+    ~expectation="when both not empty",
+    ~a=() => S.append(oneTwoThree, oneTwoThree),
+    ~b=[1, 2, 3, 1, 2, 3],
+  ),
+  areEqual(
+    ~title="append",
+    ~expectation="when both empty",
+    ~a=() => S.append(S.empty, S.empty),
+    ~b=[],
+  ),
+  areEqual(
+    ~title="append",
+    ~expectation="when first empty",
+    ~a=() => S.append(S.empty, oneTwoThree),
+    ~b=[1, 2, 3],
+  ),
+  areEqual(
+    ~title="append",
+    ~expectation="when second empty",
+    ~a=() => S.append(oneTwoThree, S.empty),
+    ~b=[1, 2, 3],
+  ),
+  areEqual(
     ~title="flatMap",
     ~expectation="when several items => flatten",
     ~a=() => oneTwoThree->S.flatMap(i => S.init(~count=3, ~initializer=(~index) => i)),
