@@ -68,6 +68,17 @@ let take = (seq, count) => {
   (. ()) => go(seq->indexed)
 }
 
+let drop = (seq, count) => {
+  let rec go = seq => {
+    switch seq(.) {
+    | Empty => Empty
+    | Next((value, index), seq) =>
+      index < count ? go(seq) : Next(value, seq->map(((value, _)) => value))
+    }
+  }
+  (. ()) => go(seq->indexed)
+}
+
 let rec filter = (seq, f) => {
   (. ()) =>
     switch seq(.) {

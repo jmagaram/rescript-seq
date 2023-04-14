@@ -179,6 +179,24 @@ let transforming = [
   ),
   areEqual(~title="take", ~expectation="when a subset", ~a=() => oneTwoThree->S.take(2), ~b=[1, 2]),
   areEqual(
+    ~title="drop",
+    ~expectation="when zero => original seq",
+    ~a=() => oneTwoThreeFourFive->S.drop(0),
+    ~b=[1, 2, 3, 4, 5],
+  ),
+  areEqual(
+    ~title="drop",
+    ~expectation="when all => empty",
+    ~a=() => oneTwoThreeFourFive->S.drop(5),
+    ~b=[],
+  ),
+  areEqual(
+    ~title="drop",
+    ~expectation="when subset",
+    ~a=() => oneTwoThreeFourFive->S.drop(2),
+    ~b=[3, 4, 5],
+  ),
+  areEqual(
     ~title="filter",
     ~expectation="",
     ~a=() => oneTwoThreeFourFive->S.filter(i => i == 2 || i == 5),
