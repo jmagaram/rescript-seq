@@ -130,3 +130,19 @@ let forEach = (seq, f) => {
     }
   }
 }
+
+let some = (seq, predicate) => {
+  let break = ref(false)
+  let curr = ref(seq(.))
+  let result = ref(false)
+  while result.contents !== true && curr.contents !== Empty {
+    switch curr.contents {
+    | Empty => break := true
+    | Next(value, seq) => {
+        result := predicate(value)
+        curr := seq(.)
+      }
+    }
+  }
+  result.contents
+}

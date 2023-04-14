@@ -18,14 +18,17 @@ let filter: (t<'a>, 'a => bool) => t<'a>
 let take: (t<'a>, int) => t<'a>
 let drop: (t<'a>, int) => t<'a>
 // let mapi: (t<'a>, (~value: 'a, ~index: int) => 'b) => t<'b>
+// takewhile
 
 // Consume and export
 let fold: (t<'a>, 'b, ('b, 'a) => 'b) => 'b
 let toArray: t<'a> => array<'a>
 let toReversedList: t<'a> => Belt.List.t<'a>
-let forEach: (t<'a>, 'a => unit) => unit // with index?
+let forEach: (t<'a>, 'a => unit) => unit
+let some: (t<'a>, 'a => bool) => bool // some, isSomeAnd
 // forEach
 // tap
+// find
 
 // get all the tc39
 // get all the oCaml

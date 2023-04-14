@@ -12,6 +12,12 @@ let areEqual = (~title, ~expectation, ~a, ~b) =>
     a == b
   })
 
+let consumeEqual = (~title, ~expectation, ~a, ~b) =>
+  T.make(~category="Seq", ~title, ~expectation, ~predicate=() => {
+    let aValue = a()
+    aValue == b
+  })
+
 let constructors = [
   areEqual(~title="singleton", ~expectation="has one item in it", ~a=() => S.singleton(3), ~b=[3]),
   areEqual(~title="empty", ~expectation="has no items", ~a=() => S.empty, ~b=[]),
@@ -228,7 +234,7 @@ let consuming = [
     ~title="unfold",
     ~expectation="a million stack won't overflow",
     ~predicate=() => {
-      S.unfold(0, i => i < 999999 ? Some(i, i + 1) : None)->S.forEach(i => ())
+      S.unfold(0, i => i < 999999 ? Some(i, i + 1) : None)->S.forEach(_ => ())
       true
     },
   ),
@@ -238,10 +244,28 @@ let consuming = [
     ~expectation="a million stack won't overflow",
     ~predicate=() => {
       S.replicate(~count=1000, ~value=0)
-      ->S.flatMap(i => S.replicate(~count=1000, ~value=0))
+      ->S.flatMap(_ => S.replicate(~count=1000, ~value=0))
       ->S.forEach(_ => ())
       true
     },
+  ),
+  consumeEqual(
+    ~title="some",
+    ~expectation="if empty => false",
+    ~a=() => S.empty->S.some(_ => true),
+    ~b=false,
+  ),
+  consumeEqual(
+    ~title="some",
+    ~expectation="if some predicate true => true",
+    ~a=() => oneTwoThreeFourFive->S.some(i => i == 2),
+    ~b=true,
+  ),
+  consumeEqual(
+    ~title="some",
+    ~expectation="if no predicate true => false",
+    ~a=() => oneTwoThreeFourFive->S.some(i => i == 99),
+    ~b=false,
   ),
 ]
 
