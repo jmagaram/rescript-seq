@@ -285,6 +285,18 @@ let consuming = [
     ~a=() => oneTwoThreeFourFive->S.everyOrEmpty(i => i != 3),
     ~b=false,
   ),
+  consumeEqual(
+    ~title="find",
+    ~expectation="if not found => None",
+    ~a=() => oneTwoThreeFourFive->S.find(i => i == 99),
+    ~b=None,
+  ),
+  consumeEqual(
+    ~title="find",
+    ~expectation="if found => Some",
+    ~a=() => oneTwoThreeFourFive->S.find(i => i == 2),
+    ~b=Some(2),
+  ),
 ]
 
 let tests = [constructors, transforming, consuming]->Belt.Array.flatMap(i => i)

@@ -27,9 +27,8 @@ let toReversedList: t<'a> => Belt.List.t<'a>
 let forEach: (t<'a>, 'a => unit) => unit
 let some: (t<'a>, 'a => bool) => bool
 let everyOrEmpty: (t<'a>, 'a => bool) => bool
-// forEach
+let find: (t<'a>, 'a => bool) => option<'a>
 // tap
-// find
 
 // get all the tc39
 // get all the oCaml

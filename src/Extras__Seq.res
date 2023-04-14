@@ -162,3 +162,20 @@ let everyOrEmpty = (seq, predicate) => {
   }
   !foundInvalid.contents
 }
+
+let find = (seq, predicate) => {
+  let curr = ref(seq(.))
+  let found = ref(None)
+  while found.contents->Belt.Option.isNone && curr.contents !== Empty {
+    switch curr.contents {
+    | Empty => ()
+    | Next(value, seq) => {
+        if predicate(value) {
+          found := Some(value)
+        }
+        curr := seq(.)
+      }
+    }
+  }
+  found.contents
+}
