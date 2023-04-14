@@ -12,7 +12,7 @@ let isLocalDevelopment = () => {
   }
 }
 
-let filter = _ => true
+let filter = i => i->Test.category == "Seq"
 let onlyShowFailures = false
 let throwIfAnyTestFails = !isLocalDevelopment()
 
@@ -28,6 +28,7 @@ let tests =
     Extras__UnionTests.tests,
     Extras__PatternTests.tests,
     Extras__UnknownTests.tests,
+    Extras__SeqTests.tests,
   ]->Array.concatMany
 
 Ex.Task.Result.make(
