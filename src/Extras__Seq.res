@@ -20,6 +20,21 @@ let rec unfold = (seed, f) =>
 let init = (~count, ~initializer) =>
   unfold(0, i => i < count ? Some(initializer(~index=i), i + 1) : None)
 
+let replicate = (~count, ~value) => unfold(0, i => i < count ? Some(value, i + 1) : None)
+
+// Transforming
+
+// let flatMap2 = (seq, f) => {
+//   let first = seq(.)
+//   switch first {
+//     | Empty =>
+//   }
+// }
+
+let flatMap = (_seq, _f) => empty
+
+// Consuming sequences
+
 let fold = (seq, zero, concat) => {
   let sum = ref(zero)
   let curr = ref(seq(.))

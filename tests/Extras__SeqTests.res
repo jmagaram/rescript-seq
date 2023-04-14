@@ -51,6 +51,35 @@ let constructors = [
     ~a=() => S.init(~count=3, ~initializer=(~index) => index->Belt.Int.toString),
     ~b=["0", "1", "2"],
   ),
+  areEqual(
+    ~title="replicate",
+    ~expectation="when count = 0 => empty",
+    ~a=() => S.replicate(~count=0, ~value="x"),
+    ~b=[],
+  ),
+  areEqual(
+    ~title="replicate",
+    ~expectation="when count = 1 => the item as singleton",
+    ~a=() => S.replicate(~count=1, ~value="x"),
+    ~b=["x"],
+  ),
+  areEqual(
+    ~title="replicate",
+    ~expectation="when count > 2 => the item repeated",
+    ~a=() => S.replicate(~count=3, ~value="x"),
+    ~b=["x", "x", "x"],
+  ),
+]
+
+let oneTwoThree = S.init(~count=3, ~initializer=(~index) => index + 1)
+
+let transforming = [
+  areEqual(
+    ~title="flatMap",
+    ~expectation="when several items => flatten",
+    ~a=() => oneTwoThree->S.flatMap(i => S.init(~count=3, ~initializer=(~index) => i)),
+    ~b=[1, 1, 1, 2, 2, 2, 3, 3, 3],
+  ),
 ]
 
 let consuming = [
@@ -69,4 +98,4 @@ let consuming = [
   ),
 ]
 
-let tests = [constructors, consuming]->Belt.Array.flatMap(i => i)
+let tests = [constructors, transforming, consuming]->Belt.Array.flatMap(i => i)
