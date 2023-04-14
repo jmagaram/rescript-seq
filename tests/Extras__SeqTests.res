@@ -128,6 +128,33 @@ let transforming = [
     ~a=() => oneTwoThree->S.flatMap(i => S.singleton(i->Belt.Int.toString)),
     ~b=["1", "2", "3"],
   ),
+  areEqual(
+    ~title="map",
+    ~expectation="",
+    ~a=() => oneTwoThree->S.map(Belt.Int.toString),
+    ~b=["1", "2", "3"],
+  ),
+  areEqual(
+    ~title="indexed",
+    ~expectation="when items, index starts at 0",
+    ~a=() => oneTwoThree->S.indexed,
+    ~b=[(1, 0), (2, 1), (3, 2)],
+  ),
+  areEqual(~title="take", ~expectation="when 0 => empty", ~a=() => oneTwoThree->S.take(0), ~b=[]),
+  areEqual(~title="take", ~expectation="when empty => empty", ~a=() => S.empty->S.take(99), ~b=[]),
+  areEqual(
+    ~title="take",
+    ~expectation="when n = all => all",
+    ~a=() => oneTwoThree->S.take(3),
+    ~b=[1, 2, 3],
+  ),
+  areEqual(
+    ~title="take",
+    ~expectation="when n > all => all",
+    ~a=() => oneTwoThree->S.take(9),
+    ~b=[1, 2, 3],
+  ),
+  areEqual(~title="take", ~expectation="when a subset", ~a=() => oneTwoThree->S.take(2), ~b=[1, 2]),
 ]
 
 let consuming = [

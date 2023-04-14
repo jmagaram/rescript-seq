@@ -22,6 +22,8 @@ let init = (~count, ~initializer) =>
 
 let replicate = (~count, ~value) => unfold(0, i => i < count ? Some(value, i + 1) : None)
 
+// let infinite = f => empty
+
 // Transforming
 
 let rec append = (s1: t<'a>, s2: t<'a>) => {
@@ -36,8 +38,30 @@ let rec flatMap = (seq: t<'a>, f: 'a => t<'b>) => {
   (. ()) =>
     switch seq(.) {
     | Empty => Empty
-    | Next(s, next) => append(f(s), flatMap(next, f))(.)
+    | Next(value, next) => append(f(value), flatMap(next, f))(.)
     }
+}
+
+let map = (seq, f) => flatMap(seq, i => singleton(f(i)))
+
+let indexed = seq => {
+  let rec go = (seq, index) =>
+    (. ()) =>
+      switch seq(.) {
+      | Empty => Empty
+      | Next(value, seq) => Next((value, index), go(seq, index + 1))
+      }
+  go(seq, 0)
+}
+
+let take = (seq, count) => {
+  let rec go = seq => {
+    switch seq(.) {
+    | Empty => Empty
+    | Next((value, index), seq) => index >= count ? Empty : Next(value, (. ()) => go(seq))
+    }
+  }
+  (. ()) => go(seq->indexed)
 }
 
 // Consuming sequences
