@@ -205,6 +205,26 @@ let consuming = [
     oneTwoThreeFourFive->S.forEach(i => result->Js.Array2.push(i)->ignore)
     result == [1, 2, 3, 4, 5]
   }),
+  T.make(
+    ~category="Seq",
+    ~title="unfold",
+    ~expectation="a million stack won't overflow",
+    ~predicate=() => {
+      S.unfold(0, i => i < 999999 ? Some(i, i + 1) : None)->S.forEach(i => ())
+      true
+    },
+  ),
+  T.make(
+    ~category="Seq",
+    ~title="flatMap",
+    ~expectation="a million stack won't overflow",
+    ~predicate=() => {
+      S.replicate(~count=1000, ~value=0)
+      ->S.flatMap(i => S.replicate(~count=1000, ~value=0))
+      ->S.forEach(_ => ())
+      true
+    },
+  ),
 ]
 
 let tests = [constructors, transforming, consuming]->Belt.Array.flatMap(i => i)
