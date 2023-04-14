@@ -80,6 +80,17 @@ let constructors = [
       ->Belt.Set.Int.size
     unique > minUnique
   }),
+  T.make(~category="Seq", ~title="infinite", ~expectation="stack won't overflow", ~predicate=() => {
+    let count = 99999
+    let minUnique = (0.95 *. count->Belt.Int.toFloat)->Belt.Int.fromFloat
+    let unique =
+      S.infinite(_ => Js.Math.random_int(0, 999999))
+      ->S.take(count)
+      ->S.toArray
+      ->Belt.Set.Int.fromArray
+      ->Belt.Set.Int.size
+    unique > minUnique
+  }),
 ]
 
 let oneTwoThree = S.init(~count=3, ~initializer=(~index) => index + 1)
@@ -189,6 +200,11 @@ let consuming = [
     ~predicate=() =>
       S.unfold(1, i => i <= 5 ? Some(i, i + 1) : None)->S.toReversedList == list{5, 4, 3, 2, 1},
   ),
+  T.make(~category="Seq", ~title="forEach", ~expectation="", ~predicate=() => {
+    let result = []
+    oneTwoThreeFourFive->S.forEach(i => result->Js.Array2.push(i)->ignore)
+    result == [1, 2, 3, 4, 5]
+  }),
 ]
 
 let tests = [constructors, transforming, consuming]->Belt.Array.flatMap(i => i)

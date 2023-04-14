@@ -22,3 +22,11 @@ let take: (t<'a>, int) => t<'a>
 let fold: (t<'a>, 'b, ('b, 'a) => 'b) => 'b
 let toArray: t<'a> => array<'a>
 let toReversedList: t<'a> => Belt.List.t<'a>
+let forEach: (t<'a>, 'a => unit) => unit // with index?
+// forEach
+// tap
+
+// get all the tc39
+// get all the oCaml
+// to iterator
+// from array too
