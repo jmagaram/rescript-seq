@@ -3,7 +3,9 @@ and node<'a> =
   | Empty
   | Next('a, t<'a>)
 
+// ===================
 // Construct sequences
+// ===================
 
 let empty = (. ()) => Empty
 
@@ -22,9 +24,11 @@ let init = (~count, ~initializer) =>
 
 let replicate = (~count, ~value) => unfold(0, i => i < count ? Some(value, i + 1) : None)
 
-// let infinite = f => empty
+let infinite = f => unfold(0, _ => Some(f(), 0))
 
+// ============
 // Transforming
+// ============
 
 let rec append = (s1: t<'a>, s2: t<'a>) => {
   (. ()) =>
@@ -76,7 +80,9 @@ let rec filter = (seq, f) => {
     }
 }
 
+// ===================
 // Consuming sequences
+// ===================
 
 let fold = (seq, zero, concat) => {
   let sum = ref(zero)

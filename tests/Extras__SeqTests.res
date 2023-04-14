@@ -69,6 +69,17 @@ let constructors = [
     ~a=() => S.replicate(~count=3, ~value="x"),
     ~b=["x", "x", "x"],
   ),
+  T.make(~category="Seq", ~title="infinite", ~expectation="calls fn every time", ~predicate=() => {
+    let count = 99999
+    let minUnique = (0.95 *. count->Belt.Int.toFloat)->Belt.Int.fromFloat
+    let unique =
+      S.infinite(_ => Js.Math.random_int(0, 999999))
+      ->S.take(count)
+      ->S.toArray
+      ->Belt.Set.Int.fromArray
+      ->Belt.Set.Int.size
+    unique > minUnique
+  }),
 ]
 
 let oneTwoThree = S.init(~count=3, ~initializer=(~index) => index + 1)

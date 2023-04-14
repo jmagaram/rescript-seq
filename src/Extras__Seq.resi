@@ -6,8 +6,7 @@ let singleton: 'a => t<'a>
 let unfold: ('seed, 'seed => option<('a, 'seed)>) => t<'a>
 let init: (~count: int, ~initializer: (~index: int) => 'a) => t<'a>
 let replicate: (~count: int, ~value: 'a) => t<'a>
-// let infinite: (unit => 'a) => t<'a>
-// repeat and forever
+let infinite: (unit => 'a) => t<'a>
 // range, step, etc.
 
 // Transform
