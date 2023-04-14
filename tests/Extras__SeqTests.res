@@ -72,6 +72,7 @@ let constructors = [
 ]
 
 let oneTwoThree = S.init(~count=3, ~initializer=(~index) => index + 1)
+let oneTwoThreeFourFive = S.init(~count=5, ~initializer=(~index) => index + 1)
 
 let transforming = [
   areEqual(
@@ -155,6 +156,12 @@ let transforming = [
     ~b=[1, 2, 3],
   ),
   areEqual(~title="take", ~expectation="when a subset", ~a=() => oneTwoThree->S.take(2), ~b=[1, 2]),
+  areEqual(
+    ~title="filter",
+    ~expectation="",
+    ~a=() => oneTwoThreeFourFive->S.filter(i => i == 2 || i == 5),
+    ~b=[2, 5],
+  ),
 ]
 
 let consuming = [

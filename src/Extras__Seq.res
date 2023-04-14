@@ -64,6 +64,18 @@ let take = (seq, count) => {
   (. ()) => go(seq->indexed)
 }
 
+let rec filter = (seq, f) => {
+  (. ()) =>
+    switch seq(.) {
+    | Empty => Empty
+    | Next(value, seq) =>
+      switch f(value) {
+      | true => Next(value, filter(seq, f))
+      | false => filter(seq, f)(.)
+      }
+    }
+}
+
 // Consuming sequences
 
 let fold = (seq, zero, concat) => {

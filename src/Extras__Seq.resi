@@ -15,6 +15,7 @@ let append: (t<'a>, t<'a>) => t<'a>
 let flatMap: (t<'a>, 'a => t<'b>) => t<'b>
 let map: (t<'a>, 'a => 'b) => t<'b>
 let indexed: t<'a> => t<('a, int)>
+let filter: (t<'a>, 'a => bool) => t<'a>
 let take: (t<'a>, int) => t<'a>
 // let mapi: (t<'a>, (~value: 'a, ~index: int) => 'b) => t<'b>
 
