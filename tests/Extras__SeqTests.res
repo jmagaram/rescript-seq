@@ -297,6 +297,24 @@ let consuming = [
     ~a=() => oneTwoThreeFourFive->S.find(i => i == 2),
     ~b=Some(2),
   ),
+  consumeEqual(
+    ~title="reduce",
+    ~expectation="if empty => initial value",
+    ~a=() => S.empty->S.reduce(99, (sum, i) => sum * i),
+    ~b=99,
+  ),
+  consumeEqual(
+    ~title="reduce",
+    ~expectation="if 1 item => f of the item and initial value",
+    ~a=() => S.singleton(4)->S.reduce(5, (sum, i) => sum * i),
+    ~b=20,
+  ),
+  consumeEqual(
+    ~title="reduce",
+    ~expectation="if many items => f of all the items and initial value",
+    ~a=() => oneTwoThreeFourFive->S.reduce(-1, (sum, i) => sum * i),
+    ~b=-1 * 2 * 3 * 4 * 5,
+  ),
 ]
 
 let tests = [constructors, transforming, consuming]->Belt.Array.flatMap(i => i)

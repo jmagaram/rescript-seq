@@ -95,7 +95,7 @@ let rec filter = (seq, f) => {
 // Consume
 // =======
 
-let fold = (seq, zero, concat) => {
+let reduce = (seq, zero, concat) => {
   let sum = ref(zero)
   let curr = ref(seq(.))
   while curr.contents !== Empty {
@@ -111,12 +111,12 @@ let fold = (seq, zero, concat) => {
 }
 
 let toArray = seq =>
-  seq->fold([], (arr, i) => {
+  seq->reduce([], (arr, i) => {
     arr->Js.Array2.push(i)->ignore
     arr
   })
 
-let toReversedList = seq => seq->fold(list{}, (lst, i) => lst->Belt.List.add(i))
+let toReversedList = seq => seq->reduce(list{}, (lst, i) => lst->Belt.List.add(i))
 
 let forEach = (seq, f) => {
   let curr = ref(seq(.))
