@@ -24,24 +24,21 @@ let replicate = (~count, ~value) => unfold(0, i => i < count ? Some(value, i + 1
 
 // Transforming
 
-let rec append = (s1, s2) => {
+let rec append = (s1: t<'a>, s2: t<'a>) => {
   (. ()) =>
     switch s1(.) {
     | Empty => s2(.)
     | Next(s1Value, b) => Next(s1Value, append(b, s2))
     }
 }
-// let flatMap2 = (seq, f) => {
-//   let curr = ref(seq(.))
-//   while curr.contents != Empty {
-//     switch curr.contents {
-//     | Empty => "a"
-//     | _ => "b"
-//     }
-//   }
-// }
 
-let flatMap = (_seq, _f) => empty
+let rec flatMap = (seq: t<'a>, f: 'a => t<'b>) => {
+  (. ()) =>
+    switch seq(.) {
+    | Empty => Empty
+    | Next(s, next) => append(f(s), flatMap(next, f))(.)
+    }
+}
 
 // Consuming sequences
 

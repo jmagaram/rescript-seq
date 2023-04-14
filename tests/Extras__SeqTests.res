@@ -100,9 +100,33 @@ let transforming = [
   ),
   areEqual(
     ~title="flatMap",
-    ~expectation="when several items => flatten",
-    ~a=() => oneTwoThree->S.flatMap(i => S.init(~count=3, ~initializer=(~index) => i)),
+    ~expectation="when map to several items => flatten",
+    ~a=() => oneTwoThree->S.flatMap(i => S.replicate(~count=3, ~value=i)),
     ~b=[1, 1, 1, 2, 2, 2, 3, 3, 3],
+  ),
+  areEqual(
+    ~title="flatMap",
+    ~expectation="when original is empty => empty",
+    ~a=() => S.empty->S.flatMap(_ => S.replicate(~count=5, ~value="x")),
+    ~b=[],
+  ),
+  areEqual(
+    ~title="flatMap",
+    ~expectation="when original is one item",
+    ~a=() => S.singleton(1)->S.flatMap(i => S.replicate(~count=5, ~value=i)),
+    ~b=[1, 1, 1, 1, 1],
+  ),
+  areEqual(
+    ~title="flatMap",
+    ~expectation="when mapped result is empty => empty",
+    ~a=() => oneTwoThree->S.flatMap(_ => S.empty),
+    ~b=[],
+  ),
+  areEqual(
+    ~title="flatMap",
+    ~expectation="when mapped result is one item",
+    ~a=() => oneTwoThree->S.flatMap(i => S.singleton(i->Belt.Int.toString)),
+    ~b=["1", "2", "3"],
   ),
 ]
 
