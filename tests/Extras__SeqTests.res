@@ -18,6 +18,9 @@ let consumeEqual = (~title, ~expectation, ~a, ~b) =>
     aValue == b
   })
 
+let oneTwoThree = S.init(~count=3, ~initializer=(~index) => index + 1)
+let oneTwoThreeFourFive = S.init(~count=5, ~initializer=(~index) => index + 1)
+
 let constructors = [
   areEqual(~title="singleton", ~expectation="has one item in it", ~a=() => S.singleton(3), ~b=[3]),
   areEqual(~title="empty", ~expectation="has no items", ~a=() => S.empty, ~b=[]),
@@ -98,9 +101,6 @@ let constructors = [
     unique > minUnique
   }),
 ]
-
-let oneTwoThree = S.init(~count=3, ~initializer=(~index) => index + 1)
-let oneTwoThreeFourFive = S.init(~count=5, ~initializer=(~index) => index + 1)
 
 let transforming = [
   areEqual(
@@ -265,6 +265,24 @@ let consuming = [
     ~title="some",
     ~expectation="if no predicate true => false",
     ~a=() => oneTwoThreeFourFive->S.some(i => i == 99),
+    ~b=false,
+  ),
+  consumeEqual(
+    ~title="every",
+    ~expectation="if empty => true",
+    ~a=() => S.empty->S.everyOrEmpty(_ => false),
+    ~b=true,
+  ),
+  consumeEqual(
+    ~title="every",
+    ~expectation="if all true => true",
+    ~a=() => oneTwoThreeFourFive->S.everyOrEmpty(i => i >= 1 && i <= 5),
+    ~b=true,
+  ),
+  consumeEqual(
+    ~title="every",
+    ~expectation="if any false => false",
+    ~a=() => oneTwoThreeFourFive->S.everyOrEmpty(i => i != 3),
     ~b=false,
   ),
 ]

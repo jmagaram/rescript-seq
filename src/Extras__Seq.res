@@ -146,3 +146,19 @@ let some = (seq, predicate) => {
   }
   result.contents
 }
+
+let everyOrEmpty = (seq, predicate) => {
+  let break = ref(false)
+  let curr = ref(seq(.))
+  let foundInvalid = ref(false)
+  while foundInvalid.contents === false && curr.contents !== Empty {
+    switch curr.contents {
+    | Empty => break := true
+    | Next(value, seq) => {
+        foundInvalid := !predicate(value)
+        curr := seq(.)
+      }
+    }
+  }
+  !foundInvalid.contents
+}

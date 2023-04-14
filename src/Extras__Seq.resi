@@ -25,7 +25,8 @@ let fold: (t<'a>, 'b, ('b, 'a) => 'b) => 'b
 let toArray: t<'a> => array<'a>
 let toReversedList: t<'a> => Belt.List.t<'a>
 let forEach: (t<'a>, 'a => unit) => unit
-let some: (t<'a>, 'a => bool) => bool // some, isSomeAnd
+let some: (t<'a>, 'a => bool) => bool
+let everyOrEmpty: (t<'a>, 'a => bool) => bool
 // forEach
 // tap
 // find
