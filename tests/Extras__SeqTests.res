@@ -315,6 +315,12 @@ let consuming = [
     ~a=() => oneTwoThreeFourFive->S.reduce(-1, (sum, i) => sum * i),
     ~b=-1 * 2 * 3 * 4 * 5,
   ),
+  consumeEqual(
+    ~title="reduce",
+    ~expectation="can transform",
+    ~a=() => oneTwoThreeFourFive->S.reduce("", (sum, i) => `${i->Belt.Int.toString}${sum}`),
+    ~b="54321",
+  ),
 ]
 
 let tests = [constructors, transforming, consuming]->Belt.Array.flatMap(i => i)
