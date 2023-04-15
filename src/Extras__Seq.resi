@@ -38,6 +38,7 @@ let map2: (t<'a>, t<'b>, ('a, 'b) => 'c) => t<'c>
 let sortedMerge: (t<'a>, t<'a>, ('a, 'a) => int) => t<'a>
 let cache: t<'a> => t<'a>
 let tap: (t<'a>, 'a => unit) => t<'a>
+let allPairs: (t<'a>, t<'b>) => t<('a, 'b)>
 // let windowed: (t<'a>, int) => t<array<'a>> // and pairwise
 
 // =======
@@ -70,7 +71,7 @@ let maxBy: (t<'a>, ('a, 'a) => int) => option<'a>
 =====
 NOTES
 =====
-Check if recursion is a problem
+!!!!! Check if recursion is a problem !!!!!
 Simple ranges with steps, up and down, inclusive or exclusive
 mapi or rely on indexed first?
 takeWhile
@@ -126,7 +127,7 @@ unfold - YES
 repeat - NO
 forever - YES as infinite
 iterate - YES
-cycle
+cycle - YES
 
 map - YES
 mapi - YES

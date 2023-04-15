@@ -249,6 +249,8 @@ let rec cache = seq =>
     }
   )
 
+let allPairs = (xx: t<'a>, yy: t<'b>) => xx->flatMap(x => yy->map(y => (x, y)))
+
 // =======
 // Consume
 // =======
