@@ -11,7 +11,8 @@ let toOption = node =>
   | Next(value, seq) => Some(value, seq)
   }
 
-let mapNext = (seq, f) =>
+type mapNext<'a, 'b> = (t<'a>, (~value: 'a, ~seq: t<'a>) => node<'b>) => t<'b>
+let mapNext: mapNext<'a, 'b> = (seq, f) =>
   (. ()) =>
     switch seq(.) {
     | Empty => Empty
@@ -68,7 +69,7 @@ let startWith = (seq, value) => (. ()) => Next(value, seq)
 
 let startWithMany = (s1, s2) => append(s2, s1)
 
-let rec flatMap = (seq: t<'a>, f: 'a => t<'b>) => {
+let rec flatMap = (seq, f) => {
   (. ()) =>
     switch seq(.) {
     | Empty => Empty
@@ -84,48 +85,41 @@ let map = (seq, f) => flatMap(seq, i => singleton(f(i)))
 
 let indexed = seq => {
   let rec go = (seq, index) =>
-    (. ()) =>
-      switch seq(.) {
-      | Empty => Empty
-      | Next(value, seq) => Next((value, index), go(seq, index + 1))
-      }
+    seq->mapNext((~value, ~seq) => Next((value, index), go(seq, index + 1)))
   go(seq, 0)
 }
 
 let mapi = (seq, f) => seq->indexed->map(((value, index)) => f(~value, ~index))
 
 let take = (seq, count) => {
-  let rec go = seq => {
-    switch seq(.) {
-    | Empty => Empty
-    | Next((value, index), seq) => index >= count ? Empty : Next(value, (. ()) => go(seq))
-    }
-  }
-  (. ()) => go(seq->indexed)
+  let rec go = seq =>
+    seq->mapNext((~value as (value, index), ~seq) =>
+      switch index >= count {
+      | true => Empty
+      | false => Next(value, go(seq))
+      }
+    )
+  go(seq->indexed)
 }
 
 let drop = (seq, count) => {
-  let rec go = seq => {
-    switch seq(.) {
-    | Empty => Empty
-    | Next((value, index), seq) =>
-      index < count ? go(seq) : Next(value, seq->map(((value, _)) => value))
-    }
-  }
-  (. ()) => go(seq->indexed)
+  let rec go = seq =>
+    seq->mapNext((~value as (value, index), ~seq) =>
+      switch index < count {
+      | true => go(seq)(.)
+      | false => Next(value, seq->map(((value, _)) => value))
+      }
+    )
+  go(seq->indexed)
 }
 
-let rec filter = (seq, f) => {
-  (. ()) =>
-    switch seq(.) {
-    | Empty => Empty
-    | Next(value, seq) =>
-      switch f(value) {
-      | true => Next(value, filter(seq, f))
-      | false => filter(seq, f)(.)
-      }
+let rec filter = (seq, f) =>
+  seq->mapNext((~value, ~seq) =>
+    switch f(value) {
+    | true => Next(value, filter(seq, f))
+    | false => filter(seq, f)(.)
     }
-}
+  )
 
 let rec zipLongest = (s1, s2) => {
   (. ()) => {
