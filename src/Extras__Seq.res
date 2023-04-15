@@ -139,6 +139,18 @@ let rec zip = (seq1, seq2) =>
     }
   }
 
+let rec filterMap = (seq, f) =>
+  (. ()) => {
+    switch seq(.) {
+    | Empty => Empty
+    | Next(value, seq) =>
+      switch f(value) {
+      | None => filterMap(seq, f)(.) // recurses till finds
+      | Some(value) => Next(value, filterMap(seq, f))
+      }
+    }
+  }
+
 // =======
 // Consume
 // =======

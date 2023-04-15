@@ -21,6 +21,7 @@ let map: (t<'a>, 'a => 'b) => t<'b>
 let mapi: (t<'a>, (~value: 'a, ~index: int) => 'b) => t<'b>
 let indexed: t<'a> => t<('a, int)>
 let filter: (t<'a>, 'a => bool) => t<'a>
+let filterMap: (t<'a>, 'a => option<'b>) => t<'b>
 let take: (t<'a>, int) => t<'a>
 let drop: (t<'a>, int) => t<'a>
 let takeWhile: (t<'a>, 'a => bool) => t<'a>
@@ -106,9 +107,9 @@ iterate - YES
 cycle
 
 map - YES
-mapi
-filter
-filter_map
+mapi - YES
+filter - YES
+filter_map - YES
 scan
 take
 drop

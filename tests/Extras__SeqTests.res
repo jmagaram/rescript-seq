@@ -303,6 +303,18 @@ let transforming = [
     ~a=() => S.zip(oneTwoThree, fourFiveSix),
     ~b=[(1, 4), (2, 5), (3, 6)],
   ),
+  areEqual(
+    ~title="filterMap",
+    ~expectation="keep the Some",
+    ~a=() => oneToFive->S.filterMap(i => i == 2 || i == 3 ? Some(i * 2) : None),
+    ~b=[4, 6],
+  ),
+  areEqual(
+    ~title="filterMap",
+    ~expectation="when empty => empty",
+    ~a=() => S.empty->S.filterMap(i => Some(1)),
+    ~b=[],
+  ),
 ]
 
 let consuming = [
