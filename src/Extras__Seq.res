@@ -11,6 +11,13 @@ let toOption = node =>
   | Next(value, seq) => Some(value, seq)
   }
 
+let mapNext = (seq, f) =>
+  (. ()) =>
+    switch seq(.) {
+    | Empty => Empty
+    | Next(value, seq) => f(~value, ~seq)
+    }
+
 // =========
 // Construct
 // =========
@@ -133,18 +140,13 @@ let rec zipLongest = (s1, s2) => {
   }
 }
 
-let rec takeWhile = (seq, predicate) => {
-  (. ()) => {
-    switch seq(.) {
-    | Empty => Empty
-    | Next(value, seq) =>
-      switch predicate(value) {
-      | false => Empty
-      | true => Next(value, takeWhile(seq, predicate))
-      }
+let rec takeWhile = (seq, predicate) =>
+  seq->mapNext((~value, ~seq) =>
+    switch predicate(value) {
+    | false => Empty
+    | true => Next(value, takeWhile(seq, predicate))
     }
-  }
-}
+  )
 
 let rec zip = (seq1, seq2) =>
   (. ()) => {

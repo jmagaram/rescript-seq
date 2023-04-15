@@ -135,7 +135,7 @@ drop - YES
 take_while - YES
 drop_while - YES
 group
-memoize
+memoize - YES
 once
 transpose
 
