@@ -399,6 +399,12 @@ let transforming = [
     ~a=() => [2, 3, 4]->S.fromArray->S.startWith(1),
     ~b=[1, 2, 3, 4],
   ),
+  areEqual(
+    ~title="startWithMany",
+    ~expectation="",
+    ~a=() => oneToFive->S.startWithMany(fourFiveSix),
+    ~b=[4, 5, 6, 1, 2, 3, 4, 5],
+  ),
 ]
 
 let consuming = [

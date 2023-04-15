@@ -59,6 +59,8 @@ let rec append = (s1: t<'a>, s2: t<'a>) => {
 
 let startWith = (seq, value) => (. ()) => Next(value, seq)
 
+let startWithMany = (s1, s2) => append(s2, s1)
+
 let rec flatMap = (seq: t<'a>, f: 'a => t<'b>) => {
   (. ()) =>
     switch seq(.) {
