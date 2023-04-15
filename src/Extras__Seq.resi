@@ -18,7 +18,7 @@ let iterate: ('a, 'a => 'a) => t<'a>
 let append: (t<'a>, t<'a>) => t<'a> // concat
 let appendMany: (t<'a>, t<t<'a>>) => t<'a> // concatMany
 let startWith: (t<'a>, 'a) => t<'a>
-let startWithMany: (t<'a>, t<'a>) => t<'a>
+let startWithMany: (t<'a>, t<'a>) => t<'a> // not analogous!
 let flatMap: (t<'a>, 'a => t<'b>) => t<'b>
 let map: (t<'a>, 'a => 'b) => t<'b>
 let mapi: (t<'a>, (~value: 'a, ~index: int) => 'b) => t<'b>

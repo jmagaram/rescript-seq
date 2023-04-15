@@ -215,16 +215,29 @@ let rec sortedMerge = (s1, s2, cmp) => {
     }
 }
 
+module UncurriedDeferred = {
+  type t<'a> = (. unit) => 'a
+
+  type toLazy<'a> = t<'a> => Lazy.t<'a>
+  let toLazy: toLazy<'a> = (f: t<'a>) => {
+    let f2 = () => f(.)
+    Lazy.from_fun(f2)
+  }
+
+  type fromLazy<'a> = Lazy.t<'a> => t<'a>
+  let fromLazy: fromLazy<'a> = f => (. ()) => Lazy.force(f)
+
+  type memoize<'a> = t<'a> => t<'a>
+  let memoize: memoize<'a> = f => f->toLazy->fromLazy
+}
+
 let rec cache = seq =>
-  (
-    lazy (
-      (. ()) =>
-        switch seq(.) {
-        | Empty => Empty
-        | Next(value, seq) => Next(value, cache(seq))
-        }
-    )
-  )->Lazy.force
+  UncurriedDeferred.memoize((. ()) =>
+    switch seq(.) {
+    | Empty => Empty
+    | Next(value, seq) => Next(value, cache(seq))
+    }
+  )
 
 // =======
 // Consume

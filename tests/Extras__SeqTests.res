@@ -667,19 +667,23 @@ let memoizeTests = [
     ~title="cache",
     ~expectation="calculations only done once",
     ~predicate=() => {
-      let calculations = ref(0)
-      let memoized = S.init(~count=5, ~initializer=(~index) => {
-        calculations := calculations.contents + 1
-        index
-      })->S.cache
-      let materialized1 = memoized->S.toArray
-      let materialized2 = memoized->S.toArray
-      let materialized3 = memoized->S.toArray
-      Js.log(`Calculations: ${calculations.contents->Belt.Int.toString}`)
-      materialized1 == [0, 1, 2, 3, 4] &&
-      materialized2 == [0, 1, 2, 3, 4] &&
-      materialized3 == [0, 1, 2, 3, 4] &&
-      calculations.contents == 5
+      let randoms = S.infinite(() => Js.Math.random())->S.take(4)->S.cache
+      let nums1 = randoms->S.toArray
+      let nums2 = randoms->S.toArray
+      let nums3 = randoms->S.toArray
+      nums1 == nums2 && nums2 == nums3
+    },
+  ),
+  T.make(
+    ~category="Seq",
+    ~title="cache",
+    ~expectation="all lazy; can cache infinite",
+    ~predicate=() => {
+      let randoms = S.infinite(() => Js.Math.random())->S.cache->S.take(4)
+      let nums1 = randoms->S.toArray
+      let nums2 = randoms->S.toArray
+      let nums3 = randoms->S.toArray
+      nums1 == nums2 && nums2 == nums3
     },
   ),
 ]
