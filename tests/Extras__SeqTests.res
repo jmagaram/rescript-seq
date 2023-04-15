@@ -185,6 +185,30 @@ let transforming = [
   ),
   areEqual(~title="take", ~expectation="when a subset", ~a=() => oneTwoThree->S.take(2), ~b=[1, 2]),
   areEqual(
+    ~title="takeWhile",
+    ~expectation="when some match, return them",
+    ~a=() => oneToFive->S.takeWhile(i => i <= 3),
+    ~b=[1, 2, 3],
+  ),
+  areEqual(
+    ~title="takeWhile",
+    ~expectation="when none match, return empty",
+    ~a=() => oneToFive->S.takeWhile(_ => false),
+    ~b=[],
+  ),
+  areEqual(
+    ~title="takeWhile",
+    ~expectation="when empty, return empty",
+    ~a=() => S.empty->S.takeWhile(_ => true),
+    ~b=[],
+  ),
+  areEqual(
+    ~title="takeWhile",
+    ~expectation="when only first matches, return it",
+    ~a=() => oneToFive->S.takeWhile(i => i == 1),
+    ~b=[1],
+  ),
+  areEqual(
     ~title="drop",
     ~expectation="when zero => original seq",
     ~a=() => oneToFive->S.drop(0),
@@ -197,6 +221,48 @@ let transforming = [
     ~expectation="",
     ~a=() => oneToFive->S.filter(i => i == 2 || i == 5),
     ~b=[2, 5],
+  ),
+  areEqual(
+    ~title="zipLongest",
+    ~expectation="when same length",
+    ~a=() => S.zipLongest(oneTwoThree, oneTwoThree),
+    ~b=[(Some(1), Some(1)), (Some(2), Some(2)), (Some(3), Some(3))],
+  ),
+  areEqual(
+    ~title="zipLongest",
+    ~expectation="when second longer => fill with None",
+    ~a=() => S.zipLongest(oneTwoThree, oneToFive),
+    ~b=[
+      (Some(1), Some(1)),
+      (Some(2), Some(2)),
+      (Some(3), Some(3)),
+      (None, Some(4)),
+      (None, Some(5)),
+    ],
+  ),
+  areEqual(
+    ~title="zipLongest",
+    ~expectation="when first longer => fill with None",
+    ~a=() => S.zipLongest(oneToFive, oneTwoThree),
+    ~b=[
+      (Some(1), Some(1)),
+      (Some(2), Some(2)),
+      (Some(3), Some(3)),
+      (Some(4), None),
+      (Some(5), None),
+    ],
+  ),
+  areEqual(
+    ~title="zipLongest",
+    ~expectation="when both empty => empty",
+    ~a=() => S.zipLongest(S.empty, S.empty),
+    ~b=[],
+  ),
+  areEqual(
+    ~title="zipLongest",
+    ~expectation="when None of different length",
+    ~a=() => S.zipLongest(S.replicate(~count=3, ~value=None), S.replicate(~count=1, ~value=None)),
+    ~b=[(Some(None), Some(None)), (Some(None), None), (Some(None), None)],
   ),
 ]
 
@@ -336,6 +402,37 @@ let consuming = [
   ),
   consumeEqual(~title="length", ~expectation="if empty => 0", ~a=() => S.empty->S.length, ~b=0),
   consumeEqual(~title="length", ~expectation="if not empty", ~a=() => oneToFive->S.length, ~b=5),
+  consumeEqual(
+    ~title="equals",
+    ~expectation="if shorter first => false",
+    ~a=() => S.equals(oneTwoThree, oneToFive, (x: int, y: int) => x == y),
+    ~b=false,
+  ),
+  consumeEqual(
+    ~title="equals",
+    ~expectation="if longer first => false",
+    ~a=() => S.equals(oneToFive, oneTwoThree, (x: int, y: int) => x == y),
+    ~b=false,
+  ),
+  consumeEqual(
+    ~title="equals",
+    ~expectation="if same values => true",
+    ~a=() => S.equals(oneTwoThree, oneTwoThree, (x: int, y: int) => x == y),
+    ~b=true,
+  ),
+  consumeEqual(
+    ~title="equals",
+    ~expectation="if different values => false",
+    ~a=() => S.equals(S.singleton(1), S.singleton(2), (x: int, y: int) => x == y),
+    ~b=false,
+  ),
+  consumeEqual(
+    ~title="equals",
+    ~expectation="can compare different types",
+    ~a=() =>
+      S.equals(S.singleton(1), S.singleton("1"), (x: int, y: string) => x->Belt.Int.toString == y),
+    ~b=true,
+  ),
 ]
 
 let tests = [constructors, transforming, consuming]->Belt.Array.flatMap(i => i)

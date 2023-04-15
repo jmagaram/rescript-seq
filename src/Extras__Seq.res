@@ -91,6 +91,32 @@ let rec filter = (seq, f) => {
     }
 }
 
+let rec zipLongest = (s1, s2) => {
+  (. ()) => {
+    let s1 = s1(.)
+    let s2 = s2(.)
+    switch (s1, s2) {
+    | (Empty, Empty) => Empty
+    | (Next(value1, s1), Empty) => Next((Some(value1), None), zipLongest(s1, empty))
+    | (Empty, Next(value2, s2)) => Next((None, Some(value2)), zipLongest(empty, s2))
+    | (Next(value1, s1), Next(value2, s2)) => Next((Some(value1), Some(value2)), zipLongest(s1, s2))
+    }
+  }
+}
+
+let rec takeWhile = (seq, predicate) => {
+  (. ()) => {
+    switch seq(.) {
+    | Empty => Empty
+    | Next(value, seq) =>
+      switch predicate(value) {
+      | false => Empty
+      | true => Next(value, takeWhile(seq, predicate))
+      }
+    }
+  }
+}
+
 // =======
 // Consume
 // =======
@@ -187,5 +213,14 @@ let findMap = (seq, f) => {
 }
 
 let find = (seq, predicate) => seq->findMap(i => predicate(i) ? Some(i) : None)
+
+let equals = (s1: t<'a>, s2: t<'b>, eq) =>
+  zipLongest(s1, s2)->everyOrEmpty(((a, b)) =>
+    switch (a, b) {
+    | (Some(a), Some(b)) => eq(a, b)
+    | (None, None) => true
+    | _ => false
+    }
+  )
 
 let length = seq => seq->reduce(0, (sum, _) => sum + 1)

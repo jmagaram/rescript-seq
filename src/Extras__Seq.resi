@@ -20,6 +20,9 @@ let indexed: t<'a> => t<('a, int)>
 let filter: (t<'a>, 'a => bool) => t<'a>
 let take: (t<'a>, int) => t<'a>
 let drop: (t<'a>, int) => t<'a>
+let takeWhile: (t<'a>, 'a => bool) => t<'a>
+// let zip: (t<'a>, t<'b>) => t<('a, 'b)>
+let zipLongest: (t<'a>, t<'b>) => t<(option<'a>, option<'b>)>
 
 // =======
 // Consume
@@ -35,6 +38,7 @@ let everyOrEmpty: (t<'a>, 'a => bool) => bool
 let find: (t<'a>, 'a => bool) => option<'a>
 let findMap: (t<'a>, 'a => option<'b>) => option<'b>
 let length: t<'a> => int
+let equals: (t<'a>, t<'b>, ('a, 'b) => bool) => bool
 
 /*
 =====
@@ -81,8 +85,8 @@ fold_lefti - YES as reducei
 for_all - YES as everyOrEmpty
 exists - YES as some
 find - YES
-find_map
-item2
+find_map - YES
+iter2
 fold_left2
 for_all2
 exists2
@@ -105,6 +109,7 @@ filter_map
 scan
 take
 drop
+take_while
 drop_while
 group
 memoize
@@ -115,7 +120,7 @@ append
 concat
 flat_map
 concat_map
-zip
+zip (excludes longer items)
 map2
 interlease
 sorted_merge
@@ -128,5 +133,7 @@ partition_map
 partition
 ints
 
+
+// Array stuff like zip2by
 
 */
