@@ -332,3 +332,9 @@ let compare = (s1, s2, cmp) =>
   ->Belt.Option.getWithDefault(0)
 
 let length = seq => seq->reduce(0, (sum, _) => sum + 1)
+
+let headTail = seq =>
+  switch seq(.) {
+  | Empty => None
+  | Next(head, tail) => Some(head, tail)
+  }

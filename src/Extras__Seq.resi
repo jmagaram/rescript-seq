@@ -50,6 +50,11 @@ let findMap: (t<'a>, 'a => option<'b>) => option<'b>
 let length: t<'a> => int
 let equals: (t<'a>, t<'b>, ('a, 'b) => bool) => bool
 let compare: (t<'a>, t<'b>, ('a, 'b) => int) => int
+let headTail: t<'a> => option<('a, t<'a>)>
+// slice, splitAt
+// push, pop
+// head
+// isempty and then...
 
 /*
 =====
@@ -87,7 +92,7 @@ from - NO an object @@iterator
 oCaml
 =====
 isEmpty
-uncons
+uncons - YES
 length - YES
 iter - YES as forEach
 fold_left - YES as reduce
@@ -148,6 +153,7 @@ Should all constructor names be "from..."
 Use Option instead of Empty and Next; or enabpe mapIfNext
 Remove recursion problems
 Persistent collections?
+Danger of compare to Empty, need isEmpty
 
 // Array stuff like zip2by
 

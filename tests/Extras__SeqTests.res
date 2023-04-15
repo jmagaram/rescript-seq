@@ -598,6 +598,24 @@ let consuming = [
     ~a=() => S.compare([1, 2, 3, 4]->S.fromArray, [1, 3, 3, 4]->S.fromArray, compareInt),
     ~b=-1,
   ),
+  consumeEqual(
+    ~title="headTail",
+    ~expectation="when empty => None",
+    ~a=() => S.empty->S.headTail,
+    ~b=None,
+  ),
+  consumeEqual(
+    ~title="headTail",
+    ~expectation="when singleton => Some(head,empty)",
+    ~a=() => S.singleton(4)->S.headTail->Belt.Option.map(((h, t)) => (h, t->S.toArray)),
+    ~b=Some(4, []),
+  ),
+  consumeEqual(
+    ~title="headTail",
+    ~expectation="when many items => Some(head,tail)",
+    ~a=() => [1, 2, 3]->S.fromArray->S.headTail->Belt.Option.map(((h, t)) => (h, t->S.toArray)),
+    ~b=Some(1, [2, 3]),
+  ),
 ]
 
 let memoizeTests = [
