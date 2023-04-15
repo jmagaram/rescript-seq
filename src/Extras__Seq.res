@@ -26,6 +26,15 @@ let replicate = (~count, ~value) => unfold(0, i => i < count ? Some(value, i + 1
 
 let infinite = f => unfold(0, _ => Some(f(), 0))
 
+let fromArray = xs => {
+  let rec go = index =>
+    switch index >= xs->Js.Array2.length {
+    | true => (. ()) => Empty
+    | false => (. ()) => Next(xs->Js.Array2.unsafe_get(index), go(index + 1))
+    }
+  go(0)
+}
+
 // =========
 // Transform
 // =========
@@ -116,6 +125,15 @@ let rec takeWhile = (seq, predicate) => {
     }
   }
 }
+
+let rec zip = (seq1, seq2) =>
+  (. ()) => {
+    switch (seq1(.), seq2(.)) {
+    | (Empty, _) => Empty
+    | (_, Empty) => Empty
+    | (Next(v1, s1), Next(v2, s2)) => Next((v1, v2), zip(s1, s2))
+    }
+  }
 
 // =======
 // Consume

@@ -19,6 +19,7 @@ let consumeEqual = (~title, ~expectation, ~a, ~b) =>
   })
 
 let oneTwoThree = S.init(~count=3, ~initializer=(~index) => index + 1)
+let fourFiveSix = S.init(~count=3, ~initializer=(~index) => index + 4)
 let oneToFive = S.init(~count=5, ~initializer=(~index) => index + 1)
 
 let constructors = [
@@ -100,6 +101,14 @@ let constructors = [
       ->Belt.Set.Int.size
     unique > minUnique
   }),
+  areEqual(
+    ~title="fromArray",
+    ~expectation="when not empty",
+    ~a=() => [1, 2, 3]->S.fromArray,
+    ~b=[1, 2, 3],
+  ),
+  areEqual(~title="fromArray", ~expectation="when one item", ~a=() => [1]->S.fromArray, ~b=[1]),
+  areEqual(~title="fromArray", ~expectation="when empty", ~a=() => []->S.fromArray, ~b=[]),
 ]
 
 let transforming = [
@@ -263,6 +272,24 @@ let transforming = [
     ~expectation="when None of different length",
     ~a=() => S.zipLongest(S.replicate(~count=3, ~value=None), S.replicate(~count=1, ~value=None)),
     ~b=[(Some(None), Some(None)), (Some(None), None), (Some(None), None)],
+  ),
+  areEqual(
+    ~title="zip",
+    ~expectation="when first longer, ignore excess",
+    ~a=() => S.zip(oneToFive, oneTwoThree),
+    ~b=[(1, 1), (2, 2), (3, 3)],
+  ),
+  areEqual(
+    ~title="zip",
+    ~expectation="when second longer, ignore excess",
+    ~a=() => S.zip(oneTwoThree, oneToFive),
+    ~b=[(1, 1), (2, 2), (3, 3)],
+  ),
+  areEqual(
+    ~title="zip",
+    ~expectation="when same length, combine",
+    ~a=() => S.zip(oneTwoThree, fourFiveSix),
+    ~b=[(1, 4), (2, 5), (3, 6)],
   ),
 ]
 

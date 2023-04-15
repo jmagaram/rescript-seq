@@ -9,6 +9,7 @@ let unfold: ('seed, 'seed => option<('a, 'seed)>) => t<'a>
 let init: (~count: int, ~initializer: (~index: int) => 'a) => t<'a>
 let replicate: (~count: int, ~value: 'a) => t<'a>
 let infinite: (unit => 'a) => t<'a>
+let fromArray: array<'a> => t<'a>
 
 // =========
 // Transform
@@ -21,7 +22,7 @@ let filter: (t<'a>, 'a => bool) => t<'a>
 let take: (t<'a>, int) => t<'a>
 let drop: (t<'a>, int) => t<'a>
 let takeWhile: (t<'a>, 'a => bool) => t<'a>
-// let zip: (t<'a>, t<'b>) => t<('a, 'b)>
+let zip: (t<'a>, t<'b>) => t<('a, 'b)>
 let zipLongest: (t<'a>, t<'b>) => t<(option<'a>, option<'b>)>
 
 // =======
@@ -90,7 +91,7 @@ iter2
 fold_left2
 for_all2
 exists2
-equal
+equal - YES
 compare
 empty - YES
 return - YES as singleton
