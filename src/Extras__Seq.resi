@@ -30,6 +30,7 @@ let zip: (t<'a>, t<'b>) => t<('a, 'b)>
 let zipLongest: (t<'a>, t<'b>) => t<(option<'a>, option<'b>)>
 let scani: (t<'a>, ~zero: 'b, (~sum: 'b, ~value: 'a, ~index: int) => 'b) => t<'b>
 let flatten: t<t<'a>> => t<'a>
+let map2: (t<'a>, t<'b>, ('a, 'b) => 'c) => t<'c>
 
 // =======
 // Consume
@@ -125,9 +126,9 @@ transpose
 
 append - YES
 concat - YES as flatten
-flat_map
+flat_map - YES as flatten
 concat_map
-zip (excludes longer items)
+zip (excludes longer items) - YES
 map2
 interlease
 sorted_merge

@@ -182,6 +182,8 @@ let rec dropWhile = (seq, predicate) => {
 
 let flatten = seq => seq->flatMap(i => i)
 
+let map2 = (s1, s2, f) => zip(s1, s2)->map(((a, b)) => f(a, b))
+
 // =======
 // Consume
 // =======

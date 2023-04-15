@@ -346,6 +346,24 @@ let transforming = [
       S.init(~count=3, ~initializer=(~index) => S.replicate(~count=2, ~value=index))->S.flatten,
     ~b=[0, 0, 1, 1, 2, 2],
   ),
+  areEqual(
+    ~title="map2",
+    ~expectation="when same length, map all",
+    ~a=() => S.map2(oneTwoThree, fourFiveSix, (a, b) => a * b),
+    ~b=[4, 10, 18],
+  ),
+  areEqual(
+    ~title="map2",
+    ~expectation="when first is shorter, ignore excess",
+    ~a=() => S.map2(oneTwoThree, oneToFive, (a, b) => a * b),
+    ~b=[1, 4, 9],
+  ),
+  areEqual(
+    ~title="map2",
+    ~expectation="when second is shorter, ignore excess",
+    ~a=() => S.map2(oneToFive, oneTwoThree, (a, b) => a * b),
+    ~b=[1, 4, 9],
+  ),
 ]
 
 let consuming = [
