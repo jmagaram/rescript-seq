@@ -110,6 +110,9 @@ let reduce = (seq, zero, concat) => {
   sum.contents
 }
 
+let reducei = (seq, zero, concat) =>
+  seq->indexed->reduce(zero, (sum, (value, index)) => concat(~sum, ~value, ~index))
+
 let toArray = seq =>
   seq->reduce([], (arr, i) => {
     arr->Js.Array2.push(i)->ignore

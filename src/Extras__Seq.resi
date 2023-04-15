@@ -25,6 +25,7 @@ let drop: (t<'a>, int) => t<'a>
 // Consume
 // =======
 let reduce: (t<'a>, 'b, ('b, 'a) => 'b) => 'b
+let reducei: (t<'a>, 'b, (~sum: 'b, ~value: 'a, ~index: int) => 'b) => 'b
 let toArray: t<'a> => array<'a>
 let toReversedList: t<'a> => Belt.List.t<'a>
 let forEach: (t<'a>, 'a => unit) => unit
@@ -74,7 +75,7 @@ uncons
 length - YES
 iter - YES as forEach
 fold_left - YES as reduce
-iteri
+iteri - YES as forEachi
 fold_lefti
 for_all
 exists

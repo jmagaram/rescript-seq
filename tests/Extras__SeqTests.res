@@ -19,7 +19,7 @@ let consumeEqual = (~title, ~expectation, ~a, ~b) =>
   })
 
 let oneTwoThree = S.init(~count=3, ~initializer=(~index) => index + 1)
-let oneTwoThreeFourFive = S.init(~count=5, ~initializer=(~index) => index + 1)
+let oneToFive = S.init(~count=5, ~initializer=(~index) => index + 1)
 
 let constructors = [
   areEqual(~title="singleton", ~expectation="has one item in it", ~a=() => S.singleton(3), ~b=[3]),
@@ -187,25 +187,15 @@ let transforming = [
   areEqual(
     ~title="drop",
     ~expectation="when zero => original seq",
-    ~a=() => oneTwoThreeFourFive->S.drop(0),
+    ~a=() => oneToFive->S.drop(0),
     ~b=[1, 2, 3, 4, 5],
   ),
-  areEqual(
-    ~title="drop",
-    ~expectation="when all => empty",
-    ~a=() => oneTwoThreeFourFive->S.drop(5),
-    ~b=[],
-  ),
-  areEqual(
-    ~title="drop",
-    ~expectation="when subset",
-    ~a=() => oneTwoThreeFourFive->S.drop(2),
-    ~b=[3, 4, 5],
-  ),
+  areEqual(~title="drop", ~expectation="when all => empty", ~a=() => oneToFive->S.drop(5), ~b=[]),
+  areEqual(~title="drop", ~expectation="when subset", ~a=() => oneToFive->S.drop(2), ~b=[3, 4, 5]),
   areEqual(
     ~title="filter",
     ~expectation="",
-    ~a=() => oneTwoThreeFourFive->S.filter(i => i == 2 || i == 5),
+    ~a=() => oneToFive->S.filter(i => i == 2 || i == 5),
     ~b=[2, 5],
   ),
 ]
@@ -226,14 +216,12 @@ let consuming = [
   ),
   T.make(~category="Seq", ~title="forEach", ~expectation="", ~predicate=() => {
     let result = []
-    oneTwoThreeFourFive->S.forEach(i => result->Js.Array2.push(i)->ignore)
+    oneToFive->S.forEach(i => result->Js.Array2.push(i)->ignore)
     result == [1, 2, 3, 4, 5]
   }),
   T.make(~category="Seq", ~title="forEachi", ~expectation="", ~predicate=() => {
     let result = []
-    oneTwoThreeFourFive->S.forEachi((~value, ~index) =>
-      result->Js.Array2.push((value, index))->ignore
-    )
+    oneToFive->S.forEachi((~value, ~index) => result->Js.Array2.push((value, index))->ignore)
     result == [(1, 0), (2, 1), (3, 2), (4, 3), (5, 4)]
   }),
   T.make(
@@ -265,13 +253,13 @@ let consuming = [
   consumeEqual(
     ~title="some",
     ~expectation="if some predicate true => true",
-    ~a=() => oneTwoThreeFourFive->S.some(i => i == 2),
+    ~a=() => oneToFive->S.some(i => i == 2),
     ~b=true,
   ),
   consumeEqual(
     ~title="some",
     ~expectation="if no predicate true => false",
-    ~a=() => oneTwoThreeFourFive->S.some(i => i == 99),
+    ~a=() => oneToFive->S.some(i => i == 99),
     ~b=false,
   ),
   consumeEqual(
@@ -283,25 +271,25 @@ let consuming = [
   consumeEqual(
     ~title="every",
     ~expectation="if all true => true",
-    ~a=() => oneTwoThreeFourFive->S.everyOrEmpty(i => i >= 1 && i <= 5),
+    ~a=() => oneToFive->S.everyOrEmpty(i => i >= 1 && i <= 5),
     ~b=true,
   ),
   consumeEqual(
     ~title="every",
     ~expectation="if any false => false",
-    ~a=() => oneTwoThreeFourFive->S.everyOrEmpty(i => i != 3),
+    ~a=() => oneToFive->S.everyOrEmpty(i => i != 3),
     ~b=false,
   ),
   consumeEqual(
     ~title="find",
     ~expectation="if not found => None",
-    ~a=() => oneTwoThreeFourFive->S.find(i => i == 99),
+    ~a=() => oneToFive->S.find(i => i == 99),
     ~b=None,
   ),
   consumeEqual(
     ~title="find",
     ~expectation="if found => Some",
-    ~a=() => oneTwoThreeFourFive->S.find(i => i == 2),
+    ~a=() => oneToFive->S.find(i => i == 2),
     ~b=Some(2),
   ),
   consumeEqual(
@@ -319,22 +307,23 @@ let consuming = [
   consumeEqual(
     ~title="reduce",
     ~expectation="if many items => f of all the items and initial value",
-    ~a=() => oneTwoThreeFourFive->S.reduce(-1, (sum, i) => sum * i),
+    ~a=() => oneToFive->S.reduce(-1, (sum, i) => sum * i),
     ~b=-1 * 2 * 3 * 4 * 5,
   ),
   consumeEqual(
     ~title="reduce",
     ~expectation="can transform",
-    ~a=() => oneTwoThreeFourFive->S.reduce("", (sum, i) => `${i->Belt.Int.toString}${sum}`),
+    ~a=() => oneToFive->S.reduce("", (sum, i) => `${i->Belt.Int.toString}${sum}`),
     ~b="54321",
   ),
-  consumeEqual(~title="length", ~expectation="if empty => 0", ~a=() => S.empty->S.length, ~b=0),
   consumeEqual(
-    ~title="length",
-    ~expectation="if not empty",
-    ~a=() => oneTwoThreeFourFive->S.length,
-    ~b=5,
+    ~title="reducei",
+    ~expectation="if many items => f of all the items and initial value",
+    ~a=() => oneTwoThree->S.reducei(0, (~sum, ~value, ~index) => sum + value * (index + 1)),
+    ~b=1 * 1 + 2 * 2 + 3 * 3,
   ),
+  consumeEqual(~title="length", ~expectation="if empty => 0", ~a=() => S.empty->S.length, ~b=0),
+  consumeEqual(~title="length", ~expectation="if not empty", ~a=() => oneToFive->S.length, ~b=5),
 ]
 
 let tests = [constructors, transforming, consuming]->Belt.Array.flatMap(i => i)
