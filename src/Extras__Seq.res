@@ -69,6 +69,8 @@ let indexed = seq => {
   go(seq, 0)
 }
 
+let mapi = (seq, f) => seq->indexed->map(((value, index)) => f(~value, ~index))
+
 let take = (seq, count) => {
   let rec go = seq => {
     switch seq(.) {

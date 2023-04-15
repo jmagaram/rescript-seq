@@ -179,6 +179,12 @@ let transforming = [
     ~b=["1", "2", "3"],
   ),
   areEqual(
+    ~title="mapi",
+    ~expectation="",
+    ~a=() => oneTwoThree->S.mapi((~value, ~index) => (value, index)),
+    ~b=[(1, 0), (2, 1), (3, 2)],
+  ),
+  areEqual(
     ~title="indexed",
     ~expectation="when items, index starts at 0",
     ~a=() => oneTwoThree->S.indexed,

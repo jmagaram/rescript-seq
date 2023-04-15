@@ -18,6 +18,7 @@ let iterate: ('a, 'a => 'a) => t<'a>
 let append: (t<'a>, t<'a>) => t<'a>
 let flatMap: (t<'a>, 'a => t<'b>) => t<'b>
 let map: (t<'a>, 'a => 'b) => t<'b>
+let mapi: (t<'a>, (~value: 'a, ~index: int) => 'b) => t<'b>
 let indexed: t<'a> => t<('a, int)>
 let filter: (t<'a>, 'a => bool) => t<'a>
 let take: (t<'a>, int) => t<'a>
@@ -100,11 +101,11 @@ cons
 init - YES
 unfold - YES
 repeat - NO
-forever - YES
+forever - YES as infinite
+iterate - YES
 cycle
-iterate
 
-map
+map - YES
 mapi
 filter
 filter_map
