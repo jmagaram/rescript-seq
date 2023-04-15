@@ -405,6 +405,12 @@ let transforming = [
     ~a=() => oneToFive->S.startWithMany(fourFiveSix),
     ~b=[4, 5, 6, 1, 2, 3, 4, 5],
   ),
+  areEqual(
+    ~title="appendMany",
+    ~expectation="",
+    ~a=() => oneToFive->S.appendMany(S.replicate(~count=3, ~value=oneTwoThree)),
+    ~b=[1, 2, 3, 4, 5, 1, 2, 3, 1, 2, 3, 1, 2, 3],
+  ),
 ]
 
 let consuming = [

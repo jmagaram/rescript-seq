@@ -69,6 +69,10 @@ let rec flatMap = (seq: t<'a>, f: 'a => t<'b>) => {
     }
 }
 
+let flatten = seq => seq->flatMap(i => i)
+
+let appendMany = (s1, others) => s1->append(others->flatten)
+
 let map = (seq, f) => flatMap(seq, i => singleton(f(i)))
 
 let indexed = seq => {
@@ -191,8 +195,6 @@ let rec dropWhile = (seq, predicate) => {
     }
   }
 }
-
-let flatten = seq => seq->flatMap(i => i)
 
 let map2 = (s1, s2, f) => zip(s1, s2)->map(((a, b)) => f(a, b))
 
