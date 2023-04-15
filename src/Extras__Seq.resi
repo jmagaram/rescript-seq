@@ -27,6 +27,7 @@ let drop: (t<'a>, int) => t<'a>
 let takeWhile: (t<'a>, 'a => bool) => t<'a>
 let zip: (t<'a>, t<'b>) => t<('a, 'b)>
 let zipLongest: (t<'a>, t<'b>) => t<(option<'a>, option<'b>)>
+let scani: (t<'a>, ~zero: 'b, (~sum: 'b, ~value: 'a, ~index: int) => 'b) => t<'b>
 
 // =======
 // Consume

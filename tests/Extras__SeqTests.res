@@ -312,8 +312,20 @@ let transforming = [
   areEqual(
     ~title="filterMap",
     ~expectation="when empty => empty",
-    ~a=() => S.empty->S.filterMap(i => Some(1)),
+    ~a=() => S.empty->S.filterMap(_ => Some(1)),
     ~b=[],
+  ),
+  areEqual(
+    ~title="scani",
+    ~expectation="when empty => zero",
+    ~a=() => S.empty->S.scani(~zero=10, (~sum, ~value, ~index) => sum + value + index + 1),
+    ~b=[10],
+  ),
+  areEqual(
+    ~title="scani",
+    ~expectation="when not empty => sequence of sums including zero",
+    ~a=() => oneTwoThree->S.scani(~zero=10, (~sum, ~value, ~index) => sum + value + index),
+    ~b=[10, 10 + 1 + 0, 10 + 1 + 0 + 2 + 1, 10 + 1 + 0 + 2 + 1 + 3 + 2],
   ),
 ]
 

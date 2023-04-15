@@ -151,6 +151,19 @@ let rec filterMap = (seq, f) =>
     }
   }
 
+let scani = (seq, ~zero, f) => {
+  let rec go = (seq, sum) =>
+    switch seq(.) {
+    | Empty => (. ()) => Empty
+    | Next((value, index), seq) =>
+      (. ()) => {
+        let sum = f(~sum, ~value, ~index)
+        Next(sum, go(seq, sum))
+      }
+    }
+  append(singleton(zero), go(seq->indexed, zero)) // not tail?
+}
+
 // =======
 // Consume
 // =======
