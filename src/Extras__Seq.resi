@@ -26,6 +26,8 @@ let mapi: (t<'a>, (~value: 'a, ~index: int) => 'b) => t<'b>
 let indexed: t<'a> => t<('a, int)>
 let filter: (t<'a>, 'a => bool) => t<'a>
 let filterMap: (t<'a>, 'a => option<'b>) => t<'b>
+let filterSome: t<option<'a>> => t<'a> // filter Ok
+let filterOk: t<result<'a, 'b>> => t<'a>
 let take: (t<'a>, int) => t<'a>
 let drop: (t<'a>, int) => t<'a>
 let takeWhile: (t<'a>, 'a => bool) => t<'a>
@@ -151,7 +153,7 @@ zip (excludes longer items) - YES
 map2 - YES
 interleave
 sorted_merge - YES
-product
+product - YES
 map_product
 
 unzip

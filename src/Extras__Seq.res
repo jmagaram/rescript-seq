@@ -177,6 +177,16 @@ let rec filterMap = (seq, f) =>
     }
   }
 
+let filterSome = seq => seq->filterMap(i => i)
+
+let filterOk = seq =>
+  seq->filterMap(i =>
+    switch i {
+    | Ok(ok) => Some(ok)
+    | Error(_) => None
+    }
+  )
+
 let scani = (seq, ~zero, f) => {
   let rec go = (seq, sum) =>
     switch seq(.) {

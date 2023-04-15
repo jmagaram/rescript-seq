@@ -429,6 +429,18 @@ let transforming = [
     let items = oneToFive->S.tap(i => seen->Js.Array2.push(i)->ignore)->S.toArray
     seen == [1, 2, 3, 4, 5] && items == [1, 2, 3, 4, 5]
   }),
+  areEqual(
+    ~title="filterSome",
+    ~expectation="",
+    ~a=() => [Some(3), None, Some(5)]->S.fromArray->S.filterSome,
+    ~b=[3, 5],
+  ),
+  areEqual(
+    ~title="filterOk",
+    ~expectation="",
+    ~a=() => [Ok(3), Error("oops"), Ok(5)]->S.fromArray->S.filterOk,
+    ~b=[3, 5],
+  ),
 ]
 
 let consuming = [
