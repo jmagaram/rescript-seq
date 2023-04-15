@@ -1,6 +1,8 @@
 module T = Extras__Test
 module S = Extras__Seq
 
+let compareInt = (a: int, b: int) => a < b ? -1 : a > b ? 1 : 0
+
 let areEqual = (~title, ~expectation, ~a, ~b) =>
   T.make(~category="Seq", ~title, ~expectation, ~predicate=() => {
     let a = a()->S.toArray
@@ -559,6 +561,66 @@ let consuming = [
       S.equals(S.singleton(1), S.singleton("1"), (x: int, y: string) => x->Belt.Int.toString == y),
     ~b=true,
   ),
+  consumeEqual(
+    ~title="equals",
+    ~expectation="can compare different types",
+    ~a=() =>
+      S.equals(S.singleton(1), S.singleton("1"), (x: int, y: string) => x->Belt.Int.toString == y),
+    ~b=true,
+  ),
+  consumeEqual(
+    ~title="compare",
+    ~expectation="",
+    ~a=() => S.compare([1, 2, 3]->S.fromArray, [1, 2, 3]->S.fromArray, compareInt),
+    ~b=0,
+  ),
+  consumeEqual(
+    ~title="compare",
+    ~expectation="",
+    ~a=() => S.compare([1, 2, 3]->S.fromArray, [1, 2, 3, 4]->S.fromArray, compareInt),
+    ~b=-1,
+  ),
+  consumeEqual(
+    ~title="compare",
+    ~expectation="",
+    ~a=() => S.compare([1, 2, 3, 4]->S.fromArray, [1, 2, 3]->S.fromArray, compareInt),
+    ~b=1,
+  ),
+  consumeEqual(
+    ~title="compare",
+    ~expectation="",
+    ~a=() => S.compare([]->S.fromArray, []->S.fromArray, compareInt),
+    ~b=0,
+  ),
+  consumeEqual(
+    ~title="compare",
+    ~expectation="",
+    ~a=() => S.compare([1, 2, 3, 4]->S.fromArray, [1, 3, 3, 4]->S.fromArray, compareInt),
+    ~b=-1,
+  ),
 ]
 
-let tests = [constructors, transforming, consuming]->Belt.Array.flatMap(i => i)
+let memoizeTests = [
+  T.make(
+    ~category="Seq",
+    ~title="cache",
+    ~expectation="calculations only done once",
+    ~predicate=() => {
+      let calculations = ref(0)
+      let memoized = S.init(~count=5, ~initializer=(~index) => {
+        calculations := calculations.contents + 1
+        index
+      })->S.cache
+      let materialized1 = memoized->S.toArray
+      let materialized2 = memoized->S.toArray
+      let materialized3 = memoized->S.toArray
+      Js.log(`Calculations: ${calculations.contents->Belt.Int.toString}`)
+      materialized1 == [0, 1, 2, 3, 4] &&
+      materialized2 == [0, 1, 2, 3, 4] &&
+      materialized3 == [0, 1, 2, 3, 4] &&
+      calculations.contents == 5
+    },
+  ),
+]
+
+let tests = [constructors, transforming, consuming, memoizeTests]->Belt.Array.flatMap(i => i)

@@ -201,6 +201,17 @@ let rec sortedMerge = (s1, s2, cmp) => {
     }
 }
 
+let rec cache = seq =>
+  (
+    lazy (
+      (. ()) =>
+        switch seq(.) {
+        | Empty => Empty
+        | Next(value, seq) => Next(value, cache(seq))
+        }
+    )
+  )->Lazy.force
+
 // =======
 // Consume
 // =======
@@ -306,5 +317,18 @@ let equals = (s1: t<'a>, s2: t<'b>, eq) =>
     | _ => false
     }
   )
+
+let compare = (s1, s2, cmp) =>
+  zipLongest(s1, s2)
+  ->map(((a, b)) =>
+    switch (a, b) {
+    | (Some(v1), Some(v2)) => cmp(v1, v2)
+    | (None, Some(_)) => -1
+    | (Some(_), None) => 1
+    | (None, None) => 0
+    }
+  )
+  ->find(i => i !== 0)
+  ->Belt.Option.getWithDefault(0)
 
 let length = seq => seq->reduce(0, (sum, _) => sum + 1)

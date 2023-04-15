@@ -32,6 +32,7 @@ let scani: (t<'a>, ~zero: 'b, (~sum: 'b, ~value: 'a, ~index: int) => 'b) => t<'b
 let flatten: t<t<'a>> => t<'a>
 let map2: (t<'a>, t<'b>, ('a, 'b) => 'c) => t<'c>
 let sortedMerge: (t<'a>, t<'a>, ('a, 'a) => int) => t<'a>
+let cache: t<'a> => t<'a>
 
 // =======
 // Consume
@@ -48,6 +49,7 @@ let find: (t<'a>, 'a => bool) => option<'a>
 let findMap: (t<'a>, 'a => option<'b>) => option<'b>
 let length: t<'a> => int
 let equals: (t<'a>, t<'b>, ('a, 'b) => bool) => bool
+let compare: (t<'a>, t<'b>, ('a, 'b) => int) => int
 
 /*
 =====
@@ -100,7 +102,7 @@ fold_left2
 for_all2
 exists2
 equal - YES
-compare
+compare - YES
 empty - YES
 return - YES as singleton
 cons
@@ -132,7 +134,7 @@ concat_map
 zip (excludes longer items) - YES
 map2 - YES
 interleave
-sorted_merge
+sorted_merge - YES
 product
 map_product
 
@@ -143,6 +145,9 @@ partition
 ints
 
 Should all constructor names be "from..."
+Use Option instead of Empty and Next; or enabpe mapIfNext
+Remove recursion problems
+Persistent collections?
 
 // Array stuff like zip2by
 
