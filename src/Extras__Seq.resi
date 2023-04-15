@@ -31,6 +31,7 @@ let forEach: (t<'a>, 'a => unit) => unit
 let some: (t<'a>, 'a => bool) => bool
 let everyOrEmpty: (t<'a>, 'a => bool) => bool
 let find: (t<'a>, 'a => bool) => option<'a>
+let length: t<'a> => int
 
 /*
 =====
@@ -63,4 +64,66 @@ some - YES
 every - YES as everyOrEmpty
 find - YES
 from - NO an object @@iterator
+
+=====
+oCaml
+=====
+isEmpty
+uncons
+length
+item
+fold_left
+iteri
+fold_lefti
+for_all
+exists
+find
+find_map
+item2
+fold_left2
+for_all2
+exists2
+equal
+compare
+empty - YES
+return - YES as singleton
+cons
+init
+unfold
+repeat
+forever
+cycle
+iterate
+
+map
+mapi
+filter
+filter_map
+scan
+take
+drop
+drop_while
+group
+memoize
+once
+transpose
+
+append
+concat
+flat_map
+concat_map
+zip
+map2
+interlease
+sorted_merge
+product
+map_product
+
+unzip
+split
+partition_map
+partition
+ints
+
+
 */

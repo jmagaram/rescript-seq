@@ -179,3 +179,5 @@ let find = (seq, predicate) => {
   }
   found.contents
 }
+
+let length = seq => seq->reduce(0, (sum, _) => sum + 1)
