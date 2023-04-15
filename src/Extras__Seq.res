@@ -53,11 +53,9 @@ let fromArray = xs => {
 
 let iterate = (seed, f) => unfold(seed, i => Some(i, f(i)))
 
-// =========
-// Transform
-// =========
+let startWith = (seq, value) => (. ()) => Next(value, seq)
 
-let rec append = (s1: t<'a>, s2: t<'a>) => {
+let rec append = (s1, s2) => {
   (. ()) =>
     switch s1(.) {
     | Empty => s2(.)
@@ -65,9 +63,17 @@ let rec append = (s1: t<'a>, s2: t<'a>) => {
     }
 }
 
-let startWith = (seq, value) => (. ()) => Next(value, seq)
-
 let startWithMany = (s1, s2) => append(s2, s1)
+
+// =========
+// Transform
+// =========
+
+let rec tap = (seq, f) =>
+  seq->mapNext((~value, ~seq) => {
+    f(value)
+    Next(value, tap(seq, f))
+  })
 
 let rec flatMap = (seq, f) => {
   (. ()) =>
@@ -78,6 +84,14 @@ let rec flatMap = (seq, f) => {
 }
 
 let flatten = seq => seq->flatMap(i => i)
+
+let cycle = seq => {
+  (. ()) =>
+    switch seq(.) {
+    | Empty => Empty
+    | Next(head, tail) => Next(head, append(tail, infinite(() => seq)->flatten))
+    }
+}
 
 let appendMany = (s1, others) => s1->append(others->flatten)
 

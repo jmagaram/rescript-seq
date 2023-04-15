@@ -11,6 +11,7 @@ let replicate: (~count: int, ~value: 'a) => t<'a>
 let infinite: (unit => 'a) => t<'a>
 let fromArray: array<'a> => t<'a>
 let iterate: ('a, 'a => 'a) => t<'a>
+let cycle: t<'a> => t<'a>
 
 // =========
 // Transform
@@ -36,6 +37,7 @@ let flatten: t<t<'a>> => t<'a>
 let map2: (t<'a>, t<'b>, ('a, 'b) => 'c) => t<'c>
 let sortedMerge: (t<'a>, t<'a>, ('a, 'a) => int) => t<'a>
 let cache: t<'a> => t<'a>
+let tap: (t<'a>, 'a => unit) => t<'a>
 // let windowed: (t<'a>, int) => t<array<'a>> // and pairwise
 
 // =======
@@ -99,7 +101,7 @@ from - NO an object @@iterator
 =====
 oCaml
 =====
-isEmpty
+isEmpty - YES
 uncons - YES
 length - YES
 iter - YES as forEach
@@ -118,7 +120,7 @@ equal - YES
 compare - YES
 empty - YES
 return - YES as singleton
-cons
+cons - YES as startWith
 init - YES
 unfold - YES
 repeat - NO

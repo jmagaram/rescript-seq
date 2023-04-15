@@ -117,6 +117,13 @@ let constructors = [
     ~a=() => S.iterate(2, i => i * 2)->S.take(3),
     ~b=[2, 4, 8],
   ),
+  areEqual(~title="cycle", ~expectation="when empty => empty", ~a=() => S.empty, ~b=[]),
+  areEqual(
+    ~title="cycle",
+    ~expectation="when not empty => repeat endlessly",
+    ~a=() => oneTwoThree->S.cycle->S.take(16),
+    ~b=[1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1],
+  ),
 ]
 
 let transforming = [
@@ -411,6 +418,11 @@ let transforming = [
     ~a=() => oneToFive->S.appendMany(S.replicate(~count=3, ~value=oneTwoThree)),
     ~b=[1, 2, 3, 4, 5, 1, 2, 3, 1, 2, 3, 1, 2, 3],
   ),
+  T.make(~category="Seq", ~title="tap", ~expectation="can inspect each value", ~predicate=() => {
+    let seen = []
+    let items = oneToFive->S.tap(i => seen->Js.Array2.push(i)->ignore)->S.toArray
+    seen == [1, 2, 3, 4, 5] && items == [1, 2, 3, 4, 5]
+  }),
 ]
 
 let consuming = [
