@@ -184,6 +184,23 @@ let flatten = seq => seq->flatMap(i => i)
 
 let map2 = (s1, s2, f) => zip(s1, s2)->map(((a, b)) => f(a, b))
 
+let rec sortedMerge = (s1, s2, cmp) => {
+  (. ()) =>
+    switch (s1(.), s2(.)) {
+    | (Empty, Next(_, _) as s2) => s2
+    | (Next(_, _) as s1, Empty) => s1
+    | (Next(v1, s1), Next(v2, s2)) => {
+        let order = cmp(v1, v2)
+        if order <= 0 {
+          Next(v1, sortedMerge(s1, append(v2->singleton, s2), cmp))
+        } else {
+          Next(v2, sortedMerge(append(v1->singleton, s1), s2, cmp))
+        }
+      }
+    | (Empty, Empty) => Empty
+    }
+}
+
 // =======
 // Consume
 // =======

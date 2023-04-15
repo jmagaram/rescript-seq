@@ -364,6 +364,32 @@ let transforming = [
     ~a=() => S.map2(oneToFive, oneTwoThree, (a, b) => a * b),
     ~b=[1, 4, 9],
   ),
+  areEqual(
+    ~title="sortedMerge",
+    ~expectation="",
+    ~a=() =>
+      S.sortedMerge([1, 4, 4, 6, 7, 9, 11]->S.fromArray, [2, 3, 3, 5, 7, 10, 12]->S.fromArray, (
+        a,
+        b,
+      ) => a < b ? -1 : a > b ? 1 : 0),
+    ~b=[1, 2, 3, 3, 4, 4, 5, 6, 7, 7, 9, 10, 11, 12],
+  ),
+  areEqual(
+    ~title="sortedMerge",
+    ~expectation="first empty",
+    ~a=() =>
+      S.sortedMerge([]->S.fromArray, [2, 3, 3, 5, 7, 10, 12]->S.fromArray, (a, b) =>
+        a < b ? -1 : a > b ? 1 : 0
+      ),
+    ~b=[2, 3, 3, 5, 7, 10, 12],
+  ),
+  areEqual(
+    ~title="sortedMerge",
+    ~expectation="second empty",
+    ~a=() =>
+      S.sortedMerge([1, 2, 2, 4]->S.fromArray, S.empty, (a, b) => a < b ? -1 : a > b ? 1 : 0),
+    ~b=[1, 2, 2, 4],
+  ),
 ]
 
 let consuming = [

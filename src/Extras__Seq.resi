@@ -31,6 +31,7 @@ let zipLongest: (t<'a>, t<'b>) => t<(option<'a>, option<'b>)>
 let scani: (t<'a>, ~zero: 'b, (~sum: 'b, ~value: 'a, ~index: int) => 'b) => t<'b>
 let flatten: t<t<'a>> => t<'a>
 let map2: (t<'a>, t<'b>, ('a, 'b) => 'c) => t<'c>
+let sortedMerge: (t<'a>, t<'a>, ('a, 'a) => int) => t<'a>
 
 // =======
 // Consume
@@ -129,8 +130,8 @@ concat - YES as flatten
 flat_map - YES as flatten
 concat_map
 zip (excludes longer items) - YES
-map2
-interlease
+map2 - YES
+interleave
 sorted_merge
 product
 map_product
