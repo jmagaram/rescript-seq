@@ -10,6 +10,7 @@ let init: (~count: int, ~initializer: (~index: int) => 'a) => t<'a>
 let replicate: (~count: int, ~value: 'a) => t<'a>
 let infinite: (unit => 'a) => t<'a>
 let fromArray: array<'a> => t<'a>
+let iterate: ('a, 'a => 'a) => t<'a>
 
 // =========
 // Transform
@@ -96,10 +97,10 @@ compare
 empty - YES
 return - YES as singleton
 cons
-init
-unfold
-repeat
-forever
+init - YES
+unfold - YES
+repeat - NO
+forever - YES
 cycle
 iterate
 

@@ -109,6 +109,12 @@ let constructors = [
   ),
   areEqual(~title="fromArray", ~expectation="when one item", ~a=() => [1]->S.fromArray, ~b=[1]),
   areEqual(~title="fromArray", ~expectation="when empty", ~a=() => []->S.fromArray, ~b=[]),
+  areEqual(
+    ~title="iterate",
+    ~expectation="",
+    ~a=() => S.iterate(2, i => i * 2)->S.take(3),
+    ~b=[2, 4, 8],
+  ),
 ]
 
 let transforming = [

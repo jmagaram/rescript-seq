@@ -35,6 +35,8 @@ let fromArray = xs => {
   go(0)
 }
 
+let iterate = (seed, f) => unfold(seed, i => Some(i, f(i)))
+
 // =========
 // Transform
 // =========
