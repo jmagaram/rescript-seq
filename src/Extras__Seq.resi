@@ -52,6 +52,7 @@ let everyOrEmpty: (t<'a>, 'a => bool) => bool
 let find: (t<'a>, 'a => bool) => option<'a>
 let findMap: (t<'a>, 'a => option<'b>) => option<'b>
 let length: t<'a> => int
+let isEmpty: t<'a> => bool
 let equals: (t<'a>, t<'b>, ('a, 'b) => bool) => bool
 let compare: (t<'a>, t<'b>, ('a, 'b) => int) => int
 let headTail: t<'a> => option<('a, t<'a>)>

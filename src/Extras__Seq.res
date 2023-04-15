@@ -356,6 +356,12 @@ let compare = (s1, s2, cmp) =>
 
 let length = seq => seq->reduce(0, (sum, _) => sum + 1)
 
+let isEmpty = seq =>
+  switch seq(.) {
+  | Empty => true
+  | _ => false
+  }
+
 let headTail = seq => seq(.)->toOption
 
 let minBy = (seq, compare) =>

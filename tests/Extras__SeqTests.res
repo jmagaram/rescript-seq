@@ -659,6 +659,18 @@ let consuming = [
     ~a=() => [6, 7, 8, 3, 1, 3, 5, 7]->S.fromArray->S.maxBy(compareInt),
     ~b=Some(8),
   ),
+  consumeEqual(
+    ~title="isEmpty",
+    ~expectation="when empty => true",
+    ~a=() => S.empty->S.isEmpty,
+    ~b=true,
+  ),
+  consumeEqual(
+    ~title="isEmpty",
+    ~expectation="when not empty => false",
+    ~a=() => S.singleton(2)->S.isEmpty,
+    ~b=false,
+  ),
 ]
 
 let memoizeTests = [
