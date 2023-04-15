@@ -16,6 +16,7 @@ let iterate: ('a, 'a => 'a) => t<'a>
 // Transform
 // =========
 let append: (t<'a>, t<'a>) => t<'a>
+let startWith: (t<'a>, 'a) => t<'a>
 let flatMap: (t<'a>, 'a => t<'b>) => t<'b>
 let map: (t<'a>, 'a => 'b) => t<'b>
 let mapi: (t<'a>, (~value: 'a, ~index: int) => 'b) => t<'b>
@@ -33,6 +34,7 @@ let flatten: t<t<'a>> => t<'a>
 let map2: (t<'a>, t<'b>, ('a, 'b) => 'c) => t<'c>
 let sortedMerge: (t<'a>, t<'a>, ('a, 'a) => int) => t<'a>
 let cache: t<'a> => t<'a>
+// let windowed: (t<'a>, int) => t<array<'a>> // and pairwise
 
 // =======
 // Consume

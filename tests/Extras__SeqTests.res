@@ -392,6 +392,13 @@ let transforming = [
       S.sortedMerge([1, 2, 2, 4]->S.fromArray, S.empty, (a, b) => a < b ? -1 : a > b ? 1 : 0),
     ~b=[1, 2, 2, 4],
   ),
+  areEqual(~title="startWith", ~expectation="when empty", ~a=() => S.empty->S.startWith(1), ~b=[1]),
+  areEqual(
+    ~title="startWith",
+    ~expectation="item not empty",
+    ~a=() => [2, 3, 4]->S.fromArray->S.startWith(1),
+    ~b=[1, 2, 3, 4],
+  ),
 ]
 
 let consuming = [
