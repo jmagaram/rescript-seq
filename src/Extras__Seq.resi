@@ -29,6 +29,7 @@ let dropWhile: (t<'a>, 'a => bool) => t<'a>
 let zip: (t<'a>, t<'b>) => t<('a, 'b)>
 let zipLongest: (t<'a>, t<'b>) => t<(option<'a>, option<'b>)>
 let scani: (t<'a>, ~zero: 'b, (~sum: 'b, ~value: 'a, ~index: int) => 'b) => t<'b>
+let flatten: t<t<'a>> => t<'a>
 
 // =======
 // Consume
@@ -116,14 +117,14 @@ scan - NO (see scani)
 take - YES
 drop - YES
 take_while - YES
-drop_while
+drop_while - YES
 group
 memoize
 once
 transpose
 
-append
-concat
+append - YES
+concat - YES as flatten
 flat_map
 concat_map
 zip (excludes longer items)

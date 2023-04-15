@@ -180,6 +180,8 @@ let rec dropWhile = (seq, predicate) => {
   }
 }
 
+let flatten = seq => seq->flatMap(i => i)
+
 // =======
 // Consume
 // =======

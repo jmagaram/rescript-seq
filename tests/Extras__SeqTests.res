@@ -339,6 +339,13 @@ let transforming = [
     ~a=() => oneTwoThree->S.dropWhile(_ => false),
     ~b=[1, 2, 3],
   ),
+  areEqual(
+    ~title="flatten",
+    ~expectation="concatenate each sub-sequence",
+    ~a=() =>
+      S.init(~count=3, ~initializer=(~index) => S.replicate(~count=2, ~value=index))->S.flatten,
+    ~b=[0, 0, 1, 1, 2, 2],
+  ),
 ]
 
 let consuming = [
