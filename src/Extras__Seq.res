@@ -65,6 +65,11 @@ let rec append = (s1, s2) => {
 
 let startWithMany = (s1, s2) => append(s2, s1)
 
+let range = (~start, ~stop) => {
+  start < stop
+    ? unfold(start, i => i <= stop ? Some(i, i + 1) : None)
+    : unfold(start, i => i >= stop ? Some(i, i - 1) : None)
+}
 // =========
 // Transform
 // =========

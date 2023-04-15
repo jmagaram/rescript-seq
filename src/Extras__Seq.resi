@@ -12,6 +12,7 @@ let infinite: (unit => 'a) => t<'a>
 let fromArray: array<'a> => t<'a>
 let iterate: ('a, 'a => 'a) => t<'a>
 let cycle: t<'a> => t<'a>
+let range: (~start: int, ~stop: int) => t<int>
 
 // =========
 // Transform
@@ -77,7 +78,6 @@ NOTES
 Simple ranges with steps, up and down, inclusive or exclusive
 mapi or rely on indexed first?
 takeWhile
-tap
 
 // get all the tc39
 // get all the oCaml
@@ -165,8 +165,33 @@ ints
 F#
 https://fsharp.github.io/fsharp-core-docs/reference/fsharp-collections-seqmodule.html#cache
 ===
-allPairs
+allPairs - YES
+chunkBySize 
+countBy
+exclude
+findIndex and findLastIndex
+insertAt
+insertManyAt
+lastItem
+map2 or map3
+pairwise
+pick (findmap)
+removeAt
+removeManyAt
+reverse
+tail (vs head)
+transpose
+findLast
+windowed
 
+#Rust
+arrayChunks
+fuse (stop at first None)
+isSorted
+isSortedBy
+last
+nth
+stepBy
 
 
 Should all constructor names be "from..."

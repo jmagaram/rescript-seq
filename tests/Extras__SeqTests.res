@@ -130,6 +130,24 @@ let constructors = [
     ~a=() => S.allPairs(oneTwoThree, fourFiveSix),
     ~b=[(1, 4), (1, 5), (1, 6), (2, 4), (2, 5), (2, 6), (3, 4), (3, 5), (3, 6)],
   ),
+  areEqual(
+    ~title="range",
+    ~expectation="can count up",
+    ~a=() => S.range(~start=3, ~stop=7),
+    ~b=[3, 4, 5, 6, 7],
+  ),
+  areEqual(
+    ~title="range",
+    ~expectation="can count down",
+    ~a=() => S.range(~start=7, ~stop=3),
+    ~b=[7, 6, 5, 4, 3],
+  ),
+  areEqual(
+    ~title="range",
+    ~expectation="can have single value",
+    ~a=() => S.range(~start=3, ~stop=3),
+    ~b=[3],
+  ),
 ]
 
 let transforming = [
