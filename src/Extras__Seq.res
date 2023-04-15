@@ -186,21 +186,6 @@ let findMap = (seq, f) => {
   found.contents
 }
 
-let find = (seq, predicate) => {
-  let curr = ref(seq(.))
-  let found = ref(None)
-  while found.contents->Belt.Option.isNone && curr.contents !== Empty {
-    switch curr.contents {
-    | Empty => ()
-    | Next(value, seq) => {
-        if predicate(value) {
-          found := Some(value)
-        }
-        curr := seq(.)
-      }
-    }
-  }
-  found.contents
-}
+let find = (seq, predicate) => seq->findMap(i => predicate(i) ? Some(i) : None)
 
 let length = seq => seq->reduce(0, (sum, _) => sum + 1)
