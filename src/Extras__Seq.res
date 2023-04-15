@@ -168,6 +168,24 @@ let everyOrEmpty = (seq, predicate) => {
   !foundInvalid.contents
 }
 
+let findMap = (seq, f) => {
+  let curr = ref(seq(.))
+  let found = ref(None)
+  while found.contents->Belt.Option.isNone && curr.contents !== Empty {
+    switch curr.contents {
+    | Empty => ()
+    | Next(value, seq) => {
+        switch f(value) {
+        | None => ()
+        | Some(_) as m => found := m
+        }
+        curr := seq(.)
+      }
+    }
+  }
+  found.contents
+}
+
 let find = (seq, predicate) => {
   let curr = ref(seq(.))
   let found = ref(None)

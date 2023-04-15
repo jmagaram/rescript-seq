@@ -293,6 +293,18 @@ let consuming = [
     ~b=Some(2),
   ),
   consumeEqual(
+    ~title="findMap",
+    ~expectation="if found => Some",
+    ~a=() => oneToFive->S.findMap(i => i == 2 ? Some("x") : None),
+    ~b=Some("x"),
+  ),
+  consumeEqual(
+    ~title="findMap",
+    ~expectation="if not found => None",
+    ~a=() => oneToFive->S.findMap(i => i == 99 ? Some("x") : None),
+    ~b=None,
+  ),
+  consumeEqual(
     ~title="reduce",
     ~expectation="if empty => initial value",
     ~a=() => S.empty->S.reduce(99, (sum, i) => sum * i),

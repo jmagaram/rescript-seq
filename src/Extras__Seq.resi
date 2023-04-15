@@ -33,6 +33,7 @@ let forEachi: (t<'a>, (~value: 'a, ~index: int) => unit) => unit
 let some: (t<'a>, 'a => bool) => bool
 let everyOrEmpty: (t<'a>, 'a => bool) => bool
 let find: (t<'a>, 'a => bool) => option<'a>
+let findMap: (t<'a>, 'a => option<'b>) => option<'b>
 let length: t<'a> => int
 
 /*
@@ -76,10 +77,10 @@ length - YES
 iter - YES as forEach
 fold_left - YES as reduce
 iteri - YES as forEachi
-fold_lefti
-for_all
-exists
-find
+fold_lefti - YES as reducei
+for_all - YES as everyOrEmpty
+exists - YES as some
+find - YES
 find_map
 item2
 fold_left2
