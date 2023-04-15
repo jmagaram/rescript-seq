@@ -28,6 +28,7 @@ let reduce: (t<'a>, 'b, ('b, 'a) => 'b) => 'b
 let toArray: t<'a> => array<'a>
 let toReversedList: t<'a> => Belt.List.t<'a>
 let forEach: (t<'a>, 'a => unit) => unit
+let forEachi: (t<'a>, (~value: 'a, ~index: int) => unit) => unit
 let some: (t<'a>, 'a => bool) => bool
 let everyOrEmpty: (t<'a>, 'a => bool) => bool
 let find: (t<'a>, 'a => bool) => option<'a>
@@ -70,9 +71,9 @@ oCaml
 =====
 isEmpty
 uncons
-length
-item
-fold_left
+length - YES
+iter - YES as forEach
+fold_left - YES as reduce
 iteri
 fold_lefti
 for_all

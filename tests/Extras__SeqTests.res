@@ -229,6 +229,13 @@ let consuming = [
     oneTwoThreeFourFive->S.forEach(i => result->Js.Array2.push(i)->ignore)
     result == [1, 2, 3, 4, 5]
   }),
+  T.make(~category="Seq", ~title="forEachi", ~expectation="", ~predicate=() => {
+    let result = []
+    oneTwoThreeFourFive->S.forEachi((~value, ~index) =>
+      result->Js.Array2.push((value, index))->ignore
+    )
+    result == [(1, 0), (2, 1), (3, 2), (4, 3), (5, 4)]
+  }),
   T.make(
     ~category="Seq",
     ~title="unfold",

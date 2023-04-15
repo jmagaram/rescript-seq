@@ -118,6 +118,21 @@ let toArray = seq =>
 
 let toReversedList = seq => seq->reduce(list{}, (lst, i) => lst->Belt.List.add(i))
 
+let forEachi = (seq, f) => {
+  let curr = ref(seq(.))
+  let index = ref(0)
+  while curr.contents !== Empty {
+    switch curr.contents {
+    | Empty => ()
+    | Next(value, seq) => {
+        f(~value, ~index=index.contents)
+        index := index.contents + 1
+        curr := seq(.)
+      }
+    }
+  }
+}
+
 let forEach = (seq, f) => {
   let curr = ref(seq(.))
   while curr.contents !== Empty {
