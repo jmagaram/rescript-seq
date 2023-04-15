@@ -1,7 +1,15 @@
+module Option = Belt.Option
+
 type rec t<'a> = (. unit) => node<'a>
 and node<'a> =
   | Empty
   | Next('a, t<'a>)
+
+let toOption = node =>
+  switch node {
+  | Empty => None
+  | Next(value, seq) => Some(value, seq)
+  }
 
 // =========
 // Construct
@@ -292,7 +300,7 @@ let everyOrEmpty = (seq, predicate) => {
 let findMap = (seq, f) => {
   let curr = ref(seq(.))
   let found = ref(None)
-  while found.contents->Belt.Option.isNone && curr.contents !== Empty {
+  while found.contents->Option.isNone && curr.contents !== Empty {
     switch curr.contents {
     | Empty => ()
     | Next(value, seq) => {
@@ -329,12 +337,24 @@ let compare = (s1, s2, cmp) =>
     }
   )
   ->find(i => i !== 0)
-  ->Belt.Option.getWithDefault(0)
+  ->Option.getWithDefault(0)
 
 let length = seq => seq->reduce(0, (sum, _) => sum + 1)
 
-let headTail = seq =>
-  switch seq(.) {
-  | Empty => None
-  | Next(head, tail) => Some(head, tail)
-  }
+let headTail = seq => seq(.)->toOption
+
+let minBy = (seq, compare) =>
+  seq->reduce(None, (sum, i) => {
+    switch sum {
+    | None => Some(i)
+    | Some(sum) => Some(compare(i, sum) < 0 ? i : sum)
+    }
+  })
+
+let maxBy = (seq, compare) =>
+  seq->reduce(None, (sum, i) => {
+    switch sum {
+    | None => Some(i)
+    | Some(sum) => Some(compare(i, sum) > 0 ? i : sum)
+    }
+  })

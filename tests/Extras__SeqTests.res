@@ -616,6 +616,30 @@ let consuming = [
     ~a=() => [1, 2, 3]->S.fromArray->S.headTail->Belt.Option.map(((h, t)) => (h, t->S.toArray)),
     ~b=Some(1, [2, 3]),
   ),
+  consumeEqual(
+    ~title="minBy",
+    ~expectation="when no items => None",
+    ~a=() => S.empty->S.minBy(compareInt),
+    ~b=None,
+  ),
+  consumeEqual(
+    ~title="minBy",
+    ~expectation="when items => Some",
+    ~a=() => [6, 7, 8, 3, 1, 3, 5, 8]->S.fromArray->S.minBy(compareInt),
+    ~b=Some(1),
+  ),
+  consumeEqual(
+    ~title="maxBy",
+    ~expectation="when no items => None",
+    ~a=() => S.empty->S.maxBy(compareInt),
+    ~b=None,
+  ),
+  consumeEqual(
+    ~title="maxBy",
+    ~expectation="when items => Some",
+    ~a=() => [6, 7, 8, 3, 1, 3, 5, 7]->S.fromArray->S.maxBy(compareInt),
+    ~b=Some(8),
+  ),
 ]
 
 let memoizeTests = [

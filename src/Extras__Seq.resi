@@ -51,6 +51,9 @@ let length: t<'a> => int
 let equals: (t<'a>, t<'b>, ('a, 'b) => bool) => bool
 let compare: (t<'a>, t<'b>, ('a, 'b) => int) => int
 let headTail: t<'a> => option<('a, t<'a>)>
+let minBy: (t<'a>, ('a, 'a) => int) => option<'a>
+let maxBy: (t<'a>, ('a, 'a) => int) => option<'a>
+
 // slice, splitAt
 // push, pop
 // head
@@ -148,6 +151,13 @@ split
 partition_map
 partition
 ints
+
+F#
+https://fsharp.github.io/fsharp-core-docs/reference/fsharp-collections-seqmodule.html#cache
+===
+allPairs
+
+
 
 Should all constructor names be "from..."
 Use Option instead of Empty and Next; or enabpe mapIfNext
