@@ -220,8 +220,8 @@ module UncurriedDeferred = {
 
   type toLazy<'a> = t<'a> => Lazy.t<'a>
   let toLazy: toLazy<'a> = (f: t<'a>) => {
-    let f2 = () => f(.)
-    Lazy.from_fun(f2)
+    let g = () => f(.)
+    Lazy.from_fun(g)
   }
 
   type fromLazy<'a> = Lazy.t<'a> => t<'a>
