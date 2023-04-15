@@ -161,7 +161,23 @@ let scani = (seq, ~zero, f) => {
         Next(sum, go(seq, sum))
       }
     }
-  append(singleton(zero), go(seq->indexed, zero)) // not tail?
+  append(singleton(zero), go(seq->indexed, zero))
+  // not tail?
+  // look at ocaml code
+  // cons?
+}
+
+let rec dropWhile = (seq, predicate) => {
+  (. ()) => {
+    switch seq(.) {
+    | Empty => Empty
+    | Next(value, seq) =>
+      switch predicate(value) {
+      | true => dropWhile(seq, predicate)(.) // recursive!
+      | false => Next(value, seq)
+      }
+    }
+  }
 }
 
 // =======

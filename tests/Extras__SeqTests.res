@@ -327,6 +327,18 @@ let transforming = [
     ~a=() => oneTwoThree->S.scani(~zero=10, (~sum, ~value, ~index) => sum + value + index),
     ~b=[10, 10 + 1 + 0, 10 + 1 + 0 + 2 + 1, 10 + 1 + 0 + 2 + 1 + 3 + 2],
   ),
+  areEqual(
+    ~title="dropWhile",
+    ~expectation="start when predicate is true",
+    ~a=() => oneTwoThree->S.dropWhile(i => i <= 2),
+    ~b=[3],
+  ),
+  areEqual(
+    ~title="dropWhile",
+    ~expectation="start when predicate is true",
+    ~a=() => oneTwoThree->S.dropWhile(_ => false),
+    ~b=[1, 2, 3],
+  ),
 ]
 
 let consuming = [

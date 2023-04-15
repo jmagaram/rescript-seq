@@ -25,6 +25,7 @@ let filterMap: (t<'a>, 'a => option<'b>) => t<'b>
 let take: (t<'a>, int) => t<'a>
 let drop: (t<'a>, int) => t<'a>
 let takeWhile: (t<'a>, 'a => bool) => t<'a>
+let dropWhile: (t<'a>, 'a => bool) => t<'a>
 let zip: (t<'a>, t<'b>) => t<('a, 'b)>
 let zipLongest: (t<'a>, t<'b>) => t<(option<'a>, option<'b>)>
 let scani: (t<'a>, ~zero: 'b, (~sum: 'b, ~value: 'a, ~index: int) => 'b) => t<'b>
@@ -111,10 +112,10 @@ map - YES
 mapi - YES
 filter - YES
 filter_map - YES
-scan
-take
-drop
-take_while
+scan - NO (see scani)
+take - YES
+drop - YES
+take_while - YES
 drop_while
 group
 memoize
@@ -138,6 +139,7 @@ partition_map
 partition
 ints
 
+Should all constructor names be "from..."
 
 // Array stuff like zip2by
 
