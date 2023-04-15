@@ -1,5 +1,6 @@
 module T = Extras__Test
 module S = Extras__Seq
+module R = Extras__Result
 
 let compareInt = (a: int, b: int) => a < b ? -1 : a > b ? 1 : 0
 
@@ -459,6 +460,62 @@ let transforming = [
     ~a=() => [Ok(3), Error("oops"), Ok(5)]->S.fromArray->S.filterOk,
     ~b=[3, 5],
   ),
+  areEqual(
+    ~title="chunkBySize",
+    ~expectation="when not empty and longer than chunk size",
+    ~a=() => [1, 2, 3, 4, 5, 6, 7]->S.fromArray->S.chunkBySize(3),
+    ~b=[[1, 2, 3], [4, 5, 6], [7]],
+  ),
+  areEqual(
+    ~title="chunkBySize",
+    ~expectation="when not empty and shorter than chunk size",
+    ~a=() => [1, 2, 3]->S.fromArray->S.chunkBySize(6),
+    ~b=[[1, 2, 3]],
+  ),
+  areEqual(
+    ~title="chunkBySize",
+    ~expectation="when not empty and equal to chunk size",
+    ~a=() => [1, 2, 3]->S.fromArray->S.chunkBySize(3),
+    ~b=[[1, 2, 3]],
+  ),
+  T.make(
+    ~category="Seq",
+    ~title="chunkBySize",
+    ~expectation="when size = 0 => throw",
+    ~predicate=() =>
+      R.fromTryCatch(() => [1, 2, 3]->S.fromArray->S.chunkBySize(0))->Belt.Result.isError,
+  ),
+  T.make(
+    ~category="Seq",
+    ~title="chunkBySize",
+    ~expectation="when size < 0 => throw",
+    ~predicate=() =>
+      R.fromTryCatch(() => [1, 2, 3]->S.fromArray->S.chunkBySize(-1))->Belt.Result.isError,
+  ),
+  areEqual(
+    ~title="chunkBySize",
+    ~expectation="when empty => empty",
+    ~a=() => []->S.fromArray->S.chunkBySize(3),
+    ~b=[],
+  ),
+  // areEqual(
+  //   ~title="positioned",
+  //   ~expectation="when empty => empty",
+  //   ~a=() => []->S.fromArray->S.positioned,
+  //   ~b=[],
+  // ),
+  // areEqual(
+  //   ~title="positioned",
+  //   ~expectation="when singleton",
+  //   ~a=() => [1]->S.fromArray->S.positioned,
+  //   ~b=[(1, Singleton)],
+  // ),
+  // areEqual(
+  //   ~title="positioned",
+  //   ~expectation="when several items",
+  //   ~a=() => [1, 2, 3, 4]->S.fromArray->S.positioned,
+  //   ~b=[(1, Head), (2, Inside(1)), (3, Inside(2)), (4, Last)],
+  // ),
 ]
 
 let consuming = [

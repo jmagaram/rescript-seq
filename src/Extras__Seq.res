@@ -5,6 +5,8 @@ and node<'a> =
   | Empty
   | Next('a, t<'a>)
 
+exception ArgumentOfOfRange(string)
+
 let toOption = node =>
   switch node {
   | Empty => None
@@ -265,6 +267,48 @@ let rec cache = seq =>
   )
 
 let allPairs = (xx: t<'a>, yy: t<'b>) => xx->flatMap(x => yy->map(y => (x, y)))
+
+// let positioned = seq => empty // t<(seq, Head)>
+// partition, split at index? consume until...take until and rest...
+
+// like head and tail?
+let consumeN = (seq, n) => {
+  if n <= 0 {
+    Js.Exn.raiseRangeError("Can not consume a 0 or negative amount of items.")
+  }
+  let consumed = []
+  let isEmpty = ref(false)
+  let seq = ref(seq)
+  while consumed->Js.Array2.length < n && !isEmpty.contents {
+    switch seq.contents(.) {
+    | Empty => isEmpty := true
+    | Next(head, tail) => {
+        consumed->Js.Array2.push(head)->ignore
+        seq := tail
+      }
+    }
+  }
+  {"consumed": consumed, "isEmpty": isEmpty.contents, "tail": seq.contents}
+}
+
+let rec chunkBySize = (seq, length) => {
+  if length <= 0 {
+    ArgumentOfOfRange(
+      `chunkBySize requires a length > 0. You asked for ${length->Belt.Int.toString}`,
+    )->raise
+  }
+  (. ()) => {
+    let n = consumeN(seq, length)
+    switch n["isEmpty"] {
+    | true =>
+      switch n["consumed"] {
+      | [] => Empty
+      | xs => Next(xs, chunkBySize(empty, length))
+      }
+    | false => Next(n["consumed"], chunkBySize(n["tail"], length))
+    }
+  }
+}
 
 // =======
 // Consume

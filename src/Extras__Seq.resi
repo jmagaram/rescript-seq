@@ -1,4 +1,5 @@
 type t<'a>
+exception ArgumentOfOfRange(string)
 
 // =========
 // Construct
@@ -25,6 +26,8 @@ let flatMap: (t<'a>, 'a => t<'b>) => t<'b>
 let map: (t<'a>, 'a => 'b) => t<'b>
 let mapi: (t<'a>, (~value: 'a, ~index: int) => 'b) => t<'b>
 let indexed: t<'a> => t<('a, int)>
+// let positioned: t<'a> => t<('a, position)>
+// filteri
 let filter: (t<'a>, 'a => bool) => t<'a>
 let filterMap: (t<'a>, 'a => option<'b>) => t<'b>
 let filterSome: t<option<'a>> => t<'a> // filter Ok
@@ -35,6 +38,7 @@ let takeWhile: (t<'a>, 'a => bool) => t<'a>
 let dropWhile: (t<'a>, 'a => bool) => t<'a>
 let zip: (t<'a>, t<'b>) => t<('a, 'b)>
 let zipLongest: (t<'a>, t<'b>) => t<(option<'a>, option<'b>)>
+// rename scan?
 let scani: (t<'a>, ~zero: 'b, (~sum: 'b, ~value: 'a, ~index: int) => 'b) => t<'b>
 let flatten: t<t<'a>> => t<'a>
 let map2: (t<'a>, t<'b>, ('a, 'b) => 'c) => t<'c>
@@ -42,6 +46,7 @@ let sortedMerge: (t<'a>, t<'a>, ('a, 'a) => int) => t<'a>
 let cache: t<'a> => t<'a>
 let tap: (t<'a>, 'a => unit) => t<'a>
 let allPairs: (t<'a>, t<'b>) => t<('a, 'b)>
+let chunkBySize: (t<'a>, int) => t<array<'a>>
 // let windowed: (t<'a>, int) => t<array<'a>> // and pairwise
 
 // =======
