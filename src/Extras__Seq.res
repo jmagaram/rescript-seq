@@ -477,3 +477,19 @@ let maxBy = (seq, compare) =>
     | Some(sum) => Some(compare(i, sum) > 0 ? i : sum)
     }
   })
+
+let last = seq => {
+  let current = ref(seq)
+  let last = ref(None)
+  let break = ref(false)
+  while !break.contents {
+    switch current.contents(.) {
+    | Empty => break := true
+    | Next(head, tail) => {
+        last := Some(head)
+        current := tail
+      }
+    }
+  }
+  last.contents
+}

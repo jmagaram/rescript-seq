@@ -807,6 +807,14 @@ let consuming = [
     ~a=() => S.singleton(2)->S.isEmpty,
     ~b=false,
   ),
+  consumeEqual(~title="last", ~expectation="when empty => None", ~a=() => S.empty->S.last, ~b=None),
+  consumeEqual(
+    ~title="last",
+    ~expectation="when singleton",
+    ~a=() => S.singleton(1)->S.last,
+    ~b=Some(1),
+  ),
+  consumeEqual(~title="last", ~expectation="when many", ~a=() => oneToFive->S.last, ~b=Some(5)),
 ]
 
 let memoizeTests = [

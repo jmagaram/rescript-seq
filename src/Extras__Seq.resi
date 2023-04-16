@@ -70,6 +70,7 @@ let compare: (t<'a>, t<'b>, ('a, 'b) => int) => int
 let headTail: t<'a> => option<('a, t<'a>)>
 let minBy: (t<'a>, ('a, 'a) => int) => option<'a>
 let maxBy: (t<'a>, ('a, 'a) => int) => option<'a>
+let last: t<'a> => option<'a>
 
 // slice, splitAt
 // push, pop
@@ -180,8 +181,8 @@ insertAt
 insertManyAt
 lastItem
 map2 or map3
-pairwise
-pick (findmap)
+pairwise - YES
+pick (findmap) - YES
 removeAt
 removeManyAt
 reverse
