@@ -531,3 +531,12 @@ let last = seq => {
   }
   last.contents
 }
+
+let rec interleave = (xs, ys) => {
+  (. ()) => {
+    switch xs(.) {
+    | Empty => ys(.)
+    | Next(x, xs) => Next(x, interleave(ys, xs))
+    }
+  }
+}

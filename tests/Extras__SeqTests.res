@@ -636,6 +636,36 @@ let transforming = [
     ~a=() => [1, 2, 3, 4]->S.fromArray->S.intersperse(-1),
     ~b=[1, -1, 2, -1, 3, -1, 4],
   ),
+  areEqual(
+    ~title="interleave",
+    ~expectation="when first shorter",
+    ~a=() => S.interleave(fourFiveSix, oneToFive),
+    ~b=[4, 1, 5, 2, 6, 3, 4, 5],
+  ),
+  areEqual(
+    ~title="interleave",
+    ~expectation="when second shorter",
+    ~a=() => S.interleave(oneToFive, fourFiveSix),
+    ~b=[1, 4, 2, 5, 3, 6, 4, 5],
+  ),
+  areEqual(
+    ~title="interleave",
+    ~expectation="when second empty",
+    ~a=() => S.interleave(oneToFive, S.empty),
+    ~b=[1, 2, 3, 4, 5],
+  ),
+  areEqual(
+    ~title="interleave",
+    ~expectation="when first empty",
+    ~a=() => S.interleave(S.empty, oneToFive),
+    ~b=[1, 2, 3, 4, 5],
+  ),
+  areEqual(
+    ~title="interleave",
+    ~expectation="when both empty",
+    ~a=() => S.interleave(S.empty, S.empty),
+    ~b=[],
+  ),
 ]
 
 let consuming = [

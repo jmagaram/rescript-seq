@@ -52,6 +52,7 @@ let pairwise: t<'a> => t<('a, 'a)>
 let window: (t<'a>, int) => t<array<'a>>
 let allPairs: (t<'a>, t<'b>) => t<('a, 'b)>
 let intersperse: (t<'a>, 'a) => t<'a>
+let interleave: (t<'a>, t<'a>) => t<'a>
 
 // =======
 // Consume
@@ -70,8 +71,8 @@ let isEmpty: t<'a> => bool
 let equals: (t<'a>, t<'b>, ('a, 'b) => bool) => bool
 let compare: (t<'a>, t<'b>, ('a, 'b) => int) => int
 let head: t<'a> => option<'a>
-let headTail: t<'a> => option<('a, t<'a>)>
 let tail: t<'a> => t<'a>
+let headTail: t<'a> => option<('a, t<'a>)>
 let minBy: (t<'a>, ('a, 'a) => int) => option<'a>
 let maxBy: (t<'a>, ('a, 'a) => int) => option<'a>
 let last: t<'a> => option<'a>
