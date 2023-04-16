@@ -73,6 +73,24 @@ let range = (~start, ~stop) => {
     ? unfold(start, i => i <= stop ? Some(i, i + 1) : None)
     : unfold(start, i => i >= stop ? Some(i, i - 1) : None)
 }
+
+// let permutations = (items, ~minLength, ~maxLength) =>{
+//     if (maxLength<minLength || minLength<=0 || maxLength<=0) {
+//         OutOfRangeError("Wrong permutations!")->raise
+//     }
+//     let itemsLength =items->Js.Array2.length
+//     let maxLength = itemsLength<maxLength ? itemsLength : maxLength
+//     let go = (prefix,startIndex)=>{
+//         let prefixLength = prefix->Js.Array2.length
+//         switch prefixLength<minLength {
+//             | true =>
+//             | false =>[]
+//         }
+//         let prefixlength = prefix->Js.Array2.length
+//     }
+//     go([],items)
+// }
+
 // =========
 // Transform
 // =========
@@ -104,6 +122,21 @@ let cycle = seq => {
 let appendMany = (s1, others) => s1->append(others->flatten)
 
 let map = (seq, f) => flatMap(seq, i => singleton(f(i)))
+
+// test throwing invalid params
+let fromArraySlice = (~start=?, ~end=?, arr: array<'a>) => {
+  switch arr->Js.Array2.length {
+  | 0 => empty
+  | len => {
+      let start = start->Option.getWithDefault(0)
+      let end = end->Option.getWithDefault(len - 1)
+      if start <= end {
+        ArgumentOfOfRange("Array bounds are incorrect.")->raise
+      }
+      range(~start, ~stop=end)->map(i => arr->Js.Array2.unsafe_get(i))
+    }
+  }
+}
 
 let indexed = seq => {
   let rec go = (seq, index) =>

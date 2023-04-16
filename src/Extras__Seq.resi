@@ -11,9 +11,14 @@ let init: (~count: int, ~initializer: (~index: int) => 'a) => t<'a>
 let replicate: (~count: int, ~value: 'a) => t<'a>
 let infinite: (unit => 'a) => t<'a>
 let fromArray: array<'a> => t<'a>
+let fromArraySlice: (~start: int=?, ~end: int=?, array<'a>) => t<'a>
 let iterate: ('a, 'a => 'a) => t<'a>
 let cycle: t<'a> => t<'a>
 let range: (~start: int, ~stop: int) => t<int>
+// let permutations: (array<'a>, ~minLength: int, ~maxLength: int) => t<array<'a>>
+// fromSet
+// fromMap
+// fromIterable
 
 // =========
 // Transform
@@ -195,6 +200,16 @@ last
 nth
 stepBy
 nextChunk
+
+#itertools
+combinations
+permutations
+fromIterable
+dropWhile
+nth
+partition
+subslices
+allEqual
 
 Should all constructor names be "from..."
 Use Option instead of Empty and Next; or enabpe mapIfNext
