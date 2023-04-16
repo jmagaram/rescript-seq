@@ -83,3 +83,4 @@ let last: t<'a> => option<'a>
 let toArray: t<'a> => array<'a>
 let toString: t<string> => string
 let toExactlyOne: t<'a> => option<'a>
+let allOk: (t<'a>, 'a => result<'b, 'c>) => result<t<'b>, 'c>

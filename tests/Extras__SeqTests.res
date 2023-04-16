@@ -423,7 +423,7 @@ let transforming = [
   areEqual(
     ~title="filterMap",
     ~expectation="when no matches",
-    ~a=() => oneToFive->S.filterMap(i => None),
+    ~a=() => oneToFive->S.filterMap(_ => None),
     ~b=[],
   ),
   areEqual(
@@ -1153,6 +1153,25 @@ let consuming = [
   ),
 ]
 
+let allOk = {
+  let mapper = n => n < 10 ? Ok(n * 2) : Error(n->Belt.Int.toString)
+  [
+    ("when empty, return empty", [], Ok([])),
+    ("when one error, return it", [30], Error("30")),
+    ("when one ok, return it", [2], Ok([4])),
+    ("when all ok, return all", [1, 2, 3], Ok([2, 4, 6])),
+    ("when all error, return first", [20, 30, 40], Error("20")),
+    ("when mix, return first error", [1, 2, 14, 3, 4], Error("14")),
+  ]->Belt.Array.map(((expectation, input, expected)) =>
+    consumeEqual(
+      ~title="okOrError",
+      ~expectation,
+      ~a=() => input->S.fromArray->S.allOk(mapper)->Belt.Result.map(i => i->S.toArray),
+      ~b=expected,
+    )
+  )
+}
+
 let memoizeTests = [
   T.make(
     ~category="Seq",
@@ -1180,4 +1199,4 @@ let memoizeTests = [
   ),
 ]
 
-let tests = [constructors, transforming, consuming, memoizeTests]->Belt.Array.flatMap(i => i)
+let tests = [allOk, constructors, transforming, consuming, memoizeTests]->Belt.Array.flatMap(i => i)

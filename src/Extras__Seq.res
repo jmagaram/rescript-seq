@@ -614,3 +614,5 @@ let windowAhead = (xs, size) => {
   })
   ->drop(size)
 }
+
+let allOk = (seq, f) => seq->toArray->Ex.Result.fromArrayMap(f)->Belt.Result.map(i => i->fromArray)
