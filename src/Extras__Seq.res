@@ -22,10 +22,6 @@ let mapNext: mapNext<'a, 'b> = (seq, f) =>
     | Next(value, seq) => f(~value, ~seq)
     }
 
-// =========
-// Construct
-// =========
-
 let empty = (. ()) => Empty
 
 let singleton = v => (. ()) => Next(v, empty)
@@ -65,10 +61,6 @@ let range = (~start, ~stop) => {
     : unfold(start, i => i >= stop ? Some(i, i - 1) : None)
 }
 
-// =========
-// Transform
-// =========
-
 let rec tap = (seq, f) =>
   seq->mapNext((~value, ~seq) => {
     f(value)
@@ -106,6 +98,14 @@ let fromArray = (~start=?, ~end=?, arr: array<'a>) => {
       range(~start, ~stop=end)->map(inx => arr->Js.Array2.unsafe_get(inx))
     }
   }
+}
+
+let rec fromList = xs => {
+  (. ()) =>
+    switch xs {
+    | list{} => Empty
+    | list{head, ...tail} => Next(head, fromList(tail))
+    }
 }
 
 let indexed = seq => {
@@ -352,10 +352,6 @@ let windowed = (seq, length) => {
 
 let pairwise = seq =>
   seq->windowed(2)->map(i => (i->Js.Array2.unsafe_get(0), i->Js.Array2.unsafe_get(1)))
-
-// =======
-// Consume
-// =======
 
 let reduce = (seq, zero, concat) => {
   let sum = ref(zero)

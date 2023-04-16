@@ -138,6 +138,12 @@ let constructors = [
     ~b=[2, 3],
   ),
   areEqual(
+    ~title="fromList",
+    ~expectation="",
+    ~a=() => list{1, 2, 3, 4, 5}->S.fromList,
+    ~b=[1, 2, 3, 4, 5],
+  ),
+  areEqual(
     ~title="iterate",
     ~expectation="",
     ~a=() => S.iterate(2, i => i * 2)->S.take(3),
