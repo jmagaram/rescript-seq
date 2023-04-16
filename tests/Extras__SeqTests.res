@@ -730,6 +730,12 @@ let consuming = [
     ~b=None,
   ),
   consumeEqual(
+    ~title="findMapi",
+    ~expectation="",
+    ~a=() => oneToFive->S.findMapi((~value, ~index) => value == 3 && index == 2 ? Some("x") : None),
+    ~b=Some("x"),
+  ),
+  consumeEqual(
     ~title="reduce",
     ~expectation="if empty => initial value",
     ~a=() => S.empty->S.reduce(99, (sum, i) => sum * i),

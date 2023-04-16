@@ -10,21 +10,21 @@ let unfold: ('seed, 'seed => option<('a, 'seed)>) => t<'a>
 let init: (~count: int, ~initializer: (~index: int) => 'a) => t<'a>
 let repeat: (~count: int, ~value: 'a) => t<'a>
 let infinite: (unit => 'a) => t<'a>
-let fromArray: (~start: int=?, ~end: int=?, array<'a>) => t<'a>
-let fromString: string => t<string>
 let iterate: ('a, 'a => 'a) => t<'a>
 let cycle: t<'a> => t<'a>
 let range: (~start: int, ~end: int) => t<int>
+let fromArray: (~start: int=?, ~end: int=?, array<'a>) => t<'a>
 let fromList: list<'a> => t<'a>
 let fromOption: option<'a> => t<'a>
+let fromString: string => t<string>
 
 // =========
 // Transform
 // =========
 let startWith: (t<'a>, 'a) => t<'a>
+let prepend: (t<'a>, t<'a>) => t<'a>
 let concat: (t<'a>, t<'a>) => t<'a>
 let concatMany: (t<'a>, t<t<'a>>) => t<'a>
-let prepend: (t<'a>, t<'a>) => t<'a>
 let flatMap: (t<'a>, 'a => t<'b>) => t<'b>
 let map: (t<'a>, 'a => 'b) => t<'b>
 let mapi: (t<'a>, (~value: 'a, ~index: int) => 'b) => t<'b>
@@ -58,14 +58,13 @@ let intersperse: (t<'a>, 'a) => t<'a>
 // =======
 let reduce: (t<'a>, 'b, ('b, 'a) => 'b) => 'b
 let reducei: (t<'a>, 'b, (~sum: 'b, ~value: 'a, ~index: int) => 'b) => 'b
-let toArray: t<'a> => array<'a>
-let toString: t<string> => string
 let forEach: (t<'a>, 'a => unit) => unit
 let forEachi: (t<'a>, (~value: 'a, ~index: int) => unit) => unit
 let some: (t<'a>, 'a => bool) => bool
 let everyOrEmpty: (t<'a>, 'a => bool) => bool
 let find: (t<'a>, 'a => bool) => option<'a>
 let findMap: (t<'a>, 'a => option<'b>) => option<'b>
+let findMapi: (t<'a>, (~value: 'a, ~index: int) => option<'b>) => option<'b>
 let length: t<'a> => int
 let isEmpty: t<'a> => bool
 let equals: (t<'a>, t<'b>, ('a, 'b) => bool) => bool
@@ -76,3 +75,5 @@ let tail: t<'a> => t<'a>
 let minBy: (t<'a>, ('a, 'a) => int) => option<'a>
 let maxBy: (t<'a>, ('a, 'a) => int) => option<'a>
 let last: t<'a> => option<'a>
+let toArray: t<'a> => array<'a>
+let toString: t<string> => string

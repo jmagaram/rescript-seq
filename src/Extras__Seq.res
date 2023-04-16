@@ -437,14 +437,15 @@ let everyOrEmpty = (seq, predicate) => {
   !foundInvalid.contents
 }
 
-let findMap = (seq, f) => {
+let findMapi = (seq, f) => {
+  let seq = seq->indexed
   let curr = ref(seq(.))
   let found = ref(None)
   while found.contents->Option.isNone && curr.contents !== Empty {
     switch curr.contents {
     | Empty => ()
-    | Next(value, seq) => {
-        switch f(value) {
+    | Next((value, index), seq) => {
+        switch f(~value, ~index) {
         | None => ()
         | Some(_) as m => found := m
         }
@@ -454,6 +455,8 @@ let findMap = (seq, f) => {
   }
   found.contents
 }
+
+let findMap = (seq, f) => findMapi(seq, (~value, ~index as _) => f(value))
 
 let find = (seq, predicate) => seq->findMap(i => predicate(i) ? Some(i) : None)
 
