@@ -1,8 +1,8 @@
 module T = Extras__Test
 module S = Extras__Seq
 module R = Extras__Result
+module Ex = Extras
 
-let compareInt = (a: int, b: int) => a < b ? -1 : a > b ? 1 : 0
 let concatInts = xs => xs->Js.Array2.map(Belt.Int.toString)->Js.Array2.joinWith("")
 
 let areEqual = (~title, ~expectation, ~a, ~b) =>
@@ -114,27 +114,27 @@ let constructors = [
   areEqual(~title="fromArray", ~expectation="when one item", ~a=() => [1]->S.fromArray, ~b=[1]),
   areEqual(~title="fromArray", ~expectation="when empty", ~a=() => []->S.fromArray, ~b=[]),
   areEqual(
-    ~title="fromArraySlice",
+    ~title="fromArray",
     ~expectation="when end but no start",
-    ~a=() => [0, 1, 2, 3]->S.fromArraySlice(~start=0, ~end=2),
+    ~a=() => [0, 1, 2, 3]->S.fromArray(~start=0, ~end=2),
     ~b=[0, 1, 2],
   ),
   areEqual(
-    ~title="fromArraySlice",
+    ~title="fromArray",
     ~expectation="when end but no start",
-    ~a=() => [0, 1, 2, 3]->S.fromArraySlice(~end=2),
+    ~a=() => [0, 1, 2, 3]->S.fromArray(~end=2),
     ~b=[0, 1, 2],
   ),
   areEqual(
-    ~title="fromArraySlice",
+    ~title="fromArray",
     ~expectation="when neither start or end",
-    ~a=() => [0, 1, 2, 3]->S.fromArraySlice,
+    ~a=() => [0, 1, 2, 3]->S.fromArray,
     ~b=[0, 1, 2, 3],
   ),
   areEqual(
-    ~title="fromArraySlice",
+    ~title="fromArray",
     ~expectation="when start => return start to end",
-    ~a=() => [0, 1, 2, 3]->S.fromArraySlice(~start=2),
+    ~a=() => [0, 1, 2, 3]->S.fromArray(~start=2),
     ~b=[2, 3],
   ),
   areEqual(
@@ -433,26 +433,23 @@ let transforming = [
     ~title="sortedMerge",
     ~expectation="",
     ~a=() =>
-      S.sortedMerge([1, 4, 4, 6, 7, 9, 11]->S.fromArray, [2, 3, 3, 5, 7, 10, 12]->S.fromArray, (
-        a,
-        b,
-      ) => a < b ? -1 : a > b ? 1 : 0),
+      S.sortedMerge(
+        [1, 4, 4, 6, 7, 9, 11]->S.fromArray,
+        [2, 3, 3, 5, 7, 10, 12]->S.fromArray,
+        Ex.Cmp.int,
+      ),
     ~b=[1, 2, 3, 3, 4, 4, 5, 6, 7, 7, 9, 10, 11, 12],
   ),
   areEqual(
     ~title="sortedMerge",
     ~expectation="first empty",
-    ~a=() =>
-      S.sortedMerge([]->S.fromArray, [2, 3, 3, 5, 7, 10, 12]->S.fromArray, (a, b) =>
-        a < b ? -1 : a > b ? 1 : 0
-      ),
+    ~a=() => S.sortedMerge([]->S.fromArray, [2, 3, 3, 5, 7, 10, 12]->S.fromArray, Ex.Cmp.int),
     ~b=[2, 3, 3, 5, 7, 10, 12],
   ),
   areEqual(
     ~title="sortedMerge",
     ~expectation="second empty",
-    ~a=() =>
-      S.sortedMerge([1, 2, 2, 4]->S.fromArray, S.empty, (a, b) => a < b ? -1 : a > b ? 1 : 0),
+    ~a=() => S.sortedMerge([1, 2, 2, 4]->S.fromArray, S.empty, Ex.Cmp.int),
     ~b=[1, 2, 2, 4],
   ),
   areEqual(~title="startWith", ~expectation="when empty", ~a=() => S.empty->S.startWith(1), ~b=[1]),
@@ -767,31 +764,31 @@ let consuming = [
   consumeEqual(
     ~title="compare",
     ~expectation="",
-    ~a=() => S.compare([1, 2, 3]->S.fromArray, [1, 2, 3]->S.fromArray, compareInt),
+    ~a=() => S.compare([1, 2, 3]->S.fromArray, [1, 2, 3]->S.fromArray, Ex.Cmp.int),
     ~b=0,
   ),
   consumeEqual(
     ~title="compare",
     ~expectation="",
-    ~a=() => S.compare([1, 2, 3]->S.fromArray, [1, 2, 3, 4]->S.fromArray, compareInt),
+    ~a=() => S.compare([1, 2, 3]->S.fromArray, [1, 2, 3, 4]->S.fromArray, Ex.Cmp.int),
     ~b=-1,
   ),
   consumeEqual(
     ~title="compare",
     ~expectation="",
-    ~a=() => S.compare([1, 2, 3, 4]->S.fromArray, [1, 2, 3]->S.fromArray, compareInt),
+    ~a=() => S.compare([1, 2, 3, 4]->S.fromArray, [1, 2, 3]->S.fromArray, Ex.Cmp.int),
     ~b=1,
   ),
   consumeEqual(
     ~title="compare",
     ~expectation="",
-    ~a=() => S.compare([]->S.fromArray, []->S.fromArray, compareInt),
+    ~a=() => S.compare([]->S.fromArray, []->S.fromArray, Ex.Cmp.int),
     ~b=0,
   ),
   consumeEqual(
     ~title="compare",
     ~expectation="",
-    ~a=() => S.compare([1, 2, 3, 4]->S.fromArray, [1, 3, 3, 4]->S.fromArray, compareInt),
+    ~a=() => S.compare([1, 2, 3, 4]->S.fromArray, [1, 3, 3, 4]->S.fromArray, Ex.Cmp.int),
     ~b=-1,
   ),
   consumeEqual(
@@ -815,25 +812,25 @@ let consuming = [
   consumeEqual(
     ~title="minBy",
     ~expectation="when no items => None",
-    ~a=() => S.empty->S.minBy(compareInt),
+    ~a=() => S.empty->S.minBy(Ex.Cmp.int),
     ~b=None,
   ),
   consumeEqual(
     ~title="minBy",
     ~expectation="when items => Some",
-    ~a=() => [6, 7, 8, 3, 1, 3, 5, 8]->S.fromArray->S.minBy(compareInt),
+    ~a=() => [6, 7, 8, 3, 1, 3, 5, 8]->S.fromArray->S.minBy(Ex.Cmp.int),
     ~b=Some(1),
   ),
   consumeEqual(
     ~title="maxBy",
     ~expectation="when no items => None",
-    ~a=() => S.empty->S.maxBy(compareInt),
+    ~a=() => S.empty->S.maxBy(Ex.Cmp.int),
     ~b=None,
   ),
   consumeEqual(
     ~title="maxBy",
     ~expectation="when items => Some",
-    ~a=() => [6, 7, 8, 3, 1, 3, 5, 7]->S.fromArray->S.maxBy(compareInt),
+    ~a=() => [6, 7, 8, 3, 1, 3, 5, 7]->S.fromArray->S.maxBy(Ex.Cmp.int),
     ~b=Some(8),
   ),
   consumeEqual(

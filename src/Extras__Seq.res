@@ -45,15 +45,6 @@ let replicate = (~count, ~value) => unfold(0, i => i < count ? Some(value, i + 1
 
 let infinite = f => unfold(0, _ => Some(f(), 0))
 
-let fromArray = xs => {
-  let rec go = index =>
-    switch index >= xs->Js.Array2.length {
-    | true => (. ()) => Empty
-    | false => (. ()) => Next(xs->Js.Array2.unsafe_get(index), go(index + 1))
-    }
-  go(0)
-}
-
 let iterate = (seed, f) => unfold(seed, i => Some(i, f(i)))
 
 let startWith = (seq, value) => (. ()) => Next(value, seq)
@@ -106,7 +97,7 @@ let appendMany = (s1, others) => s1->append(others->flatten)
 
 let map = (seq, f) => flatMap(seq, i => singleton(f(i)))
 
-let fromArraySlice = (~start=?, ~end=?, arr: array<'a>) => {
+let fromArray = (~start=?, ~end=?, arr: array<'a>) => {
   switch arr->Ex.Array.isEmpty {
   | true => empty
   | false => {
