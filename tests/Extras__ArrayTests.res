@@ -134,6 +134,40 @@ let others = {
       ~a=() => ["a", "b", "c"]->A.filterSomeWith((value, _) => value === "b" ? Some("bb") : None),
       ~b=["bb"],
     ),
+    test(~title="validateIndex", ~expect="when empty", ~a=() => []->A.validateIndex(0), ~b=None),
+    test(~title="validateIndex", ~expect="when empty", ~a=() => []->A.validateIndex(-1), ~b=None),
+    test(~title="validateIndex", ~expect="when empty", ~a=() => []->A.validateIndex(1), ~b=None),
+    test(
+      ~title="validateIndex",
+      ~expect="when single",
+      ~a=() => [1]->A.validateIndex(0),
+      ~b=Some(0),
+    ),
+    test(~title="validateIndex", ~expect="when single", ~a=() => [1]->A.validateIndex(1), ~b=None),
+    test(
+      ~title="validateIndex",
+      ~expect="when many",
+      ~a=() => [1, 2, 3]->A.validateIndex(0),
+      ~b=Some(0),
+    ),
+    test(
+      ~title="validateIndex",
+      ~expect="when many",
+      ~a=() => [1, 2, 3]->A.validateIndex(-1),
+      ~b=None,
+    ),
+    test(
+      ~title="validateIndex",
+      ~expect="when many",
+      ~a=() => [1, 2, 3]->A.validateIndex(2),
+      ~b=Some(2),
+    ),
+    test(
+      ~title="validateIndex",
+      ~expect="when many",
+      ~a=() => [1, 2, 3]->A.validateIndex(3),
+      ~b=None,
+    ),
   ]
 }
 
