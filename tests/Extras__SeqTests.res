@@ -3,6 +3,7 @@ module S = Extras__Seq
 module R = Extras__Result
 
 let compareInt = (a: int, b: int) => a < b ? -1 : a > b ? 1 : 0
+let concatInts = xs => xs->Js.Array2.map(Belt.Int.toString)->Js.Array2.joinWith("")
 
 let areEqual = (~title, ~expectation, ~a, ~b) =>
   T.make(~category="Seq", ~title, ~expectation, ~predicate=() => {
@@ -498,24 +499,36 @@ let transforming = [
     ~a=() => []->S.fromArray->S.chunkBySize(3),
     ~b=[],
   ),
-  // areEqual(
-  //   ~title="positioned",
-  //   ~expectation="when empty => empty",
-  //   ~a=() => []->S.fromArray->S.positioned,
-  //   ~b=[],
-  // ),
-  // areEqual(
-  //   ~title="positioned",
-  //   ~expectation="when singleton",
-  //   ~a=() => [1]->S.fromArray->S.positioned,
-  //   ~b=[(1, Singleton)],
-  // ),
-  // areEqual(
-  //   ~title="positioned",
-  //   ~expectation="when several items",
-  //   ~a=() => [1, 2, 3, 4]->S.fromArray->S.positioned,
-  //   ~b=[(1, Head), (2, Inside(1)), (3, Inside(2)), (4, Last)],
-  // ),
+  areEqual(
+    ~title="windowed",
+    ~expectation="when empty => empty",
+    ~a=() => S.empty->S.windowed(5),
+    ~b=[],
+  ),
+  T.make(~category="Seq", ~title="windowed", ~expectation="when size = 0 => throw", ~predicate=() =>
+    R.fromTryCatch(() => [1, 2, 3]->S.fromArray->S.windowed(0))->Belt.Result.isError
+  ),
+  T.make(~category="Seq", ~title="windowed", ~expectation="when size < 0 => throw", ~predicate=() =>
+    R.fromTryCatch(() => [1, 2, 3]->S.fromArray->S.windowed(-1))->Belt.Result.isError
+  ),
+  areEqual(
+    ~title="windowed",
+    ~expectation="when size < length",
+    ~a=() => oneToFive->S.windowed(3)->S.map(concatInts),
+    ~b=["123", "234", "345"],
+  ),
+  areEqual(
+    ~title="windowed",
+    ~expectation="when size = length",
+    ~a=() => oneToFive->S.windowed(5)->S.map(concatInts),
+    ~b=["12345"],
+  ),
+  areEqual(
+    ~title="windowed",
+    ~expectation="when size > length => empty",
+    ~a=() => oneToFive->S.windowed(6)->S.map(concatInts),
+    ~b=[],
+  ),
 ]
 
 let consuming = [

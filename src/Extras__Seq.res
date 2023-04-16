@@ -1,4 +1,5 @@
 module Option = Belt.Option
+module AX = Extras__Array
 
 type rec t<'a> = (. unit) => node<'a>
 and node<'a> =
@@ -271,7 +272,8 @@ let allPairs = (xx: t<'a>, yy: t<'b>) => xx->flatMap(x => yy->map(y => (x, y)))
 // let positioned = seq => empty // t<(seq, Head)>
 // partition, split at index? consume until...take until and rest...
 
-// like head and tail?
+// like head and tail? extract?
+// could someone write this themselves, and how? EOF
 let consumeN = (seq, n) => {
   if n <= 0 {
     Js.Exn.raiseRangeError("Can not consume a 0 or negative amount of items.")
@@ -308,6 +310,24 @@ let rec chunkBySize = (seq, length) => {
     | false => Next(n["consumed"], chunkBySize(n["tail"], length))
     }
   }
+}
+
+// returns internal data structure
+let windowed = (seq, length) => {
+  if length <= 0 {
+    ArgumentOfOfRange(
+      `windowed requires a length > 0. You asked for ${length->Belt.Int.toString}`,
+    )->raise
+  }
+  seq
+  ->scani(~zero=[], (~sum, ~value, ~index as _) => {
+    if Js.Array2.length(sum) >= length {
+      sum->Js.Array2.shift->ignore
+    }
+    sum->Js.Array2.push(value)->ignore
+    sum
+  })
+  ->filter(i => Js.Array2.length(i) == length)
 }
 
 // =======

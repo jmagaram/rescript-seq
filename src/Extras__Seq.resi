@@ -47,7 +47,8 @@ let cache: t<'a> => t<'a>
 let tap: (t<'a>, 'a => unit) => t<'a>
 let allPairs: (t<'a>, t<'b>) => t<('a, 'b)>
 let chunkBySize: (t<'a>, int) => t<array<'a>>
-// let windowed: (t<'a>, int) => t<array<'a>> // and pairwise
+// let pairwise: t<'a> => t<('a, 'a)>
+let windowed: (t<'a>, int) => t<array<'a>> // and pairwise; MUST have that many, no shorter
 
 // =======
 // Consume
@@ -171,7 +172,7 @@ F#
 https://fsharp.github.io/fsharp-core-docs/reference/fsharp-collections-seqmodule.html#cache
 ===
 allPairs - YES
-chunkBySize 
+chunkBySize - YES
 countBy
 exclude
 findIndex and findLastIndex
