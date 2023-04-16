@@ -50,6 +50,7 @@ let tap: (t<'a>, 'a => unit) => t<'a>
 let chunkBySize: (t<'a>, int) => t<array<'a>>
 let pairwise: t<'a> => t<('a, 'a)>
 let window: (t<'a>, int) => t<array<'a>>
+let windowBehind: (t<'a>, int) => t<array<'a>>
 let allPairs: (t<'a>, t<'b>) => t<('a, 'b)>
 let intersperse: (t<'a>, 'a) => t<'a>
 let interleave: (t<'a>, t<'a>) => t<'a>
@@ -69,6 +70,7 @@ let findMap: (t<'a>, 'a => option<'b>) => option<'b>
 let findMapi: (t<'a>, (~value: 'a, ~index: int) => option<'b>) => option<'b>
 let length: t<'a> => int
 let isEmpty: t<'a> => bool
+let isSortedBy: (t<'a>, ('a, 'a) => int) => bool
 let equals: (t<'a>, t<'b>, ('a, 'b) => bool) => bool
 let compare: (t<'a>, t<'b>, ('a, 'b) => int) => int
 let head: t<'a> => option<'a>

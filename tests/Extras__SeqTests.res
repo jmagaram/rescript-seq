@@ -16,6 +16,12 @@ let areEqual = (~title, ~expectation, ~a, ~b) =>
     a == b
   })
 
+let willThrow = (~title, ~expectation, ~f) => {
+  T.make(~category="Seq", ~title, ~expectation, ~predicate=() => {
+    Ex.Result.fromTryCatch(f)->Belt.Result.isError
+  })
+}
+
 let consumeEqual = (~title, ~expectation, ~a, ~b) =>
   T.make(~category="Seq", ~title, ~expectation, ~predicate=() => {
     let aValue = a()
@@ -613,6 +619,24 @@ let transforming = [
     ~b=[],
   ),
   areEqual(
+    ~title="windowBehind",
+    ~expectation="when not empty",
+    ~a=() => [1, 2, 3, 4, 5, 6]->S.fromArray->S.windowBehind(3)->S.map(i => i->Js.Array2.copy),
+    ~b=[[1], [1, 2], [1, 2, 3], [2, 3, 4], [3, 4, 5], [4, 5, 6]],
+  ),
+  areEqual(
+    ~title="windowBehind",
+    ~expectation="when empty",
+    ~a=() => S.empty->S.windowBehind(3)->S.map(i => i->Js.Array2.copy),
+    ~b=[],
+  ),
+  willThrow(~title="windowBehind", ~expectation="when size == 0 => throw", ~f=() =>
+    oneToFive->S.windowBehind(0)
+  ),
+  willThrow(~title="windowBehind", ~expectation="when size < 0 => throw", ~f=() =>
+    oneToFive->S.windowBehind(-1)
+  ),
+  areEqual(
     ~title="pairwise",
     ~expectation="when empty => empty",
     ~a=() => S.empty->S.pairwise,
@@ -1023,6 +1047,30 @@ let consuming = [
     ~expectation="when many => None",
     ~a=() => oneTwoThree->S.toExactlyOne,
     ~b=None,
+  ),
+  consumeEqual(
+    ~title="isSortedBy",
+    ~expectation="when empty => true",
+    ~a=() => S.empty->S.isSortedBy(Ex.Cmp.int),
+    ~b=true,
+  ),
+  consumeEqual(
+    ~title="isSortedBy",
+    ~expectation="when singleton => true",
+    ~a=() => S.singleton(4)->S.isSortedBy(Ex.Cmp.int),
+    ~b=true,
+  ),
+  consumeEqual(
+    ~title="isSortedBy",
+    ~expectation="when sorted => true",
+    ~a=() => [1, 2, 2, 3, 4, 5]->S.fromArray->S.isSortedBy(Ex.Cmp.int),
+    ~b=true,
+  ),
+  consumeEqual(
+    ~title="isSortedBy",
+    ~expectation="when not sorted => false",
+    ~a=() => [1, 2, 2, 3, 4, 2, 5]->S.fromArray->S.isSortedBy(Ex.Cmp.int),
+    ~b=false,
   ),
 ]
 

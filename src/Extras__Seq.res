@@ -580,3 +580,20 @@ let toExactlyOne = xs =>
     | false => None
     }
   }
+
+let isSortedBy = (xs, cmp) => xs->pairwise->everyOrEmpty(((a, b)) => cmp(a, b) <= 0)
+
+let windowBehind = (xs, size) => {
+  if size <= 0 {
+    ArgumentOfOfRange(`windowBehind requires a size greater than zero.`)->raise
+  }
+  xs
+  ->scan([], (sum, i) => {
+    if sum->Js.Array2.length === size {
+      sum->Js.Array2.shift->ignore
+    }
+    sum->Js.Array2.push(i)->ignore
+    sum->Obj.magic
+  })
+  ->drop(1)
+}
