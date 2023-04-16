@@ -574,19 +574,6 @@ let transforming = [
 ]
 
 let consuming = [
-  T.make(~category="Seq", ~title="toList", ~expectation="when empty", ~predicate=() =>
-    S.empty->S.toReversedList == list{}
-  ),
-  T.make(~category="Seq", ~title="toList", ~expectation="when one item", ~predicate=() =>
-    S.singleton(3)->S.toReversedList == list{3}
-  ),
-  T.make(
-    ~category="Seq",
-    ~title="toList",
-    ~expectation="when several items, is reversed",
-    ~predicate=() =>
-      S.unfold(1, i => i <= 5 ? Some(i, i + 1) : None)->S.toReversedList == list{5, 4, 3, 2, 1},
-  ),
   T.make(~category="Seq", ~title="forEach", ~expectation="", ~predicate=() => {
     let result = []
     oneToFive->S.forEach(i => result->Js.Array2.push(i)->ignore)

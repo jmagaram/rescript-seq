@@ -26,7 +26,6 @@ let flatMap: (t<'a>, 'a => t<'b>) => t<'b>
 let map: (t<'a>, 'a => 'b) => t<'b>
 let mapi: (t<'a>, (~value: 'a, ~index: int) => 'b) => t<'b>
 let indexed: t<'a> => t<('a, int)>
-// let positioned: t<'a> => t<('a, position)>
 // filteri
 let filter: (t<'a>, 'a => bool) => t<'a>
 let filterMap: (t<'a>, 'a => option<'b>) => t<'b>
@@ -57,7 +56,6 @@ let intersperse: (t<'a>, 'a) => t<'a>
 let reduce: (t<'a>, 'b, ('b, 'a) => 'b) => 'b
 let reducei: (t<'a>, 'b, (~sum: 'b, ~value: 'a, ~index: int) => 'b) => 'b
 let toArray: t<'a> => array<'a>
-let toReversedList: t<'a> => Belt.List.t<'a>
 let forEach: (t<'a>, 'a => unit) => unit
 let forEachi: (t<'a>, (~value: 'a, ~index: int) => unit) => unit
 let some: (t<'a>, 'a => bool) => bool
@@ -180,7 +178,7 @@ exclude
 findIndex and findLastIndex
 insertAt
 insertManyAt
-lastItem
+lastItem - YES
 map2 or map3
 pairwise - YES
 pick (findmap) - YES
@@ -190,17 +188,18 @@ reverse
 tail (vs head)
 transpose
 findLast
-windowed
+windowed - YES
 
 #Rust
-arrayChunks
-fuse (stop at first None)
+intersperse - YES
+arrayChunks - YES
+fuse (stop at but include the first None)
 isSorted
 isSortedBy
 last
 nth
 stepBy
-
+nextChunk
 
 Should all constructor names be "from..."
 Use Option instead of Empty and Next; or enabpe mapIfNext
