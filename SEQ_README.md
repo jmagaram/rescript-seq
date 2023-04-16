@@ -3,19 +3,15 @@
 ## General notes
 
 !!!!! Check if recursion is a problem !!!!!
-Simple ranges with steps, up and down, inclusive or exclusive
 mapi or rely on indexed first?
-takeWhile
 to iterator
-from array too
-
-Should all constructor names be "from..."
 Use Option instead of Empty and Next; or enabpe mapIfNext
 Remove recursion problems
-Persistent collections?
-Danger of compare to Empty, need isEmpty
+change code to xxs and xs
 
-Array stuff like zip2by
+### Ideas
+
+fromIterable, windowAhead, windowBehind, nextChunk, asNonEmpty, peekThen
 
 ## TC39 Proposal
 
@@ -35,11 +31,11 @@ from (iterator)
 
 ### Supported
 
-isEmpty, uncons, length, iter, fold_left, iteri, fold_lefti, for_all, exists, find, find_map, compare, empty, return, cons, init, unfold, equal, repeat, forever, iterate, cycle, map, mapi, filter, filter_map, take, drop, take_while, drop_while, memoize, append, concat, flat_map, zip, sorted_merge, scan, map2, product
+isEmpty, uncons, length, iter, fold_left, iteri, fold_lefti, for_all, exists, find, find_map, compare, empty, return, cons, init, unfold, equal, repeat, forever, iterate, cycle, map, mapi, filter, filter_map, take, drop, take_while, drop_while, memoize, append, concat, flat_map, zip, sorted_merge, scan, map2, product, concat_map, interleave
 
 ### Not supported
 
-iter2, fold_left2, for_all2, exists2, group, once, concat_map, interleave, map_product, unzip, split, partition_map, partition, ints
+iter2, fold_left2, for_all2, exists2, group, once, map_product, unzip, split, partition_map, partition, ints
 
 ## F#
 
@@ -59,7 +55,7 @@ average, averageBy, cast, contains, countBy, delay, distinctBy, exactlyOne, exce
 
 all, any, array_chunks, chain, cmp_by, count, cycle, enumerate, eq_by, filter, filter_map, find, find_map, flat_map, flatten, fold, for_each, inspect, intersperse, last, map, max_by, min_by, partial_cmp_by, product, scan, skip, skip_while, take, take_while, zip
 
-advance_by, cloned, cmp, collect, collect_into, copied, eq, fuse, ge, gt, intersperseWith, partitioned, try_fold, is_sorted, is_sorted_by, is_sorted_by_key, le, lt, map_while, max, min, ne, next_chunk, nth, partial_cmp, partition, partition_in_place, peekable, position, **reduce** ( to option), rev, rPosition, size_hint, step_by, sum, try_collect, try_find, try_fold, try_for_each, try_reduce, unzip
+advance_by, cloned, cmp, collect, collect_into, copied, eq, fuse, ge, gt, intersperseWith, partitioned, try_fold, is_sorted, is_sorted_by, is_sorted_by_key, le, lt, map_while, max, min, ne, next_chunk, nth, partial_cmp, partition, partition_in_place, peekable, position, **reduce** ( to option), rev, rPosition, size_hint, step_by, sum, try_collect, try_find, try_fold, try_for_each, try_reduce, unzip, some kind of **remainder** ability
 
 ## Itertools (Python)
 
@@ -81,8 +77,8 @@ recipes: all_equal, subslices
 
 ### Supported
 
-range, drop, dropWhile, enumerate, filter, flat, flatMap, interpose, map, prepend, take, takeWhile, tap, window, batch, collate, concat, join, zip, zippAll, deepEqual, every, find, findBest, first, isEmpty, reduce, size, some, takeLast, fork, arrayFrom, forEach, toString, toArray, firstHighest, firstLowest,
+range, drop, dropWhile, enumerate, filter, flat, flatMap, interpose, map, prepend, take, takeWhile, tap, window, batch, collate, concat, join, zip, zippAll, deepEqual, every, find, findBest, first, isEmpty, reduce, size, some, takeLast, fork, arrayFrom, forEach, toString, toArray, firstHighest, firstLowest, roundRobin
 
 ### Not supported
 
-range (with step), repeat (constant), objectEntries, objectKeys, objectValues, append (one value), distinct, interposeSeq, reverse, slice, takeSorted, windowAhead (with filler), windowBehind (with filler), bisect, split, splitGroups, splitOn, splitWhen, compress, joinWith, roundRobin, firstOr, includes, includesAny, **many async flavors**, isSorted, startsWith, startsWithAny, str, takeLastOr, objectFrom, toObject, lastHighest, lastLowest
+range (with step), repeat (constant), objectEntries, objectKeys, objectValues, append (one value), distinct, interposeSeq, reverse, slice, takeSorted, windowAhead (with filler), windowBehind (with filler), bisect, split, splitGroups, splitOn, splitWhen, compress, joinWith, firstOr, includes, includesAny, **many async flavors**, isSorted, startsWith, startsWithAny, str, takeLastOr, objectFrom, toObject, lastHighest, lastLowest

@@ -540,3 +540,35 @@ let rec interleave = (xs, ys) => {
     }
   }
 }
+
+let interleaveMany = xxs => {
+  switch xxs->Js.Array2.length {
+  | 0 => empty
+  | length => {
+      let xxs = xxs->Js.Array2.map(i => Some(i))
+      let remain = ref(length)
+      let consumeHead = index => {
+        xxs
+        ->Js.Array2.unsafe_get(index)
+        ->Option.flatMap(xs => {
+          switch xs->headTail {
+          | None => {
+              remain := remain.contents - 1
+              xxs->Js.Array2.unsafe_set(index, None)
+              None
+            }
+          | Some(h, t) => {
+              xxs->Js.Array2.unsafe_set(index, Some(t))
+              Some(h)
+            }
+          }
+        })
+      }
+      range(~start=0, ~end=length - 1)
+      ->cycle
+      ->map(consumeHead)
+      ->takeWhile(_ => remain.contents > 0)
+      ->filterSome
+    }
+  }
+}

@@ -415,6 +415,12 @@ let transforming = [
   ),
   areEqual(
     ~title="filterMap",
+    ~expectation="when no matches",
+    ~a=() => oneToFive->S.filterMap(i => None),
+    ~b=[],
+  ),
+  areEqual(
+    ~title="filterMap",
     ~expectation="when empty => empty",
     ~a=() => S.empty->S.filterMap(_ => Some(1)),
     ~b=[],
@@ -517,8 +523,20 @@ let transforming = [
   areEqual(
     ~title="filterSome",
     ~expectation="",
+    ~a=() => [None, None, None]->S.fromArray->S.filterSome,
+    ~b=[],
+  ),
+  areEqual(
+    ~title="filterSome",
+    ~expectation="",
     ~a=() => [Some(3), None, Some(5)]->S.fromArray->S.filterSome,
     ~b=[3, 5],
+  ),
+  areEqual(
+    ~title="filterSome",
+    ~expectation="when all None",
+    ~a=() => [None, None, None]->S.fromArray->S.filterSome,
+    ~b=[],
   ),
   areEqual(
     ~title="filterOk",
@@ -665,6 +683,48 @@ let transforming = [
     ~expectation="when both empty",
     ~a=() => S.interleave(S.empty, S.empty),
     ~b=[],
+  ),
+  areEqual(
+    ~title="interleaveMany",
+    ~expectation="when one singleton",
+    ~a=() => S.interleaveMany([S.singleton(1)]),
+    ~b=[1],
+  ),
+  areEqual(
+    ~title="interleaveMany",
+    ~expectation="when one",
+    ~a=() => S.interleaveMany([oneTwoThree]),
+    ~b=[1, 2, 3],
+  ),
+  areEqual(
+    ~title="interleaveMany",
+    ~expectation="when two",
+    ~a=() => S.interleaveMany([oneTwoThree, fourFiveSix]),
+    ~b=[1, 4, 2, 5, 3, 6],
+  ),
+  areEqual(
+    ~title="interleaveMany",
+    ~expectation="when two and first longer",
+    ~a=() => S.interleaveMany([oneToFive, fourFiveSix]),
+    ~b=[1, 4, 2, 5, 3, 6, 4, 5],
+  ),
+  areEqual(
+    ~title="interleaveMany",
+    ~expectation="when two and second longer",
+    ~a=() => S.interleaveMany([fourFiveSix, oneToFive]),
+    ~b=[4, 1, 5, 2, 6, 3, 4, 5],
+  ),
+  areEqual(
+    ~title="interleaveMany",
+    ~expectation="when many",
+    ~a=() => S.interleaveMany([oneToFive, oneTwoThree, fourFiveSix]),
+    ~b=[1, 1, 4, 2, 2, 5, 3, 3, 6, 4, 5],
+  ),
+  areEqual(
+    ~title="interleaveMany",
+    ~expectation="when many",
+    ~a=() => S.interleaveMany([S.empty, oneToFive, S.empty, oneTwoThree, S.empty, fourFiveSix]),
+    ~b=[1, 1, 4, 2, 2, 5, 3, 3, 6, 4, 5],
   ),
 ]
 
