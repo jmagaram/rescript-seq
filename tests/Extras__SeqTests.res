@@ -66,21 +66,21 @@ let constructors = [
     ~b=["0", "1", "2"],
   ),
   areEqual(
-    ~title="replicate",
+    ~title="repeat",
     ~expectation="when count = 0 => empty",
-    ~a=() => S.replicate(~count=0, ~value="x"),
+    ~a=() => S.repeat(~count=0, ~value="x"),
     ~b=[],
   ),
   areEqual(
-    ~title="replicate",
+    ~title="repeat",
     ~expectation="when count = 1 => the item as singleton",
-    ~a=() => S.replicate(~count=1, ~value="x"),
+    ~a=() => S.repeat(~count=1, ~value="x"),
     ~b=["x"],
   ),
   areEqual(
-    ~title="replicate",
+    ~title="repeat",
     ~expectation="when count > 2 => the item repeated",
-    ~a=() => S.replicate(~count=3, ~value="x"),
+    ~a=() => S.repeat(~count=3, ~value="x"),
     ~b=["x", "x", "x"],
   ),
   T.make(~category="Seq", ~title="infinite", ~expectation="calls fn every time", ~predicate=() => {
@@ -171,19 +171,19 @@ let constructors = [
   areEqual(
     ~title="range",
     ~expectation="can count up",
-    ~a=() => S.range(~start=3, ~stop=7),
+    ~a=() => S.range(~start=3, ~end=7),
     ~b=[3, 4, 5, 6, 7],
   ),
   areEqual(
     ~title="range",
     ~expectation="can count down",
-    ~a=() => S.range(~start=7, ~stop=3),
+    ~a=() => S.range(~start=7, ~end=3),
     ~b=[7, 6, 5, 4, 3],
   ),
   areEqual(
     ~title="range",
     ~expectation="can have single value",
-    ~a=() => S.range(~start=3, ~stop=3),
+    ~a=() => S.range(~start=3, ~end=3),
     ~b=[3],
   ),
   areEqual(
@@ -228,19 +228,19 @@ let transforming = [
   areEqual(
     ~title="flatMap",
     ~expectation="when map to several items => flatten",
-    ~a=() => oneTwoThree->S.flatMap(i => S.replicate(~count=3, ~value=i)),
+    ~a=() => oneTwoThree->S.flatMap(i => S.repeat(~count=3, ~value=i)),
     ~b=[1, 1, 1, 2, 2, 2, 3, 3, 3],
   ),
   areEqual(
     ~title="flatMap",
     ~expectation="when original is empty => empty",
-    ~a=() => S.empty->S.flatMap(_ => S.replicate(~count=5, ~value="x")),
+    ~a=() => S.empty->S.flatMap(_ => S.repeat(~count=5, ~value="x")),
     ~b=[],
   ),
   areEqual(
     ~title="flatMap",
     ~expectation="when original is one item",
-    ~a=() => S.singleton(1)->S.flatMap(i => S.replicate(~count=5, ~value=i)),
+    ~a=() => S.singleton(1)->S.flatMap(i => S.repeat(~count=5, ~value=i)),
     ~b=[1, 1, 1, 1, 1],
   ),
   areEqual(
@@ -386,7 +386,7 @@ let transforming = [
   areEqual(
     ~title="zipLongest",
     ~expectation="when None of different length",
-    ~a=() => S.zipLongest(S.replicate(~count=3, ~value=None), S.replicate(~count=1, ~value=None)),
+    ~a=() => S.zipLongest(S.repeat(~count=3, ~value=None), S.repeat(~count=1, ~value=None)),
     ~b=[(Some(None), Some(None)), (Some(None), None), (Some(None), None)],
   ),
   areEqual(
@@ -446,8 +446,7 @@ let transforming = [
   areEqual(
     ~title="flatten",
     ~expectation="concatenate each sub-sequence",
-    ~a=() =>
-      S.init(~count=3, ~initializer=(~index) => S.replicate(~count=2, ~value=index))->S.flatten,
+    ~a=() => S.init(~count=3, ~initializer=(~index) => S.repeat(~count=2, ~value=index))->S.flatten,
     ~b=[0, 0, 1, 1, 2, 2],
   ),
   areEqual(
@@ -507,7 +506,7 @@ let transforming = [
   areEqual(
     ~title="concatMany",
     ~expectation="",
-    ~a=() => oneToFive->S.concatMany(S.replicate(~count=3, ~value=oneTwoThree)),
+    ~a=() => oneToFive->S.concatMany(S.repeat(~count=3, ~value=oneTwoThree)),
     ~b=[1, 2, 3, 4, 5, 1, 2, 3, 1, 2, 3, 1, 2, 3],
   ),
   T.make(~category="Seq", ~title="tap", ~expectation="can inspect each value", ~predicate=() => {
@@ -664,8 +663,8 @@ let consuming = [
     ~title="flatMap",
     ~expectation="a million stack won't overflow",
     ~predicate=() => {
-      S.replicate(~count=1000, ~value=0)
-      ->S.flatMap(_ => S.replicate(~count=1000, ~value=0))
+      S.repeat(~count=1000, ~value=0)
+      ->S.flatMap(_ => S.repeat(~count=1000, ~value=0))
       ->S.forEach(_ => ())
       true
     },

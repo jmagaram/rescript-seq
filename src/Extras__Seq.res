@@ -37,7 +37,7 @@ let rec unfold = (seed, f) =>
 let init = (~count, ~initializer) =>
   unfold(0, i => i < count ? Some(initializer(~index=i), i + 1) : None)
 
-let replicate = (~count, ~value) => unfold(0, i => i < count ? Some(value, i + 1) : None)
+let repeat = (~count, ~value) => unfold(0, i => i < count ? Some(value, i + 1) : None)
 
 let infinite = f => unfold(0, _ => Some(f(), 0))
 
@@ -55,10 +55,10 @@ let rec concat = (s1, s2) => {
 
 let prepend = (s1, s2) => concat(s2, s1)
 
-let range = (~start, ~stop) => {
-  start < stop
-    ? unfold(start, i => i <= stop ? Some(i, i + 1) : None)
-    : unfold(start, i => i >= stop ? Some(i, i - 1) : None)
+let range = (~start, ~end) => {
+  start < end
+    ? unfold(start, i => i <= end ? Some(i, i + 1) : None)
+    : unfold(start, i => i >= end ? Some(i, i - 1) : None)
 }
 
 let rec tap = (seq, f) =>
@@ -92,7 +92,7 @@ let map = (seq, f) => flatMap(seq, i => singleton(f(i)))
 let fromString = s =>
   switch s->Js.String2.length {
   | 0 => empty
-  | len => range(~start=0, ~stop=len - 1)->map(inx => s->Js.String2.charAt(inx))
+  | len => range(~start=0, ~end=len - 1)->map(inx => s->Js.String2.charAt(inx))
   }
 
 let fromArray = (~start=?, ~end=?, arr: array<'a>) => {
@@ -101,7 +101,7 @@ let fromArray = (~start=?, ~end=?, arr: array<'a>) => {
   | false => {
       let start = start->Option.getWithDefault(0)
       let end = end->Option.getWithDefault(arr->Ex.Array.lastIndex->Option.getUnsafe)
-      range(~start, ~stop=end)->map(inx => arr->Js.Array2.unsafe_get(inx))
+      range(~start, ~end)->map(inx => arr->Js.Array2.unsafe_get(inx))
     }
   }
 }
