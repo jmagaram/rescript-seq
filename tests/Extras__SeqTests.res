@@ -529,6 +529,24 @@ let transforming = [
     ~a=() => oneToFive->S.windowed(6)->S.map(concatInts),
     ~b=[],
   ),
+  areEqual(
+    ~title="pairwise",
+    ~expectation="when empty => empty",
+    ~a=() => S.empty->S.pairwise,
+    ~b=[],
+  ),
+  areEqual(
+    ~title="pairwise",
+    ~expectation="when singleton => None",
+    ~a=() => S.singleton(5)->S.pairwise,
+    ~b=[],
+  ),
+  areEqual(
+    ~title="pairwise",
+    ~expectation="when multiple",
+    ~a=() => oneTwoThree->S.pairwise,
+    ~b=[(1, 2), (2, 3)],
+  ),
 ]
 
 let consuming = [

@@ -330,6 +330,9 @@ let windowed = (seq, length) => {
   ->filter(i => Js.Array2.length(i) == length)
 }
 
+let pairwise = seq =>
+  seq->windowed(2)->map(i => (i->Js.Array2.unsafe_get(0), i->Js.Array2.unsafe_get(1)))
+
 // =======
 // Consume
 // =======
