@@ -605,13 +605,12 @@ let windowAhead = (xs, size) => {
   xs
   ->map(i => Some(i))
   ->concat(repeat(~count=size - 1, ~value=None))
-  ->scan([], (sum, i) => {
-    if sum->Js.Array2.length === size {
+  ->scani(~zero=[], (~sum, ~value as i, ~index) => {
+    if index >= size {
       sum->Js.Array2.shift->ignore
     }
-    sum->Js.Array2.push(i)->ignore
+    i->Option.forEach(i => sum->Js.Array2.push(i)->ignore)
     sum
   })
   ->drop(size)
-  ->map(i => i->Ex.Array.filterSome)
 }
