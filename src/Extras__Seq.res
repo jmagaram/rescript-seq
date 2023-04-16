@@ -45,15 +45,15 @@ let iterate = (seed, f) => unfold(seed, i => Some(i, f(i)))
 
 let startWith = (seq, value) => (. ()) => Next(value, seq)
 
-let rec append = (s1, s2) => {
+let rec concat = (s1, s2) => {
   (. ()) =>
     switch s1(.) {
     | Empty => s2(.)
-    | Next(s1Value, b) => Next(s1Value, append(b, s2))
+    | Next(s1Value, b) => Next(s1Value, concat(b, s2))
     }
 }
 
-let startWithMany = (s1, s2) => append(s2, s1)
+let prepend = (s1, s2) => concat(s2, s1)
 
 let range = (~start, ~stop) => {
   start < stop
@@ -71,7 +71,7 @@ let rec flatMap = (seq, f) => {
   (. ()) =>
     switch seq(.) {
     | Empty => Empty
-    | Next(value, next) => append(f(value), flatMap(next, f))(.)
+    | Next(value, next) => concat(f(value), flatMap(next, f))(.)
     }
 }
 
@@ -81,11 +81,11 @@ let cycle = seq => {
   (. ()) =>
     switch seq(.) {
     | Empty => Empty
-    | Next(head, tail) => Next(head, append(tail, infinite(() => seq)->flatten))
+    | Next(head, tail) => Next(head, concat(tail, infinite(() => seq)->flatten))
     }
 }
 
-let appendMany = (s1, others) => s1->append(others->flatten)
+let concatMany = (s1, others) => s1->concat(others->flatten)
 
 let map = (seq, f) => flatMap(seq, i => singleton(f(i)))
 
@@ -231,11 +231,10 @@ let scani = (seq, ~zero, f) => {
         Next(sum, go(seq, sum))
       }
     }
-  append(singleton(zero), go(seq->indexed, zero))
-  // not tail?
-  // look at ocaml code
-  // cons?
+  concat(singleton(zero), go(seq->indexed, zero))
 }
+
+let scan = (seq, zero, f) => scani(seq, ~zero, (~sum, ~value, ~index as _) => f(sum, value))
 
 let rec dropWhile = (seq, predicate) => {
   (. ()) => {
@@ -260,9 +259,9 @@ let rec sortedMerge = (s1, s2, cmp) => {
     | (Next(v1, s1), Next(v2, s2)) => {
         let order = cmp(v1, v2)
         if order <= 0 {
-          Next(v1, sortedMerge(s1, append(v2->singleton, s2), cmp))
+          Next(v1, sortedMerge(s1, concat(v2->singleton, s2), cmp))
         } else {
-          Next(v2, sortedMerge(append(v1->singleton, s1), s2, cmp))
+          Next(v2, sortedMerge(concat(v1->singleton, s1), s2, cmp))
         }
       }
     | (Empty, Empty) => Empty

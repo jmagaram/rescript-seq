@@ -17,19 +17,14 @@ let cycle: t<'a> => t<'a>
 let range: (~start: int, ~stop: int) => t<int>
 let fromList: list<'a> => t<'a>
 let fromOption: option<'a> => t<'a>
-// let fromSet: Belt.Set.t<'a, 'b> => t<'a>
-// let fromForEach: (unit, 'a, unit) => t<'a>
-// fromSet
-// fromMap
-// fromIterable
 
 // =========
 // Transform
 // =========
-let append: (t<'a>, t<'a>) => t<'a> // concat
-let appendMany: (t<'a>, t<t<'a>>) => t<'a> // concatMany
 let startWith: (t<'a>, 'a) => t<'a>
-let startWithMany: (t<'a>, t<'a>) => t<'a> // not analogous!
+let concat: (t<'a>, t<'a>) => t<'a>
+let concatMany: (t<'a>, t<t<'a>>) => t<'a>
+let prepend: (t<'a>, t<'a>) => t<'a>
 let flatMap: (t<'a>, 'a => t<'b>) => t<'b>
 let map: (t<'a>, 'a => 'b) => t<'b>
 let mapi: (t<'a>, (~value: 'a, ~index: int) => 'b) => t<'b>
@@ -37,7 +32,7 @@ let indexed: t<'a> => t<('a, int)>
 let filter: (t<'a>, 'a => bool) => t<'a>
 let filteri: (t<'a>, (~value: 'a, ~index: int) => bool) => t<'a>
 let filterMap: (t<'a>, 'a => option<'b>) => t<'b>
-let filterSome: t<option<'a>> => t<'a> // filter Ok
+let filterSome: t<option<'a>> => t<'a>
 let filterOk: t<result<'a, 'b>> => t<'a>
 let takeAtMost: (t<'a>, int) => t<'a>
 let drop: (t<'a>, int) => t<'a>
@@ -45,17 +40,17 @@ let takeWhile: (t<'a>, 'a => bool) => t<'a>
 let dropWhile: (t<'a>, 'a => bool) => t<'a>
 let zip: (t<'a>, t<'b>) => t<('a, 'b)>
 let zipLongest: (t<'a>, t<'b>) => t<(option<'a>, option<'b>)>
-// rename scan?
+let scan: (t<'a>, 'b, ('b, 'a) => 'b) => t<'b>
 let scani: (t<'a>, ~zero: 'b, (~sum: 'b, ~value: 'a, ~index: int) => 'b) => t<'b>
 let flatten: t<t<'a>> => t<'a>
 let map2: (t<'a>, t<'b>, ('a, 'b) => 'c) => t<'c>
 let sortedMerge: (t<'a>, t<'a>, ('a, 'a) => int) => t<'a>
 let cache: t<'a> => t<'a>
 let tap: (t<'a>, 'a => unit) => t<'a>
-let allPairs: (t<'a>, t<'b>) => t<('a, 'b)>
 let chunkBySize: (t<'a>, int) => t<array<'a>>
 let pairwise: t<'a> => t<('a, 'a)>
-let window: (t<'a>, int) => t<array<'a>> // and pairwise; MUST have that many, no shorter
+let window: (t<'a>, int) => t<array<'a>>
+let allPairs: (t<'a>, t<'b>) => t<('a, 'b)>
 let intersperse: (t<'a>, 'a) => t<'a>
 
 // =======

@@ -202,27 +202,27 @@ let constructors = [
 
 let transforming = [
   areEqual(
-    ~title="append",
+    ~title="concat",
     ~expectation="when both not empty",
-    ~a=() => S.append(oneTwoThree, oneTwoThree),
+    ~a=() => S.concat(oneTwoThree, oneTwoThree),
     ~b=[1, 2, 3, 1, 2, 3],
   ),
   areEqual(
-    ~title="append",
+    ~title="concat",
     ~expectation="when both empty",
-    ~a=() => S.append(S.empty, S.empty),
+    ~a=() => S.concat(S.empty, S.empty),
     ~b=[],
   ),
   areEqual(
-    ~title="append",
+    ~title="concat",
     ~expectation="when first empty",
-    ~a=() => S.append(S.empty, oneTwoThree),
+    ~a=() => S.concat(S.empty, oneTwoThree),
     ~b=[1, 2, 3],
   ),
   areEqual(
-    ~title="append",
+    ~title="concat",
     ~expectation="when second empty",
-    ~a=() => S.append(oneTwoThree, S.empty),
+    ~a=() => S.concat(oneTwoThree, S.empty),
     ~b=[1, 2, 3],
   ),
   areEqual(
@@ -499,15 +499,15 @@ let transforming = [
     ~b=[1, 2, 3, 4],
   ),
   areEqual(
-    ~title="startWithMany",
+    ~title="prepend",
     ~expectation="",
-    ~a=() => oneToFive->S.startWithMany(fourFiveSix),
+    ~a=() => oneToFive->S.prepend(fourFiveSix),
     ~b=[4, 5, 6, 1, 2, 3, 4, 5],
   ),
   areEqual(
-    ~title="appendMany",
+    ~title="concatMany",
     ~expectation="",
-    ~a=() => oneToFive->S.appendMany(S.replicate(~count=3, ~value=oneTwoThree)),
+    ~a=() => oneToFive->S.concatMany(S.replicate(~count=3, ~value=oneTwoThree)),
     ~b=[1, 2, 3, 4, 5, 1, 2, 3, 1, 2, 3, 1, 2, 3],
   ),
   T.make(~category="Seq", ~title="tap", ~expectation="can inspect each value", ~predicate=() => {
