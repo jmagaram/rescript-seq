@@ -114,6 +114,12 @@ let rec fromList = xs => {
     }
 }
 
+let fromOption = opt =>
+  switch opt {
+  | None => empty
+  | Some(value) => singleton(value)
+  }
+
 let indexed = seq => {
   let rec go = (seq, index) =>
     seq->mapNext((~value, ~seq) => Next((value, index), go(seq, index + 1)))

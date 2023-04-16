@@ -186,6 +186,18 @@ let constructors = [
     ~a=() => S.range(~start=3, ~stop=3),
     ~b=[3],
   ),
+  areEqual(
+    ~title="fromOption",
+    ~expectation="when None => empty",
+    ~a=() => None->S.fromOption,
+    ~b=[],
+  ),
+  areEqual(
+    ~title="fromOption",
+    ~expectation="when Some => singleton",
+    ~a=() => Some(1)->S.fromOption,
+    ~b=[1],
+  ),
 ]
 
 let transforming = [

@@ -16,6 +16,9 @@ let iterate: ('a, 'a => 'a) => t<'a>
 let cycle: t<'a> => t<'a>
 let range: (~start: int, ~stop: int) => t<int>
 let fromList: list<'a> => t<'a>
+let fromOption: option<'a> => t<'a>
+// let fromSet: Belt.Set.t<'a, 'b> => t<'a>
+// let fromForEach: (unit, 'a, unit) => t<'a>
 // fromSet
 // fromMap
 // fromIterable
