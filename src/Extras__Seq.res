@@ -116,7 +116,7 @@ let indexed = seq => {
 
 let mapi = (seq, f) => seq->indexed->map(((value, index)) => f(~value, ~index))
 
-let take = (seq, count) => {
+let takeAtMost = (seq, count) => {
   let rec go = seq =>
     seq->mapNext((~value as (value, index), ~seq) =>
       switch index >= count {
@@ -474,7 +474,15 @@ let isEmpty = seq =>
   | _ => false
   }
 
+let head = seq =>
+  switch seq(.) {
+  | Empty => None
+  | Next(head, _) => Some(head)
+  }
+
 let headTail = seq => seq(.)->toOption
+
+let tail = seq => seq->drop(1)
 
 let minBy = (seq, compare) =>
   seq->reduce(None, (sum, i) => {

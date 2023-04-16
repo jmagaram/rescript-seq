@@ -88,7 +88,7 @@ let constructors = [
     let minUnique = (0.95 *. count->Belt.Int.toFloat)->Belt.Int.fromFloat
     let unique =
       S.infinite(_ => Js.Math.random_int(0, 999999))
-      ->S.take(count)
+      ->S.takeAtMost(count)
       ->S.toArray
       ->Belt.Set.Int.fromArray
       ->Belt.Set.Int.size
@@ -99,7 +99,7 @@ let constructors = [
     let minUnique = (0.95 *. count->Belt.Int.toFloat)->Belt.Int.fromFloat
     let unique =
       S.infinite(_ => Js.Math.random_int(0, 999999))
-      ->S.take(count)
+      ->S.takeAtMost(count)
       ->S.toArray
       ->Belt.Set.Int.fromArray
       ->Belt.Set.Int.size
@@ -146,14 +146,14 @@ let constructors = [
   areEqual(
     ~title="iterate",
     ~expectation="",
-    ~a=() => S.iterate(2, i => i * 2)->S.take(3),
+    ~a=() => S.iterate(2, i => i * 2)->S.takeAtMost(3),
     ~b=[2, 4, 8],
   ),
   areEqual(~title="cycle", ~expectation="when empty => empty", ~a=() => S.empty, ~b=[]),
   areEqual(
     ~title="cycle",
     ~expectation="when not empty => repeat endlessly",
-    ~a=() => oneTwoThree->S.cycle->S.take(16),
+    ~a=() => oneTwoThree->S.cycle->S.takeAtMost(16),
     ~b=[1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1],
   ),
   areEqual(
@@ -255,21 +255,36 @@ let transforming = [
     ~a=() => oneTwoThree->S.indexed,
     ~b=[(1, 0), (2, 1), (3, 2)],
   ),
-  areEqual(~title="take", ~expectation="when 0 => empty", ~a=() => oneTwoThree->S.take(0), ~b=[]),
-  areEqual(~title="take", ~expectation="when empty => empty", ~a=() => S.empty->S.take(99), ~b=[]),
   areEqual(
-    ~title="take",
+    ~title="takeAtMost",
+    ~expectation="when 0 => empty",
+    ~a=() => oneTwoThree->S.takeAtMost(0),
+    ~b=[],
+  ),
+  areEqual(
+    ~title="takeAtMost",
+    ~expectation="when empty => empty",
+    ~a=() => S.empty->S.takeAtMost(99),
+    ~b=[],
+  ),
+  areEqual(
+    ~title="takeAtMost",
     ~expectation="when n = all => all",
-    ~a=() => oneTwoThree->S.take(3),
+    ~a=() => oneTwoThree->S.takeAtMost(3),
     ~b=[1, 2, 3],
   ),
   areEqual(
-    ~title="take",
+    ~title="takeAtMost",
     ~expectation="when n > all => all",
-    ~a=() => oneTwoThree->S.take(9),
+    ~a=() => oneTwoThree->S.takeAtMost(9),
     ~b=[1, 2, 3],
   ),
-  areEqual(~title="take", ~expectation="when a subset", ~a=() => oneTwoThree->S.take(2), ~b=[1, 2]),
+  areEqual(
+    ~title="takeAtMost",
+    ~expectation="when a subset",
+    ~a=() => oneTwoThree->S.takeAtMost(2),
+    ~b=[1, 2],
+  ),
   areEqual(
     ~title="takeWhile",
     ~expectation="when some match, return them",
@@ -815,6 +830,13 @@ let consuming = [
     ~a=() => [1, 2, 3]->S.fromArray->S.headTail->Belt.Option.map(((h, t)) => (h, t->S.toArray)),
     ~b=Some(1, [2, 3]),
   ),
+  consumeEqual(~title="head", ~expectation="when empty", ~a=() => S.empty->S.head, ~b=None),
+  consumeEqual(
+    ~title="head",
+    ~expectation="when not empty",
+    ~a=() => oneToFive->S.head,
+    ~b=Some(1),
+  ),
   consumeEqual(
     ~title="minBy",
     ~expectation="when no items => None",
@@ -867,7 +889,7 @@ let memoizeTests = [
     ~title="cache",
     ~expectation="calculations only done once",
     ~predicate=() => {
-      let randoms = S.infinite(() => Js.Math.random())->S.take(4)->S.cache
+      let randoms = S.infinite(() => Js.Math.random())->S.takeAtMost(4)->S.cache
       let nums1 = randoms->S.toArray
       let nums2 = randoms->S.toArray
       let nums3 = randoms->S.toArray
@@ -879,7 +901,7 @@ let memoizeTests = [
     ~title="cache",
     ~expectation="all lazy; can cache infinite",
     ~predicate=() => {
-      let randoms = S.infinite(() => Js.Math.random())->S.cache->S.take(4)
+      let randoms = S.infinite(() => Js.Math.random())->S.cache->S.takeAtMost(4)
       let nums1 = randoms->S.toArray
       let nums2 = randoms->S.toArray
       let nums3 = randoms->S.toArray

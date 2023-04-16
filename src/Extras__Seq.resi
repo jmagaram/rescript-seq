@@ -35,7 +35,7 @@ let filteri: (t<'a>, (~value: 'a, ~index: int) => bool) => t<'a>
 let filterMap: (t<'a>, 'a => option<'b>) => t<'b>
 let filterSome: t<option<'a>> => t<'a> // filter Ok
 let filterOk: t<result<'a, 'b>> => t<'a>
-let take: (t<'a>, int) => t<'a>
+let takeAtMost: (t<'a>, int) => t<'a>
 let drop: (t<'a>, int) => t<'a>
 let takeWhile: (t<'a>, 'a => bool) => t<'a>
 let dropWhile: (t<'a>, 'a => bool) => t<'a>
@@ -70,7 +70,9 @@ let length: t<'a> => int
 let isEmpty: t<'a> => bool
 let equals: (t<'a>, t<'b>, ('a, 'b) => bool) => bool
 let compare: (t<'a>, t<'b>, ('a, 'b) => int) => int
+let head: t<'a> => option<'a>
 let headTail: t<'a> => option<('a, t<'a>)>
+let tail: t<'a> => t<'a>
 let minBy: (t<'a>, ('a, 'a) => int) => option<'a>
 let maxBy: (t<'a>, ('a, 'a) => int) => option<'a>
 let last: t<'a> => option<'a>
