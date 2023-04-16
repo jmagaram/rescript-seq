@@ -593,7 +593,25 @@ let windowBehind = (xs, size) => {
       sum->Js.Array2.shift->ignore
     }
     sum->Js.Array2.push(i)->ignore
-    sum->Obj.magic
+    sum
   })
   ->drop(1)
+}
+
+let windowAhead = (xs, size) => {
+  if size <= 0 {
+    ArgumentOfOfRange(`windowAhead requires a size greater than zero.`)->raise
+  }
+  xs
+  ->map(i => Some(i))
+  ->concat(repeat(~count=size - 1, ~value=None))
+  ->scan([], (sum, i) => {
+    if sum->Js.Array2.length === size {
+      sum->Js.Array2.shift->ignore
+    }
+    sum->Js.Array2.push(i)->ignore
+    sum
+  })
+  ->drop(size)
+  ->map(i => i->Ex.Array.filterSome)
 }

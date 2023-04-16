@@ -637,6 +637,31 @@ let transforming = [
     oneToFive->S.windowBehind(-1)
   ),
   areEqual(
+    ~title="windowAhead",
+    ~expectation="when not empty",
+    ~a=() =>
+      [1, 2, 3, 4, 5]->S.fromArray->S.windowAhead(3)->S.map(i => i->Js.Array2.copy->concatInts),
+    ~b=["123", "234", "345", "45", "5"],
+  ),
+  areEqual(
+    ~title="windowAhead",
+    ~expectation="when empty",
+    ~a=() => S.empty->S.windowAhead(3)->S.map(i => i->Js.Array2.copy->concatInts),
+    ~b=[],
+  ),
+  areEqual(
+    ~title="windowAhead",
+    ~expectation="when size > length",
+    ~a=() => oneTwoThree->S.windowAhead(4)->S.map(i => i->Js.Array2.copy->concatInts),
+    ~b=["123", "23", "3"],
+  ),
+  areEqual(
+    ~title="windowAhead",
+    ~expectation="when size = length",
+    ~a=() => oneTwoThree->S.windowAhead(3)->S.map(i => i->Js.Array2.copy->concatInts),
+    ~b=["123", "23", "3"],
+  ),
+  areEqual(
     ~title="pairwise",
     ~expectation="when empty => empty",
     ~a=() => S.empty->S.pairwise,

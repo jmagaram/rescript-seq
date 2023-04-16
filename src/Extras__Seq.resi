@@ -51,6 +51,7 @@ let chunkBySize: (t<'a>, int) => t<array<'a>>
 let pairwise: t<'a> => t<('a, 'a)>
 let window: (t<'a>, int) => t<array<'a>>
 let windowBehind: (t<'a>, int) => t<array<'a>>
+let windowAhead: (t<'a>, int) => t<array<'a>>
 let allPairs: (t<'a>, t<'b>) => t<('a, 'b)>
 let intersperse: (t<'a>, 'a) => t<'a>
 let interleave: (t<'a>, t<'a>) => t<'a>
