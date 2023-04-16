@@ -3,13 +3,14 @@ module S = Extras__Seq
 module R = Extras__Result
 module Ex = Extras
 
-let concatInts = xs => xs->Js.Array2.map(Belt.Int.toString)->Js.Array2.joinWith("")
+let concatInts = xs =>
+  xs->Js.Array2.length == 0 ? "_" : xs->Js.Array2.map(Belt.Int.toString)->Js.Array2.joinWith("")
 
 let areEqual = (~title, ~expectation, ~a, ~b) =>
   T.make(~category="Seq", ~title, ~expectation, ~predicate=() => {
     let a = a()->S.toArray
     if a != b {
-      Js.Console.log(`===== NOT EQUAL : ${title} =====`)
+      Js.Console.log(`===== NOT EQUAL : ${title} : ${expectation} =====`)
       Js.Console.log(`A: ${a->Js.Array2.toString}`)
       Js.Console.log(`B: ${b->Js.Array2.toString}`)
     }
@@ -638,28 +639,51 @@ let transforming = [
   ),
   areEqual(
     ~title="windowAhead",
-    ~expectation="when not empty",
-    ~a=() =>
-      [1, 2, 3, 4, 5]->S.fromArray->S.windowAhead(3)->S.map(i => i->Js.Array2.copy->concatInts),
-    ~b=["123", "234", "345", "45", "5"],
-  ),
-  areEqual(
-    ~title="windowAhead",
-    ~expectation="when empty",
+    ~expectation="when empty and size > 1",
     ~a=() => S.empty->S.windowAhead(3)->S.map(i => i->Js.Array2.copy->concatInts),
     ~b=[],
   ),
   areEqual(
     ~title="windowAhead",
-    ~expectation="when size > length",
+    ~expectation="when empty and size = 1",
+    ~a=() => S.empty->S.windowAhead(1)->S.map(i => i->Js.Array2.copy->concatInts),
+    ~b=[],
+  ),
+  areEqual(
+    ~title="windowAhead",
+    ~expectation="when not empty and size > length",
     ~a=() => oneTwoThree->S.windowAhead(4)->S.map(i => i->Js.Array2.copy->concatInts),
     ~b=["123", "23", "3"],
   ),
   areEqual(
     ~title="windowAhead",
-    ~expectation="when size = length",
+    ~expectation="when not empty and size < length",
+    ~a=() => oneTwoThree->S.windowAhead(2)->S.map(i => i->Js.Array2.copy->concatInts),
+    ~b=["12", "23", "3"],
+  ),
+  areEqual(
+    ~title="windowAhead",
+    ~expectation="when not empty and size = length",
     ~a=() => oneTwoThree->S.windowAhead(3)->S.map(i => i->Js.Array2.copy->concatInts),
     ~b=["123", "23", "3"],
+  ),
+  areEqual(
+    ~title="windowAhead",
+    ~expectation="when singleton and size > length",
+    ~a=() => S.singleton(1)->S.windowAhead(4)->S.map(i => i->Js.Array2.copy->concatInts),
+    ~b=["1"],
+  ),
+  areEqual(
+    ~title="windowAhead",
+    ~expectation="when singleton and size = 1",
+    ~a=() => S.singleton(1)->S.windowAhead(1)->S.map(i => i->Js.Array2.copy->concatInts),
+    ~b=["1"],
+  ),
+  willThrow(~title="windowAhead", ~expectation="when size == 0 => throw", ~f=() =>
+    oneToFive->S.windowAhead(0)
+  ),
+  willThrow(~title="windowAhead", ~expectation="when size < 0 => throw", ~f=() =>
+    oneToFive->S.windowAhead(-1)
   ),
   areEqual(
     ~title="pairwise",
