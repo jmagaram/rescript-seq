@@ -383,6 +383,8 @@ let toArray = seq =>
     arr
   })
 
+let toString = seq => seq->reduce("", (total, i) => total ++ i)
+
 let forEach = (seq, f) => {
   let curr = ref(seq(.))
   while curr.contents !== Empty {

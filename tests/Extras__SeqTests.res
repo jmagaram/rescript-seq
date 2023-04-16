@@ -887,6 +887,18 @@ let consuming = [
     ~b=Some(1),
   ),
   consumeEqual(~title="last", ~expectation="when many", ~a=() => oneToFive->S.last, ~b=Some(5)),
+  consumeEqual(
+    ~title="toString",
+    ~expectation="",
+    ~a=() => ["a", "b", "c"]->S.fromArray->S.toString,
+    ~b="abc",
+  ),
+  consumeEqual(
+    ~title="toString",
+    ~expectation="when empty",
+    ~a=() => []->S.fromArray->S.toString,
+    ~b="",
+  ),
 ]
 
 let memoizeTests = [

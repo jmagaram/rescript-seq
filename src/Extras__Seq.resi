@@ -61,6 +61,7 @@ let intersperse: (t<'a>, 'a) => t<'a>
 let reduce: (t<'a>, 'b, ('b, 'a) => 'b) => 'b
 let reducei: (t<'a>, 'b, (~sum: 'b, ~value: 'a, ~index: int) => 'b) => 'b
 let toArray: t<'a> => array<'a>
+let toString: t<string> => string
 let forEach: (t<'a>, 'a => unit) => unit
 let forEachi: (t<'a>, (~value: 'a, ~index: int) => unit) => unit
 let some: (t<'a>, 'a => bool) => bool
