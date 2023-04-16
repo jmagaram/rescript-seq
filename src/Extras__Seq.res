@@ -89,6 +89,12 @@ let appendMany = (s1, others) => s1->append(others->flatten)
 
 let map = (seq, f) => flatMap(seq, i => singleton(f(i)))
 
+let fromString = s =>
+  switch s->Js.String2.length {
+  | 0 => empty
+  | len => range(~start=0, ~stop=len - 1)->map(inx => s->Js.String2.charAt(inx))
+  }
+
 let fromArray = (~start=?, ~end=?, arr: array<'a>) => {
   switch arr->Ex.Array.isEmpty {
   | true => empty

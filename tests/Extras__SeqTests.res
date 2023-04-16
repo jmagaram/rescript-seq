@@ -144,6 +144,12 @@ let constructors = [
     ~b=[1, 2, 3, 4, 5],
   ),
   areEqual(
+    ~title="fromString",
+    ~expectation="get letters",
+    ~a=() => "abc"->S.fromString,
+    ~b=["a", "b", "c"],
+  ),
+  areEqual(
     ~title="iterate",
     ~expectation="",
     ~a=() => S.iterate(2, i => i * 2)->S.takeAtMost(3),

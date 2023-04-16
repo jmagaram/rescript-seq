@@ -11,6 +11,7 @@ let init: (~count: int, ~initializer: (~index: int) => 'a) => t<'a>
 let replicate: (~count: int, ~value: 'a) => t<'a>
 let infinite: (unit => 'a) => t<'a>
 let fromArray: (~start: int=?, ~end: int=?, array<'a>) => t<'a>
+let fromString: string => t<string>
 let iterate: ('a, 'a => 'a) => t<'a>
 let cycle: t<'a> => t<'a>
 let range: (~start: int, ~stop: int) => t<int>
