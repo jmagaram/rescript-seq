@@ -547,20 +547,18 @@ let interleaveMany = xxs => {
   | length => {
       let xxs = xxs->Js.Array2.map(i => Some(i))
       let remain = ref(length)
-      let consumeHead = index => {
+      let consumeHead = inx => {
         xxs
-        ->Js.Array2.unsafe_get(index)
+        ->Js.Array2.unsafe_get(inx)
         ->Option.flatMap(xs => {
           switch xs->headTail {
-          | None => {
-              remain := remain.contents - 1
-              xxs->Js.Array2.unsafe_set(index, None)
-              None
-            }
-          | Some(h, t) => {
-              xxs->Js.Array2.unsafe_set(index, Some(t))
-              Some(h)
-            }
+          | None =>
+            remain := remain.contents - 1
+            xxs->Js.Array2.unsafe_set(inx, None)
+            None
+          | Some(h, t) =>
+            xxs->Js.Array2.unsafe_set(inx, Some(t))
+            Some(h)
           }
         })
       }
