@@ -79,3 +79,4 @@ let maxBy: (t<'a>, ('a, 'a) => int) => option<'a>
 let last: t<'a> => option<'a>
 let toArray: t<'a> => array<'a>
 let toString: t<string> => string
+let toExactlyOne: t<'a> => option<'a>

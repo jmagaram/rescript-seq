@@ -1006,6 +1006,24 @@ let consuming = [
     ~a=() => []->S.fromArray->S.toString,
     ~b="",
   ),
+  consumeEqual(
+    ~title="toExactlyOne",
+    ~expectation="when empty => None",
+    ~a=() => S.empty->S.toExactlyOne,
+    ~b=None,
+  ),
+  consumeEqual(
+    ~title="toExactlyOne",
+    ~expectation="when singleton => Some",
+    ~a=() => S.singleton(1)->S.toExactlyOne,
+    ~b=Some(1),
+  ),
+  consumeEqual(
+    ~title="toExactlyOne",
+    ~expectation="when many => None",
+    ~a=() => oneTwoThree->S.toExactlyOne,
+    ~b=None,
+  ),
 ]
 
 let memoizeTests = [

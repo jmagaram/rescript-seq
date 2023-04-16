@@ -570,3 +570,13 @@ let interleaveMany = xxs => {
     }
   }
 }
+
+let toExactlyOne = xs =>
+  switch xs->headTail {
+  | None => None
+  | Some(head, tail) =>
+    switch tail->isEmpty {
+    | true => Some(head)
+    | false => None
+    }
+  }
