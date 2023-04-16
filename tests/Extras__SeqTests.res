@@ -620,24 +620,6 @@ let transforming = [
     ~b=[],
   ),
   areEqual(
-    ~title="windowBehind",
-    ~expectation="when not empty",
-    ~a=() => [1, 2, 3, 4, 5, 6]->S.fromArray->S.windowBehind(3)->S.map(i => i->Js.Array2.copy),
-    ~b=[[1], [1, 2], [1, 2, 3], [2, 3, 4], [3, 4, 5], [4, 5, 6]],
-  ),
-  areEqual(
-    ~title="windowBehind",
-    ~expectation="when empty",
-    ~a=() => S.empty->S.windowBehind(3)->S.map(i => i->Js.Array2.copy),
-    ~b=[],
-  ),
-  willThrow(~title="windowBehind", ~expectation="when size == 0 => throw", ~f=() =>
-    oneToFive->S.windowBehind(0)
-  ),
-  willThrow(~title="windowBehind", ~expectation="when size < 0 => throw", ~f=() =>
-    oneToFive->S.windowBehind(-1)
-  ),
-  areEqual(
     ~title="windowAhead",
     ~expectation="when empty and size > 1",
     ~a=() => S.empty->S.windowAhead(3)->S.map(i => i->Js.Array2.copy->concatInts),
@@ -684,6 +666,54 @@ let transforming = [
   ),
   willThrow(~title="windowAhead", ~expectation="when size < 0 => throw", ~f=() =>
     oneToFive->S.windowAhead(-1)
+  ),
+  areEqual(
+    ~title="windowBehind",
+    ~expectation="when empty and size > 1",
+    ~a=() => S.empty->S.windowBehind(3)->S.map(i => i->Js.Array2.copy->concatInts),
+    ~b=[],
+  ),
+  areEqual(
+    ~title="windowBehind",
+    ~expectation="when empty and size = 1",
+    ~a=() => S.empty->S.windowBehind(1)->S.map(i => i->Js.Array2.copy->concatInts),
+    ~b=[],
+  ),
+  areEqual(
+    ~title="windowBehind",
+    ~expectation="when not empty and size > length",
+    ~a=() => oneTwoThree->S.windowBehind(9)->S.map(i => i->Js.Array2.copy->concatInts),
+    ~b=["1", "12", "123"],
+  ),
+  areEqual(
+    ~title="windowBehind",
+    ~expectation="when not empty and size < length",
+    ~a=() => oneTwoThree->S.windowBehind(2)->S.map(i => i->Js.Array2.copy->concatInts),
+    ~b=["1", "12", "23"],
+  ),
+  areEqual(
+    ~title="windowBehind",
+    ~expectation="when not empty and size = length",
+    ~a=() => oneTwoThree->S.windowBehind(3)->S.map(i => i->Js.Array2.copy->concatInts),
+    ~b=["1", "12", "123"],
+  ),
+  areEqual(
+    ~title="windowBehind",
+    ~expectation="when singleton and size > length",
+    ~a=() => S.singleton(1)->S.windowBehind(9)->S.map(i => i->Js.Array2.copy->concatInts),
+    ~b=["1"],
+  ),
+  areEqual(
+    ~title="windowBehind",
+    ~expectation="when singleton and size = 1",
+    ~a=() => S.singleton(1)->S.windowBehind(1)->S.map(i => i->Js.Array2.copy->concatInts),
+    ~b=["1"],
+  ),
+  willThrow(~title="windowBehind", ~expectation="when size == 0 => throw", ~f=() =>
+    oneToFive->S.windowBehind(0)
+  ),
+  willThrow(~title="windowBehind", ~expectation="when size < 0 => throw", ~f=() =>
+    oneToFive->S.windowBehind(-1)
   ),
   areEqual(
     ~title="pairwise",
