@@ -652,7 +652,7 @@ let transforming = [
   areEqual(
     ~title="windowAhead",
     ~expectation="when not empty and size > length",
-    ~a=() => oneTwoThree->S.windowAhead(4)->S.map(i => i->Js.Array2.copy->concatInts),
+    ~a=() => oneTwoThree->S.windowAhead(9)->S.map(i => i->Js.Array2.copy->concatInts),
     ~b=["123", "23", "3"],
   ),
   areEqual(
@@ -670,7 +670,7 @@ let transforming = [
   areEqual(
     ~title="windowAhead",
     ~expectation="when singleton and size > length",
-    ~a=() => S.singleton(1)->S.windowAhead(4)->S.map(i => i->Js.Array2.copy->concatInts),
+    ~a=() => S.singleton(1)->S.windowAhead(9)->S.map(i => i->Js.Array2.copy->concatInts),
     ~b=["1"],
   ),
   areEqual(
