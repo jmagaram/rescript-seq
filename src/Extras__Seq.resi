@@ -15,7 +15,6 @@ let fromArraySlice: (~start: int=?, ~end: int=?, array<'a>) => t<'a>
 let iterate: ('a, 'a => 'a) => t<'a>
 let cycle: t<'a> => t<'a>
 let range: (~start: int, ~stop: int) => t<int>
-// let permutations: (array<'a>, ~minLength: int, ~maxLength: int) => t<array<'a>>
 // fromSet
 // fromMap
 // fromIterable
