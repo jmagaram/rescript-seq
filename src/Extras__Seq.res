@@ -345,7 +345,7 @@ let rec chunkBySize = (seq, length) => {
 }
 
 // returns internal data structure
-let windowed = (seq, length) => {
+let window = (seq, length) => {
   if length <= 0 {
     ArgumentOfOfRange(
       `windowed requires a length > 0. You asked for ${length->Belt.Int.toString}`,
@@ -363,7 +363,7 @@ let windowed = (seq, length) => {
 }
 
 let pairwise = seq =>
-  seq->windowed(2)->map(i => (i->Js.Array2.unsafe_get(0), i->Js.Array2.unsafe_get(1)))
+  seq->window(2)->map(i => (i->Js.Array2.unsafe_get(0), i->Js.Array2.unsafe_get(1)))
 
 let reduce = (seq, zero, concat) => {
   let sum = ref(zero)

@@ -566,33 +566,33 @@ let transforming = [
     ~b=[],
   ),
   areEqual(
-    ~title="windowed",
+    ~title="window",
     ~expectation="when empty => empty",
-    ~a=() => S.empty->S.windowed(5),
+    ~a=() => S.empty->S.window(5),
     ~b=[],
   ),
-  T.make(~category="Seq", ~title="windowed", ~expectation="when size = 0 => throw", ~predicate=() =>
-    R.fromTryCatch(() => [1, 2, 3]->S.fromArray->S.windowed(0))->Belt.Result.isError
+  T.make(~category="Seq", ~title="window", ~expectation="when size = 0 => throw", ~predicate=() =>
+    R.fromTryCatch(() => [1, 2, 3]->S.fromArray->S.window(0))->Belt.Result.isError
   ),
-  T.make(~category="Seq", ~title="windowed", ~expectation="when size < 0 => throw", ~predicate=() =>
-    R.fromTryCatch(() => [1, 2, 3]->S.fromArray->S.windowed(-1))->Belt.Result.isError
+  T.make(~category="Seq", ~title="window", ~expectation="when size < 0 => throw", ~predicate=() =>
+    R.fromTryCatch(() => [1, 2, 3]->S.fromArray->S.window(-1))->Belt.Result.isError
   ),
   areEqual(
-    ~title="windowed",
+    ~title="window",
     ~expectation="when size < length",
-    ~a=() => oneToFive->S.windowed(3)->S.map(concatInts),
+    ~a=() => oneToFive->S.window(3)->S.map(concatInts),
     ~b=["123", "234", "345"],
   ),
   areEqual(
-    ~title="windowed",
+    ~title="window",
     ~expectation="when size = length",
-    ~a=() => oneToFive->S.windowed(5)->S.map(concatInts),
+    ~a=() => oneToFive->S.window(5)->S.map(concatInts),
     ~b=["12345"],
   ),
   areEqual(
-    ~title="windowed",
+    ~title="window",
     ~expectation="when size > length => empty",
-    ~a=() => oneToFive->S.windowed(6)->S.map(concatInts),
+    ~a=() => oneToFive->S.window(6)->S.map(concatInts),
     ~b=[],
   ),
   areEqual(
