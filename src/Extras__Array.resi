@@ -20,4 +20,3 @@ let pairs: array<'a> => array<('a, 'a)>
 let prepend: (array<'a>, array<'a>) => array<'a>
 let filterSome: array<option<'a>> => array<'a>
 let filterSomeWith: (array<'a>, ('a, int) => option<'b>) => array<'b>
-let validateIndex: (array<'a>, int) => option<int>

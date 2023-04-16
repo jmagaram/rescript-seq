@@ -69,9 +69,3 @@ let filterSomeWith = (xs, f) => {
 }
 
 let filterSome = xs => xs->filterSomeWith((value, _) => value)
-
-let validateIndex = (xs, index) =>
-  switch xs->lastIndex {
-  | None => None
-  | Some(lastIndex) => index >= 0 && index <= lastIndex ? Some(index) : None
-  }
