@@ -64,15 +64,25 @@ advance_by, cloned, cmp, collect, collect_into, copied, eq, fuse, ge, gt, inters
 ## Itertools (Python)
 
 [Reference](https://docs.python.org/3/library/itertools.html)
-combinations
-permutations
-fromIterable
-dropWhile
-nth
-partition
-subslices
-allEqual
+
+### Supported
+
+count, cycle, repeat, accumulate, chain, dropwhile, filterfalse, pairwise, takewhile, zip_longest, product,
+
+### Not supported
+
+compress, groupby, islice, starmap, tee, permutations, combinations, combinations_with_replacement
+
+recipes: all_equal, subslices
 
 ## Itertools (Javascript)
 
 [Reference for JS itertools](https://github.com/iter-tools/iter-tools/blob/v7.5.0/API.md)
+
+### Supported
+
+range, drop, dropWhile, enumerate, filter, flat, flatMap, interpose, map, prepend, take, takeWhile, tap, window, batch, collate, concat, join, zip, zippAll, deepEqual, every, find, findBest, first, isEmpty, reduce, size, some, takeLast, fork, arrayFrom, forEach, toString, toArray, firstHighest, firstLowest,
+
+### Not supported
+
+range (with step), repeat (constant), objectEntries, objectKeys, objectValues, append (one value), distinct, interposeSeq, reverse, slice, takeSorted, windowAhead (with filler), windowBehind (with filler), bisect, split, splitGroups, splitOn, splitWhen, compress, joinWith, roundRobin, firstOr, includes, includesAny, **many async flavors**, isSorted, startsWith, startsWithAny, str, takeLastOr, objectFrom, toObject, lastHighest, lastLowest
