@@ -547,6 +547,30 @@ let transforming = [
     ~a=() => oneTwoThree->S.pairwise,
     ~b=[(1, 2), (2, 3)],
   ),
+  areEqual(
+    ~title="intersperse",
+    ~expectation="when empty => empty",
+    ~a=() => S.empty->S.intersperse(-1),
+    ~b=[],
+  ),
+  areEqual(
+    ~title="intersperse",
+    ~expectation="when singleton => singleton",
+    ~a=() => S.singleton(5)->S.intersperse(-1),
+    ~b=[5],
+  ),
+  areEqual(
+    ~title="intersperse",
+    ~expectation="when two",
+    ~a=() => [1, 2]->S.fromArray->S.intersperse(-1),
+    ~b=[1, -1, 2],
+  ),
+  areEqual(
+    ~title="intersperse",
+    ~expectation="when many",
+    ~a=() => [1, 2, 3, 4]->S.fromArray->S.intersperse(-1),
+    ~b=[1, -1, 2, -1, 3, -1, 4],
+  ),
 ]
 
 let consuming = [

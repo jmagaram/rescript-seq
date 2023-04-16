@@ -49,6 +49,7 @@ let allPairs: (t<'a>, t<'b>) => t<('a, 'b)>
 let chunkBySize: (t<'a>, int) => t<array<'a>>
 let pairwise: t<'a> => t<('a, 'a)>
 let windowed: (t<'a>, int) => t<array<'a>> // and pairwise; MUST have that many, no shorter
+let intersperse: (t<'a>, 'a) => t<'a>
 
 // =======
 // Consume

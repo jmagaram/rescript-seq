@@ -242,6 +242,12 @@ let rec sortedMerge = (s1, s2, cmp) => {
     | (Empty, Empty) => Empty
     }
 }
+// skip last? put it before everything but the first
+
+let intersperse = (seq, separator) =>
+  seq
+  ->mapi((~value, ~index) => index == 0 ? singleton(value) : singleton(value)->startWith(separator))
+  ->flatten
 
 module UncurriedDeferred = {
   type t<'a> = (. unit) => 'a
