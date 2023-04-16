@@ -135,6 +135,17 @@ let drop = (seq, count) => {
   go(seq->indexed)
 }
 
+let filteri = (seq, f) => {
+  let rec go = seq =>
+    seq->mapNext((~value as (value, index), ~seq) =>
+      switch f(~value, ~index) {
+      | true => Next(value, go(seq))
+      | false => go(seq)(.)
+      }
+    )
+  go(seq->indexed)
+}
+
 let rec filter = (seq, f) =>
   seq->mapNext((~value, ~seq) =>
     switch f(value) {

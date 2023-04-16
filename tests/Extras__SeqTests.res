@@ -279,6 +279,12 @@ let transforming = [
     ~b=[2, 5],
   ),
   areEqual(
+    ~title="filteri",
+    ~expectation="",
+    ~a=() => oneToFive->S.filteri((~value, ~index) => value == 3 && index == 2),
+    ~b=[3],
+  ),
+  areEqual(
     ~title="zipLongest",
     ~expectation="when same length",
     ~a=() => S.zipLongest(oneTwoThree, oneTwoThree),

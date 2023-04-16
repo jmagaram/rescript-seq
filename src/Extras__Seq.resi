@@ -26,8 +26,8 @@ let flatMap: (t<'a>, 'a => t<'b>) => t<'b>
 let map: (t<'a>, 'a => 'b) => t<'b>
 let mapi: (t<'a>, (~value: 'a, ~index: int) => 'b) => t<'b>
 let indexed: t<'a> => t<('a, int)>
-// filteri
 let filter: (t<'a>, 'a => bool) => t<'a>
+let filteri: (t<'a>, (~value: 'a, ~index: int) => bool) => t<'a>
 let filterMap: (t<'a>, 'a => option<'b>) => t<'b>
 let filterSome: t<option<'a>> => t<'a> // filter Ok
 let filterOk: t<result<'a, 'b>> => t<'a>
@@ -70,11 +70,6 @@ let headTail: t<'a> => option<('a, t<'a>)>
 let minBy: (t<'a>, ('a, 'a) => int) => option<'a>
 let maxBy: (t<'a>, ('a, 'a) => int) => option<'a>
 let last: t<'a> => option<'a>
-
-// slice, splitAt
-// push, pop
-// head
-// isempty and then...
 
 /*
 =====
