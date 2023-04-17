@@ -128,37 +128,37 @@ let indexed = xs => {
 
 let mapi = (xs, f) => xs->indexed->map(((x, index)) => f(~value=x, ~index))
 
-let takeAtMost = (seq, count) => {
-  let rec go = seq =>
-    seq->mapNext(((value, index), seq) =>
+let takeAtMost = (xs, count) => {
+  let rec go = xs =>
+    xs->mapNext(((x, index), xs) =>
       switch index >= count {
       | true => Empty
-      | false => Next(value, go(seq))
+      | false => Next(x, go(xs))
       }
     )
-  go(seq->indexed)
+  go(xs->indexed)
 }
 
-let drop = (seq, count) => {
-  let rec go = seq =>
-    seq->mapNext(((value, index), seq) =>
+let drop = (xs, count) => {
+  let rec go = xs =>
+    xs->mapNext(((x, index), xs) =>
       switch index < count {
-      | true => go(seq)(.)
-      | false => Next(value, seq->map(((value, _)) => value))
+      | true => go(xs)->consume1
+      | false => Next(x, xs->map(((x, _)) => x))
       }
     )
-  go(seq->indexed)
+  go(xs->indexed)
 }
 
-let filteri = (seq, f) => {
-  let rec go = seq =>
-    seq->mapNext(((value, index), seq) =>
-      switch f(~value, ~index) {
-      | true => Next(value, go(seq))
-      | false => go(seq)(.)
+let filteri = (xs, f) => {
+  let rec go = xs =>
+    xs->mapNext(((x, index), xs) =>
+      switch f(~value=x, ~index) {
+      | true => Next(x, go(xs))
+      | false => go(xs)->consume1
       }
     )
-  go(seq->indexed)
+  go(xs->indexed)
 }
 
 let rec filter = (seq, f) =>
