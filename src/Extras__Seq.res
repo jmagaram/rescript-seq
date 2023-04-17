@@ -199,17 +199,13 @@ let rec zip = (xs, ys) =>
     }
   }
 
-let rec filterMap = (seq, f) =>
-  (. ()) => {
-    switch seq(.) {
-    | Empty => Empty
-    | Next(value, seq) =>
-      switch f(value) {
-      | None => filterMap(seq, f)(.) // recurses till finds
-      | Some(value) => Next(value, filterMap(seq, f))
-      }
+let rec filterMap = (xs, f) =>
+  xs->mapNext((x, xs) =>
+    switch f(x) {
+    | None => filterMap(xs, f)->consume1 // big recursion!
+    | Some(x) => Next(x, filterMap(xs, f))
     }
-  }
+  )
 
 let filterSome = seq => seq->filterMap(i => i)
 
