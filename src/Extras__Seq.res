@@ -615,4 +615,6 @@ let windowAhead = (xs, size) => {
   ->drop(size)
 }
 
-let allOk = (seq, f) => seq->toArray->Ex.Result.fromArrayMap(f)->Belt.Result.map(i => i->fromArray)
+let rec takeUntil = (seq, f) =>
+  seq->mapNext((~value, ~seq) => Next(value, f(value) ? empty : takeUntil(seq, f)))
+

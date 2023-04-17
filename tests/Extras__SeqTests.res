@@ -829,6 +829,24 @@ let transforming = [
     ~a=() => S.interleaveMany([S.empty, oneToFive, S.empty, oneTwoThree, S.empty, fourFiveSix]),
     ~b=[1, 1, 4, 2, 2, 5, 3, 3, 6, 4, 5],
   ),
+  areEqual(
+    ~title="takeUntil",
+    ~expectation="when condition met, that is last item",
+    ~a=() => oneToFive->S.takeUntil(i => i == 3),
+    ~b=[1, 2, 3],
+  ),
+  areEqual(
+    ~title="takeUntil",
+    ~expectation="when condition not met, return all items",
+    ~a=() => oneToFive->S.takeUntil(_ => false),
+    ~b=[1, 2, 3, 4, 5],
+  ),
+  areEqual(
+    ~title="takeUntil",
+    ~expectation="when empty => empty",
+    ~a=() => S.empty->S.takeUntil(_ => true),
+    ~b=[],
+  ),
 ]
 
 let consuming = [
