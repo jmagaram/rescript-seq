@@ -165,6 +165,18 @@ let constructors = [
     ~a=() => [0, 1, 2, 3]->S.fromArray(~start=3, ~end=1),
     ~b=[3, 2, 1],
   ),
+  willThrow(~title="fromArray", ~expectation="throw when start too small", ~f=() =>
+    [1, 2, 3]->S.fromArray(~start=-1)
+  ),
+  willThrow(~title="fromArray", ~expectation="throw when start too small", ~f=() =>
+    []->S.fromArray(~start=0)
+  ),
+  willThrow(~title="fromArray", ~expectation="throw when end too big", ~f=() =>
+    [1, 2, 3]->S.fromArray(~end=3)
+  ),
+  willThrow(~title="fromArray", ~expectation="throw when end too big", ~f=() =>
+    []->S.fromArray(~start=0)
+  ),
   areEqual(
     ~title="fromList",
     ~expectation="",

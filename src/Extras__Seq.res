@@ -96,13 +96,13 @@ let fromString = s =>
   | len => range(~start=0, ~end=len - 1)->map(inx => s->Js.String2.charAt(inx))
   }
 
-let fromArray = (~start=?, ~end=?, xs: array<'a>) => {
-  switch xs->Ex.Array.isEmpty {
+let fromArray = (~start=?, ~end=?, arr: array<'a>) => {
+  switch arr->Ex.Array.isEmpty {
   | true => empty
   | false => {
       let start = start->Option.getWithDefault(0)
-      let end = end->Option.getWithDefault(xs->Ex.Array.lastIndex->Option.getUnsafe)
-      range(~start, ~end)->map(inx => xs->Js.Array2.unsafe_get(inx))
+      let end = end->Option.getWithDefault(arr->Ex.Array.lastIndex->Option.getUnsafe)
+      range(~start, ~end)->map(inx => arr->Js.Array2.unsafe_get(inx))
     }
   }
 }
@@ -121,13 +121,12 @@ let fromOption = opt =>
   | Some(value) => singleton(value)
   }
 
-let indexed = seq => {
-  let rec go = (seq, index) =>
-    seq->mapNext((value, seq) => Next((value, index), go(seq, index + 1)))
-  go(seq, 0)
+let indexed = xs => {
+  let rec go = (xs, inx) => xs->mapNext((x, xs) => Next((x, inx), go(xs, inx + 1)))
+  go(xs, 0)
 }
 
-let mapi = (seq, f) => seq->indexed->map(((value, index)) => f(~value, ~index))
+let mapi = (xs, f) => xs->indexed->map(((x, index)) => f(~value=x, ~index))
 
 let takeAtMost = (seq, count) => {
   let rec go = seq =>
