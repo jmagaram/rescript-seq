@@ -74,21 +74,21 @@ let rec tap = (xs, f) =>
 
 let startWith = (xs, x) => cons(x, xs)
 
-let flatten = seq => seq->flatMap(i => i)
+let flatten = xxs => xxs->flatMap(i => i)
 
-let cycleNonEmpty = seq => {
-  let rec go = seq' =>
+let cycleNonEmpty = xs => {
+  let rec go = ys =>
     (. ()) =>
-      switch seq'(.) {
-      | Empty => go(seq)(.)
-      | Next(head, tail) => Next(head, go(tail))
+      switch ys(.) {
+      | Empty => go(xs)(.)
+      | Next(y, ys) => Next(y, go(ys))
       }
-  go(seq)
+  go(xs)
 }
 
 let cycle = xs => xs->mapNext((x, xs') => cons(x, xs')->concat(xs->cycleNonEmpty)->consume1)
 
-let map = (seq, f) => flatMap(seq, i => singleton(f(i)))
+let rec map = (xs, f) => xs->mapNext((x, xs) => Next(f(x), map(xs, f)))
 
 let fromString = s =>
   switch s->Js.String2.length {
