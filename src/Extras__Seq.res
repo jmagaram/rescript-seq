@@ -34,7 +34,7 @@ let rec unfold = (seed, f) =>
 
 let init = (~count, f) => unfold(0, i => i < count ? Some(f(~index=i), i + 1) : None)
 
-let repeat = (~count, ~value) => unfold(0, i => i < count ? Some(value, i + 1) : None)
+let replicate = (~count, ~value) => unfold(0, i => i < count ? Some(value, i + 1) : None)
 
 let infinite = f => unfold(0, _ => Some(f(), 0))
 
@@ -647,7 +647,7 @@ let windowAhead = (xs, size) => {
   }
   xs
   ->map(i => Some(i))
-  ->concat(repeat(~count=size - 1, ~value=None))
+  ->concat(replicate(~count=size - 1, ~value=None))
   ->scani(~zero=[], (~sum, ~value as i, ~index) => {
     if index >= size {
       sum->Js.Array2.shift->ignore
