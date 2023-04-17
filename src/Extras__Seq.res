@@ -9,10 +9,8 @@ and node<'a> =
 
 exception ArgumentOfOfRange(string)
 
-@inline
 let consume1 = xs => xs(.)
 
-@inline
 let mapNext = (xs, f) =>
   (. ()) =>
     switch xs(.) {
@@ -20,7 +18,6 @@ let mapNext = (xs, f) =>
     | Next(x, xs) => f(x, xs)
     }
 
-@inline
 let mapBoth = (xs, ~onEmpty, ~onNext) =>
   (. ()) =>
     switch xs(.) {
@@ -50,8 +47,13 @@ let infinite = f => unfold(0, _ => Some(f(), 0))
 
 let iterate = (seed, f) => unfold(seed, i => Some(i, f(i)))
 
-let rec concat = (xs, ys) =>
-  xs->mapBoth(~onEmpty=ys->consume1, ~onNext=(x, xs) => Next(x, concat(xs, ys)))
+let rec concat = (xs, ys) => {
+  (. ()) =>
+    switch xs(.) {
+    | Empty => ys(.)
+    | Next(x, xs) => Next(x, concat(xs, ys))
+    }
+}
 
 let prepend = (xs, ys) => concat(ys, xs)
 
