@@ -34,7 +34,7 @@ let rec unfold = (seed, f) =>
   }
 
 // awkward!
-let init = (~count, ~initializer) =>
+let init = (~count, initializer) =>
   unfold(0, i => i < count ? Some(initializer(~index=i), i + 1) : None)
 
 let repeat = (~count, ~value) => unfold(0, i => i < count ? Some(value, i + 1) : None)

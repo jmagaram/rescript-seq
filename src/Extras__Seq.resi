@@ -7,7 +7,7 @@ exception ArgumentOfOfRange(string)
 let empty: t<'a>
 let singleton: 'a => t<'a>
 let unfold: ('seed, 'seed => option<('a, 'seed)>) => t<'a>
-let init: (~count: int, ~initializer: (~index: int) => 'a) => t<'a>
+let init: (~count: int, (~index: int) => 'a) => t<'a>
 let repeat: (~count: int, ~value: 'a) => t<'a>
 let infinite: (unit => 'a) => t<'a>
 let iterate: ('a, 'a => 'a) => t<'a>
@@ -17,7 +17,8 @@ let fromArray: (~start: int=?, ~end: int=?, array<'a>) => t<'a>
 let fromList: list<'a> => t<'a>
 let fromOption: option<'a> => t<'a>
 let fromString: string => t<string>
-let cons: ('a, t<'a>) => t<'a> // order of params vs start with
+let cons: ('a, t<'a>) => t<'a>
+
 // =========
 // Transform
 // =========

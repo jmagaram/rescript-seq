@@ -31,9 +31,9 @@ let consumeEqual = (~title, ~expectation, ~a, ~b) =>
     aValue == b
   })
 
-let oneTwoThree = S.init(~count=3, ~initializer=(~index) => index + 1)
-let fourFiveSix = S.init(~count=3, ~initializer=(~index) => index + 4)
-let oneToFive = S.init(~count=5, ~initializer=(~index) => index + 1)
+let oneTwoThree = S.init(~count=3, (~index) => index + 1)
+let fourFiveSix = S.init(~count=3, (~index) => index + 4)
+let oneToFive = S.init(~count=5, (~index) => index + 1)
 
 let constructors = [
   areEqual(~title="singleton", ~expectation="has one item in it", ~a=() => S.singleton(3), ~b=[3]),
@@ -60,25 +60,25 @@ let constructors = [
   areEqual(
     ~title="init",
     ~expectation="when count is < 0 => empty",
-    ~a=() => S.init(~count=-1, ~initializer=(~index) => index->Belt.Int.toString),
+    ~a=() => S.init(~count=-1, (~index) => index->Belt.Int.toString),
     ~b=[],
   ),
   areEqual(
     ~title="init",
     ~expectation="when count is 0 => empty",
-    ~a=() => S.init(~count=0, ~initializer=(~index) => index->Belt.Int.toString),
+    ~a=() => S.init(~count=0, (~index) => index->Belt.Int.toString),
     ~b=[],
   ),
   areEqual(
     ~title="init",
     ~expectation="when count is 1 => singleton",
-    ~a=() => S.init(~count=1, ~initializer=(~index) => index->Belt.Int.toString),
+    ~a=() => S.init(~count=1, (~index) => index->Belt.Int.toString),
     ~b=["0"],
   ),
   areEqual(
     ~title="init",
     ~expectation="when count > 2 => map each index",
-    ~a=() => S.init(~count=3, ~initializer=(~index) => index->Belt.Int.toString),
+    ~a=() => S.init(~count=3, (~index) => index->Belt.Int.toString),
     ~b=["0", "1", "2"],
   ),
   areEqual(
@@ -492,7 +492,7 @@ let transforming = [
   areEqual(
     ~title="flatten",
     ~expectation="concatenate each sub-sequence",
-    ~a=() => S.init(~count=3, ~initializer=(~index) => S.repeat(~count=2, ~value=index))->S.flatten,
+    ~a=() => S.init(~count=3, (~index) => S.repeat(~count=2, ~value=index))->S.flatten,
     ~b=[0, 0, 1, 1, 2, 2],
   ),
   areEqual(
