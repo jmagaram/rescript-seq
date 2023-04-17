@@ -86,13 +86,7 @@ let cycleNonEmpty = seq => {
   go(seq)
 }
 
-let cycle = seq =>
-  (. ()) => {
-    switch seq(.) {
-    | Empty => Empty
-    | Next(head, tail) => cons(head, tail)->concat(seq->cycleNonEmpty)->consume1
-    }
-  }
+let cycle = xs => xs->mapNext((x, xs') => cons(x, xs')->concat(xs->cycleNonEmpty)->consume1)
 
 let map = (seq, f) => flatMap(seq, i => singleton(f(i)))
 
