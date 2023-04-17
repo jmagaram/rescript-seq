@@ -8,10 +8,27 @@ to iterator
 Use Option instead of Empty and Next; or enabpe mapIfNext
 Remove recursion problems
 change code to xxs and xs
+"value" or "item" in callbacks?
+split on
+all the scani and mapi - include isFirst, isLast!
+mark some as @inline
+contribution guide
+
+    awkward!
+    ~a=() => S.init(~count=1, ~initializer=(~index as _) => Js.Math.random())->S.cycle,
 
 ### Ideas
 
-fromIterable, nextChunk, asNonEmpty, peekThen
+repeat one time but not constant?
+fromIterable, nextChunk, asNonEmpty, peekThen, window surrounding (size) or neighbors
+
+### Contribution guide
+
+## Coding style
+
+- Use `xs`, `ys`, `zs` for sequences
+- Use `x`, `y`, `z` for item in those sequences
+- Use `xxs` for a nested sequence
 
 ## TC39 Proposal
 
@@ -91,4 +108,8 @@ range (with step), repeat (constant), objectEntries, objectKeys, objectValues, a
 
 ### Supported
 
-takeUntil
+takeUntil, dropUntil
+
+### Not supported
+
+consume, endsWith, fallbackIfEmpty, flatten (recursive), tagFirstLast, toMap, toObject
