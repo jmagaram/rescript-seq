@@ -161,41 +161,41 @@ let filteri = (xs, f) => {
   go(xs->indexed)
 }
 
-let rec filter = (seq, f) =>
-  seq->mapNext((value, seq) =>
-    switch f(value) {
-    | true => Next(value, filter(seq, f))
-    | false => filter(seq, f)(.)
+let rec filter = (xs, f) =>
+  xs->mapNext((x, xs) =>
+    switch f(x) {
+    | true => Next(x, filter(xs, f))
+    | false => filter(xs, f)->consume1
     }
   )
 
-let rec zipLongest = (s1, s2) => {
+let rec zipLongest = (xs, ys) => {
   (. ()) => {
-    let s1 = s1(.)
-    let s2 = s2(.)
-    switch (s1, s2) {
+    let xn = xs->consume1
+    let yn = ys->consume1
+    switch (xn, yn) {
     | (Empty, Empty) => Empty
-    | (Next(value1, s1), Empty) => Next((Some(value1), None), zipLongest(s1, empty))
-    | (Empty, Next(value2, s2)) => Next((None, Some(value2)), zipLongest(empty, s2))
-    | (Next(value1, s1), Next(value2, s2)) => Next((Some(value1), Some(value2)), zipLongest(s1, s2))
+    | (Next(x, xs), Empty) => Next((Some(x), None), zipLongest(xs, empty))
+    | (Empty, Next(y, ys)) => Next((None, Some(y)), zipLongest(empty, ys))
+    | (Next(x, xs), Next(y, ys)) => Next((Some(x), Some(y)), zipLongest(xs, ys))
     }
   }
 }
 
-let rec takeWhile = (seq, predicate) =>
-  seq->mapNext((value, seq) =>
-    switch predicate(value) {
+let rec takeWhile = (xs, predicate) =>
+  xs->mapNext((x, xs) =>
+    switch predicate(x) {
     | false => Empty
-    | true => Next(value, takeWhile(seq, predicate))
+    | true => Next(x, takeWhile(xs, predicate))
     }
   )
 
-let rec zip = (seq1, seq2) =>
+let rec zip = (xs, ys) =>
   (. ()) => {
-    switch (seq1(.), seq2(.)) {
+    switch (xs->consume1, ys->consume1) {
     | (Empty, _) => Empty
     | (_, Empty) => Empty
-    | (Next(v1, s1), Next(v2, s2)) => Next((v1, v2), zip(s1, s2))
+    | (Next(x, xs), Next(y, ys)) => Next((x, y), zip(xs, ys))
     }
   }
 
