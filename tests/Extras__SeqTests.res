@@ -917,9 +917,17 @@ let transforming = [
   ),
   areEqual(
     ~title="takeUntil",
-    ~expectation="when a million items => no stack overflow",
-    ~a=() => S.infinite(Js.Math.random)->S.takeAtMost(999999)->S.takeUntil(_ => false),
-    ~b=[],
+    ~expectation="predicate only called as many times as needed",
+    ~a=() => {
+      let called = ref(0)
+      S.singleton("x")
+      ->S.takeUntil(i => {
+        called := called.contents + 1
+        i == "x"
+      })
+      ->S.map(_ => called.contents)
+    },
+    ~b=[1],
   ),
   areEqual(
     ~title="dropUntil",

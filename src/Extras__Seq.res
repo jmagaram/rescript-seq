@@ -667,7 +667,15 @@ let windowAhead = (xs, size) => {
   ->drop(size)
 }
 
-let rec takeUntil = (xs, f) => xs->mapNext((x, xs) => Next(x, f(x) ? empty : takeUntil(xs, f)))
+// add predicate call count tests elsewhere
+
+let rec takeUntil = (xs, f) =>
+  xs->mapNext((x, xs) => {
+    switch f(x) {
+    | false => Next(x, takeUntil(xs, f))
+    | true => Next(x, empty)
+    }
+  })
 
 let allOk = seq => {
   seq
