@@ -1170,6 +1170,24 @@ let consuming = [
     ~a=() => [1, 2, 2, 3, 4, 2, 5]->S.fromArray->S.isSortedBy(Ex.Cmp.int),
     ~b=false,
   ),
+  consumeEqual(
+    ~title="toOption",
+    ~expectation="when empty => None",
+    ~a=() => S.empty->S.toOption,
+    ~b=None,
+  ),
+  consumeEqual(
+    ~title="toOption",
+    ~expectation="when singleton => Some",
+    ~a=() => S.singleton(1)->S.toOption->Option.getWithDefault(S.empty)->S.toArray,
+    ~b=[1],
+  ),
+  consumeEqual(
+    ~title="toOption",
+    ~expectation="when many items => Some",
+    ~a=() => oneTwoThree->S.toOption->Option.getWithDefault(S.empty)->S.toArray,
+    ~b=[1, 2, 3],
+  ),
 ]
 
 let validationTests = [

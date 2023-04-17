@@ -646,3 +646,9 @@ let allSome = (seq, f) => {
   ->last
   ->Option.flatMap(i => i)
 }
+
+let toOption = seq =>
+  switch seq(.) {
+  | Empty => None
+  | Next(head, tail) => Some(tail->startWith(head))
+  }
