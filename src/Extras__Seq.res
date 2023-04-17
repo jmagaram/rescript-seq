@@ -11,19 +11,18 @@ exception ArgumentOfOfRange(string)
 
 let consume1 = xs => xs(.)
 
-type mapNext<'a, 'b> = (t<'a>, (~value: 'a, ~seq: t<'a>) => node<'b>) => t<'b>
-let mapNext: mapNext<'a, 'b> = (seq, f) =>
+let mapNext = (seq, f) =>
   (. ()) =>
     switch seq(.) {
     | Empty => Empty
-    | Next(value, seq) => f(~value, ~seq)
+    | Next(value, seq) => f(value, seq)
     }
 
 let empty = (. ()) => Empty
 
-let singleton = v => (. ()) => Next(v, empty)
-
 let cons = (value, seq) => (. ()) => Next(value, seq)
+
+let singleton = v => cons(v, empty)
 
 let rec unfold = (seed, f) =>
   (. ()) => {
@@ -33,9 +32,7 @@ let rec unfold = (seed, f) =>
     }
   }
 
-// awkward!
-let init = (~count, initializer) =>
-  unfold(0, i => i < count ? Some(initializer(~index=i), i + 1) : None)
+let init = (~count, f) => unfold(0, i => i < count ? Some(f(~index=i), i + 1) : None)
 
 let repeat = (~count, ~value) => unfold(0, i => i < count ? Some(value, i + 1) : None)
 
@@ -63,7 +60,7 @@ let range = (~start, ~end) => {
 
 // labels as head and tail?
 let rec tap = (seq, f) =>
-  seq->mapNext((~value, ~seq) => {
+  seq->mapNext((value, seq) => {
     f(value)
     Next(value, tap(seq, f))
   })
@@ -133,7 +130,7 @@ let fromOption = opt =>
 
 let indexed = seq => {
   let rec go = (seq, index) =>
-    seq->mapNext((~value, ~seq) => Next((value, index), go(seq, index + 1)))
+    seq->mapNext((value, seq) => Next((value, index), go(seq, index + 1)))
   go(seq, 0)
 }
 
@@ -141,7 +138,7 @@ let mapi = (seq, f) => seq->indexed->map(((value, index)) => f(~value, ~index))
 
 let takeAtMost = (seq, count) => {
   let rec go = seq =>
-    seq->mapNext((~value as (value, index), ~seq) =>
+    seq->mapNext(((value, index), seq) =>
       switch index >= count {
       | true => Empty
       | false => Next(value, go(seq))
@@ -152,7 +149,7 @@ let takeAtMost = (seq, count) => {
 
 let drop = (seq, count) => {
   let rec go = seq =>
-    seq->mapNext((~value as (value, index), ~seq) =>
+    seq->mapNext(((value, index), seq) =>
       switch index < count {
       | true => go(seq)(.)
       | false => Next(value, seq->map(((value, _)) => value))
@@ -163,7 +160,7 @@ let drop = (seq, count) => {
 
 let filteri = (seq, f) => {
   let rec go = seq =>
-    seq->mapNext((~value as (value, index), ~seq) =>
+    seq->mapNext(((value, index), seq) =>
       switch f(~value, ~index) {
       | true => Next(value, go(seq))
       | false => go(seq)(.)
@@ -173,7 +170,7 @@ let filteri = (seq, f) => {
 }
 
 let rec filter = (seq, f) =>
-  seq->mapNext((~value, ~seq) =>
+  seq->mapNext((value, seq) =>
     switch f(value) {
     | true => Next(value, filter(seq, f))
     | false => filter(seq, f)(.)
@@ -194,7 +191,7 @@ let rec zipLongest = (s1, s2) => {
 }
 
 let rec takeWhile = (seq, predicate) =>
-  seq->mapNext((~value, ~seq) =>
+  seq->mapNext((value, seq) =>
     switch predicate(value) {
     | false => Empty
     | true => Next(value, takeWhile(seq, predicate))
@@ -662,7 +659,7 @@ let windowAhead = (xs, size) => {
 }
 
 let rec takeUntil = (seq, f) =>
-  seq->mapNext((~value, ~seq) => Next(value, f(value) ? empty : takeUntil(seq, f)))
+  seq->mapNext((value, seq) => Next(value, f(value) ? empty : takeUntil(seq, f)))
 
 let allOk = (seq, f) => {
   seq
