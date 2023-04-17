@@ -400,6 +400,12 @@ let transforming = [
   areEqual(~title="drop", ~expectation="when all => empty", ~a=() => oneToFive->S.drop(5), ~b=[]),
   areEqual(~title="drop", ~expectation="when subset", ~a=() => oneToFive->S.drop(2), ~b=[3, 4, 5]),
   areEqual(
+    ~title="drop",
+    ~expectation="when a million items, no stack overflow",
+    ~a=() => S.concat(S.replicate(~count=999999, ~value="x"), S.singleton("y"))->S.drop(999999),
+    ~b=["y"],
+  ),
+  areEqual(
     ~title="filter",
     ~expectation="",
     ~a=() => oneToFive->S.filter(i => i == 2 || i == 5),

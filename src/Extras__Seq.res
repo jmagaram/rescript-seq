@@ -155,16 +155,30 @@ let takeAtMost = (xs, count) => {
   go(xs->indexed)
 }
 
-let drop = (xs, count) => {
-  let rec go = xs =>
-    xs->mapNext(((x, index), xs) =>
-      switch index < count {
-      | true => go(xs)->consume1
-      | false => Next(x, xs->map(((x, _)) => x))
+let drop = (xs, count) =>
+  if count == 0 {
+    xs
+  } else {
+    (. ()) => {
+      let dropped = ref(0)
+      let result = ref(None)
+      consumeUntil(
+        ~seq=xs,
+        ~predicate=_ => dropped.contents == count,
+        ~onEmpty=_ => (),
+        ~onNext=(x, xs) => {
+          dropped := dropped.contents + 1
+          if dropped.contents == count + 1 {
+            result := Some(x, xs)
+          }
+        },
+      )
+      switch result.contents {
+      | None => End
+      | Some(x, xs) => Next(x, xs)
       }
-    )
-  go(xs->indexed)
-}
+    }
+  }
 
 let filteri = (xs, f) => {
   let rec go = xs =>
