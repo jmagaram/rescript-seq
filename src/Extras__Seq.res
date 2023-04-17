@@ -618,3 +618,16 @@ let windowAhead = (xs, size) => {
 let rec takeUntil = (seq, f) =>
   seq->mapNext((~value, ~seq) => Next(value, f(value) ? empty : takeUntil(seq, f)))
 
+let allOk = (seq, f) => {
+  seq
+  ->map(i => f(i))
+  ->scan(Ok(empty), (sum, i) =>
+    switch i {
+    | Ok(ok) => sum->Belt.Result.map(oks => concat(oks, singleton(ok)))
+    | Error(_) as err => err
+    }
+  )
+  ->takeUntil(i => i->Belt.Result.isError)
+  ->last
+  ->Belt.Option.getUnsafe
+}

@@ -1182,7 +1182,7 @@ let allOk = {
     ("when mix, return first error", [1, 2, 14, 3, 4], Error("14")),
   ]->Belt.Array.map(((expectation, input, expected)) =>
     consumeEqual(
-      ~title="okOrError",
+      ~title="allOk",
       ~expectation,
       ~a=() => input->S.fromArray->S.allOk(mapper)->Belt.Result.map(i => i->S.toArray),
       ~b=expected,
