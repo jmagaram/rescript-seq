@@ -11,6 +11,22 @@ exception ArgumentOfOfRange(string)
 
 let consume1 = xs => xs(.)
 
+let consumeUntil = (~seq, ~predicate, ~onNext, ~onEmpty) => {
+  let break = ref(false)
+  let seq = ref(seq)
+  while !break.contents {
+    switch seq.contents(.) {
+    | Empty =>
+      break := true
+      onEmpty()
+    | Next(head, tail) =>
+      break := predicate(head)
+      seq := tail
+      onNext(head, tail)
+    }
+  }
+}
+
 let mapNext = (xs, f) =>
   (. ()) =>
     switch xs(.) {
@@ -202,8 +218,24 @@ let rec zip = (xs, ys) =>
 let rec filterMap = (xs, f) =>
   xs->mapNext((x, xs) =>
     switch f(x) {
-    | None => filterMap(xs, f)->consume1 // big recursion!
     | Some(x) => Next(x, filterMap(xs, f))
+    | None => {
+        let xs' = ref(None)
+        let x = ref(None)
+        consumeUntil(
+          ~seq=xs,
+          ~onEmpty=() => (),
+          ~onNext=(_, xs) => xs' := Some(xs),
+          ~predicate=i => {
+            x := f(i)
+            x.contents->Option.isSome
+          },
+        )
+        switch x.contents {
+        | None => Empty
+        | Some(x) => Next(x, filterMap(xs'.contents->Option.getExn, f))
+        }
+      }
     }
   )
 
@@ -318,22 +350,6 @@ let consumeN = (seq, n) => {
     }
   }
   {"consumed": consumed, "isEmpty": isEmpty.contents, "tail": seq.contents}
-}
-
-let consumeUntil = (~seq, ~predicate, ~onNext, ~onEmpty) => {
-  let break = ref(false)
-  let seq = ref(seq)
-  while !break.contents {
-    switch seq.contents(.) {
-    | Empty =>
-      break := true
-      onEmpty()
-    | Next(head, tail) =>
-      break := predicate(head)
-      seq := tail
-      onNext(head, tail)
-    }
-  }
 }
 
 let dropUntil = (seq, predicate) =>

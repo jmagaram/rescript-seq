@@ -490,6 +490,12 @@ let transforming = [
     ~b=[],
   ),
   areEqual(
+    ~title="filterMap",
+    ~expectation="when millions of None => empty",
+    ~a=() => S.infinite(() => Js.Math.random())->S.takeAtMost(999999)->S.filterMap(_ => None),
+    ~b=[],
+  ),
+  areEqual(
     ~title="scani",
     ~expectation="when empty => zero",
     ~a=() => S.empty->S.scani(~zero=10, (~sum, ~value, ~index) => sum + value + index + 1),
