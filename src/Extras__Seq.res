@@ -9,6 +9,8 @@ and node<'a> =
 
 exception ArgumentOfOfRange(string)
 
+let consume1 = xs => xs(.)
+
 type mapNext<'a, 'b> = (t<'a>, (~value: 'a, ~seq: t<'a>) => node<'b>) => t<'b>
 let mapNext: mapNext<'a, 'b> = (seq, f) =>
   (. ()) =>
@@ -90,7 +92,7 @@ let cycle = seq =>
   (. ()) => {
     switch seq(.) {
     | Empty => Empty
-    | Next(head, tail) => (cons(head, tail)->concat(cycleNonEmpty(seq)))(.)
+    | Next(head, tail) => cons(head, tail)->concat(seq->cycleNonEmpty)->consume1
     }
   }
 
