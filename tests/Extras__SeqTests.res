@@ -848,6 +848,42 @@ let transforming = [
     ~a=() => S.empty->S.takeUntil(_ => true),
     ~b=[],
   ),
+  areEqual(
+    ~title="dropUntil",
+    ~expectation="when more than one item and condition met, that is first item",
+    ~a=() => oneToFive->S.dropUntil(i => i == 1),
+    ~b=[1, 2, 3, 4, 5],
+  ),
+  areEqual(
+    ~title="dropUntil",
+    ~expectation="when more than one item and condition met, that is first item",
+    ~a=() => oneToFive->S.dropUntil(i => i == 4),
+    ~b=[4, 5],
+  ),
+  areEqual(
+    ~title="dropUntil",
+    ~expectation="when more than one item and condition not met, return no items",
+    ~a=() => oneToFive->S.dropUntil(i => i == 99),
+    ~b=[],
+  ),
+  areEqual(
+    ~title="dropUntil",
+    ~expectation="when empty => empty",
+    ~a=() => S.empty->S.dropUntil(_ => true),
+    ~b=[],
+  ),
+  areEqual(
+    ~title="dropUntil",
+    ~expectation="when singleton and condition not met => empty",
+    ~a=() => S.singleton(1)->S.dropUntil(i => i == 99),
+    ~b=[],
+  ),
+  areEqual(
+    ~title="dropUntil",
+    ~expectation="when singleton and condition met => singleton",
+    ~a=() => S.singleton(1)->S.dropUntil(i => i == 1),
+    ~b=[1],
+  ),
 ]
 
 let consuming = [

@@ -325,6 +325,37 @@ let consumeN = (seq, n) => {
   {"consumed": consumed, "isEmpty": isEmpty.contents, "tail": seq.contents}
 }
 
+let consumeUntil = (~seq, ~predicate, ~onNext, ~onEmpty) => {
+  let break = ref(false)
+  let seq = ref(seq)
+  while !break.contents {
+    switch seq.contents(.) {
+    | Empty =>
+      break := true
+      onEmpty()
+    | Next(head, tail) =>
+      break := predicate(head)
+      seq := tail
+      onNext(head, tail)
+    }
+  }
+}
+
+let dropUntil = (seq, predicate) =>
+  (. ()) => {
+    let start = ref(None)
+    consumeUntil(
+      ~seq,
+      ~predicate,
+      ~onNext=(head, tail) => {start := Some((head, tail))},
+      ~onEmpty=() => start := None,
+    )
+    switch start.contents {
+    | None => Empty
+    | Some(head, tail) => Next(head, tail)
+    }
+  }
+
 let rec chunkBySize = (seq, length) => {
   if length <= 0 {
     ArgumentOfOfRange(

@@ -39,6 +39,7 @@ let drop: (t<'a>, int) => t<'a>
 let takeWhile: (t<'a>, 'a => bool) => t<'a>
 let takeUntil: (t<'a>, 'a => bool) => t<'a>
 let dropWhile: (t<'a>, 'a => bool) => t<'a>
+let dropUntil: (t<'a>, 'a => bool) => t<'a>
 let zip: (t<'a>, t<'b>) => t<('a, 'b)>
 let zipLongest: (t<'a>, t<'b>) => t<(option<'a>, option<'b>)>
 let scan: (t<'a>, 'b, ('b, 'a) => 'b) => t<'b>
