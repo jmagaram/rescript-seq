@@ -4,7 +4,7 @@ module Ex = Extras
 
 type rec t<'a> = (. unit) => node<'a>
 and node<'a> =
-  | Empty
+  | End
   | Next('a, t<'a>)
 
 exception ArgumentOfOfRange(string)
@@ -16,7 +16,7 @@ let consumeUntil = (~seq, ~predicate, ~onNext, ~onEmpty) => {
   let seq = ref(seq)
   while !break.contents {
     switch seq.contents(.) {
-    | Empty =>
+    | End =>
       break := true
       onEmpty()
     | Next(head, tail) =>
@@ -30,18 +30,18 @@ let consumeUntil = (~seq, ~predicate, ~onNext, ~onEmpty) => {
 let mapNext = (xs, f) =>
   (. ()) =>
     switch xs(.) {
-    | Empty => Empty
+    | End => End
     | Next(x, xs) => f(x, xs)
     }
 
 let mapBoth = (xs, ~onEmpty, ~onNext) =>
   (. ()) =>
     switch xs(.) {
-    | Empty => onEmpty()
+    | End => onEmpty()
     | Next(x, xs) => onNext(x, xs)
     }
 
-let empty = (. ()) => Empty
+let empty = (. ()) => End
 
 let cons = (value, seq) => (. ()) => Next(value, seq)
 
@@ -50,7 +50,7 @@ let singleton = v => cons(v, empty)
 let rec unfold = (seed, f) =>
   (. ()) => {
     switch f(seed) {
-    | None => Empty
+    | None => End
     | Some(value, seed) => Next(value, unfold(seed, f))
     }
   }
@@ -77,7 +77,7 @@ let range = (~start, ~end) => {
 let rec flatMap = (xs, f) => {
   (. ()) =>
     switch xs(.) {
-    | Empty => Empty
+    | End => End
     | Next(value, next) => concat(f(value), flatMap(next, f))(.)
     }
 }
@@ -96,7 +96,7 @@ let cycleNonEmpty = xs => {
   let rec go = ys =>
     (. ()) =>
       switch ys(.) {
-      | Empty => go(xs)(.)
+      | End => go(xs)(.)
       | Next(y, ys) => Next(y, go(ys))
       }
   go(xs)
@@ -126,7 +126,7 @@ let fromArray = (~start=?, ~end=?, arr: array<'a>) => {
 let rec fromList = xs => {
   (. ()) =>
     switch xs {
-    | list{} => Empty
+    | list{} => End
     | list{head, ...tail} => Next(head, fromList(tail))
     }
 }
@@ -148,7 +148,7 @@ let takeAtMost = (xs, count) => {
   let rec go = xs =>
     xs->mapNext(((x, index), xs) =>
       switch index >= count {
-      | true => Empty
+      | true => End
       | false => Next(x, go(xs))
       }
     )
@@ -190,9 +190,9 @@ let rec zipLongest = (xs, ys) => {
     let xn = xs->consume1
     let yn = ys->consume1
     switch (xn, yn) {
-    | (Empty, Empty) => Empty
-    | (Next(x, xs), Empty) => Next((Some(x), None), zipLongest(xs, empty))
-    | (Empty, Next(y, ys)) => Next((None, Some(y)), zipLongest(empty, ys))
+    | (End, End) => End
+    | (Next(x, xs), End) => Next((Some(x), None), zipLongest(xs, empty))
+    | (End, Next(y, ys)) => Next((None, Some(y)), zipLongest(empty, ys))
     | (Next(x, xs), Next(y, ys)) => Next((Some(x), Some(y)), zipLongest(xs, ys))
     }
   }
@@ -201,7 +201,7 @@ let rec zipLongest = (xs, ys) => {
 let rec takeWhile = (xs, predicate) =>
   xs->mapNext((x, xs) =>
     switch predicate(x) {
-    | false => Empty
+    | false => End
     | true => Next(x, takeWhile(xs, predicate))
     }
   )
@@ -209,8 +209,8 @@ let rec takeWhile = (xs, predicate) =>
 let rec zip = (xs, ys) =>
   (. ()) => {
     switch (xs->consume1, ys->consume1) {
-    | (Empty, _) => Empty
-    | (_, Empty) => Empty
+    | (End, _) => End
+    | (_, End) => End
     | (Next(x, xs), Next(y, ys)) => Next((x, y), zip(xs, ys))
     }
   }
@@ -232,7 +232,7 @@ let rec filterMap = (xs, f) =>
           },
         )
         switch x.contents {
-        | None => Empty
+        | None => End
         | Some(x) => Next(x, filterMap(xs'.contents->Option.getExn, f))
         }
       }
@@ -252,7 +252,7 @@ let filterOk = seq =>
 let scani = (seq, ~zero, f) => {
   let rec go = (seq, sum) =>
     switch seq(.) {
-    | Empty => (. ()) => Empty
+    | End => (. ()) => End
     | Next((value, index), seq) =>
       (. ()) => {
         let sum = f(~sum, ~value, ~index)
@@ -267,7 +267,7 @@ let scan = (seq, zero, f) => scani(seq, ~zero, (~sum, ~value, ~index as _) => f(
 let rec dropWhile = (seq, predicate) => {
   (. ()) => {
     switch seq(.) {
-    | Empty => Empty
+    | End => End
     | Next(value, seq) =>
       switch predicate(value) {
       | true => dropWhile(seq, predicate)(.) // recursive!
@@ -282,8 +282,8 @@ let map2 = (s1, s2, f) => zip(s1, s2)->map(((a, b)) => f(a, b))
 let rec sortedMerge = (s1, s2, cmp) => {
   (. ()) =>
     switch (s1(.), s2(.)) {
-    | (Empty, Next(_, _) as s2) => s2
-    | (Next(_, _) as s1, Empty) => s1
+    | (End, Next(_, _) as s2) => s2
+    | (Next(_, _) as s1, End) => s1
     | (Next(v1, s1), Next(v2, s2)) => {
         let order = cmp(v1, v2)
         if order <= 0 {
@@ -292,7 +292,7 @@ let rec sortedMerge = (s1, s2, cmp) => {
           Next(v2, sortedMerge(concat(v1->singleton, s1), s2, cmp))
         }
       }
-    | (Empty, Empty) => Empty
+    | (End, End) => End
     }
 }
 // skip last? put it before everything but the first
@@ -321,7 +321,7 @@ module UncurriedDeferred = {
 let rec cache = seq =>
   UncurriedDeferred.memoize((. ()) =>
     switch seq(.) {
-    | Empty => Empty
+    | End => End
     | Next(value, seq) => Next(value, cache(seq))
     }
   )
@@ -342,7 +342,7 @@ let consumeN = (seq, n) => {
   let seq = ref(seq)
   while consumed->Js.Array2.length < n && !isEmpty.contents {
     switch seq.contents(.) {
-    | Empty => isEmpty := true
+    | End => isEmpty := true
     | Next(head, tail) => {
         consumed->Js.Array2.push(head)->ignore
         seq := tail
@@ -362,7 +362,7 @@ let dropUntil = (seq, predicate) =>
       ~onEmpty=() => start := None,
     )
     switch start.contents {
-    | None => Empty
+    | None => End
     | Some(head, tail) => Next(head, tail)
     }
   }
@@ -378,7 +378,7 @@ let rec chunkBySize = (seq, length) => {
     switch n["isEmpty"] {
     | true =>
       switch n["consumed"] {
-      | [] => Empty
+      | [] => End
       | xs => Next(xs, chunkBySize(empty, length))
       }
     | false => Next(n["consumed"], chunkBySize(n["tail"], length))
@@ -410,9 +410,9 @@ let pairwise = seq =>
 let reduce = (seq, zero, concat) => {
   let sum = ref(zero)
   let curr = ref(seq(.))
-  while curr.contents !== Empty {
+  while curr.contents !== End {
     switch curr.contents {
-    | Empty => ()
+    | End => ()
     | Next(v, seq) => {
         curr := seq(.)
         sum := concat(sum.contents, v)
@@ -435,9 +435,9 @@ let toString = seq => seq->reduce("", (total, i) => total ++ i)
 
 let forEach = (seq, f) => {
   let curr = ref(seq(.))
-  while curr.contents !== Empty {
+  while curr.contents !== End {
     switch curr.contents {
-    | Empty => ()
+    | End => ()
     | Next(value, seq) => {
         f(value)
         curr := seq(.)
@@ -452,9 +452,9 @@ let some = (seq, predicate) => {
   let break = ref(false)
   let curr = ref(seq(.))
   let result = ref(false)
-  while result.contents !== true && curr.contents !== Empty {
+  while result.contents !== true && curr.contents !== End {
     switch curr.contents {
-    | Empty => break := true
+    | End => break := true
     | Next(value, seq) => {
         result := predicate(value)
         curr := seq(.)
@@ -468,9 +468,9 @@ let everyOrEmpty = (seq, predicate) => {
   let break = ref(false)
   let curr = ref(seq(.))
   let foundInvalid = ref(false)
-  while foundInvalid.contents === false && curr.contents !== Empty {
+  while foundInvalid.contents === false && curr.contents !== End {
     switch curr.contents {
-    | Empty => break := true
+    | End => break := true
     | Next(value, seq) => {
         foundInvalid := !predicate(value)
         curr := seq(.)
@@ -484,9 +484,9 @@ let findMapi = (seq, f) => {
   let seq = seq->indexed
   let curr = ref(seq(.))
   let found = ref(None)
-  while found.contents->Option.isNone && curr.contents !== Empty {
+  while found.contents->Option.isNone && curr.contents !== End {
     switch curr.contents {
-    | Empty => ()
+    | End => ()
     | Next((value, index), seq) => {
         switch f(~value, ~index) {
         | None => ()
@@ -529,19 +529,19 @@ let length = seq => seq->reduce(0, (sum, _) => sum + 1)
 
 let isEmpty = seq =>
   switch seq(.) {
-  | Empty => true
+  | End => true
   | _ => false
   }
 
 let head = seq =>
   switch seq(.) {
-  | Empty => None
+  | End => None
   | Next(head, _) => Some(head)
   }
 
 let headTail = seq =>
   switch seq(.) {
-  | Empty => None
+  | End => None
   | Next(head, tail) => Some(head, tail)
   }
 
@@ -569,7 +569,7 @@ let last = seq => {
   let break = ref(false)
   while !break.contents {
     switch current.contents(.) {
-    | Empty => break := true
+    | End => break := true
     | Next(head, tail) => {
         last := Some(head)
         current := tail
@@ -582,7 +582,7 @@ let last = seq => {
 let rec interleave = (xs, ys) => {
   (. ()) => {
     switch xs(.) {
-    | Empty => ys(.)
+    | End => ys(.)
     | Next(x, xs) => Next(x, interleave(ys, xs))
     }
   }
@@ -693,6 +693,6 @@ let allSome = seq => {
 
 let toOption = seq =>
   switch seq(.) {
-  | Empty => None
+  | End => None
   | Next(head, tail) => Some(tail->startWith(head))
   }
