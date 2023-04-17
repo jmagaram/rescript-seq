@@ -21,7 +21,7 @@ let mapNext = (xs, f) =>
 let mapBoth = (xs, ~onEmpty, ~onNext) =>
   (. ()) =>
     switch xs(.) {
-    | Empty => onEmpty
+    | Empty => onEmpty()
     | Next(x, xs) => onNext(x, xs)
     }
 
@@ -47,13 +47,8 @@ let infinite = f => unfold(0, _ => Some(f(), 0))
 
 let iterate = (seed, f) => unfold(seed, i => Some(i, f(i)))
 
-let rec concat = (xs, ys) => {
-  (. ()) =>
-    switch xs(.) {
-    | Empty => ys(.)
-    | Next(x, xs) => Next(x, concat(xs, ys))
-    }
-}
+let rec concat = (xs, ys) =>
+  xs->mapBoth(~onEmpty=() => ys->consume1, ~onNext=(x, xs) => Next(x, concat(xs, ys)))
 
 let prepend = (xs, ys) => concat(ys, xs)
 
