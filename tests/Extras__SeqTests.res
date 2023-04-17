@@ -2,6 +2,8 @@ module T = Extras__Test
 module S = Extras__Seq
 module R = Extras__Result
 module Ex = Extras
+module Option = Belt.Option
+module Result = Belt.Result
 
 let concatInts = xs =>
   xs->Js.Array2.length == 0 ? "_" : xs->Js.Array2.map(Belt.Int.toString)->Js.Array2.joinWith("")
@@ -19,7 +21,7 @@ let areEqual = (~title, ~expectation, ~a, ~b) =>
 
 let willThrow = (~title, ~expectation, ~f) => {
   T.make(~category="Seq", ~title, ~expectation, ~predicate=() => {
-    Ex.Result.fromTryCatch(f)->Belt.Result.isError
+    Ex.Result.fromTryCatch(f)->Result.isError
   })
 }
 
@@ -573,15 +575,14 @@ let transforming = [
     ~category="Seq",
     ~title="chunkBySize",
     ~expectation="when size = 0 => throw",
-    ~predicate=() =>
-      R.fromTryCatch(() => [1, 2, 3]->S.fromArray->S.chunkBySize(0))->Belt.Result.isError,
+    ~predicate=() => R.fromTryCatch(() => [1, 2, 3]->S.fromArray->S.chunkBySize(0))->Result.isError,
   ),
   T.make(
     ~category="Seq",
     ~title="chunkBySize",
     ~expectation="when size < 0 => throw",
     ~predicate=() =>
-      R.fromTryCatch(() => [1, 2, 3]->S.fromArray->S.chunkBySize(-1))->Belt.Result.isError,
+      R.fromTryCatch(() => [1, 2, 3]->S.fromArray->S.chunkBySize(-1))->Result.isError,
   ),
   areEqual(
     ~title="chunkBySize",
@@ -596,10 +597,10 @@ let transforming = [
     ~b=[],
   ),
   T.make(~category="Seq", ~title="window", ~expectation="when size = 0 => throw", ~predicate=() =>
-    R.fromTryCatch(() => [1, 2, 3]->S.fromArray->S.window(0))->Belt.Result.isError
+    R.fromTryCatch(() => [1, 2, 3]->S.fromArray->S.window(0))->Result.isError
   ),
   T.make(~category="Seq", ~title="window", ~expectation="when size < 0 => throw", ~predicate=() =>
-    R.fromTryCatch(() => [1, 2, 3]->S.fromArray->S.window(-1))->Belt.Result.isError
+    R.fromTryCatch(() => [1, 2, 3]->S.fromArray->S.window(-1))->Result.isError
   ),
   areEqual(
     ~title="window",
@@ -1055,13 +1056,13 @@ let consuming = [
   consumeEqual(
     ~title="headTail",
     ~expectation="when singleton => Some(head,empty)",
-    ~a=() => S.singleton(4)->S.headTail->Belt.Option.map(((h, t)) => (h, t->S.toArray)),
+    ~a=() => S.singleton(4)->S.headTail->Option.map(((h, t)) => (h, t->S.toArray)),
     ~b=Some(4, []),
   ),
   consumeEqual(
     ~title="headTail",
     ~expectation="when many items => Some(head,tail)",
-    ~a=() => [1, 2, 3]->S.fromArray->S.headTail->Belt.Option.map(((h, t)) => (h, t->S.toArray)),
+    ~a=() => [1, 2, 3]->S.fromArray->S.headTail->Option.map(((h, t)) => (h, t->S.toArray)),
     ~b=Some(1, [2, 3]),
   ),
   consumeEqual(~title="head", ~expectation="when empty", ~a=() => S.empty->S.head, ~b=None),
@@ -1171,21 +1172,38 @@ let consuming = [
   ),
 ]
 
-let allOk = {
-  let mapper = n => n < 10 ? Ok(n * 2) : Error(n->Belt.Int.toString)
-  [
-    ("when empty, return empty", [], Ok([])),
-    ("when one error, return it", [30], Error("30")),
-    ("when one ok, return it", [2], Ok([4])),
-    ("when all ok, return all", [1, 2, 3], Ok([2, 4, 6])),
-    ("when all error, return first", [20, 30, 40], Error("20")),
-    ("when mix, return first error", [1, 2, 14, 3, 4], Error("14")),
-  ]->Belt.Array.map(((expectation, input, expected)) =>
+let validationTests = [
+  ("when empty, return empty", [], Ok([])),
+  ("when one error, return it", [30], Error("30")),
+  ("when one ok, return it", [2], Ok([4])),
+  ("when all ok, return all", [1, 2, 3], Ok([2, 4, 6])),
+  ("when all error, return first", [20, 30, 40], Error("20")),
+  ("when mix, return first error", [1, 2, 14, 3, 4], Error("14")),
+]
+
+let validate = n => n < 10 ? Ok(n * 2) : Error(n->Belt.Int.toString)
+
+let allOkTests =
+  validationTests->Belt.Array.map(((expectation, input, expected)) =>
     consumeEqual(
       ~title="allOk",
       ~expectation,
-      ~a=() => input->S.fromArray->S.allOk(mapper)->Belt.Result.map(i => i->S.toArray),
+      ~a=() => input->S.fromArray->S.allOk(validate)->Result.map(i => i->S.toArray),
       ~b=expected,
+    )
+  )
+
+let allSomeTests = {
+  validationTests->Belt.Array.map(((expectation, input, expected)) =>
+    consumeEqual(
+      ~title="allSome",
+      ~expectation,
+      ~a=() =>
+        input
+        ->S.fromArray
+        ->S.allSome(i => i->validate->Ex.Result.toOption)
+        ->Option.map(i => i->S.toArray),
+      ~b=expected->Ex.Result.toOption,
     )
   )
 }
@@ -1217,4 +1235,12 @@ let memoizeTests = [
   ),
 ]
 
-let tests = [allOk, constructors, transforming, consuming, memoizeTests]->Belt.Array.flatMap(i => i)
+let tests =
+  [
+    allOkTests,
+    allSomeTests,
+    constructors,
+    transforming,
+    consuming,
+    memoizeTests,
+  ]->Belt.Array.flatMap(i => i)

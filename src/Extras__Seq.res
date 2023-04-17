@@ -1,4 +1,5 @@
 module Option = Belt.Option
+module Result = Belt.Result
 module Ex = Extras
 
 type rec t<'a> = (. unit) => node<'a>
@@ -620,14 +621,28 @@ let rec takeUntil = (seq, f) =>
 
 let allOk = (seq, f) => {
   seq
-  ->map(i => f(i))
+  ->map(f)
   ->scan(Ok(empty), (sum, i) =>
     switch i {
-    | Ok(ok) => sum->Belt.Result.map(oks => concat(oks, singleton(ok)))
+    | Ok(ok) => sum->Result.map(oks => concat(oks, singleton(ok)))
     | Error(_) as err => err
     }
   )
-  ->takeUntil(i => i->Belt.Result.isError)
+  ->takeUntil(Result.isError(_))
   ->last
-  ->Belt.Option.getUnsafe
+  ->Option.getUnsafe
+}
+
+let allSome = (seq, f) => {
+  seq
+  ->map(f)
+  ->scan(Some(empty), (sum, i) =>
+    switch i {
+    | Some(ok) => sum->Option.map(oks => concat(oks, singleton(ok)))
+    | None => None
+    }
+  )
+  ->takeUntil(Option.isNone(_))
+  ->last
+  ->Option.flatMap(i => i)
 }
