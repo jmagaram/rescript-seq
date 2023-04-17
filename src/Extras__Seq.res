@@ -661,9 +661,8 @@ let windowAhead = (xs, size) => {
 let rec takeUntil = (seq, f) =>
   seq->mapNext((value, seq) => Next(value, f(value) ? empty : takeUntil(seq, f)))
 
-let allOk = (seq, f) => {
+let allOk = seq => {
   seq
-  ->map(f)
   ->scan(Ok(empty), (sum, i) =>
     switch i {
     | Ok(ok) => sum->Result.map(oks => concat(oks, singleton(ok)))
@@ -675,9 +674,8 @@ let allOk = (seq, f) => {
   ->Option.getUnsafe
 }
 
-let allSome = (seq, f) => {
+let allSome = seq => {
   seq
-  ->map(f)
   ->scan(Some(empty), (sum, i) =>
     switch i {
     | Some(ok) => sum->Option.map(oks => concat(oks, singleton(ok)))

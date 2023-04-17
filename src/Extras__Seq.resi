@@ -87,5 +87,5 @@ let toArray: t<'a> => array<'a>
 let toString: t<string> => string
 let toExactlyOne: t<'a> => option<'a>
 let toOption: t<'a> => option<t<'a>>
-let allOk: (t<'a>, 'a => result<'b, 'c>) => result<t<'b>, 'c>
-let allSome: (t<'a>, 'a => option<'b>) => option<t<'b>>
+let allOk: t<result<'ok, 'err>> => result<t<'ok>, 'err>
+let allSome: t<option<'a>> => option<t<'a>>

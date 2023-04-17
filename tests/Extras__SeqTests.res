@@ -1285,7 +1285,7 @@ let allOkTests =
     consumeEqual(
       ~title="allOk",
       ~expectation,
-      ~a=() => input->S.fromArray->S.allOk(validate)->Result.map(i => i->S.toArray),
+      ~a=() => input->S.fromArray->S.map(validate)->S.allOk->Result.map(i => i->S.toArray),
       ~b=expected,
     )
   )
@@ -1298,7 +1298,9 @@ let allSomeTests = {
       ~a=() =>
         input
         ->S.fromArray
-        ->S.allSome(i => i->validate->Ex.Result.toOption)
+        ->S.map(validate)
+        ->S.map(Ex.Result.toOption)
+        ->S.allSome
         ->Option.map(i => i->S.toArray),
       ~b=expected->Ex.Result.toOption,
     )
