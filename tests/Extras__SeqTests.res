@@ -160,6 +160,12 @@ let constructors = [
     ~b=[2],
   ),
   areEqual(
+    ~title="fromArray",
+    ~expectation="when start>end => returns just fine in reverse order",
+    ~a=() => [0, 1, 2, 3]->S.fromArray(~start=3, ~end=1),
+    ~b=[3, 2, 1],
+  ),
+  areEqual(
     ~title="fromList",
     ~expectation="",
     ~a=() => list{1, 2, 3, 4, 5}->S.fromList,
