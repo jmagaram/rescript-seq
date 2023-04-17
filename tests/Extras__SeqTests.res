@@ -154,6 +154,12 @@ let constructors = [
     ~b=[2, 3],
   ),
   areEqual(
+    ~title="fromArray",
+    ~expectation="when start=end => return one item",
+    ~a=() => [0, 1, 2, 3]->S.fromArray(~start=2, ~end=2),
+    ~b=[2],
+  ),
+  areEqual(
     ~title="fromList",
     ~expectation="",
     ~a=() => list{1, 2, 3, 4, 5}->S.fromList,
