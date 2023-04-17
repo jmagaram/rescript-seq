@@ -9,8 +9,10 @@ and node<'a> =
 
 exception ArgumentOfOfRange(string)
 
+@inline
 let consume1 = xs => xs(.)
 
+@inline
 let mapNext = (xs, f) =>
   (. ()) =>
     switch xs(.) {
@@ -18,6 +20,7 @@ let mapNext = (xs, f) =>
     | Next(x, xs) => f(x, xs)
     }
 
+@inline
 let mapBoth = (xs, ~onEmpty, ~onNext) =>
   (. ()) =>
     switch xs(.) {
