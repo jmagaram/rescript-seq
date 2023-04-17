@@ -832,15 +832,27 @@ let transforming = [
   ),
   areEqual(
     ~title="takeUntil",
-    ~expectation="when condition met, that is last item",
+    ~expectation="when more than one item and condition met, that is last item",
     ~a=() => oneToFive->S.takeUntil(i => i == 3),
     ~b=[1, 2, 3],
   ),
   areEqual(
     ~title="takeUntil",
-    ~expectation="when condition not met, return all items",
+    ~expectation="when more than one item and condition not met, return all items",
     ~a=() => oneToFive->S.takeUntil(_ => false),
     ~b=[1, 2, 3, 4, 5],
+  ),
+  areEqual(
+    ~title="takeUntil",
+    ~expectation="when one item and condition met, that is last item",
+    ~a=() => S.singleton(1)->S.takeUntil(i => i == 1),
+    ~b=[1],
+  ),
+  areEqual(
+    ~title="takeUntil",
+    ~expectation="when one item and condition not met, return all items",
+    ~a=() => S.singleton(1)->S.takeUntil(i => i == 99),
+    ~b=[1],
   ),
   areEqual(
     ~title="takeUntil",
