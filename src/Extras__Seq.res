@@ -206,6 +206,11 @@ let rec takeWhile = (xs, predicate) =>
     }
   )
 
+// let rec filterMap2 = (xs, f) =>
+//   xs->mapNext((x, xs) => {
+//     let c = xs->map(f)->takeUntil(Option.isSome)
+//   })
+
 let rec zip = (xs, ys) =>
   (. ()) => {
     switch (xs->consume1, ys->consume1) {
@@ -662,8 +667,7 @@ let windowAhead = (xs, size) => {
   ->drop(size)
 }
 
-let rec takeUntil = (seq, f) =>
-  seq->mapNext((value, seq) => Next(value, f(value) ? empty : takeUntil(seq, f)))
+let rec takeUntil = (xs, f) => xs->mapNext((x, xs) => Next(x, f(x) ? empty : takeUntil(xs, f)))
 
 let allOk = seq => {
   seq

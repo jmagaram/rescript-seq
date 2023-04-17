@@ -7,14 +7,14 @@ module Result = Belt.Result
 
 let concatInts = xs =>
   xs->Js.Array2.length == 0 ? "_" : xs->Js.Array2.map(Belt.Int.toString)->Js.Array2.joinWith("")
-
+let shorten = s => Js.String2.slice(s, ~from=0, ~to_=1000)
 let areEqual = (~title, ~expectation, ~a, ~b) =>
   T.make(~category="Seq", ~title, ~expectation, ~predicate=() => {
     let a = a()->S.toArray
     if a != b {
       Js.Console.log(`===== NOT EQUAL : ${title} : ${expectation} =====`)
-      Js.Console.log(`A: ${a->Js.Array2.toString}`)
-      Js.Console.log(`B: ${b->Js.Array2.toString}`)
+      Js.Console.log(`A: ${a->Js.Array2.toString->shorten}`)
+      Js.Console.log(`B: ${b->Js.Array2.toString->shorten}`)
     }
     a == b
   })
@@ -913,6 +913,12 @@ let transforming = [
     ~title="takeUntil",
     ~expectation="when empty => empty",
     ~a=() => S.empty->S.takeUntil(_ => true),
+    ~b=[],
+  ),
+  areEqual(
+    ~title="takeUntil",
+    ~expectation="when a million items => no stack overflow",
+    ~a=() => S.infinite(Js.Math.random)->S.takeAtMost(999999)->S.takeUntil(_ => false),
     ~b=[],
   ),
   areEqual(
