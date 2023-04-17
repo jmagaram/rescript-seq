@@ -9,12 +9,6 @@ and node<'a> =
 
 exception ArgumentOfOfRange(string)
 
-let toOption = node =>
-  switch node {
-  | Empty => None
-  | Next(value, seq) => Some(value, seq)
-  }
-
 type mapNext<'a, 'b> = (t<'a>, (~value: 'a, ~seq: t<'a>) => node<'b>) => t<'b>
 let mapNext: mapNext<'a, 'b> = (seq, f) =>
   (. ()) =>
@@ -528,7 +522,11 @@ let head = seq =>
   | Next(head, _) => Some(head)
   }
 
-let headTail = seq => seq(.)->toOption
+let headTail = seq =>
+  switch seq(.) {
+  | Empty => None
+  | Next(head, tail) => Some(head, tail)
+  }
 
 let tail = seq => seq->drop(1)
 
