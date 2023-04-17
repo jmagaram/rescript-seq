@@ -11,11 +11,18 @@ exception ArgumentOfOfRange(string)
 
 let consume1 = xs => xs(.)
 
-let mapNext = (seq, f) =>
+let mapNext = (xs, f) =>
   (. ()) =>
-    switch seq(.) {
+    switch xs(.) {
     | Empty => Empty
-    | Next(value, seq) => f(value, seq)
+    | Next(x, xs) => f(x, xs)
+    }
+
+let mapBoth = (xs, ~onEmpty, ~onNext) =>
+  (. ()) =>
+    switch xs(.) {
+    | Empty => onEmpty
+    | Next(x, xs) => onNext(x, xs)
     }
 
 let empty = (. ()) => Empty
@@ -40,17 +47,8 @@ let infinite = f => unfold(0, _ => Some(f(), 0))
 
 let iterate = (seed, f) => unfold(seed, i => Some(i, f(i)))
 
-let rec concat = (xs, ys) => {
-  (. ()) =>
-    switch xs(.) {
-    | Empty => ys(.)
-    | Next(x, xs) => Next(x, concat(xs, ys))
-    }
-}
-
-// concatMany?
-// in pipeline mode could just concat concat concat
-// if not pipeline mode...
+let rec concat = (xs, ys) =>
+  xs->mapBoth(~onEmpty=ys->consume1, ~onNext=(x, xs) => Next(x, concat(xs, ys)))
 
 let prepend = (xs, ys) => concat(ys, xs)
 
@@ -60,22 +58,21 @@ let range = (~start, ~end) => {
     : unfold(start, i => i >= end ? Some(i, i - 1) : None)
 }
 
-// labels as head and tail?
-let rec tap = (seq, f) =>
-  seq->mapNext((value, seq) => {
-    f(value)
-    Next(value, tap(seq, f))
-  })
-
-let startWith = (seq, value) => cons(value, seq)
-
-let rec flatMap = (seq, f) => {
+let rec flatMap = (xs, f) => {
   (. ()) =>
-    switch seq(.) {
+    switch xs(.) {
     | Empty => Empty
     | Next(value, next) => concat(f(value), flatMap(next, f))(.)
     }
 }
+
+let rec tap = (xs, f) =>
+  xs->mapNext((x, xs) => {
+    f(x)
+    Next(x, tap(xs, f))
+  })
+
+let startWith = (xs, x) => cons(x, xs)
 
 let flatten = seq => seq->flatMap(i => i)
 
