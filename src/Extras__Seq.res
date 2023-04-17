@@ -40,8 +40,6 @@ let infinite = f => unfold(0, _ => Some(f(), 0))
 
 let iterate = (seed, f) => unfold(seed, i => Some(i, f(i)))
 
-let startWith = (seq, value) => (. ()) => Next(value, seq)
-
 let rec concat = (xs, ys) => {
   (. ()) =>
     switch xs(.) {
@@ -49,6 +47,10 @@ let rec concat = (xs, ys) => {
     | Next(x, xs) => Next(x, concat(xs, ys))
     }
 }
+
+// concatMany?
+// in pipeline mode could just concat concat concat
+// if not pipeline mode...
 
 let prepend = (xs, ys) => concat(ys, xs)
 
@@ -64,6 +66,8 @@ let rec tap = (seq, f) =>
     f(value)
     Next(value, tap(seq, f))
   })
+
+let startWith = (seq, value) => cons(value, seq)
 
 let rec flatMap = (seq, f) => {
   (. ()) =>
@@ -92,8 +96,6 @@ let cycle = seq =>
     | Next(head, tail) => cons(head, tail)->concat(seq->cycleNonEmpty)->consume1
     }
   }
-
-let concatMany = (s1, others) => s1->concat(others->flatten)
 
 let map = (seq, f) => flatMap(seq, i => singleton(f(i)))
 

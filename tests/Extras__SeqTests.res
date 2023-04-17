@@ -549,12 +549,6 @@ let transforming = [
     ~a=() => oneToFive->S.prepend(fourFiveSix),
     ~b=[4, 5, 6, 1, 2, 3, 4, 5],
   ),
-  areEqual(
-    ~title="concatMany",
-    ~expectation="",
-    ~a=() => oneToFive->S.concatMany(S.replicate(~count=3, ~value=oneTwoThree)),
-    ~b=[1, 2, 3, 4, 5, 1, 2, 3, 1, 2, 3, 1, 2, 3],
-  ),
   T.make(~category="Seq", ~title="tap", ~expectation="can inspect each value", ~predicate=() => {
     let seen = []
     let items = oneToFive->S.tap(i => seen->Js.Array2.push(i)->ignore)->S.toArray

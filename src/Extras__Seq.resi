@@ -25,7 +25,7 @@ let cons: ('a, t<'a>) => t<'a>
 let startWith: (t<'a>, 'a) => t<'a>
 let prepend: (t<'a>, t<'a>) => t<'a>
 let concat: (t<'a>, t<'a>) => t<'a>
-let concatMany: (t<'a>, t<t<'a>>) => t<'a>
+let flatten: t<t<'a>> => t<'a>
 let flatMap: (t<'a>, 'a => t<'b>) => t<'b>
 let map: (t<'a>, 'a => 'b) => t<'b>
 let mapi: (t<'a>, (~value: 'a, ~index: int) => 'b) => t<'b>
@@ -45,7 +45,6 @@ let zip: (t<'a>, t<'b>) => t<('a, 'b)>
 let zipLongest: (t<'a>, t<'b>) => t<(option<'a>, option<'b>)>
 let scan: (t<'a>, 'b, ('b, 'a) => 'b) => t<'b>
 let scani: (t<'a>, ~zero: 'b, (~sum: 'b, ~value: 'a, ~index: int) => 'b) => t<'b>
-let flatten: t<t<'a>> => t<'a>
 let map2: (t<'a>, t<'b>, ('a, 'b) => 'c) => t<'c>
 let sortedMerge: (t<'a>, t<'a>, ('a, 'a) => int) => t<'a>
 let cache: t<'a> => t<'a>
