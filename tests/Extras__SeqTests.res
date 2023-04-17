@@ -50,6 +50,13 @@ let constructors = [
     ~a=() => S.unfold(1, x => x <= 5 ? Some(x, x + 1) : None),
     ~b=[1, 2, 3, 4, 5],
   ),
+  areEqual(~title="cons", ~expectation="when a + empty => a", ~a=() => S.cons(1, S.empty), ~b=[1]),
+  areEqual(
+    ~title="cons",
+    ~expectation="when a + bcd => abcd",
+    ~a=() => S.cons(1, S.range(~start=2, ~end=4)),
+    ~b=[1, 2, 3, 4],
+  ),
   areEqual(
     ~title="init",
     ~expectation="when count is < 0 => empty",
