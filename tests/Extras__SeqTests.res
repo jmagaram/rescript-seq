@@ -40,15 +40,15 @@ let constructors = [
   areEqual(~title="empty", ~expectation="has no items", ~a=() => S.empty, ~b=[]),
   areEqual(
     ~title="unfold",
-    ~expectation="when many items",
+    ~expectation="when generate many items",
     ~a=() => S.unfold(1, x => x <= 5 ? Some(x, x + 1) : None),
     ~b=[1, 2, 3, 4, 5],
   ),
   areEqual(
     ~title="unfold",
-    ~expectation="when empty",
-    ~a=() => S.unfold(1, x => x <= 5 ? Some(x, x + 1) : None),
-    ~b=[1, 2, 3, 4, 5],
+    ~expectation="when generate zero items",
+    ~a=() => S.unfold(1, _ => None),
+    ~b=[],
   ),
   areEqual(~title="cons", ~expectation="when a + empty => a", ~a=() => S.cons(1, S.empty), ~b=[1]),
   areEqual(
