@@ -21,6 +21,8 @@ let empty = (. ()) => Empty
 
 let singleton = v => (. ()) => Next(v, empty)
 
+let cons = (value, seq) => (. ()) => Next(value, seq)
+
 let rec unfold = (seed, f) =>
   (. ()) => {
     switch f(seed) {
@@ -29,6 +31,7 @@ let rec unfold = (seed, f) =>
     }
   }
 
+// awkward!
 let init = (~count, ~initializer) =>
   unfold(0, i => i < count ? Some(initializer(~index=i), i + 1) : None)
 
@@ -40,22 +43,23 @@ let iterate = (seed, f) => unfold(seed, i => Some(i, f(i)))
 
 let startWith = (seq, value) => (. ()) => Next(value, seq)
 
-let rec concat = (s1, s2) => {
+let rec concat = (xs, ys) => {
   (. ()) =>
-    switch s1(.) {
-    | Empty => s2(.)
-    | Next(s1Value, b) => Next(s1Value, concat(b, s2))
+    switch xs(.) {
+    | Empty => ys(.)
+    | Next(x, xs) => Next(x, concat(xs, ys))
     }
 }
 
-let prepend = (s1, s2) => concat(s2, s1)
+let prepend = (xs, ys) => concat(ys, xs)
 
 let range = (~start, ~end) => {
-  start < end
+  start <= end
     ? unfold(start, i => i <= end ? Some(i, i + 1) : None)
     : unfold(start, i => i >= end ? Some(i, i - 1) : None)
 }
 
+// labels as head and tail?
 let rec tap = (seq, f) =>
   seq->mapNext((~value, ~seq) => {
     f(value)
@@ -72,13 +76,23 @@ let rec flatMap = (seq, f) => {
 
 let flatten = seq => seq->flatMap(i => i)
 
-let cycle = seq => {
-  (. ()) =>
+let cycleNonEmpty = seq => {
+  let rec go = seq' =>
+    (. ()) =>
+      switch seq'(.) {
+      | Empty => go(seq)(.)
+      | Next(head, tail) => Next(head, go(tail))
+      }
+  go(seq)
+}
+
+let cycle = seq =>
+  (. ()) => {
     switch seq(.) {
     | Empty => Empty
-    | Next(head, tail) => Next(head, concat(tail, infinite(() => seq)->flatten))
+    | Next(head, tail) => (cons(head, tail)->concat(cycleNonEmpty(seq)))(.)
     }
-}
+  }
 
 let concatMany = (s1, others) => s1->concat(others->flatten)
 

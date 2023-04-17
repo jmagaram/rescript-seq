@@ -167,6 +167,30 @@ let constructors = [
   areEqual(~title="cycle", ~expectation="when empty => empty", ~a=() => S.empty, ~b=[]),
   areEqual(
     ~title="cycle",
+    ~expectation="when singleton => repeat endlessly",
+    ~a=() => S.singleton(1)->S.cycle->S.takeAtMost(5),
+    ~b=[1, 1, 1, 1, 1],
+  ),
+  T.make(
+    ~title="Seq",
+    ~category="cycle",
+    ~expectation="use but do not cache first value",
+    ~predicate=() => {
+      let generated = []
+      let items =
+        S.infinite(() => {
+          let r = Js.Math.random()
+          generated->Js.Array2.push(r)->ignore
+          r
+        })
+        ->S.cycle
+        ->S.takeAtMost(3)
+        ->S.toArray
+      items == generated
+    },
+  ),
+  areEqual(
+    ~title="cycle",
     ~expectation="when not empty => repeat endlessly",
     ~a=() => oneTwoThree->S.cycle->S.takeAtMost(16),
     ~b=[1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1],

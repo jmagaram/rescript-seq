@@ -17,7 +17,7 @@ let fromArray: (~start: int=?, ~end: int=?, array<'a>) => t<'a>
 let fromList: list<'a> => t<'a>
 let fromOption: option<'a> => t<'a>
 let fromString: string => t<string>
-
+let cons: ('a, t<'a>) => t<'a> // order of params vs start with
 // =========
 // Transform
 // =========
