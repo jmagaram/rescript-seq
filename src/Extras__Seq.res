@@ -1,7 +1,7 @@
 module Option = Belt.Option
 module Result = Belt.Result
 module Ex = Extras
-module TR = Ex.Functions.Trampoline
+module TR = Extras__Trampoline
 
 type rec t<'a> = (. unit) => node<'a>
 and node<'a> =
@@ -11,6 +11,32 @@ and node<'a> =
 exception ArgumentOfOfRange(string)
 
 let next = (xs: t<'a>) => xs(.)
+
+let nodeToOption = n =>
+  switch n {
+  | End => None
+  | Next(x, xs) => Some(x, xs)
+  }
+// foundational; can not be recursive
+let findNode = (xs, f) => {
+  let found = ref(None)
+  let current = ref(xs)
+  let break = ref(false)
+  while !break.contents {
+    switch current.contents->next {
+    | End => break := true
+    | Next(x, xs) as node =>
+      switch f(x) {
+      | true =>
+        found := Some(node)
+        break := true
+      | false => ()
+      }
+      current := xs
+    }
+  }
+  found.contents
+}
 
 let consumeUntil = (~seq, ~predicate, ~onNext, ~onEmpty) => {
   let break = ref(false)
@@ -58,6 +84,8 @@ let headTail = seq =>
   | End => None
   | Next(head, tail) => Some(head, tail)
   }
+
+let find = (xs, f) => xs->findNode(f)->Option.flatMap(nodeToOption)->Option.map(((x, _)) => x)
 
 let singleton = v => cons(v, empty)
 
@@ -310,11 +338,6 @@ let rec takeWhile = (xs, predicate) =>
     }
   )
 
-// let rec filterMap2 = (xs, f) =>
-//   xs->mapNext((x, xs) => {
-//     let c = xs->map(f)->takeUntil(Option.isSome)
-//   })
-
 let rec zip = (xs, ys) =>
   (. ()) => {
     switch (xs->next, ys->next) {
@@ -324,41 +347,44 @@ let rec zip = (xs, ys) =>
     }
   }
 
-let rec filterMap = (xs, f) =>
-  xs->mapNext((x, xs) =>
-    switch f(x) {
-    | Some(x) => Next(x, filterMap(xs, f))
-    | None => {
-        let xs' = ref(None)
-        let x = ref(None)
-        consumeUntil(
-          ~seq=xs,
-          ~onEmpty=() => (),
-          ~onNext=(_, xs) => xs' := Some(xs),
-          ~predicate=i => {
-            x := f(i)
-            x.contents->Option.isSome
-          },
-        )
-        switch x.contents {
-        | None => End
-        | Some(x) => Next(x, filterMap(xs'.contents->Option.getExn, f))
-        }
-      }
-    }
-  )
+// let rec filterMap = (xs, f) =>
+//   xs->mapNext((x, xs) =>
+//     switch f(x) {
+//     | Some(x) => Next(x, filterMap(xs, f))
+//     | None => {
+//         let xs' = ref(None)
+//         let x = ref(None)
+//         consumeUntil(
+//           ~seq=xs,
+//           ~onEmpty=() => (),
+//           ~onNext=(_, xs) => xs' := Some(xs),
+//           ~predicate=i => {
+//             x := f(i)
+//             x.contents->Option.isSome
+//           },
+//         )
+//         switch x.contents {
+//         | None => End
+//         | Some(x) => Next(x, filterMap(xs'.contents->Option.getExn, f))
+//         }
+//       }
+//     }
+//   )
 
-let filterSome = seq => seq->filterMap(i => i)
+let filterMap = (xs, f) => xs->map(f)->filter(Option.isSome)->map(Option.getUnsafe)
 
-let filterOk = seq =>
-  seq->filterMap(i =>
-    switch i {
+let filterSome = xs => xs->filterMap(x => x)
+
+let filterOk = xs =>
+  xs->filterMap(x =>
+    switch x {
     | Ok(ok) => Some(ok)
     | Error(_) => None
     }
   )
 
-let scani = (seq, ~zero, f) => {
+// need stress millions test on this
+let scani = (xs, ~zero, f) => {
   let rec go = (seq, sum) =>
     switch seq->next {
     | End => (. ()) => End
@@ -368,7 +394,7 @@ let scani = (seq, ~zero, f) => {
         Next(sum, go(seq, sum))
       }
     }
-  concat(singleton(zero), go(seq->indexed, zero))
+  concat(singleton(zero), go(xs->indexed, zero))
 }
 
 let scan = (seq, zero, f) => scani(seq, ~zero, (~sum, ~value, ~index as _) => f(sum, value))
@@ -610,8 +636,6 @@ let findMapi = (seq, f) => {
 }
 
 let findMap = (seq, f) => findMapi(seq, (~value, ~index as _) => f(value))
-
-let find = (seq, predicate) => seq->findMap(i => predicate(i) ? Some(i) : None)
 
 let equals = (s1: t<'a>, s2: t<'b>, eq) =>
   zipLongest(s1, s2)->everyOrEmpty(((a, b)) =>
