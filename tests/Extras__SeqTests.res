@@ -463,9 +463,33 @@ let transforming = [
   ),
   areEqual(
     ~title="filter",
-    ~expectation="",
+    ~expectation="when 1 item and condition met",
+    ~a=() => S.singleton(1)->S.filter(i => i == 1),
+    ~b=[1],
+  ),
+  areEqual(
+    ~title="filter",
+    ~expectation="when 1 item and condition not met",
+    ~a=() => S.singleton(1)->S.filter(_ => false),
+    ~b=[],
+  ),
+  areEqual(
+    ~title="filter",
+    ~expectation="when empty",
+    ~a=() => S.empty->S.filter(_ => true),
+    ~b=[],
+  ),
+  areEqual(
+    ~title="filter",
+    ~expectation="when > 1 items and condition met",
     ~a=() => oneToFive->S.filter(i => i == 2 || i == 5),
     ~b=[2, 5],
+  ),
+  areEqual(
+    ~title="filter",
+    ~expectation="when > 1 items and condition met with first",
+    ~a=() => [1, 1, 2, 2]->S.fromArray->S.filter(i => i == 1),
+    ~b=[1, 1],
   ),
   areEqual(
     ~title="filter",
