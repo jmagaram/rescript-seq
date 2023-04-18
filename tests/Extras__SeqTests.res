@@ -203,8 +203,8 @@ let constructors = [
     ~b=[1, 1, 1, 1, 1],
   ),
   T.make(
-    ~title="Seq",
-    ~category="cycle",
+    ~category="Seq",
+    ~title="cycle",
     ~expectation="use but do not cache first value",
     ~predicate=() => {
       let generated = []
@@ -217,7 +217,7 @@ let constructors = [
         ->S.cycle
         ->S.takeAtMost(3)
         ->S.toArray
-      items == generated
+      items == generated && generated->Js.Array2.length == 3
     },
   ),
   areEqual(
@@ -393,15 +393,43 @@ let transforming = [
   ),
   areEqual(
     ~title="drop",
-    ~expectation="when zero => original seq",
+    ~expectation="when count = 0 => original seq by value",
     ~a=() => oneToFive->S.drop(0),
     ~b=[1, 2, 3, 4, 5],
   ),
-  areEqual(~title="drop", ~expectation="when all => empty", ~a=() => oneToFive->S.drop(5), ~b=[]),
-  areEqual(~title="drop", ~expectation="when subset", ~a=() => oneToFive->S.drop(2), ~b=[3, 4, 5]),
   areEqual(
     ~title="drop",
-    ~expectation="when a million items, no stack overflow",
+    ~expectation="when count = 0 => original seq by ===",
+    ~a=() => S.singleton(oneToFive->S.drop(0) === oneToFive),
+    ~b=[true],
+  ),
+  areEqual(
+    ~title="drop",
+    ~expectation="when count == length => empty",
+    ~a=() => oneToFive->S.drop(5),
+    ~b=[],
+  ),
+  areEqual(
+    ~title="drop",
+    ~expectation="when count > length => empty",
+    ~a=() => oneToFive->S.drop(Int32.max_int),
+    ~b=[],
+  ),
+  areEqual(
+    ~title="drop",
+    ~expectation="when count < length => subset",
+    ~a=() => oneToFive->S.drop(2),
+    ~b=[3, 4, 5],
+  ),
+  areEqual(
+    ~title="drop",
+    ~expectation="when count == 1 => just skip first",
+    ~a=() => oneToFive->S.drop(1),
+    ~b=[2, 3, 4, 5],
+  ),
+  areEqual(
+    ~title="drop",
+    ~expectation="when drop a million items => no stack overflow",
     ~a=() => S.concat(S.replicate(~count=999999, ~value="x"), S.singleton("y"))->S.drop(999999),
     ~b=["y"],
   ),

@@ -1,4 +1,5 @@
 open Belt
+module String = Js.String2
 
 type t = {
   category: string,
@@ -10,6 +11,24 @@ type t = {
 let category = i => i.category
 let title = i => i.title
 let expectation = i => i.expectation
+let predicate = i => i.predicate
+
+let hasKeyword = (i, xs) => {
+  let match = (~text, ~keyword) => {
+    let text = text->String.trim->String.toLocaleLowerCase
+    let keyword = keyword->String.trim->String.toLocaleLowerCase
+    text->Js.String2.includes(keyword)
+  }
+  switch xs {
+  | [] => false
+  | xs =>
+    xs->Js.Array2.some(x =>
+      match(~text=i->category, ~keyword=x) ||
+      match(~text=i->title, ~keyword=x) ||
+      match(~text=i->expectation, ~keyword=x)
+    )
+  }
+}
 
 type summary = {
   pass: int,
@@ -50,7 +69,7 @@ let run = async i => {
 
 let toString = i => `${i.category} | ${i.title} | ${i.expectation}`
 
-let runSuite = async (~filter=_ => true, ~onlyShowFailures=false, tests) => {
+let runSuite = async (~keywords=[], ~filter=_ => true, ~onlyShowFailures=false, tests) => {
   let log = Js.Console.log
   let logSection = n => {
     log("")
@@ -59,11 +78,12 @@ let runSuite = async (~filter=_ => true, ~onlyShowFailures=false, tests) => {
   let results =
     await tests
     ->Array.keep(filter)
+    ->Array.keep(test => hasKeyword(test, keywords))
     ->SortArray.stableSortBy(cmp)
     ->Array.map(i => i->run)
     ->Js.Promise2.all
   let (succeeded, failed) = results->Array.partition(((r, _)) => r)
-  if succeeded->Array.length > 0 && !onlyShowFailures {
+  if succeeded->Array.length > 0 && onlyShowFailures {
     logSection("SUCCEEDED")
     succeeded->Array.forEach(((_, t)) => `PASS ${t->toString}`->log)
   }
@@ -77,7 +97,6 @@ let runSuite = async (~filter=_ => true, ~onlyShowFailures=false, tests) => {
     fail: failed->Array.length,
     ran: succeeded->Array.length + failed->Array.length,
   }
-
   log(`PASS : ${summary.pass->Int.toString}`)
   log(`FAIL : ${summary.fail->Int.toString}`)
   log(`RAN  : ${summary.ran->Int.toString}`)
