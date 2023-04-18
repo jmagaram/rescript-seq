@@ -1,3 +1,8 @@
+## Version 0.22.0
+
+- Allow test filtering by keyword
+- `Functions` module with `Trampoline` recursion helper
+
 ## Version 0.21.0
 
 - Make `Task.t` not abstract
