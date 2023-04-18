@@ -1,6 +1,7 @@
 module Option = Belt.Option
 module Result = Belt.Result
 module Ex = Extras
+module TR = Ex.Functions.Trampoline
 
 type rec t<'a> = (. unit) => node<'a>
 and node<'a> =
@@ -9,7 +10,7 @@ and node<'a> =
 
 exception ArgumentOfOfRange(string)
 
-let consume1 = xs => xs(.)
+let next = (xs: t<'a>) => xs(.)
 
 let consumeUntil = (~seq, ~predicate, ~onNext, ~onEmpty) => {
   let break = ref(false)
@@ -31,7 +32,7 @@ let empty = (. ()) => End
 
 let mapNext = (xs, f) => {
   (. ()) =>
-    switch xs(.) {
+    switch xs->next {
     | End => End
     | Next(x, xs) => f(x, xs)
     }
@@ -39,7 +40,7 @@ let mapNext = (xs, f) => {
 
 let mapBoth = (xs, ~onEmpty, ~onNext) =>
   (. ()) =>
-    switch xs(.) {
+    switch xs->next {
     | End => onEmpty()
     | Next(x, xs) => onNext(x, xs)
     }
@@ -47,13 +48,13 @@ let mapBoth = (xs, ~onEmpty, ~onNext) =>
 let cons = (value, seq) => (. ()) => Next(value, seq)
 
 let head = seq =>
-  switch seq(.) {
+  switch seq->next {
   | End => None
   | Next(head, _) => Some(head)
   }
 
 let headTail = seq =>
-  switch seq(.) {
+  switch seq->next {
   | End => None
   | Next(head, tail) => Some(head, tail)
   }
@@ -61,12 +62,11 @@ let headTail = seq =>
 let singleton = v => cons(v, empty)
 
 let rec unfold = (seed, f) =>
-  (. ()) => {
+  (. ()) =>
     switch f(seed) {
     | None => End
     | Some(value, seed) => Next(value, unfold(seed, f))
     }
-  }
 
 let init = (~count, f) => unfold(0, i => i < count ? Some(f(~index=i), i + 1) : None)
 
@@ -77,7 +77,7 @@ let infinite = f => unfold(0, _ => Some(f(), 0))
 let iterate = (seed, f) => unfold(seed, i => Some(i, f(i)))
 
 let rec concat = (xs, ys) =>
-  xs->mapBoth(~onEmpty=() => ys->consume1, ~onNext=(x, xs) => Next(x, concat(xs, ys)))
+  xs->mapBoth(~onEmpty=() => ys->next, ~onNext=(x, xs) => Next(x, concat(xs, ys)))
 
 let prepend = (xs, ys) => concat(ys, xs)
 
@@ -89,7 +89,7 @@ let range = (~start, ~end) => {
 
 let rec flatMap = (xs, f) => {
   (. ()) =>
-    switch xs(.) {
+    switch xs->next {
     | End => End
     | Next(value, next) => concat(f(value), flatMap(next, f))(.)
     }
@@ -108,14 +108,14 @@ let flatten = xxs => xxs->flatMap(i => i)
 let cycleNonEmpty = xs => {
   let rec go = ys =>
     (. ()) =>
-      switch ys(.) {
+      switch ys->next {
       | End => go(xs)(.)
       | Next(y, ys) => Next(y, go(ys))
       }
   go(xs)
 }
 
-let cycle = xs => xs->mapNext((x, xs') => cons(x, xs')->concat(xs->cycleNonEmpty)->consume1)
+let cycle = xs => xs->mapNext((x, xs') => cons(x, xs')->concat(xs->cycleNonEmpty)->next)
 
 let rec map = (xs, f) => xs->mapNext((x, xs) => Next(f(x), map(xs, f)))
 
@@ -188,20 +188,14 @@ let takeAtMost = (xs, count) => {
 let headTails = xs =>
   unfold(xs, xs => xs->headTail->Option.flatMap(((_, xs) as ht) => Some(ht, xs)))
 
-let last = seq => {
-  let current = ref(seq)
-  let last = ref(None)
-  let break = ref(false)
-  while !break.contents {
-    switch current.contents(.) {
-    | End => break := true
-    | Next(head, tail) => {
-        last := Some(head)
-        current := tail
-      }
+let last = xs => {
+  let rec go = (last, xs) => {
+    switch xs->next {
+    | End => TR.resolve(last)
+    | Next(x, xs) => TR.work(() => go(Some(x), xs))
     }
   }
-  last.contents
+  TR.work(() => go(None, xs))->TR.solve
 }
 
 // This caused problems with windowAhead; don't know why
@@ -248,24 +242,54 @@ let filteri = (xs, f) => {
     xs->mapNext(((x, index), xs) =>
       switch f(~value=x, ~index) {
       | true => Next(x, go(xs))
-      | false => go(xs)->consume1
+      | false => go(xs)->next
       }
     )
   go(xs->indexed)
 }
 
+// let rec filter = (xs, f) =>
+//   xs->mapNext((x, xs) =>
+//     switch f(x) {
+//     | true => Next(x, filter(xs, f))
+//     | false => filter(xs, f)->next
+//     }
+//   )
+
+// let rec filter f seq () = match seq() with
+//   | Nil -> Nil
+//   | Cons (x, next) ->
+//       if f x
+//       then Cons (x, filter f next)
+//       else filter f next ()
+
 let rec filter = (xs, f) =>
-  xs->mapNext((x, xs) =>
-    switch f(x) {
-    | true => Next(x, filter(xs, f))
-    | false => filter(xs, f)->consume1
+  (. ()) => {
+    let rec find = xs => {
+      switch xs->next {
+      | End => TR.resolve(None)
+      | Next(x, xs) as n =>
+        switch f(x) {
+        | true => TR.resolve(Some(n))
+        | false => TR.work(() => find(xs))
+        }
+      }
     }
-  )
+    TR.work(() => find(xs))
+    ->TR.solve
+    ->Option.map(i =>
+      switch i {
+      | Next(x, xs) => Next(x, filter(xs, f))
+      | End => End
+      }
+    )
+    ->Option.getWithDefault(End)
+  }
 
 let rec zipLongest = (xs, ys) => {
   (. ()) => {
-    let xn = xs->consume1
-    let yn = ys->consume1
+    let xn = xs->next
+    let yn = ys->next
     switch (xn, yn) {
     | (End, End) => End
     | (Next(x, xs), End) => Next((Some(x), None), zipLongest(xs, empty))
@@ -290,7 +314,7 @@ let rec takeWhile = (xs, predicate) =>
 
 let rec zip = (xs, ys) =>
   (. ()) => {
-    switch (xs->consume1, ys->consume1) {
+    switch (xs->next, ys->next) {
     | (End, _) => End
     | (_, End) => End
     | (Next(x, xs), Next(y, ys)) => Next((x, y), zip(xs, ys))
@@ -333,7 +357,7 @@ let filterOk = seq =>
 
 let scani = (seq, ~zero, f) => {
   let rec go = (seq, sum) =>
-    switch seq(.) {
+    switch seq->next {
     | End => (. ()) => End
     | Next((value, index), seq) =>
       (. ()) => {
@@ -348,7 +372,7 @@ let scan = (seq, zero, f) => scani(seq, ~zero, (~sum, ~value, ~index as _) => f(
 
 let rec dropWhile = (seq, predicate) => {
   (. ()) => {
-    switch seq(.) {
+    switch seq->next {
     | End => End
     | Next(value, seq) =>
       switch predicate(value) {
@@ -402,7 +426,7 @@ module UncurriedDeferred = {
 
 let rec cache = seq =>
   UncurriedDeferred.memoize((. ()) =>
-    switch seq(.) {
+    switch seq->next {
     | End => End
     | Next(value, seq) => Next(value, cache(seq))
     }
@@ -423,7 +447,7 @@ let consumeN = (seq, n) => {
   let isEmpty = ref(false)
   let seq = ref(seq)
   while consumed->Js.Array2.length < n && !isEmpty.contents {
-    switch seq.contents(.) {
+    switch seq.contents->next {
     | End => isEmpty := true
     | Next(head, tail) => {
         consumed->Js.Array2.push(head)->ignore
@@ -486,18 +510,18 @@ let window = (seq, length) => {
   ->filter(i => Js.Array2.length(i) == length)
 }
 
-let pairwise = seq =>
-  seq->window(2)->map(i => (i->Js.Array2.unsafe_get(0), i->Js.Array2.unsafe_get(1)))
+let pairwise = xs =>
+  xs->window(2)->map(i => (i->Js.Array2.unsafe_get(0), i->Js.Array2.unsafe_get(1)))
 
 // Always tries to generate at least 1 item to determine that the seq has 0 items
 let reduce = (seq, zero, concat) => {
   let sum = ref(zero)
-  let curr = ref(seq(.))
+  let curr = ref(seq->next)
   while curr.contents !== End {
     switch curr.contents {
     | End => ()
     | Next(v, seq) => {
-        curr := seq(.)
+        curr := seq->next
         sum := concat(sum.contents, v)
       }
     }
@@ -517,13 +541,13 @@ let toArray = seq =>
 let toString = seq => seq->reduce("", (total, i) => total ++ i)
 
 let forEach = (seq, f) => {
-  let curr = ref(seq(.))
+  let curr = ref(seq->next)
   while curr.contents !== End {
     switch curr.contents {
     | End => ()
     | Next(value, seq) => {
         f(value)
-        curr := seq(.)
+        curr := seq->next
       }
     }
   }
@@ -533,14 +557,14 @@ let forEachi = (seq, f) => seq->indexed->forEach(((value, index)) => f(~value, ~
 
 let some = (seq, predicate) => {
   let break = ref(false)
-  let curr = ref(seq(.))
+  let curr = ref(seq->next)
   let result = ref(false)
   while result.contents !== true && curr.contents !== End {
     switch curr.contents {
     | End => break := true
     | Next(value, seq) => {
         result := predicate(value)
-        curr := seq(.)
+        curr := seq->next
       }
     }
   }
@@ -549,14 +573,14 @@ let some = (seq, predicate) => {
 
 let everyOrEmpty = (seq, predicate) => {
   let break = ref(false)
-  let curr = ref(seq(.))
+  let curr = ref(seq->next)
   let foundInvalid = ref(false)
   while foundInvalid.contents === false && curr.contents !== End {
     switch curr.contents {
     | End => break := true
     | Next(value, seq) => {
         foundInvalid := !predicate(value)
-        curr := seq(.)
+        curr := seq->next
       }
     }
   }
@@ -565,7 +589,7 @@ let everyOrEmpty = (seq, predicate) => {
 
 let findMapi = (seq, f) => {
   let seq = seq->indexed
-  let curr = ref(seq(.))
+  let curr = ref(seq->next)
   let found = ref(None)
   while found.contents->Option.isNone && curr.contents !== End {
     switch curr.contents {
@@ -575,7 +599,7 @@ let findMapi = (seq, f) => {
         | None => ()
         | Some(_) as m => found := m
         }
-        curr := seq(.)
+        curr := seq->next
       }
     }
   }
@@ -611,7 +635,7 @@ let compare = (s1, s2, cmp) =>
 let length = seq => seq->reduce(0, (sum, _) => sum + 1)
 
 let isEmpty = seq =>
-  switch seq(.) {
+  switch seq->next {
   | End => true
   | _ => false
   }
@@ -636,8 +660,8 @@ let maxBy = (seq, compare) =>
 
 let rec interleave = (xs, ys) => {
   (. ()) => {
-    switch xs(.) {
-    | End => ys(.)
+    switch xs->next {
+    | End => ys->next
     | Next(x, xs) => Next(x, interleave(ys, xs))
     }
   }
@@ -756,10 +780,7 @@ let allSome = seq => {
 }
 
 let toOption = seq =>
-  switch seq(.) {
+  switch seq->next {
   | End => None
   | Next(head, tail) => Some(tail->startWith(head))
   }
-
-let quiw = singleton(1)->windowAhead(1)->toArray
-Js.log2("it was ", quiw)
