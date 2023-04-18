@@ -29,6 +29,7 @@ let tests =
     Extras__PatternTests.tests,
     Extras__UnknownTests.tests,
     Extras__SeqTests.tests,
+    Extras__FunctionsTests.tests,
   ]->Array.concatMany
 
 Ex.Task.Result.make(
