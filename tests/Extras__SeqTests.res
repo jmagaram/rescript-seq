@@ -560,30 +560,6 @@ let transforming = [
     ~b=[(1, 4), (2, 5), (3, 6)],
   ),
   areEqual(
-    ~title="filterMap",
-    ~expectation="keep the Some",
-    ~a=() => oneToFive->S.filterMap(i => i == 2 || i == 3 ? Some(i * 2) : None),
-    ~b=[4, 6],
-  ),
-  areEqual(
-    ~title="filterMap",
-    ~expectation="when no matches",
-    ~a=() => oneToFive->S.filterMap(_ => None),
-    ~b=[],
-  ),
-  areEqual(
-    ~title="filterMap",
-    ~expectation="when empty => empty",
-    ~a=() => S.empty->S.filterMap(_ => Some(1)),
-    ~b=[],
-  ),
-  areEqual(
-    ~title="filterMap",
-    ~expectation="when millions of None => empty",
-    ~a=() => S.infinite(() => Js.Math.random())->S.takeAtMost(999_999)->S.filterMap(_ => None),
-    ~b=[],
-  ),
-  areEqual(
     ~title="scani",
     ~expectation="when empty => zero",
     ~a=() => S.empty->S.scani(~zero=10, (~sum, ~value, ~index) => sum + value + index + 1),
@@ -1030,43 +1006,33 @@ let transforming = [
     },
     ~b=[1],
   ),
-  areEqual(
-    ~title="filter",
-    ~expectation="when 1 item and condition met",
-    ~a=() => S.singleton(1)->S.filter(i => i == 1),
-    ~b=[1],
-  ),
-  areEqual(
-    ~title="filter",
-    ~expectation="when 1 item and condition not met",
-    ~a=() => S.singleton(1)->S.filter(_ => false),
-    ~b=[],
-  ),
-  areEqual(
-    ~title="filter",
-    ~expectation="when empty",
-    ~a=() => S.empty->S.filter(_ => true),
-    ~b=[],
-  ),
-  areEqual(
-    ~title="filter",
-    ~expectation="when > 1 items and condition met",
-    ~a=() => oneToFive->S.filter(i => i == 2 || i == 5),
-    ~b=[2, 5],
-  ),
-  areEqual(
-    ~title="filter",
-    ~expectation="when > 1 items and condition met with first",
-    ~a=() => [1, 1, 2, 2]->S.fromArray->S.filter(i => i == 1),
-    ~b=[1, 1],
-  ),
-  areEqual(
-    ~title="filter",
-    ~expectation="when skipping millions => no stack problem",
-    ~a=() => S.replicate(~count=999_999, ~value=1)->S.concat(2->S.singleton)->S.filter(i => i != 1),
-    ~b=[2],
-  ),
 ]
+
+let filterMapTests =
+  [
+    (S.empty, _ => Some(1), [], ""),
+    (S.empty, _ => None, [], ""),
+    (1->S.singleton, i => Some(i * 2), [2], ""),
+    (1->S.singleton, _ => None, [], ""),
+    (oneToFive, i => Some(i), [1, 2, 3, 4, 5], ""),
+    (oneToFive, _ => None, [], ""),
+    (oneToFive, i => i == 3 || i == 5 ? Some(i) : None, [3, 5], ""),
+    (oneToFive, i => i == 5 ? Some(99) : None, [99], ""),
+    (oneToFive, i => i == 1 || i == 3 ? Some(i * 2) : None, [2, 6], ""),
+    (
+      S.range(~start=1, ~end=9_999_999),
+      i => i == 9_999_999 ? Some(-i) : None,
+      [-9_999_999],
+      "millions",
+    ),
+  ]->Js.Array2.mapi(((source, f, result, note), inx) =>
+    areEqual(
+      ~title="filterMap",
+      ~expectation=`index ${inx->intToString} ${note}`,
+      ~a=() => source->S.filterMap(f),
+      ~b=result,
+    )
+  )
 
 let filterTests =
   [
@@ -1550,6 +1516,7 @@ let tests =
     findTests,
     dropUntilTests,
     filterTests,
+    filterMapTests,
     lastTests,
     allOkTests,
     allSomeTests,
