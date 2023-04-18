@@ -504,6 +504,15 @@ let transforming = [
     ~b=[3],
   ),
   areEqual(
+    ~title="filteri",
+    ~expectation="when skipping millions => no stack problem",
+    ~a=() =>
+      S.replicate(~count=999999, ~value=1)
+      ->S.concat(2->S.singleton)
+      ->S.filteri((~value, ~index as _) => value != 1),
+    ~b=[2],
+  ),
+  areEqual(
     ~title="zipLongest",
     ~expectation="when same length",
     ~a=() => S.zipLongest(oneTwoThree, oneTwoThree),
