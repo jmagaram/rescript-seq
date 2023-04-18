@@ -22,7 +22,7 @@ let hasKeyword = (i, xs) => {
   switch xs {
   | [] => false
   | xs =>
-    xs->Js.Array2.some(x =>
+    xs->Js.Array2.every(x =>
       match(~text=i->category, ~keyword=x) ||
       match(~text=i->title, ~keyword=x) ||
       match(~text=i->expectation, ~keyword=x)
