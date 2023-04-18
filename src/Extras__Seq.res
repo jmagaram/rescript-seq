@@ -17,6 +17,7 @@ let nodeToOption = n =>
   | End => None
   | Next(x, xs) => Some(x, xs)
   }
+
 // foundational; can not be recursive
 let findNode = (xs, f) => {
   let found = ref(None)
@@ -84,6 +85,20 @@ let headTail = seq =>
   | End => None
   | Next(head, tail) => Some(head, tail)
   }
+
+module Indexed = {
+  type t<'a> = ('a, int)
+  @inline let make = (~value, ~index) => (value, index)
+  @inline let value = ((value, _): t<'a>) => value
+  @inline let index = ((_, index): t<'a>) => index
+  @inline let indexEquals = (i, other) => i->index == other
+  @inline let existsValue = (i: t<'a>, f) => f(i->value)
+}
+
+let indexed = xs => {
+  let rec go = (xs, inx) => xs->mapNext((x, xs) => Next((x, inx), go(xs, inx + 1)))
+  go(xs, 0)
+}
 
 let find = (xs, f) => xs->findNode(f)->Option.flatMap(nodeToOption)->Option.map(((x, _)) => x)
 
@@ -195,11 +210,6 @@ let fromOption = opt =>
   | Some(value) => singleton(value)
   }
 
-let indexed = xs => {
-  let rec go = (xs, inx) => xs->mapNext((x, xs) => Next((x, inx), go(xs, inx + 1)))
-  go(xs, 0)
-}
-
 let mapi = (xs, f) => xs->indexed->map(((x, index)) => f(~value=x, ~index))
 
 let takeAtMost = (xs, count) => {
@@ -226,43 +236,23 @@ let last = xs => {
   TR.work(() => go(None, xs))->TR.solve
 }
 
-// This caused problems with windowAhead; don't know why
-//
-// let drop = (xs, count) =>
-//   switch count {
-//   | 0 => xs
-//   | _ =>
-//     xs
-//     ->headTails
-//     ->takeAtMost(count)
-//     ->last
-//     ->Option.map(((_, xs)) => xs)
-//     ->Option.getWithDefault(empty)
-//   }
+let snd = ((_, b)) => b
 
-let drop = (xs, count) =>
-  if count == 0 {
+let drop = (xs: t<'a>, count) =>
+  switch count {
+  | 0 => xs
+  | n if n < 0 =>
+    ArgumentOfOfRange(
+      `'drop' requires a count of zero or more but youu asked for ${count->Belt.Int.toString}`,
+    )->raise
+  | count =>
     xs
-  } else {
-    (. ()) => {
-      let dropped = ref(0)
-      let result = ref(None)
-      consumeUntil(
-        ~seq=xs,
-        ~predicate=_ => dropped.contents == count,
-        ~onEmpty=_ => (),
-        ~onNext=(x, xs) => {
-          dropped := dropped.contents + 1
-          if dropped.contents == count + 1 {
-            result := Some(x, xs)
-          }
-        },
-      )
-      switch result.contents {
-      | None => End
-      | Some(x, xs) => Next(x, xs)
-      }
-    }
+    ->headTails
+    ->indexed
+    ->find(Indexed.indexEquals(_, count - 1))
+    ->Option.map(Indexed.value)
+    ->Option.map(snd)
+    ->Option.getWithDefault(empty)
   }
 
 // let filteri = (xs, f) => {

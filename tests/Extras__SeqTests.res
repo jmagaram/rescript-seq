@@ -1511,8 +1511,8 @@ let findTests = [
   (() => [1, 2, 3]->S.fromArray, i => i == 2, Some(2), "when many and is middle"),
   (() => [1, 2, 3]->S.fromArray, i => i == 3, Some(3), "when many and is last"),
   (() => [1, 2, 3]->S.fromArray, _ => false, None, "when many and predicate false"),
-  (() => S.range(~start=1, ~end=999999), i => i == 999999, Some(999999), "when million"),
-  (() => S.range(~start=1, ~end=999999), _ => false, None, "when million"),
+  (() => S.range(~start=1, ~end=9999999), i => i == 9999999, Some(9999999), "when million"),
+  (() => S.range(~start=1, ~end=9999999), _ => false, None, "when million"),
 ]->Js.Array2.mapi(((source, predicate, result, note), index) =>
   T.make(
     ~category="Seq",
