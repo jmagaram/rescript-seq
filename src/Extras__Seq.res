@@ -66,8 +66,6 @@ let find = (xs, f) => xs->findNode(f)->Node.head
 
 let mapNext = (xs, f) => (. ()) => xs->next->Node.mapNext(f)
 
-let rec map = (xs, f) => xs->mapNext((x, xs) => Node.next(f(x), map(xs, f)))
-
 let mapBoth = (xs, ~onEmpty, ~onNext) =>
   (. ()) =>
     switch xs->next {
@@ -75,19 +73,23 @@ let mapBoth = (xs, ~onEmpty, ~onNext) =>
     | Next(x, xs) => onNext(x, xs)
     }
 
+let rec concat = (xs, ys) =>
+  xs->mapBoth(~onEmpty=() => ys->next, ~onNext=(x, xs) => Node.next(x, concat(xs, ys)))
+
+let rec flatMap = (xs, f) =>
+  (. ()) =>
+    switch xs->next {
+    | End => End
+    | Next(x, xs) => concat(f(x), flatMap(xs, f))(.)
+    }
+
+let rec map = (xs, f) => xs->mapNext((x, xs) => Node.next(f(x), map(xs, f)))
+
 let cons = (value, seq) => (. ()) => Next(value, seq)
 
-let head = seq =>
-  switch seq->next {
-  | End => None
-  | Next(head, _) => Some(head)
-  }
+let head = xs => xs->next->Node.head
 
-let headTail = seq =>
-  switch seq->next {
-  | End => None
-  | Next(head, tail) => Some(head, tail)
-  }
+let headTail = xs => xs->next->Node.toOption
 
 module Indexed = {
   type t<'a> = ('a, int)
@@ -108,8 +110,8 @@ let singleton = v => cons(v, empty)
 let rec unfold = (seed, f) =>
   (. ()) =>
     switch f(seed) {
-    | None => End
-    | Some(value, seed) => Next(value, unfold(seed, f))
+    | None => Node.end
+    | Some(value, seed) => Node.next(value, unfold(seed, f))
     }
 
 let init = (~count, f) => unfold(0, i => i < count ? Some(f(~index=i), i + 1) : None)
@@ -120,23 +122,12 @@ let infinite = f => unfold(0, _ => Some(f(), 0))
 
 let iterate = (seed, f) => unfold(seed, i => Some(i, f(i)))
 
-let rec concat = (xs, ys) =>
-  xs->mapBoth(~onEmpty=() => ys->next, ~onNext=(x, xs) => Next(x, concat(xs, ys)))
-
 let prepend = (xs, ys) => concat(ys, xs)
 
 let range = (~start, ~end) => {
   start <= end
     ? unfold(start, i => i <= end ? Some(i, i + 1) : None)
     : unfold(start, i => i >= end ? Some(i, i - 1) : None)
-}
-
-let rec flatMap = (xs, f) => {
-  (. ()) =>
-    switch xs->next {
-    | End => End
-    | Next(value, next) => concat(f(value), flatMap(next, f))(.)
-    }
 }
 
 let rec tap = (xs, f) =>
