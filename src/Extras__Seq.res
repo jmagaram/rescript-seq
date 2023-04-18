@@ -298,30 +298,6 @@ let rec zip = (xs, ys) =>
     }
   }
 
-// let rec filterMap = (xs, f) =>
-//   xs->mapNext((x, xs) =>
-//     switch f(x) {
-//     | Some(x) => Next(x, filterMap(xs, f))
-//     | None => {
-//         let xs' = ref(None)
-//         let x = ref(None)
-//         consumeUntil(
-//           ~seq=xs,
-//           ~onEmpty=() => (),
-//           ~onNext=(_, xs) => xs' := Some(xs),
-//           ~predicate=i => {
-//             x := f(i)
-//             x.contents->Option.isSome
-//           },
-//         )
-//         switch x.contents {
-//         | None => End
-//         | Some(x) => Next(x, filterMap(xs'.contents->Option.getExn, f))
-//         }
-//       }
-//     }
-//   )
-
 let filterMap = (xs, f) => xs->map(f)->filter(Option.isSome)->map(Option.getUnsafe)
 
 let filterSome = xs => xs->filterMap(x => x)

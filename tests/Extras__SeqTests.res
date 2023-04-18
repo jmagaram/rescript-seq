@@ -649,43 +649,6 @@ let transforming = [
     seen == [1, 2, 3, 4, 5] && items == [1, 2, 3, 4, 5]
   }),
   areEqual(
-    ~title="filterSome",
-    ~expectation="",
-    ~a=() => [None, None, None]->S.fromArray->S.filterSome,
-    ~b=[],
-  ),
-  areEqual(
-    ~title="filterSome",
-    ~expectation="",
-    ~a=() => [Some(3), None, Some(5)]->S.fromArray->S.filterSome,
-    ~b=[3, 5],
-  ),
-  areEqual(
-    ~title="filterSome",
-    ~expectation="when all None",
-    ~a=() => [None, None, None]->S.fromArray->S.filterSome,
-    ~b=[],
-  ),
-  areEqual(
-    ~title="filterSome",
-    ~expectation="when millions of None => empty",
-    ~a=() => S.replicate(~count=999_999, ~value=None)->S.concat(S.singleton(Some(1)))->S.filterSome,
-    ~b=[1],
-  ),
-  areEqual(
-    ~title="filterOk",
-    ~expectation="",
-    ~a=() => [Ok(3), Error("oops"), Ok(5)]->S.fromArray->S.filterOk,
-    ~b=[3, 5],
-  ),
-  areEqual(
-    ~title="filterOk",
-    ~expectation="when millions of Error => empty",
-    ~a=() =>
-      S.replicate(~count=999_999, ~value=Error("x"))->S.concat(S.singleton(Ok(1)))->S.filterOk,
-    ~b=[1],
-  ),
-  areEqual(
     ~title="chunkBySize",
     ~expectation="when not empty and longer than chunk size",
     ~a=() => [1, 2, 3, 4, 5, 6, 7]->S.fromArray->S.chunkBySize(3),
@@ -1007,6 +970,31 @@ let transforming = [
     ~b=[1],
   ),
 ]
+
+let makeSeqEqualsTests = (~title, xs) =>
+  xs->Js.Array2.mapi(((source, result, note), inx) =>
+    areEqual(~title, ~expectation=`index ${inx->intToString} ${note}`, ~a=() => source, ~b=result)
+  )
+
+let filterSomeTests = makeSeqEqualsTests(
+  ~title="filterSome",
+  [
+    (S.empty->S.filterSome, [], ""),
+    (S.singleton(None)->S.filterSome, [], ""),
+    (S.singleton(Some(1))->S.filterSome, [1], ""),
+    ([Some(1), None, Some(3), None]->S.fromArray->S.filterSome, [1, 3], ""),
+  ],
+)
+
+let filterOkTests = makeSeqEqualsTests(
+  ~title="filterOk",
+  [
+    (S.empty->S.filterOk, [], ""),
+    (S.singleton(Error("x"))->S.filterOk, [], ""),
+    (S.singleton(Ok(1))->S.filterOk, [1], ""),
+    ([Ok(1), Error("x"), Ok(3), Error("x")]->S.fromArray->S.filterOk, [1, 3], ""),
+  ],
+)
 
 let filterMapTests =
   [
@@ -1517,6 +1505,8 @@ let tests =
     dropUntilTests,
     filterTests,
     filterMapTests,
+    filterSomeTests,
+    filterOkTests,
     lastTests,
     allOkTests,
     allSomeTests,
