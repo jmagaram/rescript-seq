@@ -237,16 +237,16 @@ let drop = (xs, count) =>
     }
   }
 
-let filteri = (xs, f) => {
-  let rec go = xs =>
-    xs->mapNext(((x, index), xs) =>
-      switch f(~value=x, ~index) {
-      | true => Next(x, go(xs))
-      | false => go(xs)->next
-      }
-    )
-  go(xs->indexed)
-}
+// let filteri = (xs, f) => {
+//   let rec go = xs =>
+//     xs->mapNext(((x, index), xs) =>
+//       switch f(~value=x, ~index) {
+//       | true => Next(x, go(xs))
+//       | false => go(xs)->next
+//       }
+//     )
+//   go(xs->indexed)
+// }
 
 // let rec filter = (xs, f) =>
 //   xs->mapNext((x, xs) =>
@@ -285,6 +285,9 @@ let rec filter = (xs, f) =>
     )
     ->Option.getWithDefault(End)
   }
+
+let filteri = (xs, f) =>
+  xs->indexed->filter(((value, index)) => f(~value, ~index))->map(((v, _)) => v)
 
 let rec zipLongest = (xs, ys) => {
   (. ()) => {
