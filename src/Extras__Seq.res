@@ -10,7 +10,22 @@ and node<'a> =
 
 exception ArgumentOfOfRange(string)
 
+module Node = {
+  type t<'a> = node<'a>
+
+  let toOption = i =>
+    switch i {
+    | End => None
+    | Next((x, xs)) => Some(x, xs)
+    }
+
+  let head = i => i->toOption->Option.map(((x, xs)) => x)
+}
+
 let next = (xs: t<'a>) => xs(.)
+
+type delayType<'a> = node<'a> => t<'a>
+let delay: delayType<'a> = n => (. ()) => n
 
 let nodeToOption = n =>
   switch n {
@@ -18,7 +33,20 @@ let nodeToOption = n =>
   | Next(x, xs) => Some(x, xs)
   }
 
-// foundational; can not be recursive
+let mapNext = (xs, f) => {
+  (. ()) =>
+    switch xs->next {
+    | End => End
+    | Next(x, xs) => f(x, xs)
+    }
+}
+
+let rec map = (xs, f) => xs->mapNext((x, xs) => Next(f(x), map(xs, f)))
+
+/**
+This is a foundation method for many of the functions in this library. It must
+not be recursive to prevent stack overflows.
+*/
 let findNode = (xs, f) => {
   let found = ref(None)
   let current = ref(xs)
@@ -36,8 +64,10 @@ let findNode = (xs, f) => {
       current := xs
     }
   }
-  found.contents
+  found.contents->Option.getWithDefault(End)
 }
+
+let find = (xs, f) => xs->findNode(f)->Node.head
 
 let consumeUntil = (~seq, ~predicate, ~onNext, ~onEmpty) => {
   let break = ref(false)
@@ -56,14 +86,6 @@ let consumeUntil = (~seq, ~predicate, ~onNext, ~onEmpty) => {
 }
 
 let empty = (. ()) => End
-
-let mapNext = (xs, f) => {
-  (. ()) =>
-    switch xs->next {
-    | End => End
-    | Next(x, xs) => f(x, xs)
-    }
-}
 
 let mapBoth = (xs, ~onEmpty, ~onNext) =>
   (. ()) =>
@@ -99,8 +121,6 @@ let indexed = xs => {
   let rec go = (xs, inx) => xs->mapNext((x, xs) => Next((x, inx), go(xs, inx + 1)))
   go(xs, 0)
 }
-
-let find = (xs, f) => xs->findNode(f)->Option.flatMap(nodeToOption)->Option.map(((x, _)) => x)
 
 let singleton = v => cons(v, empty)
 
@@ -159,8 +179,6 @@ let cycleNonEmpty = xs => {
 }
 
 let cycle = xs => xs->mapNext((x, xs') => cons(x, xs')->concat(xs->cycleNonEmpty)->next)
-
-let rec map = (xs, f) => xs->mapNext((x, xs) => Next(f(x), map(xs, f)))
 
 let fromString = s =>
   switch s->Js.String2.length {
