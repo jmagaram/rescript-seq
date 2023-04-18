@@ -33,7 +33,7 @@ let tests =
   ]->Array.concatMany
 
 Ex.Task.Result.make(
-  ~promise=() => Ex.Test.runSuite(tests, ~keywords, ~onlyShowFailures),
+  ~promise=() => Ex.Test.runSuite(tests, ~keywords, ~onlyShowFailures=false),
   ~onError=e => e,
 )
 ->Ex.Task.map(i =>
