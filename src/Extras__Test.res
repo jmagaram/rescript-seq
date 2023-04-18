@@ -20,7 +20,7 @@ let hasKeyword = (i, xs) => {
     text->Js.String2.includes(keyword)
   }
   switch xs {
-  | [] => false
+  | [] => true
   | xs =>
     xs->Js.Array2.every(x =>
       match(~text=i->category, ~keyword=x) ||
@@ -83,7 +83,7 @@ let runSuite = async (~keywords=[], ~filter=_ => true, ~onlyShowFailures=false, 
     ->Array.map(i => i->run)
     ->Js.Promise2.all
   let (succeeded, failed) = results->Array.partition(((r, _)) => r)
-  if succeeded->Array.length > 0 && onlyShowFailures {
+  if succeeded->Array.length > 0 && !onlyShowFailures {
     logSection("SUCCEEDED")
     succeeded->Array.forEach(((_, t)) => `PASS ${t->toString}`->log)
   }
