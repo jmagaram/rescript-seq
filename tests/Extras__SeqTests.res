@@ -704,6 +704,12 @@ let transforming = [
     ~b=[],
   ),
   areEqual(
+    ~title="filterSome",
+    ~expectation="when millions of None => empty",
+    ~a=() => S.replicate(~count=999999, ~value=None)->S.concat(S.singleton(Some(1)))->S.filterSome,
+    ~b=[1],
+  ),
+  areEqual(
     ~title="filterOk",
     ~expectation="",
     ~a=() => [Ok(3), Error("oops"), Ok(5)]->S.fromArray->S.filterOk,
