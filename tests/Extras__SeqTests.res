@@ -5,8 +5,10 @@ module Ex = Extras
 module Option = Belt.Option
 module Result = Belt.Result
 
+let intToString = Belt.Int.toString
+
 let concatInts = xs =>
-  xs->Js.Array2.length == 0 ? "_" : xs->Js.Array2.map(Belt.Int.toString)->Js.Array2.joinWith("")
+  xs->Js.Array2.length == 0 ? "_" : xs->Js.Array2.map(intToString)->Js.Array2.joinWith("")
 let shorten = s => Js.String2.slice(s, ~from=0, ~to_=1000)
 let areEqual = (~title, ~expectation, ~a, ~b) =>
   T.make(~category="Seq", ~title, ~expectation, ~predicate=() => {
@@ -18,6 +20,9 @@ let areEqual = (~title, ~expectation, ~a, ~b) =>
     }
     a == b
   })
+
+let isTrueAlways = _ => true
+let isFalseAlways = _ => false
 
 let willThrow = (~title, ~expectation, ~f) => {
   T.make(~category="Seq", ~title, ~expectation, ~predicate=() => {
@@ -76,25 +81,25 @@ let constructors = [
   areEqual(
     ~title="init",
     ~expectation="when count is < 0 => empty",
-    ~a=() => S.init(~count=-1, (~index) => index->Belt.Int.toString),
+    ~a=() => S.init(~count=-1, (~index) => index->intToString),
     ~b=[],
   ),
   areEqual(
     ~title="init",
     ~expectation="when count is 0 => empty",
-    ~a=() => S.init(~count=0, (~index) => index->Belt.Int.toString),
+    ~a=() => S.init(~count=0, (~index) => index->intToString),
     ~b=[],
   ),
   areEqual(
     ~title="init",
     ~expectation="when count is 1 => singleton",
-    ~a=() => S.init(~count=1, (~index) => index->Belt.Int.toString),
+    ~a=() => S.init(~count=1, (~index) => index->intToString),
     ~b=["0"],
   ),
   areEqual(
     ~title="init",
     ~expectation="when count > 2 => map each index",
-    ~a=() => S.init(~count=3, (~index) => index->Belt.Int.toString),
+    ~a=() => S.init(~count=3, (~index) => index->intToString),
     ~b=["0", "1", "2"],
   ),
   areEqual(
@@ -344,13 +349,13 @@ let transforming = [
   areEqual(
     ~title="flatMap",
     ~expectation="when mapped result is one item",
-    ~a=() => oneTwoThree->S.flatMap(i => S.singleton(i->Belt.Int.toString)),
+    ~a=() => oneTwoThree->S.flatMap(i => S.singleton(i->intToString)),
     ~b=["1", "2", "3"],
   ),
   areEqual(
     ~title="map",
     ~expectation="",
-    ~a=() => oneTwoThree->S.map(Belt.Int.toString),
+    ~a=() => oneTwoThree->S.map(intToString),
     ~b=["1", "2", "3"],
   ),
   areEqual(
@@ -1043,43 +1048,29 @@ let transforming = [
     },
     ~b=[1],
   ),
-  areEqual(
-    ~title="dropUntil",
-    ~expectation="when more than one item and condition met, that is first item",
-    ~a=() => oneToFive->S.dropUntil(i => i == 1),
-    ~b=[1, 2, 3, 4, 5],
-  ),
-  areEqual(
-    ~title="dropUntil",
-    ~expectation="when more than one item and condition met, that is first item",
-    ~a=() => oneToFive->S.dropUntil(i => i == 4),
-    ~b=[4, 5],
-  ),
-  areEqual(
-    ~title="dropUntil",
-    ~expectation="when more than one item and condition not met, return no items",
-    ~a=() => oneToFive->S.dropUntil(i => i == 99),
-    ~b=[],
-  ),
-  areEqual(
-    ~title="dropUntil",
-    ~expectation="when empty => empty",
-    ~a=() => S.empty->S.dropUntil(_ => true),
-    ~b=[],
-  ),
-  areEqual(
-    ~title="dropUntil",
-    ~expectation="when singleton and condition not met => empty",
-    ~a=() => S.singleton(1)->S.dropUntil(i => i == 99),
-    ~b=[],
-  ),
-  areEqual(
-    ~title="dropUntil",
-    ~expectation="when singleton and condition met => singleton",
-    ~a=() => S.singleton(1)->S.dropUntil(i => i == 1),
-    ~b=[1],
-  ),
 ]
+
+let dropUntilTests =
+  [
+    (S.empty, isFalseAlways, [], ""),
+    (S.empty, isTrueAlways, [], ""),
+    (1->S.singleton, i => i == 1, [1], ""),
+    (1->S.singleton, isFalseAlways, [], ""),
+    (1->S.singleton, isTrueAlways, [1], ""),
+    (oneToFive, isTrueAlways, [1, 2, 3, 4, 5], ""),
+    (oneToFive, isFalseAlways, [], ""),
+    (oneToFive, i => i == 3, [3, 4, 5], ""),
+    (oneToFive, i => i == 5, [5], ""),
+    (oneToFive, i => i == 1, [1, 2, 3, 4, 5], ""),
+    (S.range(~start=1, ~end=999999), i => i == 999999, [999999], "millions"),
+  ]->Js.Array2.mapi(((source, predicate, result, note), inx) =>
+    areEqual(
+      ~title="dropUntil",
+      ~expectation=`index ${inx->intToString} ${note}`,
+      ~a=() => source->S.dropUntil(predicate),
+      ~b=result,
+    )
+  )
 
 let consuming = [
   T.make(~category="Seq", ~title="forEach", ~expectation="", ~predicate=() => {
@@ -1199,7 +1190,7 @@ let consuming = [
   consumeEqual(
     ~title="reduce",
     ~expectation="can transform",
-    ~a=() => oneToFive->S.reduce("", (sum, i) => `${i->Belt.Int.toString}${sum}`),
+    ~a=() => oneToFive->S.reduce("", (sum, i) => `${i->intToString}${sum}`),
     ~b="54321",
   ),
   consumeEqual(
@@ -1253,15 +1244,13 @@ let consuming = [
   consumeEqual(
     ~title="equals",
     ~expectation="can compare different types",
-    ~a=() =>
-      S.equals(S.singleton(1), S.singleton("1"), (x: int, y: string) => x->Belt.Int.toString == y),
+    ~a=() => S.equals(S.singleton(1), S.singleton("1"), (x: int, y: string) => x->intToString == y),
     ~b=true,
   ),
   consumeEqual(
     ~title="equals",
     ~expectation="can compare different types",
-    ~a=() =>
-      S.equals(S.singleton(1), S.singleton("1"), (x: int, y: string) => x->Belt.Int.toString == y),
+    ~a=() => S.equals(S.singleton(1), S.singleton("1"), (x: int, y: string) => x->intToString == y),
     ~b=true,
   ),
   consumeEqual(
@@ -1446,7 +1435,7 @@ let validationTests = [
   ("when mix, return first error", [1, 2, 14, 3, 4], Error("14")),
 ]
 
-let validate = n => n < 10 ? Ok(n * 2) : Error(n->Belt.Int.toString)
+let validate = n => n < 10 ? Ok(n * 2) : Error(n->intToString)
 
 let allOkTests =
   validationTests->Belt.Array.map(((expectation, input, expected)) =>
@@ -1517,7 +1506,7 @@ let findTests = [
   T.make(
     ~category="Seq",
     ~title="find",
-    ~expectation=`${index->Belt.Int.toString} ${note}`,
+    ~expectation=`${index->intToString} ${note}`,
     ~predicate=() => {
       source()->S.find(predicate) == result
     },
@@ -1527,6 +1516,7 @@ let findTests = [
 let tests =
   [
     findTests,
+    dropUntilTests,
     allOkTests,
     allSomeTests,
     constructors,

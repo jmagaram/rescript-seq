@@ -3,49 +3,44 @@ module Result = Belt.Result
 module Ex = Extras
 module TR = Extras__Trampoline
 
+exception ArgumentOfOfRange(string)
+
 type rec t<'a> = (. unit) => node<'a>
 and node<'a> =
   | End
   | Next('a, t<'a>)
 
-exception ArgumentOfOfRange(string)
-
 module Node = {
-  type t<'a> = node<'a>
+  let end = End
 
-  let toOption = i =>
-    switch i {
+  @inline
+  let next = (x, xs) => Next(x, xs)
+
+  @inline
+  let toOption = n =>
+    switch n {
     | End => None
     | Next((x, xs)) => Some(x, xs)
     }
 
-  let head = i => i->toOption->Option.map(((x, xs)) => x)
-}
+  @inline let head = n => n->toOption->Option.map(((x, _)) => x)
 
-let next = (xs: t<'a>) => xs(.)
-
-type delayType<'a> = node<'a> => t<'a>
-let delay: delayType<'a> = n => (. ()) => n
-
-let nodeToOption = n =>
-  switch n {
-  | End => None
-  | Next(x, xs) => Some(x, xs)
-  }
-
-let mapNext = (xs, f) => {
-  (. ()) =>
-    switch xs->next {
+  @inline
+  let mapNext = (n, f) =>
+    switch n {
     | End => End
     | Next(x, xs) => f(x, xs)
     }
 }
 
-let rec map = (xs, f) => xs->mapNext((x, xs) => Next(f(x), map(xs, f)))
+let empty = (. ()) => Node.end
+
+let next = (xs: t<'a>) => xs(.)
 
 /**
 This is a foundation method for many of the functions in this library. It must
-not be recursive to prevent stack overflows.
+not be recursive to prevent stack overflows. This consumes at least 1 item in
+`xs`.
 */
 let findNode = (xs, f) => {
   let found = ref(None)
@@ -69,23 +64,9 @@ let findNode = (xs, f) => {
 
 let find = (xs, f) => xs->findNode(f)->Node.head
 
-let consumeUntil = (~seq, ~predicate, ~onNext, ~onEmpty) => {
-  let break = ref(false)
-  let seq = ref(seq)
-  while !break.contents {
-    switch seq.contents(.) {
-    | End =>
-      break := true
-      onEmpty()
-    | Next(head, tail) =>
-      break := predicate(head)
-      seq := tail
-      onNext(head, tail)
-    }
-  }
-}
+let mapNext = (xs, f) => (. ()) => xs->next->Node.mapNext(f)
 
-let empty = (. ()) => End
+let rec map = (xs, f) => xs->mapNext((x, xs) => Node.next(f(x), map(xs, f)))
 
 let mapBoth = (xs, ~onEmpty, ~onNext) =>
   (. ()) =>
@@ -114,11 +95,11 @@ module Indexed = {
   @inline let value = ((value, _): t<'a>) => value
   @inline let index = ((_, index): t<'a>) => index
   @inline let indexEquals = (i, other) => i->index == other
-  @inline let existsValue = (i: t<'a>, f) => f(i->value)
 }
 
 let indexed = xs => {
-  let rec go = (xs, inx) => xs->mapNext((x, xs) => Next((x, inx), go(xs, inx + 1)))
+  let rec go = (xs, index) =>
+    xs->mapNext((x, xs) => Next(Indexed.make(~value=x, ~index), go(xs, index + 1)))
   go(xs, 0)
 }
 
@@ -495,20 +476,13 @@ let consumeN = (seq, n) => {
   {"consumed": consumed, "isEmpty": isEmpty.contents, "tail": seq.contents}
 }
 
-let dropUntil = (seq, predicate) =>
-  (. ()) => {
-    let start = ref(None)
-    consumeUntil(
-      ~seq,
-      ~predicate,
-      ~onNext=(head, tail) => {start := Some((head, tail))},
-      ~onEmpty=() => start := None,
-    )
-    switch start.contents {
-    | None => End
-    | Some(head, tail) => Next(head, tail)
-    }
-  }
+let dropUntil = (xs, predicate) =>
+  (. ()) =>
+    xs
+    ->headTails
+    ->find(((x, _)) => predicate(x))
+    ->Option.map(((x, xs)) => Node.next(x, xs))
+    ->Option.getWithDefault(Node.end)
 
 let rec chunkBySize = (seq, length) => {
   if length <= 0 {
