@@ -1502,8 +1502,30 @@ let memoizeTests = [
   ),
 ]
 
+let findTests = [
+  (() => S.empty, _ => true, None, "when empty and predicate true"),
+  (() => S.empty, _ => false, None, "when empty and predicate false"),
+  (() => 1->S.singleton, i => i == 1, Some(1), "when singleton and found"),
+  (() => 1->S.singleton, _ => false, None, "when singleton and predicate false"),
+  (() => [1, 2, 3]->S.fromArray, i => i == 1, Some(1), "when many and is first"),
+  (() => [1, 2, 3]->S.fromArray, i => i == 2, Some(2), "when many and is middle"),
+  (() => [1, 2, 3]->S.fromArray, i => i == 3, Some(3), "when many and is last"),
+  (() => [1, 2, 3]->S.fromArray, _ => false, None, "when many and predicate false"),
+  (() => S.range(~start=1, ~end=999999), i => i == 999999, Some(999999), "when million"),
+]->Js.Array2.mapi(((source, predicate, result, note), index) =>
+  T.make(
+    ~category="Seq",
+    ~title="find",
+    ~expectation=`${index->Belt.Int.toString} ${note}`,
+    ~predicate=() => {
+      source()->S.find(predicate) == result
+    },
+  )
+)
+
 let tests =
   [
+    findTests,
     allOkTests,
     allSomeTests,
     constructors,
