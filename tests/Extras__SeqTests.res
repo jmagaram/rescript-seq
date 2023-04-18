@@ -10,6 +10,7 @@ let intToString = Belt.Int.toString
 let concatInts = xs =>
   xs->Js.Array2.length == 0 ? "_" : xs->Js.Array2.map(intToString)->Js.Array2.joinWith("")
 let shorten = s => Js.String2.slice(s, ~from=0, ~to_=1000)
+
 let areEqual = (~title, ~expectation, ~a, ~b) =>
   T.make(~category="Seq", ~title, ~expectation, ~predicate=() => {
     let a = a()->S.toArray
@@ -33,7 +34,13 @@ let willThrow = (~title, ~expectation, ~f) => {
 let consumeEqual = (~title, ~expectation, ~a, ~b) =>
   T.make(~category="Seq", ~title, ~expectation, ~predicate=() => {
     let aValue = a()
-    aValue == b
+    let pass = aValue == b
+    if !pass {
+      Js.Console.log(`===== NOT EQUAL : ${title} : ${expectation} =====`)
+      Js.Console.log(`A: ${a->Obj.magic}`)
+      Js.Console.log(`B: ${b->Obj.magic}`)
+    }
+    pass
   })
 
 let oneTwoThree = S.init(~count=3, (~index) => index + 1)
@@ -43,18 +50,6 @@ let oneToFive = S.init(~count=5, (~index) => index + 1)
 let constructors = [
   areEqual(~title="singleton", ~expectation="has one item in it", ~a=() => S.singleton(3), ~b=[3]),
   areEqual(~title="empty", ~expectation="has no items", ~a=() => S.empty, ~b=[]),
-  areEqual(
-    ~title="unfold",
-    ~expectation="when generate many items",
-    ~a=() => S.unfold(1, x => x <= 5 ? Some(x, x + 1) : None),
-    ~b=[1, 2, 3, 4, 5],
-  ),
-  areEqual(
-    ~title="unfold",
-    ~expectation="when generate zero items",
-    ~a=() => S.unfold(1, _ => None),
-    ~b=[],
-  ),
   // areEqual(
   //   ~title="unfold",
   //   ~expectation="when generate zero items, function never called",
@@ -124,7 +119,7 @@ let constructors = [
     let count = 99999
     let minUnique = (0.95 *. count->Belt.Int.toFloat)->Belt.Int.fromFloat
     let unique =
-      S.infinite(_ => Js.Math.random_int(0, 999999))
+      S.infinite(_ => Js.Math.random_int(0, 999_999))
       ->S.takeAtMost(count)
       ->S.toArray
       ->Belt.Set.Int.fromArray
@@ -135,7 +130,7 @@ let constructors = [
     let count = 99999
     let minUnique = (0.95 *. count->Belt.Int.toFloat)->Belt.Int.fromFloat
     let unique =
-      S.infinite(_ => Js.Math.random_int(0, 999999))
+      S.infinite(_ => Js.Math.random_int(0, 999_999))
       ->S.takeAtMost(count)
       ->S.toArray
       ->Belt.Set.Int.fromArray
@@ -294,6 +289,29 @@ let constructors = [
     ~expectation="when Some => singleton",
     ~a=() => Some(1)->S.fromOption,
     ~b=[1],
+  ),
+  areEqual(
+    ~title="unfold",
+    ~expectation="generate many items",
+    ~a=() => S.unfold(1, x => x <= 5 ? Some(x, x + 1) : None),
+    ~b=[1, 2, 3, 4, 5],
+  ),
+  areEqual(
+    ~title="unfold",
+    ~expectation="generate zero items",
+    ~a=() => S.unfold(1, _ => None),
+    ~b=[],
+  ),
+  areEqual(
+    ~title="unfold",
+    ~expectation="generate millions of items",
+    ~a=() => {
+      let count = 9_999_999
+      let last = ref(-1)
+      S.unfold(1, i => i <= count ? Some(i, i + 1) : None)->S.forEach(i => last := i)
+      S.singleton(last.contents)
+    },
+    ~b=[9_999_999],
   ),
 ]
 
@@ -463,7 +481,7 @@ let transforming = [
   areEqual(
     ~title="drop",
     ~expectation="when drop a million items => no stack overflow",
-    ~a=() => S.concat(S.replicate(~count=999999, ~value="x"), S.singleton("y"))->S.drop(999999),
+    ~a=() => S.concat(S.replicate(~count=999_999, ~value="x"), S.singleton("y"))->S.drop(999_999),
     ~b=["y"],
   ),
   areEqual(
@@ -499,7 +517,7 @@ let transforming = [
   areEqual(
     ~title="filter",
     ~expectation="when skipping millions => no stack problem",
-    ~a=() => S.replicate(~count=999999, ~value=1)->S.concat(2->S.singleton)->S.filter(i => i != 1),
+    ~a=() => S.replicate(~count=999_999, ~value=1)->S.concat(2->S.singleton)->S.filter(i => i != 1),
     ~b=[2],
   ),
   areEqual(
@@ -512,7 +530,7 @@ let transforming = [
     ~title="filteri",
     ~expectation="when skipping millions => no stack problem",
     ~a=() =>
-      S.replicate(~count=999999, ~value=1)
+      S.replicate(~count=999_999, ~value=1)
       ->S.concat(2->S.singleton)
       ->S.filteri((~value, ~index as _) => value != 1),
     ~b=[2],
@@ -598,7 +616,7 @@ let transforming = [
   areEqual(
     ~title="filterMap",
     ~expectation="when millions of None => empty",
-    ~a=() => S.infinite(() => Js.Math.random())->S.takeAtMost(999999)->S.filterMap(_ => None),
+    ~a=() => S.infinite(() => Js.Math.random())->S.takeAtMost(999_999)->S.filterMap(_ => None),
     ~b=[],
   ),
   areEqual(
@@ -711,7 +729,7 @@ let transforming = [
   areEqual(
     ~title="filterSome",
     ~expectation="when millions of None => empty",
-    ~a=() => S.replicate(~count=999999, ~value=None)->S.concat(S.singleton(Some(1)))->S.filterSome,
+    ~a=() => S.replicate(~count=999_999, ~value=None)->S.concat(S.singleton(Some(1)))->S.filterSome,
     ~b=[1],
   ),
   areEqual(
@@ -724,7 +742,7 @@ let transforming = [
     ~title="filterOk",
     ~expectation="when millions of Error => empty",
     ~a=() =>
-      S.replicate(~count=999999, ~value=Error("x"))->S.concat(S.singleton(Ok(1)))->S.filterOk,
+      S.replicate(~count=999_999, ~value=Error("x"))->S.concat(S.singleton(Ok(1)))->S.filterOk,
     ~b=[1],
   ),
   areEqual(
@@ -1062,7 +1080,7 @@ let dropUntilTests =
     (oneToFive, i => i == 3, [3, 4, 5], ""),
     (oneToFive, i => i == 5, [5], ""),
     (oneToFive, i => i == 1, [1, 2, 3, 4, 5], ""),
-    (S.range(~start=1, ~end=999999), i => i == 999999, [999999], "millions"),
+    (S.range(~start=1, ~end=999_999), i => i == 999_999, [999_999], "millions"),
   ]->Js.Array2.mapi(((source, predicate, result, note), inx) =>
     areEqual(
       ~title="dropUntil",
@@ -1083,15 +1101,6 @@ let consuming = [
     oneToFive->S.forEachi((~value, ~index) => result->Js.Array2.push((value, index))->ignore)
     result == [(1, 0), (2, 1), (3, 2), (4, 3), (5, 4)]
   }),
-  T.make(
-    ~category="Seq",
-    ~title="unfold",
-    ~expectation="a million stack won't overflow",
-    ~predicate=() => {
-      S.unfold(0, i => i < 999999 ? Some(i, i + 1) : None)->S.forEach(_ => ())
-      true
-    },
-  ),
   T.make(
     ~category="Seq",
     ~title="flatMap",
@@ -1168,30 +1177,6 @@ let consuming = [
     ~expectation="",
     ~a=() => oneToFive->S.findMapi((~value, ~index) => value == 3 && index == 2 ? Some("x") : None),
     ~b=Some("x"),
-  ),
-  consumeEqual(
-    ~title="reduce",
-    ~expectation="if empty => initial value",
-    ~a=() => S.empty->S.reduce(99, (sum, i) => sum * i),
-    ~b=99,
-  ),
-  consumeEqual(
-    ~title="reduce",
-    ~expectation="if 1 item => f of the item and initial value",
-    ~a=() => S.singleton(4)->S.reduce(5, (sum, i) => sum * i),
-    ~b=20,
-  ),
-  consumeEqual(
-    ~title="reduce",
-    ~expectation="if many items => f of all the items and initial value",
-    ~a=() => oneToFive->S.reduce(-1, (sum, i) => sum * i),
-    ~b=-1 * 2 * 3 * 4 * 5,
-  ),
-  consumeEqual(
-    ~title="reduce",
-    ~expectation="can transform",
-    ~a=() => oneToFive->S.reduce("", (sum, i) => `${i->intToString}${sum}`),
-    ~b="54321",
   ),
   consumeEqual(
     ~title="toArray",
@@ -1344,14 +1329,6 @@ let consuming = [
     ~a=() => S.singleton(2)->S.isEmpty,
     ~b=false,
   ),
-  consumeEqual(~title="last", ~expectation="when empty => None", ~a=() => S.empty->S.last, ~b=None),
-  consumeEqual(
-    ~title="last",
-    ~expectation="when singleton",
-    ~a=() => S.singleton(1)->S.last,
-    ~b=Some(1),
-  ),
-  consumeEqual(~title="last", ~expectation="when many", ~a=() => oneToFive->S.last, ~b=Some(5)),
   consumeEqual(
     ~title="toString",
     ~expectation="",
@@ -1425,6 +1402,40 @@ let consuming = [
     ~b=[1, 2, 3],
   ),
 ]
+
+let reduceTests = {
+  let add = (total, x) => total + x
+  let lastSeen = (_: option<'a>, x: 'a) => Some(x)
+  let oneUpTo = n => S.range(~start=1, ~end=n)
+  [
+    (() => S.empty->S.reduce(-1, add), -1),
+    (() => S.singleton(99)->S.reduce(1, add), 100),
+    (() => oneTwoThree->S.reduce(1, add), 7),
+    (() => oneUpTo(99)->S.reduce(None, lastSeen)->Option.getWithDefault(-1), 99),
+    (() => oneUpTo(9999)->S.reduce(None, lastSeen)->Option.getWithDefault(-1), 9999),
+    (() => oneUpTo(9_999_999)->S.reduce(None, lastSeen)->Option.getWithDefault(-1), 9_999_999),
+  ]->Js.Array2.mapi(((a, b), index) =>
+    consumeEqual(~title="reduce", ~expectation=`index ${index->intToString}`, ~a, ~b)
+  )
+}
+
+let lastTests = {
+  [
+    (S.empty, None),
+    (1->S.singleton, Some(1)),
+    (S.range(~start=1, ~end=9), Some(9)),
+    (S.range(~start=1, ~end=99), Some(99)),
+    (S.range(~start=1, ~end=999), Some(999)),
+    (S.range(~start=1, ~end=999999), Some(999999)),
+  ]->Js.Array2.mapi(((xs, result), index) =>
+    consumeEqual(
+      ~title="last",
+      ~expectation=`index ${index->intToString}`,
+      ~a=() => xs->S.last,
+      ~b=result,
+    )
+  )
+}
 
 let validationTests = [
   ("when empty, return empty", [], Ok([])),
@@ -1500,8 +1511,8 @@ let findTests = [
   (() => [1, 2, 3]->S.fromArray, i => i == 2, Some(2), "when many and is middle"),
   (() => [1, 2, 3]->S.fromArray, i => i == 3, Some(3), "when many and is last"),
   (() => [1, 2, 3]->S.fromArray, _ => false, None, "when many and predicate false"),
-  (() => S.range(~start=1, ~end=9999999), i => i == 9999999, Some(9999999), "when million"),
-  (() => S.range(~start=1, ~end=9999999), _ => false, None, "when million"),
+  (() => S.range(~start=1, ~end=9_999_999), i => i == 9_999_999, Some(9_999_999), "when million"),
+  (() => S.range(~start=1, ~end=9_999_999), _ => false, None, "when million"),
 ]->Js.Array2.mapi(((source, predicate, result, note), index) =>
   T.make(
     ~category="Seq",
@@ -1517,10 +1528,12 @@ let tests =
   [
     findTests,
     dropUntilTests,
+    lastTests,
     allOkTests,
     allSomeTests,
     constructors,
     transforming,
     consuming,
     memoizeTests,
+    reduceTests,
   ]->Belt.Array.flatMap(i => i)

@@ -85,11 +85,25 @@ let rec flatMap = (xs, f) =>
 
 let rec map = (xs, f) => xs->mapNext((x, xs) => Node.next(f(x), map(xs, f)))
 
-let cons = (value, seq) => (. ()) => Next(value, seq)
+let cons = (x, xs) => (. ()) => Next(x, xs)
 
 let head = xs => xs->next->Node.head
 
 let headTail = xs => xs->next->Node.toOption
+
+let forEach = (xs, f) => {
+  let curr = ref(xs->next)
+  let break = ref(false)
+  while !break.contents {
+    switch curr.contents {
+    | End => break := true
+    | Next(x, xs) => {
+        f(x)
+        curr := xs->next
+      }
+    }
+  }
+}
 
 module Indexed = {
   type t<'a> = ('a, int)
@@ -105,13 +119,13 @@ let indexed = xs => {
   go(xs, 0)
 }
 
-let singleton = v => cons(v, empty)
+let singleton = x => cons(x, empty)
 
 let rec unfold = (seed, f) =>
   (. ()) =>
     switch f(seed) {
     | None => Node.end
-    | Some(value, seed) => Node.next(value, unfold(seed, f))
+    | Some(x, seed) => Node.next(x, unfold(seed, f))
     }
 
 let init = (~count, f) => unfold(0, i => i < count ? Some(f(~index=i), i + 1) : None)
@@ -190,14 +204,14 @@ let rec fromList = xs => {
   (. ()) =>
     switch xs {
     | list{} => End
-    | list{head, ...tail} => Next(head, fromList(tail))
+    | list{x, ...xs} => Next(x, fromList(xs))
     }
 }
 
 let fromOption = opt =>
   switch opt {
   | None => empty
-  | Some(value) => singleton(value)
+  | Some(x) => singleton(x)
   }
 
 let mapi = (xs, f) => xs->indexed->map(((x, index)) => f(~value=x, ~index))
@@ -215,16 +229,6 @@ let takeAtMost = (xs, count) => {
 
 let headTails = xs =>
   unfold(xs, xs => xs->headTail->Option.flatMap(((_, xs) as ht) => Some(ht, xs)))
-
-let last = xs => {
-  let rec go = (last, xs) => {
-    switch xs->next {
-    | End => TR.resolve(last)
-    | Next(x, xs) => TR.work(() => go(Some(x), xs))
-    }
-  }
-  TR.work(() => go(None, xs))->TR.solve
-}
 
 let snd = ((_, b)) => b
 
@@ -515,24 +519,16 @@ let window = (seq, length) => {
 let pairwise = xs =>
   xs->window(2)->map(i => (i->Js.Array2.unsafe_get(0), i->Js.Array2.unsafe_get(1)))
 
-// Always tries to generate at least 1 item to determine that the seq has 0 items
-let reduce = (seq, zero, concat) => {
+let reduce = (xs, zero, concat) => {
   let sum = ref(zero)
-  let curr = ref(seq->next)
-  while curr.contents !== End {
-    switch curr.contents {
-    | End => ()
-    | Next(v, seq) => {
-        curr := seq->next
-        sum := concat(sum.contents, v)
-      }
-    }
-  }
+  xs->forEach(x => sum := concat(sum.contents, x))
   sum.contents
 }
 
 let reducei = (seq, zero, concat) =>
   seq->indexed->reduce(zero, (sum, (value, index)) => concat(~sum, ~value, ~index))
+
+let last = xs => xs->reduce(None, (_, x) => Some(x))
 
 let toArray = seq =>
   seq->reduce([], (arr, i) => {
@@ -541,19 +537,6 @@ let toArray = seq =>
   })
 
 let toString = seq => seq->reduce("", (total, i) => total ++ i)
-
-let forEach = (seq, f) => {
-  let curr = ref(seq->next)
-  while curr.contents !== End {
-    switch curr.contents {
-    | End => ()
-    | Next(value, seq) => {
-        f(value)
-        curr := seq->next
-      }
-    }
-  }
-}
 
 let forEachi = (seq, f) => seq->indexed->forEach(((value, index)) => f(~value, ~index))
 
