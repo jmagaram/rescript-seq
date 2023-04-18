@@ -468,6 +468,12 @@ let transforming = [
     ~b=[2, 5],
   ),
   areEqual(
+    ~title="filter",
+    ~expectation="when skipping millions => no stack problem",
+    ~a=() => S.replicate(~count=999999, ~value=1)->S.concat(2->S.singleton)->S.filter(i => i != 1),
+    ~b=[2],
+  ),
+  areEqual(
     ~title="filteri",
     ~expectation="",
     ~a=() => oneToFive->S.filteri((~value, ~index) => value == 3 && index == 2),
