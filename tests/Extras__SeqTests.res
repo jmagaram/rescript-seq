@@ -572,18 +572,6 @@ let transforming = [
     ~b=[10, 10 + 1 + 0, 10 + 1 + 0 + 2 + 1, 10 + 1 + 0 + 2 + 1 + 3 + 2],
   ),
   areEqual(
-    ~title="dropWhile",
-    ~expectation="start when predicate is true",
-    ~a=() => oneTwoThree->S.dropWhile(i => i <= 2),
-    ~b=[3],
-  ),
-  areEqual(
-    ~title="dropWhile",
-    ~expectation="start when predicate is true",
-    ~a=() => oneTwoThree->S.dropWhile(_ => false),
-    ~b=[1, 2, 3],
-  ),
-  areEqual(
     ~title="flatten",
     ~expectation="concatenate each sub-sequence",
     ~a=() => S.init(~count=3, (~index) => S.replicate(~count=2, ~value=index))->S.flatten,
@@ -976,6 +964,30 @@ let makeSeqEqualsTests = (~title, xs) =>
     areEqual(~title, ~expectation=`index ${inx->intToString} ${note}`, ~a=() => source, ~b=result)
   )
 
+let dropWhileTests =
+  [
+    (S.empty, isFalseAlways, [], ""),
+    (S.empty, isTrueAlways, [], ""),
+    (1->S.singleton, i => i == 1, [], ""),
+    (1->S.singleton, isFalseAlways, [1], ""),
+    (1->S.singleton, isTrueAlways, [], ""),
+    (oneToFive, isTrueAlways, [], ""),
+    (oneToFive, isFalseAlways, [1, 2, 3, 4, 5], ""),
+    (oneToFive, i => i < 3, [3, 4, 5], ""),
+    (oneToFive, i => i <= 5, [], ""),
+    (oneToFive, i => i <= 1, [2, 3, 4, 5], ""),
+    (S.range(~start=1, ~end=99), i => i != 99, [99], "tens"),
+    (S.range(~start=1, ~end=9_999), i => i != 9_999, [9_999], "thousands"),
+    (S.range(~start=1, ~end=9_999_999), i => i != 9_999_999, [9_999_999], "millions"),
+  ]->Js.Array2.mapi(((source, predicate, result, note), inx) =>
+    areEqual(
+      ~title="dropWhile",
+      ~expectation=`index ${inx->intToString} ${note}`,
+      ~a=() => source->S.dropWhile(predicate),
+      ~b=result,
+    )
+  )
+
 let filterSomeTests = makeSeqEqualsTests(
   ~title="filterSome",
   [
@@ -1043,6 +1055,7 @@ let filterTests =
       ~b=result,
     )
   )
+
 let dropUntilTests =
   [
     (S.empty, isFalseAlways, [], ""),
@@ -1503,6 +1516,7 @@ let tests =
   [
     findTests,
     dropUntilTests,
+    dropWhileTests,
     filterTests,
     filterMapTests,
     filterSomeTests,
