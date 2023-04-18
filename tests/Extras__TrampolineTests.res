@@ -1,15 +1,15 @@
 module T = Extras__Test
-module F = Extras__Trampoline
+module TR = Extras__Trampoline
 module Array = Belt.Array
 
 let factorial = n => {
   let rec go = (total, n) =>
     switch n {
-    | 1 => F.Trampoline.resolve(total)
-    | n => F.Trampoline.work(() => go(total * n, n - 1))
+    | 1 => TR.resolve(total)
+    | n => TR.work(() => go(total * n, n - 1))
     }
-  let initialState = F.Trampoline.work(() => go(1, n))
-  F.Trampoline.solve(initialState)
+  let initialState = TR.work(() => go(1, n))
+  TR.solve(initialState)
 }
 
 let factorialTests =
@@ -25,11 +25,11 @@ let factorialTests =
 let decrement = n => {
   let rec go = current =>
     switch current == 0 {
-    | true => F.Trampoline.resolve(current)
-    | false => F.Trampoline.work(() => go(current - 1))
+    | true => TR.resolve(current)
+    | false => TR.work(() => go(current - 1))
     }
-  let initialState = F.Trampoline.work(() => go(n))
-  F.Trampoline.solve(initialState)
+  let initialState = TR.work(() => go(n))
+  TR.solve(initialState)
 }
 
 let decrementTests =
