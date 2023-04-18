@@ -11,7 +11,6 @@ type t = {
 let category = i => i.category
 let title = i => i.title
 let expectation = i => i.expectation
-let predicate = i => i.predicate
 
 let hasKeyword = (i, xs) => {
   let match = (~text, ~keyword) => {
