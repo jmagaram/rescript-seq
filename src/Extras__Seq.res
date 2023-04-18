@@ -27,12 +27,15 @@ let consumeUntil = (~seq, ~predicate, ~onNext, ~onEmpty) => {
   }
 }
 
-let mapNext = (xs, f) =>
+let empty = (. ()) => End
+
+let mapNext = (xs, f) => {
   (. ()) =>
     switch xs(.) {
     | End => End
     | Next(x, xs) => f(x, xs)
     }
+}
 
 let mapBoth = (xs, ~onEmpty, ~onNext) =>
   (. ()) =>
@@ -41,9 +44,19 @@ let mapBoth = (xs, ~onEmpty, ~onNext) =>
     | Next(x, xs) => onNext(x, xs)
     }
 
-let empty = (. ()) => End
-
 let cons = (value, seq) => (. ()) => Next(value, seq)
+
+let head = seq =>
+  switch seq(.) {
+  | End => None
+  | Next(head, _) => Some(head)
+  }
+
+let headTail = seq =>
+  switch seq(.) {
+  | End => None
+  | Next(head, tail) => Some(head, tail)
+  }
 
 let singleton = v => cons(v, empty)
 
@@ -112,13 +125,30 @@ let fromString = s =>
   | len => range(~start=0, ~end=len - 1)->map(inx => s->Js.String2.charAt(inx))
   }
 
-let fromArray = (~start=?, ~end=?, arr: array<'a>) => {
-  switch arr->Ex.Array.isEmpty {
-  | true => empty
+let fromArray = (~start=?, ~end=?, xs: array<'a>) => {
+  switch xs->Ex.Array.isEmpty {
+  | true =>
+    start
+    ->Option.orElse(end)
+    ->Option.forEach(_ =>
+      ArgumentOfOfRange("The array is empty but you provided start and/or end indexes.")->raise
+    )
+    empty
   | false => {
+      let len = xs->Js.Array2.length
       let start = start->Option.getWithDefault(0)
-      let end = end->Option.getWithDefault(arr->Ex.Array.lastIndex->Option.getUnsafe)
-      range(~start, ~end)->map(inx => arr->Js.Array2.unsafe_get(inx))
+      let end = end->Option.getWithDefault(len - 1)
+      if start < 0 || start > len - 1 {
+        ArgumentOfOfRange(
+          `The start index ${start->Belt.Int.toString} is outside the array bounds.`,
+        )->raise
+      }
+      if end < 0 || end > len - 1 {
+        ArgumentOfOfRange(
+          `The end index ${start->Belt.Int.toString} is outside the array bounds.`,
+        )->raise
+      }
+      range(~start, ~end)->map(inx => xs->Js.Array2.unsafe_get(inx))
     }
   }
 }
@@ -154,6 +184,39 @@ let takeAtMost = (xs, count) => {
     )
   go(xs->indexed)
 }
+
+let headTails = xs =>
+  unfold(xs, xs => xs->headTail->Option.flatMap(((_, xs) as ht) => Some(ht, xs)))
+
+let last = seq => {
+  let current = ref(seq)
+  let last = ref(None)
+  let break = ref(false)
+  while !break.contents {
+    switch current.contents(.) {
+    | End => break := true
+    | Next(head, tail) => {
+        last := Some(head)
+        current := tail
+      }
+    }
+  }
+  last.contents
+}
+
+// This caused problems with windowAhead; don't know why
+//
+// let drop = (xs, count) =>
+//   switch count {
+//   | 0 => xs
+//   | _ =>
+//     xs
+//     ->headTails
+//     ->takeAtMost(count)
+//     ->last
+//     ->Option.map(((_, xs)) => xs)
+//     ->Option.getWithDefault(empty)
+//   }
 
 let drop = (xs, count) =>
   if count == 0 {
@@ -426,6 +489,7 @@ let window = (seq, length) => {
 let pairwise = seq =>
   seq->window(2)->map(i => (i->Js.Array2.unsafe_get(0), i->Js.Array2.unsafe_get(1)))
 
+// Always tries to generate at least 1 item to determine that the seq has 0 items
 let reduce = (seq, zero, concat) => {
   let sum = ref(zero)
   let curr = ref(seq(.))
@@ -552,18 +616,6 @@ let isEmpty = seq =>
   | _ => false
   }
 
-let head = seq =>
-  switch seq(.) {
-  | End => None
-  | Next(head, _) => Some(head)
-  }
-
-let headTail = seq =>
-  switch seq(.) {
-  | End => None
-  | Next(head, tail) => Some(head, tail)
-  }
-
 let tail = seq => seq->drop(1)
 
 let minBy = (seq, compare) =>
@@ -581,22 +633,6 @@ let maxBy = (seq, compare) =>
     | Some(sum) => Some(compare(i, sum) > 0 ? i : sum)
     }
   })
-
-let last = seq => {
-  let current = ref(seq)
-  let last = ref(None)
-  let break = ref(false)
-  while !break.contents {
-    switch current.contents(.) {
-    | End => break := true
-    | Next(head, tail) => {
-        last := Some(head)
-        current := tail
-      }
-    }
-  }
-  last.contents
-}
 
 let rec interleave = (xs, ys) => {
   (. ()) => {
@@ -652,33 +688,35 @@ let isSortedBy = (xs, cmp) => xs->pairwise->everyOrEmpty(((a, b)) => cmp(a, b) <
 let windowBehind = (xs, size) => {
   if size <= 0 {
     ArgumentOfOfRange(`windowBehind requires a size greater than zero.`)->raise
+  } else {
+    xs
+    ->scan([], (sum, i) => {
+      if sum->Js.Array2.length === size {
+        sum->Js.Array2.shift->ignore
+      }
+      sum->Js.Array2.push(i)->ignore
+      sum
+    })
+    ->drop(1)
   }
-  xs
-  ->scan([], (sum, i) => {
-    if sum->Js.Array2.length === size {
-      sum->Js.Array2.shift->ignore
-    }
-    sum->Js.Array2.push(i)->ignore
-    sum
-  })
-  ->drop(1)
 }
 
 let windowAhead = (xs, size) => {
   if size <= 0 {
     ArgumentOfOfRange(`windowAhead requires a size greater than zero.`)->raise
+  } else {
+    xs
+    ->map(i => Some(i))
+    ->concat(replicate(~count=size - 1, ~value=None))
+    ->scani(~zero=[], (~sum, ~value as i, ~index) => {
+      if index >= size {
+        sum->Js.Array2.shift->ignore
+      }
+      i->Option.forEach(i => sum->Js.Array2.push(i)->ignore)
+      sum
+    })
+    ->drop(size)
   }
-  xs
-  ->map(i => Some(i))
-  ->concat(replicate(~count=size - 1, ~value=None))
-  ->scani(~zero=[], (~sum, ~value as i, ~index) => {
-    if index >= size {
-      sum->Js.Array2.shift->ignore
-    }
-    i->Option.forEach(i => sum->Js.Array2.push(i)->ignore)
-    sum
-  })
-  ->drop(size)
 }
 
 // add predicate call count tests elsewhere
@@ -722,3 +760,6 @@ let toOption = seq =>
   | End => None
   | Next(head, tail) => Some(tail->startWith(head))
   }
+
+let quiw = singleton(1)->windowAhead(1)->toArray
+Js.log2("it was ", quiw)

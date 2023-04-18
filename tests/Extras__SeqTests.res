@@ -50,6 +50,22 @@ let constructors = [
     ~a=() => S.unfold(1, _ => None),
     ~b=[],
   ),
+  // areEqual(
+  //   ~title="unfold",
+  //   ~expectation="when generate zero items, function never called",
+  //   ~a=() => {
+  //     let callCount = ref(0)
+  //     S.unfold(1, i => {
+  //       callCount := callCount.contents + 1
+  //       Some(i, i + 1)
+  //     })
+  //     ->S.cycle
+  //     ->S.takeAtMost(0)
+  //     ->ignore
+  //     S.singleton(callCount.contents)
+  //   },
+  //   ~b=[0],
+  // ),
   areEqual(~title="cons", ~expectation="when a + empty => a", ~a=() => S.cons(1, S.empty), ~b=[1]),
   areEqual(
     ~title="cons",
@@ -165,17 +181,23 @@ let constructors = [
     ~a=() => [0, 1, 2, 3]->S.fromArray(~start=3, ~end=1),
     ~b=[3, 2, 1],
   ),
-  willThrow(~title="fromArray", ~expectation="throw when start too small", ~f=() =>
+  willThrow(~title="fromArray", ~expectation="throw if items and start too small", ~f=() =>
     [1, 2, 3]->S.fromArray(~start=-1)
   ),
-  willThrow(~title="fromArray", ~expectation="throw when start too small", ~f=() =>
+  willThrow(~title="fromArray", ~expectation="throw if items and start too big", ~f=() =>
+    [1, 2, 3]->S.fromArray(~start=3)
+  ),
+  willThrow(~title="fromArray", ~expectation="throw if empty and any start index", ~f=() =>
     []->S.fromArray(~start=0)
   ),
-  willThrow(~title="fromArray", ~expectation="throw when end too big", ~f=() =>
+  willThrow(~title="fromArray", ~expectation="throw if items and end too small", ~f=() =>
+    [1, 2, 3]->S.fromArray(~end=-1)
+  ),
+  willThrow(~title="fromArray", ~expectation="throw if items and end too big", ~f=() =>
     [1, 2, 3]->S.fromArray(~end=3)
   ),
-  willThrow(~title="fromArray", ~expectation="throw when end too big", ~f=() =>
-    []->S.fromArray(~start=0)
+  willThrow(~title="fromArray", ~expectation="throw if empty and any end index", ~f=() =>
+    []->S.fromArray(~end=0)
   ),
   areEqual(
     ~title="fromList",
@@ -202,11 +224,16 @@ let constructors = [
     ~a=() => S.singleton(1)->S.cycle->S.takeAtMost(5),
     ~b=[1, 1, 1, 1, 1],
   ),
-  T.make(
-    ~category="Seq",
+  areEqual(
     ~title="cycle",
-    ~expectation="use but do not cache first value",
-    ~predicate=() => {
+    ~expectation="when infinite => can still cycle",
+    ~a=() => S.infinite(() => 1)->S.cycle->S.takeAtMost(5),
+    ~b=[1, 1, 1, 1, 1],
+  ),
+  areEqual(
+    ~title="cycle",
+    ~expectation="first item is cached and used",
+    ~a=() => {
       let generated = []
       let items =
         S.infinite(() => {
@@ -217,8 +244,9 @@ let constructors = [
         ->S.cycle
         ->S.takeAtMost(3)
         ->S.toArray
-      items == generated && generated->Js.Array2.length == 3
+      S.singleton(items[0] == generated[0])
     },
+    ~b=[true],
   ),
   areEqual(
     ~title="cycle",
@@ -1121,6 +1149,22 @@ let consuming = [
     ~expectation="can transform",
     ~a=() => oneToFive->S.reduce("", (sum, i) => `${i->Belt.Int.toString}${sum}`),
     ~b="54321",
+  ),
+  consumeEqual(
+    ~title="toArray",
+    ~expectation="when empty sequence, no generator functions are called",
+    ~a=() => {
+      let calls = ref(0)
+      S.unfold(0, i => {
+        calls := calls.contents + 1
+        i < 100 ? Some(i, i + 1) : None
+      })
+      ->S.takeAtMost(0)
+      ->S.toArray
+      ->ignore
+      calls.contents
+    },
+    ~b=0,
   ),
   consumeEqual(
     ~title="reducei",
