@@ -249,53 +249,20 @@ let drop = (xs: t<'a>, count) =>
     ->Option.getWithDefault(empty)
   }
 
-// let filteri = (xs, f) => {
-//   let rec go = xs =>
-//     xs->mapNext(((x, index), xs) =>
-//       switch f(~value=x, ~index) {
-//       | true => Next(x, go(xs))
-//       | false => go(xs)->next
-//       }
-//     )
-//   go(xs->indexed)
-// }
-
-// let rec filter = (xs, f) =>
-//   xs->mapNext((x, xs) =>
-//     switch f(x) {
-//     | true => Next(x, filter(xs, f))
-//     | false => filter(xs, f)->next
-//     }
-//   )
-
-// let rec filter f seq () = match seq() with
-//   | Nil -> Nil
-//   | Cons (x, next) ->
-//       if f x
-//       then Cons (x, filter f next)
-//       else filter f next ()
-
 let rec filter = (xs, f) =>
   (. ()) => {
-    let rec find = xs => {
-      switch xs->next {
-      | End => TR.resolve(None)
-      | Next(x, xs) as n =>
-        switch f(x) {
-        | true => TR.resolve(Some(n))
-        | false => TR.work(() => find(xs))
+    switch xs->next {
+    | End => End
+    | Next(x, xs) =>
+      switch f(x) {
+      | true => Next(x, filter(xs, f))
+      | false =>
+        switch xs->headTails->find(((x, _)) => f(x)) {
+        | None => End
+        | Some((x, xs)) => Next(x, filter(xs, f))
         }
       }
     }
-    TR.work(() => find(xs))
-    ->TR.solve
-    ->Option.map(i =>
-      switch i {
-      | Next(x, xs) => Next(x, filter(xs, f))
-      | End => End
-      }
-    )
-    ->Option.getWithDefault(End)
   }
 
 let filteri = (xs, f) =>

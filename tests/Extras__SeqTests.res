@@ -485,42 +485,6 @@ let transforming = [
     ~b=["y"],
   ),
   areEqual(
-    ~title="filter",
-    ~expectation="when 1 item and condition met",
-    ~a=() => S.singleton(1)->S.filter(i => i == 1),
-    ~b=[1],
-  ),
-  areEqual(
-    ~title="filter",
-    ~expectation="when 1 item and condition not met",
-    ~a=() => S.singleton(1)->S.filter(_ => false),
-    ~b=[],
-  ),
-  areEqual(
-    ~title="filter",
-    ~expectation="when empty",
-    ~a=() => S.empty->S.filter(_ => true),
-    ~b=[],
-  ),
-  areEqual(
-    ~title="filter",
-    ~expectation="when > 1 items and condition met",
-    ~a=() => oneToFive->S.filter(i => i == 2 || i == 5),
-    ~b=[2, 5],
-  ),
-  areEqual(
-    ~title="filter",
-    ~expectation="when > 1 items and condition met with first",
-    ~a=() => [1, 1, 2, 2]->S.fromArray->S.filter(i => i == 1),
-    ~b=[1, 1],
-  ),
-  areEqual(
-    ~title="filter",
-    ~expectation="when skipping millions => no stack problem",
-    ~a=() => S.replicate(~count=999_999, ~value=1)->S.concat(2->S.singleton)->S.filter(i => i != 1),
-    ~b=[2],
-  ),
-  areEqual(
     ~title="filteri",
     ~expectation="",
     ~a=() => oneToFive->S.filteri((~value, ~index) => value == 3 && index == 2),
@@ -1066,8 +1030,65 @@ let transforming = [
     },
     ~b=[1],
   ),
+  areEqual(
+    ~title="filter",
+    ~expectation="when 1 item and condition met",
+    ~a=() => S.singleton(1)->S.filter(i => i == 1),
+    ~b=[1],
+  ),
+  areEqual(
+    ~title="filter",
+    ~expectation="when 1 item and condition not met",
+    ~a=() => S.singleton(1)->S.filter(_ => false),
+    ~b=[],
+  ),
+  areEqual(
+    ~title="filter",
+    ~expectation="when empty",
+    ~a=() => S.empty->S.filter(_ => true),
+    ~b=[],
+  ),
+  areEqual(
+    ~title="filter",
+    ~expectation="when > 1 items and condition met",
+    ~a=() => oneToFive->S.filter(i => i == 2 || i == 5),
+    ~b=[2, 5],
+  ),
+  areEqual(
+    ~title="filter",
+    ~expectation="when > 1 items and condition met with first",
+    ~a=() => [1, 1, 2, 2]->S.fromArray->S.filter(i => i == 1),
+    ~b=[1, 1],
+  ),
+  areEqual(
+    ~title="filter",
+    ~expectation="when skipping millions => no stack problem",
+    ~a=() => S.replicate(~count=999_999, ~value=1)->S.concat(2->S.singleton)->S.filter(i => i != 1),
+    ~b=[2],
+  ),
 ]
 
+let filterTests =
+  [
+    (S.empty, isFalseAlways, [], ""),
+    (S.empty, isTrueAlways, [], ""),
+    (1->S.singleton, i => i == 1, [1], ""),
+    (1->S.singleton, isFalseAlways, [], ""),
+    (1->S.singleton, isTrueAlways, [1], ""),
+    (oneToFive, isTrueAlways, [1, 2, 3, 4, 5], ""),
+    (oneToFive, isFalseAlways, [], ""),
+    (oneToFive, i => i == 3 || i == 5, [3, 5], ""),
+    (oneToFive, i => i == 5, [5], ""),
+    (oneToFive, i => i == 1 || i == 3, [1, 3], ""),
+    (S.range(~start=1, ~end=9_999_999), i => i == 9_999_999, [9_999_999], "millions"),
+  ]->Js.Array2.mapi(((source, predicate, result, note), inx) =>
+    areEqual(
+      ~title="filter",
+      ~expectation=`index ${inx->intToString} ${note}`,
+      ~a=() => source->S.filter(predicate),
+      ~b=result,
+    )
+  )
 let dropUntilTests =
   [
     (S.empty, isFalseAlways, [], ""),
@@ -1528,6 +1549,7 @@ let tests =
   [
     findTests,
     dropUntilTests,
+    filterTests,
     lastTests,
     allOkTests,
     allSomeTests,
