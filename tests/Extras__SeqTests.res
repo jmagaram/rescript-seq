@@ -716,6 +716,13 @@ let transforming = [
     ~b=[3, 5],
   ),
   areEqual(
+    ~title="filterOk",
+    ~expectation="when millions of Error => empty",
+    ~a=() =>
+      S.replicate(~count=999999, ~value=Error("x"))->S.concat(S.singleton(Ok(1)))->S.filterOk,
+    ~b=[1],
+  ),
+  areEqual(
     ~title="chunkBySize",
     ~expectation="when not empty and longer than chunk size",
     ~a=() => [1, 2, 3, 4, 5, 6, 7]->S.fromArray->S.chunkBySize(3),
