@@ -1,7 +1,7 @@
 ## Version 0.22.0
 
 - Allow test filtering by keyword
-- `Functions` module with `Trampoline` recursion helper
+- `Trampoline` module to eliminate recursion in functions
 
 ## Version 0.21.0
 

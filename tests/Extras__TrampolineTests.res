@@ -1,5 +1,5 @@
 module T = Extras__Test
-module F = Extras__Functions
+module F = Extras__Trampoline
 module Array = Belt.Array
 
 let factorial = n => {
