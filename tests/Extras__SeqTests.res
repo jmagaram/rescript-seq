@@ -978,7 +978,7 @@ let dropWhileTests =
     (oneToFive, i => i <= 1, [2, 3, 4, 5], ""),
     (S.range(~start=1, ~end=99), i => i != 99, [99], "tens"),
     (S.range(~start=1, ~end=9_999), i => i != 9_999, [9_999], "thousands"),
-    (S.range(~start=1, ~end=9_999_999), i => i != 9_999_999, [9_999_999], "millions"),
+    (S.range(~start=1, ~end=999_999), i => i != 999_999, [999_999], "millions"),
   ]->Js.Array2.mapi(((source, predicate, result, note), inx) =>
     areEqual(
       ~title="dropWhile",

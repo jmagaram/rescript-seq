@@ -326,19 +326,6 @@ let scani = (xs, ~zero, f) => {
 
 let scan = (seq, zero, f) => scani(seq, ~zero, (~sum, ~value, ~index as _) => f(sum, value))
 
-let rec dropWhile = (seq, predicate) => {
-  (. ()) => {
-    switch seq->next {
-    | End => End
-    | Next(value, seq) =>
-      switch predicate(value) {
-      | true => dropWhile(seq, predicate)(.) // recursive!
-      | false => Next(value, seq)
-      }
-    }
-  }
-}
-
 let map2 = (s1, s2, f) => zip(s1, s2)->map(((a, b)) => f(a, b))
 
 let rec sortedMerge = (s1, s2, cmp) => {
@@ -420,6 +407,14 @@ let dropUntil = (xs, predicate) =>
     ->headTails
     ->find(((x, _)) => predicate(x))
     ->Option.map(((x, xs)) => Node.next(x, xs))
+    ->Option.getWithDefault(Node.end)
+
+let dropWhile = (xs, predicate) =>
+  (. ()) =>
+    xs
+    ->headTails
+    ->find(((x, _)) => false == predicate(x))
+    ->Option.map(((x, xs)) => Next(x, xs))
     ->Option.getWithDefault(Node.end)
 
 let rec chunkBySize = (seq, length) => {
