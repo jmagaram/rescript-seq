@@ -26,7 +26,7 @@ let decrement = n => {
   let rec go = current =>
     switch current == 0 {
     | true => F.Trampoline.resolve(current)
-    | n => F.Trampoline.work(() => go(current - 1))
+    | false => F.Trampoline.work(() => go(current - 1))
     }
   let initialState = F.Trampoline.work(() => go(n))
   F.Trampoline.solve(initialState)
