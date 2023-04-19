@@ -165,7 +165,7 @@ let rangeTests = [
   ),
 ]
 
-let transforming = [
+let concatTests = [
   areEqual(
     ~title="concat",
     ~expectation="when both not empty",
@@ -190,6 +190,9 @@ let transforming = [
     ~a=() => S.concat(oneTwoThree, S.empty),
     ~b=[1, 2, 3],
   ),
+]
+
+let flatMapTests = [
   areEqual(
     ~title="flatMap",
     ~expectation="when map to several items => flatten",
@@ -220,24 +223,28 @@ let transforming = [
     ~a=() => oneTwoThree->S.flatMap(i => S.singleton(i->intToString)),
     ~b=["1", "2", "3"],
   ),
-  areEqual(
-    ~title="map",
-    ~expectation="",
-    ~a=() => oneTwoThree->S.map(intToString),
-    ~b=["1", "2", "3"],
-  ),
-  areEqual(
-    ~title="mapi",
-    ~expectation="",
-    ~a=() => oneTwoThree->S.mapi((~value, ~index) => (value, index)),
-    ~b=[(1, 0), (2, 1), (3, 2)],
-  ),
-  areEqual(
-    ~title="indexed",
-    ~expectation="when items, index starts at 0",
-    ~a=() => oneTwoThree->S.indexed,
-    ~b=[(1, 0), (2, 1), (3, 2)],
-  ),
+]
+
+let mapTests = makeSeqEqualsTests(
+  ~title="map",
+  [
+    (oneToFive->S.map(i => i + 1), [2, 3, 4, 5, 6], ""),
+    (S.singleton(1)->S.map(i => i + 1), [2], ""),
+    (S.empty->S.map(i => i + 1), [], ""),
+    (oneTwoThree->S.mapi((~value, ~index) => value * index), [0, 2, 6], ""),
+  ],
+)
+
+let indexedTests = makeSeqEqualsTests(
+  ~title="indexed",
+  [
+    (oneTwoThree->S.indexed, [(1, 0), (2, 1), (3, 2)], ""),
+    (S.singleton(9)->S.indexed, [(9, 0)], ""),
+    (S.empty->S.indexed, [], ""),
+  ],
+)
+
+let takeWhileTests = [
   areEqual(
     ~title="takeWhile",
     ~expectation="when some match, return them",
@@ -262,6 +269,9 @@ let transforming = [
     ~a=() => oneToFive->S.takeWhile(i => i == 1),
     ~b=[1],
   ),
+]
+
+let dropTests = [
   areEqual(
     ~title="drop",
     ~expectation="when count = 0 => original seq by value",
@@ -304,21 +314,9 @@ let transforming = [
     ~a=() => S.concat(S.replicate(~count=999_999, ~value="x"), S.singleton("y"))->S.drop(999_999),
     ~b=["y"],
   ),
-  areEqual(
-    ~title="filteri",
-    ~expectation="",
-    ~a=() => oneToFive->S.filteri((~value, ~index) => value == 3 && index == 2),
-    ~b=[3],
-  ),
-  areEqual(
-    ~title="filteri",
-    ~expectation="when skipping millions => no stack problem",
-    ~a=() =>
-      S.replicate(~count=999_999, ~value=1)
-      ->S.concat(2->S.singleton)
-      ->S.filteri((~value, ~index as _) => value != 1),
-    ~b=[2],
-  ),
+]
+
+let zipLongestTests = [
   areEqual(
     ~title="zipLongest",
     ~expectation="when same length",
@@ -361,6 +359,9 @@ let transforming = [
     ~a=() => S.zipLongest(S.replicate(~count=3, ~value=None), S.replicate(~count=1, ~value=None)),
     ~b=[(Some(None), Some(None)), (Some(None), None), (Some(None), None)],
   ),
+]
+
+let zipTests = [
   areEqual(
     ~title="zip",
     ~expectation="when first longer, ignore excess",
@@ -379,12 +380,24 @@ let transforming = [
     ~a=() => S.zip(oneTwoThree, fourFiveSix),
     ~b=[(1, 4), (2, 5), (3, 6)],
   ),
+]
+
+let flattenTests = [
   areEqual(
     ~title="flatten",
     ~expectation="concatenate each sub-sequence",
     ~a=() => S.init(~count=3, (~index) => S.replicate(~count=2, ~value=index))->S.flatten,
     ~b=[0, 0, 1, 1, 2, 2],
   ),
+  areEqual(
+    ~title="flatten",
+    ~expectation="concatenate each sub-sequence",
+    ~a=() => S.infinite(() => S.empty)->S.takeAtMost(5)->S.flatten,
+    ~b=[],
+  ),
+]
+
+let map2Tests = [
   areEqual(
     ~title="map2",
     ~expectation="when same length, map all",
@@ -403,6 +416,9 @@ let transforming = [
     ~a=() => S.map2(oneToFive, oneTwoThree, (a, b) => a * b),
     ~b=[1, 4, 9],
   ),
+]
+
+let transforming = [
   areEqual(
     ~title="sortedMerge",
     ~expectation="",
@@ -1016,7 +1032,8 @@ let filterTests =
     (oneToFive, i => i == 5, [5], ""),
     (oneToFive, i => i == 1 || i == 3, [1, 3], ""),
     (S.range(~start=1, ~end=9_999_999), i => i == 9_999_999, [9_999_999], "millions"),
-  ]->Js.Array2.mapi(((source, predicate, result, note), inx) =>
+  ]
+  ->Js.Array2.mapi(((source, predicate, result, note), inx) =>
     areEqual(
       ~title="filter",
       ~expectation=`index ${inx->intToString} ${note}`,
@@ -1024,6 +1041,23 @@ let filterTests =
       ~b=result,
     )
   )
+  ->Js.Array.concat([
+    areEqual(
+      ~title="filteri",
+      ~expectation="",
+      ~a=() => oneToFive->S.filteri((~value, ~index) => value == 3 && index == 2),
+      ~b=[3],
+    ),
+    areEqual(
+      ~title="filteri",
+      ~expectation="when skipping millions => no stack problem",
+      ~a=() =>
+        S.replicate(~count=999_999, ~value=1)
+        ->S.concat(2->S.singleton)
+        ->S.filteri((~value, ~index as _) => value != 1),
+      ~b=[2],
+    ),
+  ])
 
 let dropUntilTests =
   [
@@ -1499,6 +1533,7 @@ let tests =
     takeUntilTests,
     filterTests,
     filterMapTests,
+    indexedTests,
     filterSomeTests,
     filterOkTests,
     lastTests,
@@ -1512,5 +1547,14 @@ let tests =
     reduceTests,
     chunkBySizeTests,
     intersperseTests,
+    concatTests,
     allPairsTests,
+    flatMapTests,
+    mapTests,
+    takeWhileTests,
+    dropTests,
+    flattenTests,
+    zipTests,
+    zipLongestTests,
+    map2Tests,
   ]->Belt.Array.flatMap(i => i)
