@@ -513,6 +513,34 @@ let compare = (xs, ys, cmp) => {
   ->Option.getWithDefault(0)
 }
 
+let rec map2 = (xs, ys, f) =>
+  (. ()) => {
+    switch xs->next {
+    | End => End
+    | Next(x, xs) =>
+      switch ys->next {
+      | End => End
+      | Next(y, ys) => Next(f(x, y), map2(xs, ys, f))
+      }
+    }
+  }
+
+let rec map3 = (xs, ys, zs, f) =>
+  (. ()) => {
+    switch xs->next {
+    | End => End
+    | Next(x, xs) =>
+      switch ys->next {
+      | End => End
+      | Next(y, ys) =>
+        switch zs->next {
+        | End => End
+        | Next(z, zs) => Next(f(x, y, z), map3(xs, ys, zs, f))
+        }
+      }
+    }
+  }
+
 let length = xs => xs->reduce(0, (sum, _) => sum + 1)
 
 let isEmpty = xs =>

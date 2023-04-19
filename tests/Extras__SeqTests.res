@@ -1526,6 +1526,64 @@ let findTests = [
   )
 )
 
+let map2Tests = {
+  let test = (xs, ys, expected) => {
+    T.make(
+      ~category="Seq",
+      ~title="map2",
+      ~expectation=`${xs},${ys} => ${expected}`,
+      ~predicate=() => {
+        let xs = xs->S.fromString
+        let ys = ys->S.fromString
+        let expected = expected == "" ? S.empty : expected->Js.String2.split(",")->S.fromArray
+        let actual = S.map2(xs, ys, (x, y) => x ++ y)
+        S.equals(expected, actual, (i, j) => i == j)
+      },
+    )
+  }
+  [
+    test("", "", ""),
+    test("a", "", ""),
+    test("", "a", ""),
+    test("a", "b", "ab"),
+    test("aa", "bb", "ab,ab"),
+    test("aaa", "bbb", "ab,ab,ab"),
+    test("a", "bbb", "ab"),
+    test("aaa", "b", "ab"),
+    test("aaaaaaa", "bbb", "ab,ab,ab"),
+  ]
+}
+
+let map3Tests = {
+  let test = (xs, ys, zs, expected) => {
+    T.make(
+      ~category="Seq",
+      ~title="map3",
+      ~expectation=`${xs},${ys},${zs} => ${expected}`,
+      ~predicate=() => {
+        let xs = xs->S.fromString
+        let ys = ys->S.fromString
+        let zs = zs->S.fromString
+        let expected = expected == "" ? S.empty : expected->Js.String2.split(",")->S.fromArray
+        let actual = S.map3(xs, ys, zs, (x, y, z) => x ++ y ++ z)
+        S.equals(expected, actual, (i, j) => i == j)
+      },
+    )
+  }
+  [
+    test("", "", "", ""),
+    test("a", "", "", ""),
+    test("", "b", "", ""),
+    test("", "", "c", ""),
+    test("a", "", "c", ""),
+    test("a", "b", "c", "abc"),
+    test("a", "bb", "ccc", "abc"),
+    test("aa", "bb", "ccc", "abc,abc"),
+    test("aaaaaaaa", "bbb", "c", "abc"),
+    test("aaaaaaaa", "bbbbbb", "ccc", "abc,abc,abc"),
+  ]
+}
+
 let tests =
   [
     allOkTests,
@@ -1568,6 +1626,8 @@ let tests =
     lastTests,
     lengthTests,
     mapTests,
+    map2Tests,
+    map3Tests,
     memoizeTests,
     minByMaxByTests,
     pairwiseTests,
