@@ -13,7 +13,7 @@ let isLocalDevelopment = () => {
 }
 
 let keywords = ["Seq"]
-let onlyShowFailures = false
+let onlyShowFailures = true
 let throwIfAnyTestFails = !isLocalDevelopment()
 
 let tests =
@@ -33,7 +33,7 @@ let tests =
   ]->Array.concatMany
 
 Ex.Task.Result.make(
-  ~promise=() => Ex.Test.runSuite(tests, ~keywords, ~onlyShowFailures=false),
+  ~promise=() => Ex.Test.runSuite(tests, ~keywords, ~onlyShowFailures),
   ~onError=e => e,
 )
 ->Ex.Task.map(i =>
