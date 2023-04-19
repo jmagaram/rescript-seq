@@ -840,49 +840,47 @@ let transforming = [
     ~a=() => S.interleaveMany([S.empty, oneToFive, S.empty, oneTwoThree, S.empty, fourFiveSix]),
     ~b=[1, 1, 4, 2, 2, 5, 3, 3, 6, 4, 5],
   ),
-  areEqual(
-    ~title="chunkBySize",
-    ~expectation="when not empty and longer than chunk size",
-    ~a=() => [1, 2, 3, 4, 5, 6, 7]->S.fromArray->S.chunkBySize(3),
-    ~b=[[1, 2, 3], [4, 5, 6], [7]],
-  ),
-  areEqual(
-    ~title="chunkBySize",
-    ~expectation="when not empty and shorter than chunk size",
-    ~a=() => [1, 2, 3]->S.fromArray->S.chunkBySize(6),
-    ~b=[[1, 2, 3]],
-  ),
-  areEqual(
-    ~title="chunkBySize",
-    ~expectation="when not empty and equal to chunk size",
-    ~a=() => [1, 2, 3]->S.fromArray->S.chunkBySize(3),
-    ~b=[[1, 2, 3]],
-  ),
-  T.make(
-    ~category="Seq",
-    ~title="chunkBySize",
-    ~expectation="when size = 0 => throw",
-    ~predicate=() => R.fromTryCatch(() => [1, 2, 3]->S.fromArray->S.chunkBySize(0))->Result.isError,
-  ),
-  T.make(
-    ~category="Seq",
-    ~title="chunkBySize",
-    ~expectation="when size < 0 => throw",
-    ~predicate=() =>
-      R.fromTryCatch(() => [1, 2, 3]->S.fromArray->S.chunkBySize(-1))->Result.isError,
-  ),
-  areEqual(
-    ~title="chunkBySize",
-    ~expectation="when empty => empty",
-    ~a=() => []->S.fromArray->S.chunkBySize(3),
-    ~b=[],
-  ),
 ]
 
 let makeSeqEqualsTests = (~title, xs) =>
   xs->Js.Array2.mapi(((source, result, note), inx) =>
     areEqual(~title, ~expectation=`index ${inx->intToString} ${note}`, ~a=() => source, ~b=result)
   )
+
+let chunkBySizeTests = {
+  let process = (xs, n) => xs->S.chunkBySize(n)->S.map(concatInts)
+  makeSeqEqualsTests(
+    ~title="chunkBySize",
+    [
+      (S.empty->process(1), [], ""),
+      (S.singleton(1)->process(1), ["1"], ""),
+      (S.singleton(1)->process(2), ["1"], ""),
+      (oneTwoThree->process(1), ["1", "2", "3"], ""),
+      (oneTwoThree->process(2), ["12", "3"], ""),
+      (oneTwoThree->process(3), ["123"], ""),
+      (oneTwoThree->process(4), ["123"], "millions"),
+      (
+        S.range(~start=0, ~end=9)
+        ->S.cycle
+        ->S.takeAtMost(1_000_000)
+        ->S.chunkBySize(10)
+        ->S.map(concatInts)
+        ->S.last
+        ->Option.map(S.singleton)
+        ->Option.getWithDefault(""->S.singleton),
+        ["0123456789"],
+        "",
+      ),
+    ],
+  )->Js.Array2.concat([
+    willThrow(~title="chunkBySize", ~expectation="when size == 0", ~f=() =>
+      oneToFive->S.chunkBySize(0)
+    ),
+    willThrow(~title="chunkBySize", ~expectation="when size == -1", ~f=() =>
+      oneToFive->S.chunkBySize(0)
+    ),
+  ])
+}
 
 let scanTests = {
   let push = (sum, x) => {
@@ -1523,5 +1521,6 @@ let tests =
     scanTests,
     memoizeTests,
     reduceTests,
+    chunkBySizeTests,
     intersperseTests,
   ]->Belt.Array.flatMap(i => i)

@@ -398,44 +398,29 @@ let dropWhile = (xs, predicate) =>
     ->Option.map(((x, xs)) => Next(x, xs))
     ->Option.getWithDefault(Node.end)
 
-// could someone write this themselves, and how? EOF
-let consumeN = (seq, n) => {
-  if n <= 0 {
-    Js.Exn.raiseRangeError("Can not consume a 0 or negative amount of items.")
-  }
-  let consumed = []
-  let isEmpty = ref(false)
-  let seq = ref(seq)
-  while consumed->Js.Array2.length < n && !isEmpty.contents {
-    switch seq.contents->next {
-    | End => isEmpty := true
-    | Next(head, tail) => {
-        consumed->Js.Array2.push(head)->ignore
-        seq := tail
-      }
-    }
-  }
-  {"consumed": consumed, "isEmpty": isEmpty.contents, "tail": seq.contents}
-}
-
-// max size?
-let rec chunkBySize = (seq, length) => {
+let chunkBySize = (xs, length) => {
   if length <= 0 {
     ArgumentOfOfRange(
       `chunkBySize requires a length > 0. You asked for ${length->Belt.Int.toString}`,
     )->raise
   }
-  (. ()) => {
-    let n = consumeN(seq, length)
-    switch n["isEmpty"] {
-    | true =>
-      switch n["consumed"] {
-      | [] => End
-      | xs => Next(xs, chunkBySize(empty, length))
+  xs
+  ->map(i => Some(i))
+  ->concat(replicate(~count=length - 1, ~value=None))
+  ->scani(~zero=[], (~sum, ~value, ~index) => {
+    switch value {
+    | None => sum
+    | Some(value) =>
+      switch mod(index, length) {
+      | 0 => [value]
+      | _ =>
+        sum->Js.Array2.push(value)->ignore
+        sum
       }
-    | false => Next(n["consumed"], chunkBySize(n["tail"], length))
     }
-  }
+  })
+  ->filteri((~value as _, ~index) => mod(index, length) == 0)
+  ->drop(1)
 }
 
 // returns internal data structure
