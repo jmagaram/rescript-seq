@@ -1,7 +1,6 @@
 module Option = Belt.Option
 module Result = Belt.Result
 module Ex = Extras
-module TR = Extras__Trampoline
 
 exception ArgumentOfOfRange(string)
 
@@ -268,6 +267,22 @@ let rec filter = (xs, f) =>
 let filteri = (xs, f) =>
   xs->indexed->filter(((value, index)) => f(~value, ~index))->map(((v, _)) => v)
 
+let rec takeWhile = (xs, predicate) =>
+  xs->mapNext((x, xs) =>
+    switch predicate(x) {
+    | false => End
+    | true => Next(x, takeWhile(xs, predicate))
+    }
+  )
+
+let rec takeUntil = (xs, f) =>
+  xs->mapNext((x, xs) => {
+    switch f(x) {
+    | false => Next(x, takeUntil(xs, f))
+    | true => Next(x, empty)
+    }
+  })
+
 let rec zipLongest = (xs, ys) => {
   (. ()) => {
     let xn = xs->next
@@ -280,14 +295,6 @@ let rec zipLongest = (xs, ys) => {
     }
   }
 }
-
-let rec takeWhile = (xs, predicate) =>
-  xs->mapNext((x, xs) =>
-    switch predicate(x) {
-    | false => End
-    | true => Next(x, takeWhile(xs, predicate))
-    }
-  )
 
 let rec zip = (xs, ys) =>
   (. ()) => {
@@ -661,14 +668,6 @@ let windowAhead = (xs, size) => {
     ->drop(size)
   }
 }
-
-let rec takeUntil = (xs, f) =>
-  xs->mapNext((x, xs) => {
-    switch f(x) {
-    | false => Next(x, takeUntil(xs, f))
-    | true => Next(x, empty)
-    }
-  })
 
 let allOk = seq => {
   seq
