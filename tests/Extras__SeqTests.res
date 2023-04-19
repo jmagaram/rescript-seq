@@ -6,16 +6,21 @@ module Option = Belt.Option
 module Result = Belt.Result
 
 let intToString = Belt.Int.toString
+
 let concatInts = xs =>
   xs->Js.Array2.length == 0 ? "_" : xs->Js.Array2.map(intToString)->Js.Array2.joinWith("")
+
 let shorten = s => Js.String2.slice(s, ~from=0, ~to_=1000)
-let isTrueAlways = _ => true
-let isFalseAlways = _ => false
+
+let trueAlways = _ => true
+
+let falseAlways = _ => false
+
 let oneTwoThree = S.init(~count=3, (~index) => index + 1)
 let fourFiveSix = S.init(~count=3, (~index) => index + 4)
 let oneToFive = S.init(~count=5, (~index) => index + 1)
 
-let areEqual = (~title, ~expectation, ~a, ~b) =>
+let seqEqual = (~title, ~expectation, ~a, ~b) =>
   T.make(~category="Seq", ~title, ~expectation, ~predicate=() => {
     let a = a()->S.toArray
     if a != b {
@@ -26,13 +31,12 @@ let areEqual = (~title, ~expectation, ~a, ~b) =>
     a == b
   })
 
-let willThrow = (~title, ~expectation, ~f) => {
+let willThrow = (~title, ~expectation, ~f) =>
   T.make(~category="Seq", ~title, ~expectation, ~predicate=() => {
     Ex.Result.fromTryCatch(f)->Result.isError
   })
-}
 
-let consumeEqual = (~title, ~expectation, ~a, ~b) =>
+let foldEqual = (~title, ~expectation, ~a, ~b) =>
   T.make(~category="Seq", ~title, ~expectation, ~predicate=() => {
     let aValue = a()
     let pass = aValue == b
@@ -46,39 +50,39 @@ let consumeEqual = (~title, ~expectation, ~a, ~b) =>
 
 let makeSeqEqualsTests = (~title, xs) =>
   xs->Js.Array2.mapi(((source, result, note), inx) =>
-    areEqual(~title, ~expectation=`index ${inx->intToString} ${note}`, ~a=() => source, ~b=result)
+    seqEqual(~title, ~expectation=`index ${inx->intToString} ${note}`, ~a=() => source, ~b=result)
   )
 
 let basicConstructorTests = [
-  areEqual(~title="singleton", ~expectation="has one item in it", ~a=() => S.singleton(3), ~b=[3]),
-  areEqual(~title="empty", ~expectation="has no items", ~a=() => S.empty, ~b=[]),
-  areEqual(~title="cons", ~expectation="when a + empty => a", ~a=() => S.cons(1, S.empty), ~b=[1]),
-  areEqual(
+  seqEqual(~title="singleton", ~expectation="has one item in it", ~a=() => S.singleton(3), ~b=[3]),
+  seqEqual(~title="empty", ~expectation="has no items", ~a=() => S.empty, ~b=[]),
+  seqEqual(~title="cons", ~expectation="when a + empty => a", ~a=() => S.cons(1, S.empty), ~b=[1]),
+  seqEqual(
     ~title="cons",
     ~expectation="when a + bcd => abcd",
     ~a=() => S.cons(1, S.range(~start=2, ~end=4)),
     ~b=[1, 2, 3, 4],
   ),
-  areEqual(
+  seqEqual(
     ~title="fromOption",
     ~expectation="when None => empty",
     ~a=() => None->S.fromOption,
     ~b=[],
   ),
-  areEqual(
+  seqEqual(
     ~title="fromOption",
     ~expectation="when Some => singleton",
     ~a=() => Some(1)->S.fromOption,
     ~b=[1],
   ),
-  areEqual(
+  seqEqual(
     ~title="fromString",
     ~expectation="get letters",
     ~a=() => "abc"->S.fromString,
     ~b=["a", "b", "c"],
   ),
-  areEqual(~title="startWith", ~expectation="when empty", ~a=() => S.empty->S.startWith(1), ~b=[1]),
-  areEqual(
+  seqEqual(~title="startWith", ~expectation="when empty", ~a=() => S.empty->S.startWith(1), ~b=[1]),
+  seqEqual(
     ~title="startWith",
     ~expectation="item not empty",
     ~a=() => [2, 3, 4]->S.fromArray->S.startWith(1),
@@ -87,7 +91,7 @@ let basicConstructorTests = [
 ]
 
 let fromListTests = [
-  areEqual(
+  seqEqual(
     ~title="fromList",
     ~expectation="",
     ~a=() => list{1, 2, 3, 4, 5}->S.fromList,
@@ -96,20 +100,20 @@ let fromListTests = [
 ]
 
 let cycleTests = [
-  areEqual(~title="cycle", ~expectation="when empty => empty", ~a=() => S.empty, ~b=[]),
-  areEqual(
+  seqEqual(~title="cycle", ~expectation="when empty => empty", ~a=() => S.empty, ~b=[]),
+  seqEqual(
     ~title="cycle",
     ~expectation="when singleton => repeat endlessly",
     ~a=() => S.singleton(1)->S.cycle->S.takeAtMost(5),
     ~b=[1, 1, 1, 1, 1],
   ),
-  areEqual(
+  seqEqual(
     ~title="cycle",
     ~expectation="when infinite => can still cycle",
     ~a=() => S.infinite(() => 1)->S.cycle->S.takeAtMost(5),
     ~b=[1, 1, 1, 1, 1],
   ),
-  areEqual(
+  seqEqual(
     ~title="cycle",
     ~expectation="first item is cached and used",
     ~a=() => {
@@ -127,7 +131,7 @@ let cycleTests = [
     },
     ~b=[true],
   ),
-  areEqual(
+  seqEqual(
     ~title="cycle",
     ~expectation="when not empty => repeat endlessly",
     ~a=() => oneTwoThree->S.cycle->S.takeAtMost(16),
@@ -152,19 +156,19 @@ let allPairsTests = makeSeqEqualsTests(
 )
 
 let rangeTests = [
-  areEqual(
+  seqEqual(
     ~title="range",
     ~expectation="can count up",
     ~a=() => S.range(~start=3, ~end=7),
     ~b=[3, 4, 5, 6, 7],
   ),
-  areEqual(
+  seqEqual(
     ~title="range",
     ~expectation="can count down",
     ~a=() => S.range(~start=7, ~end=3),
     ~b=[7, 6, 5, 4, 3],
   ),
-  areEqual(
+  seqEqual(
     ~title="range",
     ~expectation="can have single value",
     ~a=() => S.range(~start=3, ~end=3),
@@ -173,25 +177,25 @@ let rangeTests = [
 ]
 
 let concatTests = [
-  areEqual(
+  seqEqual(
     ~title="concat",
     ~expectation="when both not empty",
     ~a=() => S.concat(oneTwoThree, oneTwoThree),
     ~b=[1, 2, 3, 1, 2, 3],
   ),
-  areEqual(
+  seqEqual(
     ~title="concat",
     ~expectation="when both empty",
     ~a=() => S.concat(S.empty, S.empty),
     ~b=[],
   ),
-  areEqual(
+  seqEqual(
     ~title="concat",
     ~expectation="when first empty",
     ~a=() => S.concat(S.empty, oneTwoThree),
     ~b=[1, 2, 3],
   ),
-  areEqual(
+  seqEqual(
     ~title="concat",
     ~expectation="when second empty",
     ~a=() => S.concat(oneTwoThree, S.empty),
@@ -200,31 +204,31 @@ let concatTests = [
 ]
 
 let flatMapTests = [
-  areEqual(
+  seqEqual(
     ~title="flatMap",
     ~expectation="when map to several items => flatten",
     ~a=() => oneTwoThree->S.flatMap(i => S.replicate(~count=3, ~value=i)),
     ~b=[1, 1, 1, 2, 2, 2, 3, 3, 3],
   ),
-  areEqual(
+  seqEqual(
     ~title="flatMap",
     ~expectation="when original is empty => empty",
     ~a=() => S.empty->S.flatMap(_ => S.replicate(~count=5, ~value="x")),
     ~b=[],
   ),
-  areEqual(
+  seqEqual(
     ~title="flatMap",
     ~expectation="when original is one item",
     ~a=() => S.singleton(1)->S.flatMap(i => S.replicate(~count=5, ~value=i)),
     ~b=[1, 1, 1, 1, 1],
   ),
-  areEqual(
+  seqEqual(
     ~title="flatMap",
     ~expectation="when mapped result is empty => empty",
     ~a=() => oneTwoThree->S.flatMap(_ => S.empty),
     ~b=[],
   ),
-  areEqual(
+  seqEqual(
     ~title="flatMap",
     ~expectation="when mapped result is one item",
     ~a=() => oneTwoThree->S.flatMap(i => S.singleton(i->intToString)),
@@ -264,25 +268,25 @@ let indexedTests = makeSeqEqualsTests(
 )
 
 let takeWhileTests = [
-  areEqual(
+  seqEqual(
     ~title="takeWhile",
     ~expectation="when some match, return them",
     ~a=() => oneToFive->S.takeWhile(i => i <= 3),
     ~b=[1, 2, 3],
   ),
-  areEqual(
+  seqEqual(
     ~title="takeWhile",
     ~expectation="when none match, return empty",
     ~a=() => oneToFive->S.takeWhile(_ => false),
     ~b=[],
   ),
-  areEqual(
+  seqEqual(
     ~title="takeWhile",
     ~expectation="when empty, return empty",
     ~a=() => S.empty->S.takeWhile(_ => true),
     ~b=[],
   ),
-  areEqual(
+  seqEqual(
     ~title="takeWhile",
     ~expectation="when only first matches, return it",
     ~a=() => oneToFive->S.takeWhile(i => i == 1),
@@ -291,43 +295,43 @@ let takeWhileTests = [
 ]
 
 let dropTests = [
-  areEqual(
+  seqEqual(
     ~title="drop",
     ~expectation="when count = 0 => original seq by value",
     ~a=() => oneToFive->S.drop(0),
     ~b=[1, 2, 3, 4, 5],
   ),
-  areEqual(
+  seqEqual(
     ~title="drop",
     ~expectation="when count = 0 => original seq by ===",
     ~a=() => S.singleton(oneToFive->S.drop(0) === oneToFive),
     ~b=[true],
   ),
-  areEqual(
+  seqEqual(
     ~title="drop",
     ~expectation="when count == length => empty",
     ~a=() => oneToFive->S.drop(5),
     ~b=[],
   ),
-  areEqual(
+  seqEqual(
     ~title="drop",
     ~expectation="when count > length => empty",
     ~a=() => oneToFive->S.drop(Int32.max_int),
     ~b=[],
   ),
-  areEqual(
+  seqEqual(
     ~title="drop",
     ~expectation="when count < length => subset",
     ~a=() => oneToFive->S.drop(2),
     ~b=[3, 4, 5],
   ),
-  areEqual(
+  seqEqual(
     ~title="drop",
     ~expectation="when count == 1 => just skip first",
     ~a=() => oneToFive->S.drop(1),
     ~b=[2, 3, 4, 5],
   ),
-  areEqual(
+  seqEqual(
     ~title="drop",
     ~expectation="when drop a million items => no stack overflow",
     ~a=() => S.concat(S.replicate(~count=999_999, ~value="x"), S.singleton("y"))->S.drop(999_999),
@@ -336,13 +340,13 @@ let dropTests = [
 ]
 
 let zipLongestTests = [
-  areEqual(
+  seqEqual(
     ~title="zipLongest",
     ~expectation="when same length",
     ~a=() => S.zipLongest(oneTwoThree, oneTwoThree),
     ~b=[(Some(1), Some(1)), (Some(2), Some(2)), (Some(3), Some(3))],
   ),
-  areEqual(
+  seqEqual(
     ~title="zipLongest",
     ~expectation="when second longer => fill with None",
     ~a=() => S.zipLongest(oneTwoThree, oneToFive),
@@ -354,7 +358,7 @@ let zipLongestTests = [
       (None, Some(5)),
     ],
   ),
-  areEqual(
+  seqEqual(
     ~title="zipLongest",
     ~expectation="when first longer => fill with None",
     ~a=() => S.zipLongest(oneToFive, oneTwoThree),
@@ -366,13 +370,13 @@ let zipLongestTests = [
       (Some(5), None),
     ],
   ),
-  areEqual(
+  seqEqual(
     ~title="zipLongest",
     ~expectation="when both empty => empty",
     ~a=() => S.zipLongest(S.empty, S.empty),
     ~b=[],
   ),
-  areEqual(
+  seqEqual(
     ~title="zipLongest",
     ~expectation="when None of different length",
     ~a=() => S.zipLongest(S.replicate(~count=3, ~value=None), S.replicate(~count=1, ~value=None)),
@@ -381,19 +385,19 @@ let zipLongestTests = [
 ]
 
 let zipTests = [
-  areEqual(
+  seqEqual(
     ~title="zip",
     ~expectation="when first longer, ignore excess",
     ~a=() => S.zip(oneToFive, oneTwoThree),
     ~b=[(1, 1), (2, 2), (3, 3)],
   ),
-  areEqual(
+  seqEqual(
     ~title="zip",
     ~expectation="when second longer, ignore excess",
     ~a=() => S.zip(oneTwoThree, oneToFive),
     ~b=[(1, 1), (2, 2), (3, 3)],
   ),
-  areEqual(
+  seqEqual(
     ~title="zip",
     ~expectation="when same length, combine",
     ~a=() => S.zip(oneTwoThree, fourFiveSix),
@@ -402,13 +406,13 @@ let zipTests = [
 ]
 
 let flattenTests = [
-  areEqual(
+  seqEqual(
     ~title="flatten",
     ~expectation="concatenate each sub-sequence",
     ~a=() => S.init(~count=3, (~index) => S.replicate(~count=2, ~value=index))->S.flatten,
     ~b=[0, 0, 1, 1, 2, 2],
   ),
-  areEqual(
+  seqEqual(
     ~title="flatten",
     ~expectation="concatenate each sub-sequence",
     ~a=() => S.infinite(() => S.empty)->S.takeAtMost(5)->S.flatten,
@@ -417,19 +421,19 @@ let flattenTests = [
 ]
 
 let map2Tests = [
-  areEqual(
+  seqEqual(
     ~title="map2",
     ~expectation="when same length, map all",
     ~a=() => S.map2(oneTwoThree, fourFiveSix, (a, b) => a * b),
     ~b=[4, 10, 18],
   ),
-  areEqual(
+  seqEqual(
     ~title="map2",
     ~expectation="when first is shorter, ignore excess",
     ~a=() => S.map2(oneTwoThree, oneToFive, (a, b) => a * b),
     ~b=[1, 4, 9],
   ),
-  areEqual(
+  seqEqual(
     ~title="map2",
     ~expectation="when second is shorter, ignore excess",
     ~a=() => S.map2(oneToFive, oneTwoThree, (a, b) => a * b),
@@ -438,7 +442,7 @@ let map2Tests = [
 ]
 
 let sortedMergeTests = [
-  areEqual(
+  seqEqual(
     ~title="sortedMerge",
     ~expectation="",
     ~a=() =>
@@ -449,13 +453,13 @@ let sortedMergeTests = [
       ),
     ~b=[1, 2, 3, 3, 4, 4, 5, 6, 7, 7, 9, 10, 11, 12],
   ),
-  areEqual(
+  seqEqual(
     ~title="sortedMerge",
     ~expectation="first empty",
     ~a=() => S.sortedMerge([]->S.fromArray, [2, 3, 3, 5, 7, 10, 12]->S.fromArray, Ex.Cmp.int),
     ~b=[2, 3, 3, 5, 7, 10, 12],
   ),
-  areEqual(
+  seqEqual(
     ~title="sortedMerge",
     ~expectation="second empty",
     ~a=() => S.sortedMerge([1, 2, 2, 4]->S.fromArray, S.empty, Ex.Cmp.int),
@@ -464,7 +468,7 @@ let sortedMergeTests = [
 ]
 
 let prependTests = [
-  areEqual(
+  seqEqual(
     ~title="prepend",
     ~expectation="",
     ~a=() => oneToFive->S.prepend(fourFiveSix),
@@ -481,7 +485,7 @@ let tapTests = [
 ]
 
 let windowTests = [
-  areEqual(
+  seqEqual(
     ~title="window",
     ~expectation="when empty => empty",
     ~a=() => S.empty->S.window(5),
@@ -493,19 +497,19 @@ let windowTests = [
   T.make(~category="Seq", ~title="window", ~expectation="when size < 0 => throw", ~predicate=() =>
     R.fromTryCatch(() => [1, 2, 3]->S.fromArray->S.window(-1))->Result.isError
   ),
-  areEqual(
+  seqEqual(
     ~title="window",
     ~expectation="when size < length",
     ~a=() => oneToFive->S.window(3)->S.map(concatInts),
     ~b=["123", "234", "345"],
   ),
-  areEqual(
+  seqEqual(
     ~title="window",
     ~expectation="when size = length",
     ~a=() => oneToFive->S.window(5)->S.map(concatInts),
     ~b=["12345"],
   ),
-  areEqual(
+  seqEqual(
     ~title="window",
     ~expectation="when size > length => empty",
     ~a=() => oneToFive->S.window(6)->S.map(concatInts),
@@ -514,43 +518,43 @@ let windowTests = [
 ]
 
 let windowAheadTests = [
-  areEqual(
+  seqEqual(
     ~title="windowAhead",
     ~expectation="when empty and size > 1",
     ~a=() => S.empty->S.windowAhead(3)->S.map(i => i->Js.Array2.copy->concatInts),
     ~b=[],
   ),
-  areEqual(
+  seqEqual(
     ~title="windowAhead",
     ~expectation="when empty and size = 1",
     ~a=() => S.empty->S.windowAhead(1)->S.map(i => i->Js.Array2.copy->concatInts),
     ~b=[],
   ),
-  areEqual(
+  seqEqual(
     ~title="windowAhead",
     ~expectation="when not empty and size > length",
     ~a=() => oneTwoThree->S.windowAhead(9)->S.map(i => i->Js.Array2.copy->concatInts),
     ~b=["123", "23", "3"],
   ),
-  areEqual(
+  seqEqual(
     ~title="windowAhead",
     ~expectation="when not empty and size < length",
     ~a=() => oneTwoThree->S.windowAhead(2)->S.map(i => i->Js.Array2.copy->concatInts),
     ~b=["12", "23", "3"],
   ),
-  areEqual(
+  seqEqual(
     ~title="windowAhead",
     ~expectation="when not empty and size = length",
     ~a=() => oneTwoThree->S.windowAhead(3)->S.map(i => i->Js.Array2.copy->concatInts),
     ~b=["123", "23", "3"],
   ),
-  areEqual(
+  seqEqual(
     ~title="windowAhead",
     ~expectation="when singleton and size > length",
     ~a=() => S.singleton(1)->S.windowAhead(9)->S.map(i => i->Js.Array2.copy->concatInts),
     ~b=["1"],
   ),
-  areEqual(
+  seqEqual(
     ~title="windowAhead",
     ~expectation="when singleton and size = 1",
     ~a=() => S.singleton(1)->S.windowAhead(1)->S.map(i => i->Js.Array2.copy->concatInts),
@@ -565,43 +569,43 @@ let windowAheadTests = [
 ]
 
 let windowBehindTests = [
-  areEqual(
+  seqEqual(
     ~title="windowBehind",
     ~expectation="when empty and size > 1",
     ~a=() => S.empty->S.windowBehind(3)->S.map(i => i->Js.Array2.copy->concatInts),
     ~b=[],
   ),
-  areEqual(
+  seqEqual(
     ~title="windowBehind",
     ~expectation="when empty and size = 1",
     ~a=() => S.empty->S.windowBehind(1)->S.map(i => i->Js.Array2.copy->concatInts),
     ~b=[],
   ),
-  areEqual(
+  seqEqual(
     ~title="windowBehind",
     ~expectation="when not empty and size > length",
     ~a=() => oneTwoThree->S.windowBehind(9)->S.map(i => i->Js.Array2.copy->concatInts),
     ~b=["1", "12", "123"],
   ),
-  areEqual(
+  seqEqual(
     ~title="windowBehind",
     ~expectation="when not empty and size < length",
     ~a=() => oneTwoThree->S.windowBehind(2)->S.map(i => i->Js.Array2.copy->concatInts),
     ~b=["1", "12", "23"],
   ),
-  areEqual(
+  seqEqual(
     ~title="windowBehind",
     ~expectation="when not empty and size = length",
     ~a=() => oneTwoThree->S.windowBehind(3)->S.map(i => i->Js.Array2.copy->concatInts),
     ~b=["1", "12", "123"],
   ),
-  areEqual(
+  seqEqual(
     ~title="windowBehind",
     ~expectation="when singleton and size > length",
     ~a=() => S.singleton(1)->S.windowBehind(9)->S.map(i => i->Js.Array2.copy->concatInts),
     ~b=["1"],
   ),
-  areEqual(
+  seqEqual(
     ~title="windowBehind",
     ~expectation="when singleton and size = 1",
     ~a=() => S.singleton(1)->S.windowBehind(1)->S.map(i => i->Js.Array2.copy->concatInts),
@@ -616,19 +620,19 @@ let windowBehindTests = [
 ]
 
 let pairwiseTests = [
-  areEqual(
+  seqEqual(
     ~title="pairwise",
     ~expectation="when empty => empty",
     ~a=() => S.empty->S.pairwise,
     ~b=[],
   ),
-  areEqual(
+  seqEqual(
     ~title="pairwise",
     ~expectation="when singleton => None",
     ~a=() => S.singleton(5)->S.pairwise,
     ~b=[],
   ),
-  areEqual(
+  seqEqual(
     ~title="pairwise",
     ~expectation="when multiple",
     ~a=() => oneTwoThree->S.pairwise,
@@ -637,31 +641,31 @@ let pairwiseTests = [
 ]
 
 let interleaveTests = [
-  areEqual(
+  seqEqual(
     ~title="interleave",
     ~expectation="when first shorter",
     ~a=() => S.interleave(fourFiveSix, oneToFive),
     ~b=[4, 1, 5, 2, 6, 3, 4, 5],
   ),
-  areEqual(
+  seqEqual(
     ~title="interleave",
     ~expectation="when second shorter",
     ~a=() => S.interleave(oneToFive, fourFiveSix),
     ~b=[1, 4, 2, 5, 3, 6, 4, 5],
   ),
-  areEqual(
+  seqEqual(
     ~title="interleave",
     ~expectation="when second empty",
     ~a=() => S.interleave(oneToFive, S.empty),
     ~b=[1, 2, 3, 4, 5],
   ),
-  areEqual(
+  seqEqual(
     ~title="interleave",
     ~expectation="when first empty",
     ~a=() => S.interleave(S.empty, oneToFive),
     ~b=[1, 2, 3, 4, 5],
   ),
-  areEqual(
+  seqEqual(
     ~title="interleave",
     ~expectation="when both empty",
     ~a=() => S.interleave(S.empty, S.empty),
@@ -670,43 +674,43 @@ let interleaveTests = [
 ]
 
 let interleaveManyTests = [
-  areEqual(
+  seqEqual(
     ~title="interleaveMany",
     ~expectation="when one singleton",
     ~a=() => S.interleaveMany([S.singleton(1)]),
     ~b=[1],
   ),
-  areEqual(
+  seqEqual(
     ~title="interleaveMany",
     ~expectation="when one",
     ~a=() => S.interleaveMany([oneTwoThree]),
     ~b=[1, 2, 3],
   ),
-  areEqual(
+  seqEqual(
     ~title="interleaveMany",
     ~expectation="when two",
     ~a=() => S.interleaveMany([oneTwoThree, fourFiveSix]),
     ~b=[1, 4, 2, 5, 3, 6],
   ),
-  areEqual(
+  seqEqual(
     ~title="interleaveMany",
     ~expectation="when two and first longer",
     ~a=() => S.interleaveMany([oneToFive, fourFiveSix]),
     ~b=[1, 4, 2, 5, 3, 6, 4, 5],
   ),
-  areEqual(
+  seqEqual(
     ~title="interleaveMany",
     ~expectation="when two and second longer",
     ~a=() => S.interleaveMany([fourFiveSix, oneToFive]),
     ~b=[4, 1, 5, 2, 6, 3, 4, 5],
   ),
-  areEqual(
+  seqEqual(
     ~title="interleaveMany",
     ~expectation="when many",
     ~a=() => S.interleaveMany([oneToFive, oneTwoThree, fourFiveSix]),
     ~b=[1, 1, 4, 2, 2, 5, 3, 3, 6, 4, 5],
   ),
-  areEqual(
+  seqEqual(
     ~title="interleaveMany",
     ~expectation="when many",
     ~a=() => S.interleaveMany([S.empty, oneToFive, S.empty, oneTwoThree, S.empty, fourFiveSix]),
@@ -780,7 +784,7 @@ let takeAtMostTests = makeSeqEqualsTests(
     (oneToFive->S.takeAtMost(6), [1, 2, 3, 4, 5], ""),
   ],
 )->Js.Array2.concat([
-  consumeEqual(
+  foldEqual(
     ~title="takeAtMost",
     ~expectation="millions",
     ~a=() => S.range(~start=1, ~end=999_999)->S.last,
@@ -819,7 +823,7 @@ let takeAtMostTests = makeSeqEqualsTests(
 ])
 
 let infiniteTests = [
-  areEqual(
+  seqEqual(
     ~title="infinite",
     ~expectation="values are generated",
     ~a=() => S.infinite(() => 1)->S.takeAtMost(5),
@@ -847,7 +851,7 @@ let unfoldTests =
       (S.unfold(1, i => i < 100 ? Some(i, i * 2) : None), [1, 2, 4, 8, 16, 32, 64], ""),
     ],
   )->Js.Array2.concat([
-    consumeEqual(
+    foldEqual(
       ~title="unfold",
       ~expectation="millions",
       ~a=() => S.unfold(1, i => i <= 999_999 ? Some(i, i + 1) : None)->S.last,
@@ -864,13 +868,13 @@ let initTests =
       (S.init(~count=3, (~index) => index * 2), [0, 2, 4], ""),
     ],
   )->Js.Array2.concat([
-    consumeEqual(
+    foldEqual(
       ~title="init",
       ~expectation="tens",
       ~a=() => S.init(~count=100, (~index) => index)->S.last,
       ~b=Some(99),
     ),
-    consumeEqual(
+    foldEqual(
       ~title="init",
       ~expectation="millions",
       ~a=() => S.init(~count=1_000_000, (~index) => index)->S.last,
@@ -943,13 +947,13 @@ let scanTests = {
 let takeUntilTests = makeSeqEqualsTests(
   ~title="takeUntil",
   [
-    (S.empty->S.takeUntil(isTrueAlways), [], ""),
-    (S.empty->S.takeUntil(isFalseAlways), [], ""),
+    (S.empty->S.takeUntil(trueAlways), [], ""),
+    (S.empty->S.takeUntil(falseAlways), [], ""),
     (1->S.singleton->S.takeUntil(i => i == 1), [1], ""),
-    (1->S.singleton->S.takeUntil(isFalseAlways), [1], ""),
-    (1->S.singleton->S.takeUntil(isTrueAlways), [1], ""),
-    (oneToFive->S.takeUntil(isTrueAlways), [1], ""),
-    (oneToFive->S.takeUntil(isFalseAlways), [1, 2, 3, 4, 5], ""),
+    (1->S.singleton->S.takeUntil(falseAlways), [1], ""),
+    (1->S.singleton->S.takeUntil(trueAlways), [1], ""),
+    (oneToFive->S.takeUntil(trueAlways), [1], ""),
+    (oneToFive->S.takeUntil(falseAlways), [1, 2, 3, 4, 5], ""),
     (oneToFive->S.takeUntil(i => i == 3), [1, 2, 3], ""),
     (oneToFive->S.takeUntil(i => i == 1), [1], ""),
     (oneToFive->S.takeUntil(i => i == 5), [1, 2, 3, 4, 5], ""),
@@ -987,13 +991,13 @@ let intersperseTests = makeSeqEqualsTests(
 
 let dropWhileTests =
   [
-    (S.empty, isFalseAlways, [], ""),
-    (S.empty, isTrueAlways, [], ""),
+    (S.empty, falseAlways, [], ""),
+    (S.empty, trueAlways, [], ""),
     (1->S.singleton, i => i == 1, [], ""),
-    (1->S.singleton, isFalseAlways, [1], ""),
-    (1->S.singleton, isTrueAlways, [], ""),
-    (oneToFive, isTrueAlways, [], ""),
-    (oneToFive, isFalseAlways, [1, 2, 3, 4, 5], ""),
+    (1->S.singleton, falseAlways, [1], ""),
+    (1->S.singleton, trueAlways, [], ""),
+    (oneToFive, trueAlways, [], ""),
+    (oneToFive, falseAlways, [1, 2, 3, 4, 5], ""),
     (oneToFive, i => i < 3, [3, 4, 5], ""),
     (oneToFive, i => i <= 5, [], ""),
     (oneToFive, i => i <= 1, [2, 3, 4, 5], ""),
@@ -1001,7 +1005,7 @@ let dropWhileTests =
     (S.range(~start=1, ~end=9_999), i => i != 9_999, [9_999], "thousands"),
     (S.range(~start=1, ~end=999_999), i => i != 999_999, [999_999], "millions"),
   ]->Js.Array2.mapi(((source, predicate, result, note), inx) =>
-    areEqual(
+    seqEqual(
       ~title="dropWhile",
       ~expectation=`index ${inx->intToString} ${note}`,
       ~a=() => source->S.dropWhile(predicate),
@@ -1047,7 +1051,7 @@ let filterMapTests =
       "millions",
     ),
   ]->Js.Array2.mapi(((source, f, result, note), inx) =>
-    areEqual(
+    seqEqual(
       ~title="filterMap",
       ~expectation=`index ${inx->intToString} ${note}`,
       ~a=() => source->S.filterMap(f),
@@ -1057,20 +1061,20 @@ let filterMapTests =
 
 let filterTests =
   [
-    (S.empty, isFalseAlways, [], ""),
-    (S.empty, isTrueAlways, [], ""),
+    (S.empty, falseAlways, [], ""),
+    (S.empty, trueAlways, [], ""),
     (1->S.singleton, i => i == 1, [1], ""),
-    (1->S.singleton, isFalseAlways, [], ""),
-    (1->S.singleton, isTrueAlways, [1], ""),
-    (oneToFive, isTrueAlways, [1, 2, 3, 4, 5], ""),
-    (oneToFive, isFalseAlways, [], ""),
+    (1->S.singleton, falseAlways, [], ""),
+    (1->S.singleton, trueAlways, [1], ""),
+    (oneToFive, trueAlways, [1, 2, 3, 4, 5], ""),
+    (oneToFive, falseAlways, [], ""),
     (oneToFive, i => i == 3 || i == 5, [3, 5], ""),
     (oneToFive, i => i == 5, [5], ""),
     (oneToFive, i => i == 1 || i == 3, [1, 3], ""),
     (S.range(~start=1, ~end=9_999_999), i => i == 9_999_999, [9_999_999], "millions"),
   ]
   ->Js.Array2.mapi(((source, predicate, result, note), inx) =>
-    areEqual(
+    seqEqual(
       ~title="filter",
       ~expectation=`index ${inx->intToString} ${note}`,
       ~a=() => source->S.filter(predicate),
@@ -1078,13 +1082,13 @@ let filterTests =
     )
   )
   ->Js.Array.concat([
-    areEqual(
+    seqEqual(
       ~title="filteri",
       ~expectation="",
       ~a=() => oneToFive->S.filteri((~value, ~index) => value == 3 && index == 2),
       ~b=[3],
     ),
-    areEqual(
+    seqEqual(
       ~title="filteri",
       ~expectation="when skipping millions => no stack problem",
       ~a=() =>
@@ -1097,19 +1101,19 @@ let filterTests =
 
 let dropUntilTests =
   [
-    (S.empty, isFalseAlways, [], ""),
-    (S.empty, isTrueAlways, [], ""),
+    (S.empty, falseAlways, [], ""),
+    (S.empty, trueAlways, [], ""),
     (1->S.singleton, i => i == 1, [1], ""),
-    (1->S.singleton, isFalseAlways, [], ""),
-    (1->S.singleton, isTrueAlways, [1], ""),
-    (oneToFive, isTrueAlways, [1, 2, 3, 4, 5], ""),
-    (oneToFive, isFalseAlways, [], ""),
+    (1->S.singleton, falseAlways, [], ""),
+    (1->S.singleton, trueAlways, [1], ""),
+    (oneToFive, trueAlways, [1, 2, 3, 4, 5], ""),
+    (oneToFive, falseAlways, [], ""),
     (oneToFive, i => i == 3, [3, 4, 5], ""),
     (oneToFive, i => i == 5, [5], ""),
     (oneToFive, i => i == 1, [1, 2, 3, 4, 5], ""),
     (S.range(~start=1, ~end=999_999), i => i == 999_999, [999_999], "millions"),
   ]->Js.Array2.mapi(((source, predicate, result, note), inx) =>
-    areEqual(
+    seqEqual(
       ~title="dropUntil",
       ~expectation=`index ${inx->intToString} ${note}`,
       ~a=() => source->S.dropUntil(predicate),
@@ -1131,19 +1135,19 @@ let forEachTests = [
 ]
 
 let someTests = [
-  consumeEqual(
+  foldEqual(
     ~title="some",
     ~expectation="if empty => false",
     ~a=() => S.empty->S.some(_ => true),
     ~b=false,
   ),
-  consumeEqual(
+  foldEqual(
     ~title="some",
     ~expectation="if some predicate true => true",
     ~a=() => oneToFive->S.some(i => i == 2),
     ~b=true,
   ),
-  consumeEqual(
+  foldEqual(
     ~title="some",
     ~expectation="if no predicate true => false",
     ~a=() => oneToFive->S.some(i => i == 99),
@@ -1152,19 +1156,19 @@ let someTests = [
 ]
 
 let everyTests = [
-  consumeEqual(
+  foldEqual(
     ~title="every",
     ~expectation="if empty => true",
     ~a=() => S.empty->S.everyOrEmpty(_ => false),
     ~b=true,
   ),
-  consumeEqual(
+  foldEqual(
     ~title="every",
     ~expectation="if all true => true",
     ~a=() => oneToFive->S.everyOrEmpty(i => i >= 1 && i <= 5),
     ~b=true,
   ),
-  consumeEqual(
+  foldEqual(
     ~title="every",
     ~expectation="if any false => false",
     ~a=() => oneToFive->S.everyOrEmpty(i => i != 3),
@@ -1173,25 +1177,25 @@ let everyTests = [
 ]
 
 let findMapTests = [
-  consumeEqual(
+  foldEqual(
     ~title="findMap",
     ~expectation="if found => Some",
     ~a=() => oneToFive->S.findMap(i => i == 2 ? Some("x") : None),
     ~b=Some("x"),
   ),
-  consumeEqual(
+  foldEqual(
     ~title="findMap",
     ~expectation="if not found => None",
     ~a=() => oneToFive->S.findMap(i => i == 99 ? Some("x") : None),
     ~b=None,
   ),
-  consumeEqual(
+  foldEqual(
     ~title="findMapi",
     ~expectation="",
     ~a=() => oneToFive->S.findMapi((~value, ~index) => value == 3 && index == 2 ? Some("x") : None),
     ~b=Some("x"),
   ),
-  consumeEqual(
+  foldEqual(
     ~title="findMap",
     ~expectation="millions",
     ~a=() => S.range(~start=1, ~end=999_999)->S.findMap(i => i == 999_999 ? Some("x") : None),
@@ -1200,7 +1204,7 @@ let findMapTests = [
 ]
 
 let toArrayTests = [
-  consumeEqual(
+  foldEqual(
     ~title="toArray",
     ~expectation="when empty sequence, no generator functions are called",
     ~a=() => {
@@ -1219,9 +1223,9 @@ let toArrayTests = [
 ]
 
 let lengthTests = [
-  consumeEqual(~title="length", ~expectation="if empty => 0", ~a=() => S.empty->S.length, ~b=0),
-  consumeEqual(~title="length", ~expectation="if not empty", ~a=() => oneToFive->S.length, ~b=5),
-  consumeEqual(
+  foldEqual(~title="length", ~expectation="if empty => 0", ~a=() => S.empty->S.length, ~b=0),
+  foldEqual(~title="length", ~expectation="if not empty", ~a=() => oneToFive->S.length, ~b=5),
+  foldEqual(
     ~title="length",
     ~expectation="millions",
     ~a=() => S.replicate(~count=999_999, ~value=1)->S.length,
@@ -1230,37 +1234,37 @@ let lengthTests = [
 ]
 
 let equalsTests = [
-  consumeEqual(
+  foldEqual(
     ~title="equals",
     ~expectation="if shorter first => false",
     ~a=() => S.equals(oneTwoThree, oneToFive, (x: int, y: int) => x == y),
     ~b=false,
   ),
-  consumeEqual(
+  foldEqual(
     ~title="equals",
     ~expectation="if longer first => false",
     ~a=() => S.equals(oneToFive, oneTwoThree, (x: int, y: int) => x == y),
     ~b=false,
   ),
-  consumeEqual(
+  foldEqual(
     ~title="equals",
     ~expectation="if same values => true",
     ~a=() => S.equals(oneTwoThree, oneTwoThree, (x: int, y: int) => x == y),
     ~b=true,
   ),
-  consumeEqual(
+  foldEqual(
     ~title="equals",
     ~expectation="if different values => false",
     ~a=() => S.equals(S.singleton(1), S.singleton(2), (x: int, y: int) => x == y),
     ~b=false,
   ),
-  consumeEqual(
+  foldEqual(
     ~title="equals",
     ~expectation="can compare different types",
     ~a=() => S.equals(S.singleton(1), S.singleton("1"), (x: int, y: string) => x->intToString == y),
     ~b=true,
   ),
-  consumeEqual(
+  foldEqual(
     ~title="equals",
     ~expectation="can compare different types",
     ~a=() => S.equals(S.singleton(1), S.singleton("1"), (x: int, y: string) => x->intToString == y),
@@ -1269,31 +1273,31 @@ let equalsTests = [
 ]
 
 let compareTests = [
-  consumeEqual(
+  foldEqual(
     ~title="compare",
     ~expectation="",
     ~a=() => S.compare([1, 2, 3]->S.fromArray, [1, 2, 3]->S.fromArray, Ex.Cmp.int),
     ~b=0,
   ),
-  consumeEqual(
+  foldEqual(
     ~title="compare",
     ~expectation="",
     ~a=() => S.compare([1, 2, 3]->S.fromArray, [1, 2, 3, 4]->S.fromArray, Ex.Cmp.int),
     ~b=-1,
   ),
-  consumeEqual(
+  foldEqual(
     ~title="compare",
     ~expectation="",
     ~a=() => S.compare([1, 2, 3, 4]->S.fromArray, [1, 2, 3]->S.fromArray, Ex.Cmp.int),
     ~b=1,
   ),
-  consumeEqual(
+  foldEqual(
     ~title="compare",
     ~expectation="",
     ~a=() => S.compare([]->S.fromArray, []->S.fromArray, Ex.Cmp.int),
     ~b=0,
   ),
-  consumeEqual(
+  foldEqual(
     ~title="compare",
     ~expectation="",
     ~a=() => S.compare([1, 2, 3, 4]->S.fromArray, [1, 3, 3, 4]->S.fromArray, Ex.Cmp.int),
@@ -1302,19 +1306,19 @@ let compareTests = [
 ]
 
 let headTailTests = [
-  consumeEqual(
+  foldEqual(
     ~title="headTail",
     ~expectation="when empty => None",
     ~a=() => S.empty->S.headTail,
     ~b=None,
   ),
-  consumeEqual(
+  foldEqual(
     ~title="headTail",
     ~expectation="when singleton => Some(head,empty)",
     ~a=() => S.singleton(4)->S.headTail->Option.map(((h, t)) => (h, t->S.toArray)),
     ~b=Some(4, []),
   ),
-  consumeEqual(
+  foldEqual(
     ~title="headTail",
     ~expectation="when many items => Some(head,tail)",
     ~a=() => [1, 2, 3]->S.fromArray->S.headTail->Option.map(((h, t)) => (h, t->S.toArray)),
@@ -1323,35 +1327,30 @@ let headTailTests = [
 ]
 
 let headTests = [
-  consumeEqual(~title="head", ~expectation="when empty", ~a=() => S.empty->S.head, ~b=None),
-  consumeEqual(
-    ~title="head",
-    ~expectation="when not empty",
-    ~a=() => oneToFive->S.head,
-    ~b=Some(1),
-  ),
+  foldEqual(~title="head", ~expectation="when empty", ~a=() => S.empty->S.head, ~b=None),
+  foldEqual(~title="head", ~expectation="when not empty", ~a=() => oneToFive->S.head, ~b=Some(1)),
 ]
 
 let minByMaxByTests = [
-  consumeEqual(
+  foldEqual(
     ~title="minBy",
     ~expectation="when no items => None",
     ~a=() => S.empty->S.minBy(Ex.Cmp.int),
     ~b=None,
   ),
-  consumeEqual(
+  foldEqual(
     ~title="minBy",
     ~expectation="when items => Some",
     ~a=() => [6, 7, 8, 3, 1, 3, 5, 8]->S.fromArray->S.minBy(Ex.Cmp.int),
     ~b=Some(1),
   ),
-  consumeEqual(
+  foldEqual(
     ~title="maxBy",
     ~expectation="when no items => None",
     ~a=() => S.empty->S.maxBy(Ex.Cmp.int),
     ~b=None,
   ),
-  consumeEqual(
+  foldEqual(
     ~title="maxBy",
     ~expectation="when items => Some",
     ~a=() => [6, 7, 8, 3, 1, 3, 5, 7]->S.fromArray->S.maxBy(Ex.Cmp.int),
@@ -1360,13 +1359,13 @@ let minByMaxByTests = [
 ]
 
 let isEqualTests = [
-  consumeEqual(
+  foldEqual(
     ~title="isEmpty",
     ~expectation="when empty => true",
     ~a=() => S.empty->S.isEmpty,
     ~b=true,
   ),
-  consumeEqual(
+  foldEqual(
     ~title="isEmpty",
     ~expectation="when not empty => false",
     ~a=() => S.singleton(2)->S.isEmpty,
@@ -1375,13 +1374,13 @@ let isEqualTests = [
 ]
 
 let toStringTests = [
-  consumeEqual(
+  foldEqual(
     ~title="toString",
     ~expectation="",
     ~a=() => ["a", "b", "c"]->S.fromArray->S.toString,
     ~b="abc",
   ),
-  consumeEqual(
+  foldEqual(
     ~title="toString",
     ~expectation="when empty",
     ~a=() => []->S.fromArray->S.toString,
@@ -1390,19 +1389,19 @@ let toStringTests = [
 ]
 
 let toExactlyOneTests = [
-  consumeEqual(
+  foldEqual(
     ~title="toExactlyOne",
     ~expectation="when empty => None",
     ~a=() => S.empty->S.toExactlyOne,
     ~b=None,
   ),
-  consumeEqual(
+  foldEqual(
     ~title="toExactlyOne",
     ~expectation="when singleton => Some",
     ~a=() => S.singleton(1)->S.toExactlyOne,
     ~b=Some(1),
   ),
-  consumeEqual(
+  foldEqual(
     ~title="toExactlyOne",
     ~expectation="when many => None",
     ~a=() => oneTwoThree->S.toExactlyOne,
@@ -1411,25 +1410,25 @@ let toExactlyOneTests = [
 ]
 
 let isSortedByTests = [
-  consumeEqual(
+  foldEqual(
     ~title="isSortedBy",
     ~expectation="when empty => true",
     ~a=() => S.empty->S.isSortedBy(Ex.Cmp.int),
     ~b=true,
   ),
-  consumeEqual(
+  foldEqual(
     ~title="isSortedBy",
     ~expectation="when singleton => true",
     ~a=() => S.singleton(4)->S.isSortedBy(Ex.Cmp.int),
     ~b=true,
   ),
-  consumeEqual(
+  foldEqual(
     ~title="isSortedBy",
     ~expectation="when sorted => true",
     ~a=() => [1, 2, 2, 3, 4, 5]->S.fromArray->S.isSortedBy(Ex.Cmp.int),
     ~b=true,
   ),
-  consumeEqual(
+  foldEqual(
     ~title="isSortedBy",
     ~expectation="when not sorted => false",
     ~a=() => [1, 2, 2, 3, 4, 2, 5]->S.fromArray->S.isSortedBy(Ex.Cmp.int),
@@ -1438,19 +1437,19 @@ let isSortedByTests = [
 ]
 
 let toOptionTests = [
-  consumeEqual(
+  foldEqual(
     ~title="toOption",
     ~expectation="when empty => None",
     ~a=() => S.empty->S.toOption,
     ~b=None,
   ),
-  consumeEqual(
+  foldEqual(
     ~title="toOption",
     ~expectation="when singleton => Some",
     ~a=() => S.singleton(1)->S.toOption->Option.getWithDefault(S.empty)->S.toArray,
     ~b=[1],
   ),
-  consumeEqual(
+  foldEqual(
     ~title="toOption",
     ~expectation="when many items => Some",
     ~a=() => oneTwoThree->S.toOption->Option.getWithDefault(S.empty)->S.toArray,
@@ -1470,7 +1469,7 @@ let reduceTests = {
     (() => oneUpTo(9999)->S.reduce(None, lastSeen)->Option.getWithDefault(-1), 9999),
     (() => oneUpTo(9_999_999)->S.reduce(None, lastSeen)->Option.getWithDefault(-1), 9_999_999),
   ]->Js.Array2.mapi(((a, b), index) =>
-    consumeEqual(~title="reduce", ~expectation=`index ${index->intToString}`, ~a, ~b)
+    foldEqual(~title="reduce", ~expectation=`index ${index->intToString}`, ~a, ~b)
   )
 }
 
@@ -1483,7 +1482,7 @@ let lastTests = {
     (S.range(~start=1, ~end=999), Some(999)),
     (S.range(~start=1, ~end=999999), Some(999999)),
   ]->Js.Array2.mapi(((xs, result), index) =>
-    consumeEqual(
+    foldEqual(
       ~title="last",
       ~expectation=`index ${index->intToString}`,
       ~a=() => xs->S.last,
@@ -1506,7 +1505,7 @@ let (allOkTests, allSomeTests) = {
 
   let allOkTests =
     validationTests->Belt.Array.map(((expectation, input, expected)) =>
-      consumeEqual(
+      foldEqual(
         ~title="allOk",
         ~expectation,
         ~a=() => input->S.fromArray->S.map(validate)->S.allOk->Result.map(i => i->S.toArray),
@@ -1516,7 +1515,7 @@ let (allOkTests, allSomeTests) = {
 
   let allSomeTests = {
     validationTests->Belt.Array.map(((expectation, input, expected)) =>
-      consumeEqual(
+      foldEqual(
         ~title="allSome",
         ~expectation,
         ~a=() =>
@@ -1589,64 +1588,64 @@ let tests =
     allSomeTests,
     basicConstructorTests,
     chunkBySizeTests,
+    compareTests,
     concatTests,
-    toOptionTests,
     cycleTests,
     dropTests,
     dropUntilTests,
     dropWhileTests,
+    equalsTests,
+    everyTests,
     filterMapTests,
     filterOkTests,
     filterSomeTests,
     filterTests,
+    findMapTests,
+    findMapTests,
+    findTests,
     findTests,
     flatMapTests,
     flattenTests,
+    forEachTests,
     fromArrayTests,
     fromListTests,
+    headTailTests,
+    headTests,
     indexedTests,
     infiniteTests,
     initTests,
     interleaveManyTests,
     interleaveTests,
     intersperseTests,
+    isEqualTests,
+    isSortedByTests,
     iterateTests,
     lastTests,
+    lengthTests,
     map2Tests,
     mapTests,
     memoizeTests,
+    minByMaxByTests,
     pairwiseTests,
     prependTests,
     rangeTests,
     reduceTests,
     replicateTests,
     scanTests,
+    someTests,
     sortedMergeTests,
     takeAtMostTests,
     takeUntilTests,
     takeWhileTests,
     tapTests,
+    toArrayTests,
+    toExactlyOneTests,
+    toOptionTests,
+    toStringTests,
     unfoldTests,
     windowAheadTests,
     windowBehindTests,
-    findMapTests,
     windowTests,
     zipLongestTests,
-    forEachTests,
-    someTests,
-    findTests,
-    findMapTests,
-    everyTests,
-    toArrayTests,
-    lengthTests,
-    compareTests,
-    equalsTests,
-    headTailTests,
-    headTests,
-    minByMaxByTests,
-    isEqualTests,
-    toStringTests,
-    toExactlyOneTests,
-    isSortedByTests,
     zipTests,
   ]->Belt.Array.flatMap(i => i)
