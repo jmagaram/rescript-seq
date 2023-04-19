@@ -29,10 +29,10 @@ let concat: (t<'a>, t<'a>) => t<'a>
 let flatten: t<t<'a>> => t<'a>
 let flatMap: (t<'a>, 'a => t<'b>) => t<'b>
 let map: (t<'a>, 'a => 'b) => t<'b>
-let mapi: (t<'a>, (~value: 'a, ~index: int) => 'b) => t<'b>
+let mapi: (t<'a>, ('a, int) => 'b) => t<'b>
 let indexed: t<'a> => t<('a, int)>
 let filter: (t<'a>, 'a => bool) => t<'a>
-let filteri: (t<'a>, (~value: 'a, ~index: int) => bool) => t<'a>
+let filteri: (t<'a>, ('a, int) => bool) => t<'a>
 let filterMap: (t<'a>, 'a => option<'b>) => t<'b>
 let filterSome: t<option<'a>> => t<'a>
 let filterOk: t<result<'a, 'b>> => t<'a>
@@ -68,14 +68,14 @@ let interleave: (t<'a>, t<'a>) => t<'a>
 // Consume
 // =======
 let reduce: (t<'a>, 'b, ('b, 'a) => 'b) => 'b
-let reducei: (t<'a>, 'b, (~sum: 'b, ~value: 'a, ~index: int) => 'b) => 'b
+let reducei: (t<'a>, ~zero: 'b, (~sum: 'b, ~value: 'a, ~index: int) => 'b) => 'b
 let forEach: (t<'a>, 'a => unit) => unit
-let forEachi: (t<'a>, (~value: 'a, ~index: int) => unit) => unit
+let forEachi: (t<'a>, ('a, int) => unit) => unit
 let some: (t<'a>, 'a => bool) => bool
 let everyOrEmpty: (t<'a>, 'a => bool) => bool
 let find: (t<'a>, 'a => bool) => option<'a>
 let findMap: (t<'a>, 'a => option<'b>) => option<'b>
-let findMapi: (t<'a>, (~value: 'a, ~index: int) => option<'b>) => option<'b>
+let findMapi: (t<'a>, ('a, int) => option<'b>) => option<'b>
 let length: t<'a> => int
 let isEmpty: t<'a> => bool
 let isSortedBy: (t<'a>, ('a, 'a) => int) => bool

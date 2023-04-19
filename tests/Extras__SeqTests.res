@@ -254,7 +254,7 @@ let mapTests = makeSeqEqualsTests(
     (oneToFive->S.map(i => i + 1), [2, 3, 4, 5, 6], ""),
     (S.singleton(1)->S.map(i => i + 1), [2], ""),
     (S.empty->S.map(i => i + 1), [], ""),
-    (oneTwoThree->S.mapi((~value, ~index) => value * index), [0, 2, 6], ""),
+    (oneTwoThree->S.mapi((n, inx) => n * inx), [0, 2, 6], ""),
   ],
 )
 
@@ -912,7 +912,7 @@ let filterTests =
     seqEqual(
       ~title="filteri",
       ~expectation="",
-      ~a=() => oneToFive->S.filteri((~value, ~index) => value == 3 && index == 2),
+      ~a=() => oneToFive->S.filteri((n, inx) => n == 3 && inx == 2),
       ~b=[3],
     ),
     seqEqual(
@@ -921,7 +921,7 @@ let filterTests =
       ~a=() =>
         S.replicate(~count=999_999, ~value=1)
         ->S.concat(2->S.singleton)
-        ->S.filteri((~value, ~index as _) => value != 1),
+        ->S.filteri((value, _) => value != 1),
       ~b=[2],
     ),
   ])
@@ -956,7 +956,7 @@ let forEachTests = [
   }),
   T.make(~category="Seq", ~title="forEachi", ~expectation="", ~predicate=() => {
     let result = []
-    oneToFive->S.forEachi((~value, ~index) => result->Js.Array2.push((value, index))->ignore)
+    oneToFive->S.forEachi((n, inx) => result->Js.Array2.push((n, inx))->ignore)
     result == [(1, 0), (2, 1), (3, 2), (4, 3), (5, 4)]
   }),
 ]
@@ -1031,7 +1031,7 @@ let findMapTests = [
   foldEqual(
     ~title="findMapi",
     ~expectation="",
-    ~a=() => oneToFive->S.findMapi((~value, ~index) => value == 3 && index == 2 ? Some("x") : None),
+    ~a=() => oneToFive->S.findMapi((n, inx) => n == 3 && inx == 2 ? Some("x") : None),
     ~b=Some("x"),
   ),
   foldEqual(

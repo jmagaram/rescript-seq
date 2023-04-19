@@ -234,7 +234,7 @@ let fromOption = opt =>
   | Some(x) => singleton(x)
   }
 
-let mapi = (xx, f) => xx->indexed->map(((x, index)) => f(~value=x, ~index))
+let mapi = (xx, f) => xx->indexed->map(((x, inx)) => f(x, inx))
 
 let takeAtMost = (xx, count) => {
   if count == 0 {
@@ -289,8 +289,7 @@ let rec filter = (xx, f) =>
     }
   }
 
-let filteri = (xx, f) =>
-  xx->indexed->filter(((value, index)) => f(~value, ~index))->map(((v, _)) => v)
+let filteri = (xx, f) => xx->indexed->filter(((x, inx)) => f(x, inx))->map(((v, _)) => v)
 
 let rec takeWhile = (xx, predicate) =>
   xx->mapNext((x, xx) =>
@@ -353,9 +352,7 @@ let rec sortedMerge = (xx, yy, cmp) => {
 }
 
 let intersperse = (xx, separator) =>
-  xx
-  ->mapi((~value, ~index) => index == 0 ? singleton(value) : singleton(value)->startWith(separator))
-  ->flatten
+  xx->mapi((x, inx) => inx == 0 ? singleton(x) : singleton(x)->startWith(separator))->flatten
 
 module UncurriedDeferred = {
   type t<'a> = (. unit) => 'a
@@ -420,7 +417,7 @@ let chunkBySize = (xx, length) => {
       }
     }
   })
-  ->filteri((~value as _, ~index) => mod(index, length) == 0)
+  ->filteri((_, inx) => mod(inx, length) == 0)
   ->drop(1)
 }
 
@@ -450,7 +447,7 @@ let reduce = (xx, zero, concat) => {
   sum.contents
 }
 
-let reducei = (xx, zero, concat) =>
+let reducei = (xx, ~zero, concat) =>
   xx->indexed->reduce(zero, (sum, (value, index)) => concat(~sum, ~value, ~index))
 
 let last = xx => xx->reduce(None, (_, x) => Some(x))
@@ -463,19 +460,16 @@ let toArray = xx =>
 
 let joinString = xx => xx->reduce("", (total, i) => total ++ i)
 
-let forEachi = (xx, f) => xx->indexed->forEach(((value, index)) => f(~value, ~index))
+let forEachi = (xx, f) => xx->indexed->forEach(((x, inx)) => f(x, inx))
 
 let some = (xx, f) => xx->find(f)->Option.isSome
 
 let everyOrEmpty = (xx, f) => xx->find(i => !f(i))->Option.isNone
 
 let findMapi = (xx, f) =>
-  xx
-  ->mapi((~value, ~index) => f(~value, ~index))
-  ->find(Option.isSome(_))
-  ->Option.map(Option.getUnsafe)
+  xx->mapi((x, inx) => f(x, inx))->find(Option.isSome(_))->Option.map(Option.getUnsafe)
 
-let findMap = (xx, f) => findMapi(xx, (~value, ~index as _) => f(value))
+let findMap = (xx, f) => findMapi(xx, (x, _) => f(x))
 
 let rec map2 = (xx, yy, f) =>
   (. ()) => {
