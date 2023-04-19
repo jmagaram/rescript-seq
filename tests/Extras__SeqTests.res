@@ -420,27 +420,6 @@ let flattenTests = [
   ),
 ]
 
-let map2Tests = [
-  seqEqual(
-    ~title="map2",
-    ~expectation="when same length, map all",
-    ~a=() => S.map2(oneTwoThree, fourFiveSix, (a, b) => a * b),
-    ~b=[4, 10, 18],
-  ),
-  seqEqual(
-    ~title="map2",
-    ~expectation="when first is shorter, ignore excess",
-    ~a=() => S.map2(oneTwoThree, oneToFive, (a, b) => a * b),
-    ~b=[1, 4, 9],
-  ),
-  seqEqual(
-    ~title="map2",
-    ~expectation="when second is shorter, ignore excess",
-    ~a=() => S.map2(oneToFive, oneTwoThree, (a, b) => a * b),
-    ~b=[1, 4, 9],
-  ),
-]
-
 let sortedMergeTests = [
   seqEqual(
     ~title="sortedMerge",
@@ -1616,7 +1595,6 @@ let tests =
     iterateTests,
     lastTests,
     lengthTests,
-    map2Tests,
     mapTests,
     memoizeTests,
     minByMaxByTests,

@@ -355,8 +355,6 @@ let scani = (xs, ~zero, f) => {
 
 let scan = (xs, zero, f) => scani(xs, ~zero, (~sum, ~value, ~index as _) => f(sum, value))
 
-let map2 = (xs, ys, f) => zip(xs, ys)->map(((x, y)) => f(x, y))
-
 let rec sortedMerge = (xs, ys, cmp) => {
   (. ()) =>
     switch (xs(.), ys(.)) {
