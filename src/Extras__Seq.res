@@ -351,11 +351,22 @@ let rec sortedMerge = (xx, yy, cmp) => {
     }
 }
 
-let intersperseWith = (xx, separator) =>
-  xx->mapi((x, inx) => inx == 0 ? singleton(x) : singleton(x)->startWith(separator()))->flatten
+let intersperseWith = (xx, separator) => {
+  let rec beforeEach = (xx, separator) =>
+    (. ()) => {
+      switch xx->nextNode {
+      | End => End
+      | Next(x, xx) => Next(separator(), cons(x, beforeEach(xx, separator)))
+      }
+    }
+  (. ()) =>
+    switch xx->nextNode {
+    | End => End
+    | Next(x, xx) => Next(x, beforeEach(xx, separator))
+    }
+}
 
-let intersperse = (xx, separator) =>
-  xx->mapi((x, inx) => inx == 0 ? singleton(x) : singleton(x)->startWith(separator))->flatten
+let intersperse = (xx, separator) => xx->intersperseWith(() => separator)
 
 module UncurriedDeferred = {
   type t<'a> = (. unit) => 'a
