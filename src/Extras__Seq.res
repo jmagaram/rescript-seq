@@ -87,6 +87,8 @@ let rec flatMap = (xs, f) =>
     | Next(x, xs) => concat(f(x), flatMap(xs, f))(.)
     }
 
+let flatten = xxs => xxs->flatMap(i => i)
+
 let rec map = (xs, f) =>
   (. ()) => {
     switch xs->next {
@@ -150,8 +152,6 @@ let init = (~count, f) => unfold(0, i => i < count ? Some(f(~index=i), i + 1) : 
 
 let replicate = (~count, ~value) => unfold(0, i => i < count ? Some(value, i + 1) : None)
 
-let rec infinite = f => (. ()) => Next(f(), infinite(f))
-
 let iterate = (seed, f) => unfold(seed, i => Some(i, f(i)))
 
 let range = (~start, ~end) => {
@@ -160,13 +160,17 @@ let range = (~start, ~end) => {
     : unfold(start, i => i >= end ? Some(i, i - 1) : None)
 }
 
-let rec tap = (xs, f) =>
-  xs->mapNext((x, xs) => {
-    f(x)
-    Next(x, tap(xs, f))
-  })
+let rec infinite = f => (. ()) => Next(f(), infinite(f))
 
-let flatten = xxs => xxs->flatMap(i => i)
+let rec tap = (xs, f) =>
+  (. ()) =>
+    switch xs->next {
+    | End => End
+    | Next(x, xs) => {
+        f(x)
+        Next(x, tap(xs, f))
+      }
+    }
 
 let cycleNonEmpty = xs => {
   let rec go = ys =>
@@ -250,7 +254,7 @@ let headTails = xs =>
 
 let snd = ((_, b)) => b
 
-let drop = (xs: t<'a>, count) =>
+let drop = (xs, count) =>
   switch count {
   | 0 => xs
   | n if n < 0 =>
