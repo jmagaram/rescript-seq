@@ -344,10 +344,9 @@ let rec sortedMerge = (s1, s2, cmp) => {
     | (End, End) => End
     }
 }
-// skip last? put it before everything but the first
 
-let intersperse = (seq, separator) =>
-  seq
+let intersperse = (xs, separator) =>
+  xs
   ->mapi((~value, ~index) => index == 0 ? singleton(value) : singleton(value)->startWith(separator))
   ->flatten
 
@@ -377,7 +376,6 @@ let rec cache = seq =>
 
 let allPairs = (xx: t<'a>, yy: t<'b>) => xx->flatMap(x => yy->map(y => (x, y)))
 
-// let positioned = seq => empty // t<(seq, Head)>
 // partition, split at index? consume until...take until and rest...
 
 // like head and tail? extract?

@@ -818,30 +818,6 @@ let transforming = [
     ~b=[(1, 2), (2, 3)],
   ),
   areEqual(
-    ~title="intersperse",
-    ~expectation="when empty => empty",
-    ~a=() => S.empty->S.intersperse(-1),
-    ~b=[],
-  ),
-  areEqual(
-    ~title="intersperse",
-    ~expectation="when singleton => singleton",
-    ~a=() => S.singleton(5)->S.intersperse(-1),
-    ~b=[5],
-  ),
-  areEqual(
-    ~title="intersperse",
-    ~expectation="when two",
-    ~a=() => [1, 2]->S.fromArray->S.intersperse(-1),
-    ~b=[1, -1, 2],
-  ),
-  areEqual(
-    ~title="intersperse",
-    ~expectation="when many",
-    ~a=() => [1, 2, 3, 4]->S.fromArray->S.intersperse(-1),
-    ~b=[1, -1, 2, -1, 3, -1, 4],
-  ),
-  areEqual(
     ~title="interleave",
     ~expectation="when first shorter",
     ~a=() => S.interleave(fourFiveSix, oneToFive),
@@ -963,6 +939,16 @@ let makeSeqEqualsTests = (~title, xs) =>
   xs->Js.Array2.mapi(((source, result, note), inx) =>
     areEqual(~title, ~expectation=`index ${inx->intToString} ${note}`, ~a=() => source, ~b=result)
   )
+
+let intersperseTests = makeSeqEqualsTests(
+  ~title="intersperse",
+  [
+    ([]->S.fromArray->S.intersperse(","), [], ""),
+    (["a"]->S.fromArray->S.intersperse(","), ["a"], ""),
+    (["a", "b"]->S.fromArray->S.intersperse(","), ["a", ",", "b"], ""),
+    (["a", "b", "c"]->S.fromArray->S.intersperse(","), ["a", ",", "b", ",", "c"], ""),
+  ],
+)
 
 let dropWhileTests =
   [
@@ -1529,4 +1515,5 @@ let tests =
     consuming,
     memoizeTests,
     reduceTests,
+    intersperseTests,
   ]->Belt.Array.flatMap(i => i)
