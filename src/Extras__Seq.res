@@ -487,21 +487,7 @@ let forEachi = (xs, f) => xs->indexed->forEach(((value, index)) => f(~value, ~in
 
 let some = (xs, predicate) => xs->find(predicate)->Option.isSome
 
-let everyOrEmpty = (xs, predicate) => {
-  let break = ref(false)
-  let curr = ref(xs->next)
-  let foundInvalid = ref(false)
-  while foundInvalid.contents === false && curr.contents !== End {
-    switch curr.contents {
-    | End => break := true
-    | Next(value, seq) => {
-        foundInvalid := !predicate(value)
-        curr := seq->next
-      }
-    }
-  }
-  !foundInvalid.contents
-}
+let everyOrEmpty = (xs, predicate) => xs->find(i => !predicate(i))->Option.isNone
 
 let findMapi = (seq, f) => {
   let seq = seq->indexed

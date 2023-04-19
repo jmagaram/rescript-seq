@@ -1153,6 +1153,12 @@ let everyTests = [
     ~a=() => oneToFive->S.everyOrEmpty(i => i != 3),
     ~b=false,
   ),
+  foldEqual(
+    ~title="every",
+    ~expectation="millions",
+    ~a=() => S.range(~start=1, ~end=999_999)->S.everyOrEmpty(i => i >= 1 && i <= 999_999),
+    ~b=true,
+  ),
 ]
 
 let findMapTests = [
