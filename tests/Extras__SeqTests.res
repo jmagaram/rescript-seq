@@ -877,24 +877,39 @@ let transforming = [
     ~a=() => S.interleaveMany([S.empty, oneToFive, S.empty, oneTwoThree, S.empty, fourFiveSix]),
     ~b=[1, 1, 4, 2, 2, 5, 3, 3, 6, 4, 5],
   ),
-  areEqual(
-    ~title="scani",
-    ~expectation="when empty => zero",
-    ~a=() => S.empty->S.scani(~zero=10, (~sum, ~value, ~index) => sum + value + index + 1),
-    ~b=[10],
-  ),
-  areEqual(
-    ~title="scani",
-    ~expectation="when not empty => sequence of sums including zero",
-    ~a=() => oneTwoThree->S.scani(~zero=10, (~sum, ~value, ~index) => sum + value + index),
-    ~b=[10, 10 + 1 + 0, 10 + 1 + 0 + 2 + 1, 10 + 1 + 0 + 2 + 1 + 3 + 2],
-  ),
 ]
 
 let makeSeqEqualsTests = (~title, xs) =>
   xs->Js.Array2.mapi(((source, result, note), inx) =>
     areEqual(~title, ~expectation=`index ${inx->intToString} ${note}`, ~a=() => source, ~b=result)
   )
+
+let scanTests = {
+  let push = (sum, x) => {
+    let copied = sum->Js.Array2.copy
+    copied->Js.Array2.push(x)->ignore
+    copied
+  }
+  let scanConcat = xs => xs->S.scan([0], push)->S.map(concatInts)
+  makeSeqEqualsTests(
+    ~title="scan",
+    [
+      (oneTwoThree->scanConcat, ["0", "01", "012", "0123"], ""),
+      (S.singleton(1)->scanConcat, ["0", "01"], ""),
+      (S.empty->scanConcat, ["0"], "always includes the zero"),
+      (
+        S.range(~start=1, ~end=999_999)
+        ->S.scan(-1, (_, i) => i)
+        ->S.map(intToString)
+        ->S.last
+        ->Option.map(s => S.singleton(s))
+        ->Option.getWithDefault(S.singleton("")),
+        ["999999"],
+        "",
+      ),
+    ],
+  )
+}
 
 let takeUntilTests = makeSeqEqualsTests(
   ~title="takeUntil",
@@ -1505,6 +1520,7 @@ let tests =
     constructors,
     transforming,
     consuming,
+    scanTests,
     memoizeTests,
     reduceTests,
     intersperseTests,
