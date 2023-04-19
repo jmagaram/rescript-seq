@@ -6,10 +6,14 @@ module Option = Belt.Option
 module Result = Belt.Result
 
 let intToString = Belt.Int.toString
-
 let concatInts = xs =>
   xs->Js.Array2.length == 0 ? "_" : xs->Js.Array2.map(intToString)->Js.Array2.joinWith("")
 let shorten = s => Js.String2.slice(s, ~from=0, ~to_=1000)
+let isTrueAlways = _ => true
+let isFalseAlways = _ => false
+let oneTwoThree = S.init(~count=3, (~index) => index + 1)
+let fourFiveSix = S.init(~count=3, (~index) => index + 4)
+let oneToFive = S.init(~count=5, (~index) => index + 1)
 
 let areEqual = (~title, ~expectation, ~a, ~b) =>
   T.make(~category="Seq", ~title, ~expectation, ~predicate=() => {
@@ -21,9 +25,6 @@ let areEqual = (~title, ~expectation, ~a, ~b) =>
     }
     a == b
   })
-
-let isTrueAlways = _ => true
-let isFalseAlways = _ => false
 
 let willThrow = (~title, ~expectation, ~f) => {
   T.make(~category="Seq", ~title, ~expectation, ~predicate=() => {
@@ -43,11 +44,12 @@ let consumeEqual = (~title, ~expectation, ~a, ~b) =>
     pass
   })
 
-let oneTwoThree = S.init(~count=3, (~index) => index + 1)
-let fourFiveSix = S.init(~count=3, (~index) => index + 4)
-let oneToFive = S.init(~count=5, (~index) => index + 1)
+let makeSeqEqualsTests = (~title, xs) =>
+  xs->Js.Array2.mapi(((source, result, note), inx) =>
+    areEqual(~title, ~expectation=`index ${inx->intToString} ${note}`, ~a=() => source, ~b=result)
+  )
 
-let constructors = [
+let basicConstructorTests = [
   areEqual(~title="singleton", ~expectation="has one item in it", ~a=() => S.singleton(3), ~b=[3]),
   areEqual(~title="empty", ~expectation="has no items", ~a=() => S.empty, ~b=[]),
   areEqual(~title="cons", ~expectation="when a + empty => a", ~a=() => S.cons(1, S.empty), ~b=[1]),
@@ -58,112 +60,16 @@ let constructors = [
     ~b=[1, 2, 3, 4],
   ),
   areEqual(
-    ~title="replicate",
-    ~expectation="when count = 0 => empty",
-    ~a=() => S.replicate(~count=0, ~value="x"),
+    ~title="fromOption",
+    ~expectation="when None => empty",
+    ~a=() => None->S.fromOption,
     ~b=[],
   ),
   areEqual(
-    ~title="replicate",
-    ~expectation="when count = 1 => the item as singleton",
-    ~a=() => S.replicate(~count=1, ~value="x"),
-    ~b=["x"],
-  ),
-  areEqual(
-    ~title="replicate",
-    ~expectation="when count > 2 => the item repeated",
-    ~a=() => S.replicate(~count=3, ~value="x"),
-    ~b=["x", "x", "x"],
-  ),
-  T.make(~category="Seq", ~title="infinite", ~expectation="calls fn every time", ~predicate=() => {
-    let count = 99999
-    let minUnique = (0.95 *. count->Belt.Int.toFloat)->Belt.Int.fromFloat
-    let unique =
-      S.infinite(_ => Js.Math.random_int(0, 999_999))
-      ->S.takeAtMost(count)
-      ->S.toArray
-      ->Belt.Set.Int.fromArray
-      ->Belt.Set.Int.size
-    unique > minUnique
-  }),
-  T.make(~category="Seq", ~title="infinite", ~expectation="stack won't overflow", ~predicate=() => {
-    let count = 99999
-    let minUnique = (0.95 *. count->Belt.Int.toFloat)->Belt.Int.fromFloat
-    let unique =
-      S.infinite(_ => Js.Math.random_int(0, 999_999))
-      ->S.takeAtMost(count)
-      ->S.toArray
-      ->Belt.Set.Int.fromArray
-      ->Belt.Set.Int.size
-    unique > minUnique
-  }),
-  areEqual(
-    ~title="fromArray",
-    ~expectation="when not empty",
-    ~a=() => [1, 2, 3]->S.fromArray,
-    ~b=[1, 2, 3],
-  ),
-  areEqual(~title="fromArray", ~expectation="when one item", ~a=() => [1]->S.fromArray, ~b=[1]),
-  areEqual(~title="fromArray", ~expectation="when empty", ~a=() => []->S.fromArray, ~b=[]),
-  areEqual(
-    ~title="fromArray",
-    ~expectation="when end but no start",
-    ~a=() => [0, 1, 2, 3]->S.fromArray(~start=0, ~end=2),
-    ~b=[0, 1, 2],
-  ),
-  areEqual(
-    ~title="fromArray",
-    ~expectation="when end but no start",
-    ~a=() => [0, 1, 2, 3]->S.fromArray(~end=2),
-    ~b=[0, 1, 2],
-  ),
-  areEqual(
-    ~title="fromArray",
-    ~expectation="when neither start or end",
-    ~a=() => [0, 1, 2, 3]->S.fromArray,
-    ~b=[0, 1, 2, 3],
-  ),
-  areEqual(
-    ~title="fromArray",
-    ~expectation="when start => return start to end",
-    ~a=() => [0, 1, 2, 3]->S.fromArray(~start=2),
-    ~b=[2, 3],
-  ),
-  areEqual(
-    ~title="fromArray",
-    ~expectation="when start=end => return one item",
-    ~a=() => [0, 1, 2, 3]->S.fromArray(~start=2, ~end=2),
-    ~b=[2],
-  ),
-  areEqual(
-    ~title="fromArray",
-    ~expectation="when start>end => returns just fine in reverse order",
-    ~a=() => [0, 1, 2, 3]->S.fromArray(~start=3, ~end=1),
-    ~b=[3, 2, 1],
-  ),
-  willThrow(~title="fromArray", ~expectation="throw if items and start too small", ~f=() =>
-    [1, 2, 3]->S.fromArray(~start=-1)
-  ),
-  willThrow(~title="fromArray", ~expectation="throw if items and start too big", ~f=() =>
-    [1, 2, 3]->S.fromArray(~start=3)
-  ),
-  willThrow(~title="fromArray", ~expectation="throw if empty and any start index", ~f=() =>
-    []->S.fromArray(~start=0)
-  ),
-  willThrow(~title="fromArray", ~expectation="throw if items and end too small", ~f=() =>
-    [1, 2, 3]->S.fromArray(~end=-1)
-  ),
-  willThrow(~title="fromArray", ~expectation="throw if items and end too big", ~f=() =>
-    [1, 2, 3]->S.fromArray(~end=3)
-  ),
-  willThrow(~title="fromArray", ~expectation="throw if empty and any end index", ~f=() =>
-    []->S.fromArray(~end=0)
-  ),
-  areEqual(
-    ~title="fromList",
-    ~expectation="",
-    ~a=() => list{1, 2, 3, 4, 5}->S.fromList,
-    ~b=[1, 2, 3, 4, 5],
+    ~title="fromOption",
+    ~expectation="when Some => singleton",
+    ~a=() => Some(1)->S.fromOption,
+    ~b=[1],
   ),
   areEqual(
     ~title="fromString",
@@ -171,12 +77,18 @@ let constructors = [
     ~a=() => "abc"->S.fromString,
     ~b=["a", "b", "c"],
   ),
+]
+
+let fromListTests = [
   areEqual(
-    ~title="iterate",
+    ~title="fromList",
     ~expectation="",
-    ~a=() => S.iterate(2, i => i * 2)->S.takeAtMost(3),
-    ~b=[2, 4, 8],
+    ~a=() => list{1, 2, 3, 4, 5}->S.fromList,
+    ~b=[1, 2, 3, 4, 5],
   ),
+]
+
+let cycleTests = [
   areEqual(~title="cycle", ~expectation="when empty => empty", ~a=() => S.empty, ~b=[]),
   areEqual(
     ~title="cycle",
@@ -214,12 +126,25 @@ let constructors = [
     ~a=() => oneTwoThree->S.cycle->S.takeAtMost(16),
     ~b=[1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1],
   ),
-  areEqual(
-    ~title="allPairs",
-    ~expectation="",
-    ~a=() => S.allPairs(oneTwoThree, fourFiveSix),
-    ~b=[(1, 4), (1, 5), (1, 6), (2, 4), (2, 5), (2, 6), (3, 4), (3, 5), (3, 6)],
-  ),
+]
+
+let allPairsTests = makeSeqEqualsTests(
+  ~title="allPairs",
+  [
+    (S.allPairs(S.empty, S.empty), [], ""),
+    (S.allPairs(S.empty, fourFiveSix), [], ""),
+    (S.allPairs(S.singleton(1), S.singleton(2)), [(1, 2)], ""),
+    (S.allPairs(S.singleton(1), fourFiveSix), [(1, 4), (1, 5), (1, 6)], ""),
+    (S.allPairs(fourFiveSix, S.singleton(1)), [(4, 1), (5, 1), (6, 1)], ""),
+    (
+      S.allPairs(oneTwoThree, fourFiveSix),
+      [(1, 4), (1, 5), (1, 6), (2, 4), (2, 5), (2, 6), (3, 4), (3, 5), (3, 6)],
+      "",
+    ),
+  ],
+)
+
+let rangeTests = [
   areEqual(
     ~title="range",
     ~expectation="can count up",
@@ -237,18 +162,6 @@ let constructors = [
     ~expectation="can have single value",
     ~a=() => S.range(~start=3, ~end=3),
     ~b=[3],
-  ),
-  areEqual(
-    ~title="fromOption",
-    ~expectation="when None => empty",
-    ~a=() => None->S.fromOption,
-    ~b=[],
-  ),
-  areEqual(
-    ~title="fromOption",
-    ~expectation="when Some => singleton",
-    ~a=() => Some(1)->S.fromOption,
-    ~b=[1],
   ),
 ]
 
@@ -749,10 +662,56 @@ let transforming = [
   ),
 ]
 
-let makeSeqEqualsTests = (~title, xs) =>
-  xs->Js.Array2.mapi(((source, result, note), inx) =>
-    areEqual(~title, ~expectation=`index ${inx->intToString} ${note}`, ~a=() => source, ~b=result)
+let iterateTests = makeSeqEqualsTests(
+  ~title="iterate",
+  [
+    (S.iterate(2, i => i * 2)->S.takeAtMost(3), [2, 4, 8], ""),
+    (S.iterate(2, i => i * 2)->S.takeAtMost(1), [2], ""),
+    (S.iterate(2, i => i * 2)->S.takeAtMost(0), [], ""),
+    (
+      S.iterate(1, i => i + 1)->S.takeAtMost(999_999)->S.filter(i => i === 999_999),
+      [999_999],
+      "millions",
+    ),
+  ],
+)
+
+let fromArrayTests = {
+  let basicTests = makeSeqEqualsTests(
+    ~title="fromArray",
+    [
+      ([1, 2, 3]->S.fromArray, [1, 2, 3], ""),
+      ([1]->S.fromArray, [1], ""),
+      ([]->S.fromArray, [], ""),
+      ([0, 1, 2, 3]->S.fromArray(~start=0, ~end=2), [0, 1, 2], ""),
+      ([0, 1, 2, 3]->S.fromArray(~end=2), [0, 1, 2], ""),
+      ([0, 1, 2, 3]->S.fromArray, [0, 1, 2, 3], ""),
+      ([0, 1, 2, 3]->S.fromArray(~start=2), [2, 3], ""),
+      ([0, 1, 2, 3]->S.fromArray(~start=2, ~end=2), [2], ""),
+      ([0, 1, 2, 3]->S.fromArray(~start=2, ~end=1), [2, 1], ""),
+    ],
   )
+  let throws = f => willThrow(~title="fromArray", ~expectation="throws", ~f)
+  let throwsTests = [
+    throws(() => [1, 2, 3]->S.fromArray(~start=-1)),
+    throws(() => [1, 2, 3]->S.fromArray(~start=3)),
+    throws(() => []->S.fromArray(~start=0)),
+    throws(() => []->S.fromArray(~end=0)),
+    throws(() => [1, 2, 3]->S.fromArray(~end=-1)),
+    throws(() => [1, 2, 3]->S.fromArray(~end=3)),
+    throws(() => []->S.fromArray(~end=0)),
+  ]
+  Js.Array2.concat(basicTests, throwsTests)
+}
+
+let replicateTests = makeSeqEqualsTests(
+  ~title="replicate",
+  [
+    (S.replicate(~count=0, ~value=1), [], ""),
+    (S.replicate(~count=1, ~value=1), [1], ""),
+    (S.replicate(~count=2, ~value=1), [1, 1], ""),
+  ],
+)
 
 let takeAtMostTests = makeSeqEqualsTests(
   ~title="takeAtMost",
@@ -789,7 +748,43 @@ let takeAtMostTests = makeSeqEqualsTests(
       true
     },
   ),
+  T.make(
+    ~category="Seq",
+    ~title="takeAtMost",
+    ~expectation="if 3, generator function called 3 times",
+    ~predicate=() => {
+      let callCount = ref(0)
+      S.unfold(0, _ => {
+        callCount := callCount.contents + 1
+        Some(1, 1)
+      })
+      ->S.takeAtMost(3)
+      ->S.toArray
+      ->ignore
+      callCount.contents == 3
+    },
+  ),
 ])
+
+let infiniteTests = [
+  areEqual(
+    ~title="infinite",
+    ~expectation="values are generated",
+    ~a=() => S.infinite(() => 1)->S.takeAtMost(5),
+    ~b=[1, 1, 1, 1, 1],
+  ),
+  T.make(~category="Seq", ~title="infinite", ~expectation="millions", ~predicate=() => {
+    let callCount = ref(0)
+    S.infinite(() => {
+      callCount := callCount.contents + 1
+      callCount.contents
+    })
+    ->S.takeAtMost(999_999)
+    ->S.forEach(_ => ())
+    Js.log(callCount.contents)
+    callCount.contents == 999_999
+  }),
+]
 
 let unfoldTests =
   makeSeqEqualsTests(
@@ -807,22 +802,6 @@ let unfoldTests =
       ~b=Some(999_999),
     ),
   ])
-// areEqual(
-//   ~title="unfold",
-//   ~expectation="when generate zero items, function never called",
-//   ~a=() => {
-//     let callCount = ref(0)
-//     S.unfold(1, i => {
-//       callCount := callCount.contents + 1
-//       Some(i, i + 1)
-//     })
-//     ->S.cycle
-//     ->S.takeAtMost(0)
-//     ->ignore
-//     S.singleton(callCount.contents)
-//   },
-//   ~b=[0],
-// ),
 
 let initTests =
   makeSeqEqualsTests(
@@ -1505,7 +1484,14 @@ let findTests = [
 let tests =
   [
     initTests,
+    replicateTests,
+    basicConstructorTests,
+    iterateTests,
+    cycleTests,
     unfoldTests,
+    fromArrayTests,
+    fromListTests,
+    infiniteTests,
     findTests,
     dropUntilTests,
     dropWhileTests,
@@ -1518,7 +1504,7 @@ let tests =
     lastTests,
     allOkTests,
     allSomeTests,
-    constructors,
+    rangeTests,
     transforming,
     consuming,
     scanTests,
@@ -1526,4 +1512,5 @@ let tests =
     reduceTests,
     chunkBySizeTests,
     intersperseTests,
+    allPairsTests,
   ]->Belt.Array.flatMap(i => i)
