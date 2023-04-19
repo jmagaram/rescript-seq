@@ -317,21 +317,20 @@ let filterOk = xs =>
     }
   )
 
-// need stress millions test on this
 let scani = (xs, ~zero, f) => {
-  let rec go = (seq, sum) =>
-    switch seq->next {
+  let rec go = (xs, sum) =>
+    switch xs->next {
     | End => (. ()) => End
-    | Next((value, index), seq) =>
+    | Next((x, index), xs) =>
       (. ()) => {
-        let sum = f(~sum, ~value, ~index)
-        Next(sum, go(seq, sum))
+        let sum = f(~sum, ~value=x, ~index)
+        Next(sum, go(xs, sum))
       }
     }
   concat(singleton(zero), go(xs->indexed, zero))
 }
 
-let scan = (seq, zero, f) => scani(seq, ~zero, (~sum, ~value, ~index as _) => f(sum, value))
+let scan = (xs, zero, f) => scani(xs, ~zero, (~sum, ~value, ~index as _) => f(sum, value))
 
 let map2 = (s1, s2, f) => zip(s1, s2)->map(((a, b)) => f(a, b))
 
