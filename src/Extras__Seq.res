@@ -659,3 +659,5 @@ let toOption = xx =>
   | End => None
   | Next(x, xx) => Some(xx->startWith(x))
   }
+
+let consume = xx => xx->forEach(_ => ())

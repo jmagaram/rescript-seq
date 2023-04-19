@@ -1450,6 +1450,19 @@ let map3Tests = {
   ]
 }
 
+let consumeTests = [
+  T.make(
+    ~category="Seq",
+    ~title="consume",
+    ~expectation="enumerates sequence for side effects",
+    ~predicate=() => {
+      let lastSeen = ref(0)
+      S.range(~start=0, ~end=999_999)->S.tap(i => lastSeen := i)->S.consume
+      lastSeen.contents == 999_999
+    },
+  ),
+]
+
 let tests =
   [
     allOkTests,
@@ -1459,6 +1472,7 @@ let tests =
     chunkBySizeTests,
     compareTests,
     concatTests,
+    consumeTests,
     cycleTests,
     dropTests,
     dropUntilTests,

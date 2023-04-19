@@ -93,3 +93,4 @@ let toExactlyOne: t<'a> => option<'a>
 let toOption: t<'a> => option<t<'a>>
 let allOk: t<result<'ok, 'err>> => result<t<'ok>, 'err>
 let allSome: t<option<'a>> => option<t<'a>>
+let consume: t<'a> => unit
