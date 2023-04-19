@@ -51,7 +51,7 @@ let map3: (t<'a>, t<'b>, t<'c>, ('a, 'b, 'c) => 'd) => t<'d>
 let map4: (t<'a>, t<'b>, t<'c>, t<'d>, ('a, 'b, 'c, 'd) => 'e) => t<'e>
 let map5: (t<'a>, t<'b>, t<'c>, t<'d>, t<'e>, ('a, 'b, 'c, 'd, 'e) => 'f) => t<'f>
 let scan: (t<'a>, 'b, ('b, 'a) => 'b) => t<'b>
-let scani: (t<'a>, ~zero: 'b, (~sum: 'b, ~value: 'a, ~index: int) => 'b) => t<'b>
+let scani: (t<'a>, ~zero: 'b, (~sum: 'b, ~val: 'a, ~inx: int) => 'b) => t<'b>
 let sortedMerge: (t<'a>, t<'a>, ('a, 'a) => int) => t<'a>
 let cache: t<'a> => t<'a>
 let tap: (t<'a>, 'a => unit) => t<'a>
@@ -68,7 +68,7 @@ let interleave: (t<'a>, t<'a>) => t<'a>
 // Consume
 // =======
 let reduce: (t<'a>, 'b, ('b, 'a) => 'b) => 'b
-let reducei: (t<'a>, ~zero: 'b, (~sum: 'b, ~value: 'a, ~index: int) => 'b) => 'b
+let reducei: (t<'a>, ~zero: 'b, (~sum: 'b, ~val: 'a, ~inx: int) => 'b) => 'b
 let forEach: (t<'a>, 'a => unit) => unit
 let forEachi: (t<'a>, ('a, int) => unit) => unit
 let some: (t<'a>, 'a => bool) => bool

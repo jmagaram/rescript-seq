@@ -324,15 +324,15 @@ let scani = (xx, ~zero, f) => {
     (. ()) =>
       switch xx->nextNode {
       | End => End
-      | Next((x, index), xx) => {
-          let sum = f(~sum, ~value=x, ~index)
+      | Next((x, inx), xx) => {
+          let sum = f(~sum, ~val=x, ~inx)
           Next(sum, go(xx, sum))
         }
       }
   concat(singleton(zero), go(xx->indexed, zero))
 }
 
-let scan = (xx, zero, f) => scani(xx, ~zero, (~sum, ~value, ~index as _) => f(sum, value))
+let scan = (xx, zero, f) => scani(xx, ~zero, (~sum, ~val, ~inx as _) => f(sum, val))
 
 let rec sortedMerge = (xx, yy, cmp) => {
   (. ()) =>
@@ -405,11 +405,11 @@ let chunkBySize = (xx, length) => {
   xx
   ->map(i => Some(i))
   ->concat(replicate(~count=length - 1, ~value=None))
-  ->scani(~zero=[], (~sum, ~value, ~index) => {
-    switch value {
+  ->scani(~zero=[], (~sum, ~val, ~inx) => {
+    switch val {
     | None => sum
     | Some(value) =>
-      switch mod(index, length) {
+      switch mod(inx, length) {
       | 0 => [value]
       | _ =>
         sum->Js.Array2.push(value)->ignore
@@ -428,11 +428,11 @@ let window = (xx, length) => {
     )->raise
   }
   xx
-  ->scani(~zero=[], (~sum, ~value, ~index as _) => {
+  ->scani(~zero=[], (~sum, ~val, ~inx as _) => {
     if Js.Array2.length(sum) >= length {
       sum->Js.Array2.shift->ignore
     }
-    sum->Js.Array2.push(value)->ignore
+    sum->Js.Array2.push(val)->ignore
     sum
   })
   ->filter(i => Js.Array2.length(i) == length)
@@ -448,7 +448,7 @@ let reduce = (xx, zero, concat) => {
 }
 
 let reducei = (xx, ~zero, concat) =>
-  xx->indexed->reduce(zero, (sum, (value, index)) => concat(~sum, ~value, ~index))
+  xx->indexed->reduce(zero, (sum, (val, inx)) => concat(~sum, ~val, ~inx))
 
 let last = xx => xx->reduce(None, (_, x) => Some(x))
 
@@ -618,8 +618,8 @@ let windowAhead = (xx, size) => {
   xx
   ->map(i => Some(i))
   ->concat(replicate(~count=size - 1, ~value=None))
-  ->scani(~zero=[], (~sum, ~value as i, ~index) => {
-    if index >= size {
+  ->scani(~zero=[], (~sum, ~val as i, ~inx) => {
+    if inx >= size {
       sum->Js.Array2.shift->ignore
     }
     i->Option.forEach(i => sum->Js.Array2.push(i)->ignore)
