@@ -23,6 +23,7 @@ let cons: ('a, t<'a>) => t<'a>
 // Transform
 // =========
 let startWith: (t<'a>, 'a) => t<'a>
+let endWith: (t<'a>, 'a) => t<'a>
 let prepend: (t<'a>, t<'a>) => t<'a>
 let concat: (t<'a>, t<'a>) => t<'a>
 let flatten: t<t<'a>> => t<'a>
@@ -42,7 +43,6 @@ let takeUntil: (t<'a>, 'a => bool) => t<'a>
 let dropWhile: (t<'a>, 'a => bool) => t<'a>
 let dropUntil: (t<'a>, 'a => bool) => t<'a>
 let zip: (t<'a>, t<'b>) => t<('a, 'b)>
-let zipLongest: (t<'a>, t<'b>) => t<(option<'a>, option<'b>)>
 let scan: (t<'a>, 'b, ('b, 'a) => 'b) => t<'b>
 let scani: (t<'a>, ~zero: 'b, (~sum: 'b, ~value: 'a, ~index: int) => 'b) => t<'b>
 let sortedMerge: (t<'a>, t<'a>, ('a, 'a) => int) => t<'a>

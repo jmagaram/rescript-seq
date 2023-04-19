@@ -78,6 +78,7 @@ let rec concat = (xs, ys) =>
     }
   }
 
+let endWith = (xs, x) => concat(xs, singleton(x))
 let prepend = (xs, ys) => concat(ys, xs)
 
 let rec flatMap = (xs, f) =>
@@ -306,19 +307,6 @@ let rec takeUntil = (xs, f) =>
     }
   })
 
-let rec zipLongest = (xs, ys) => {
-  (. ()) => {
-    let xn = xs->next
-    let yn = ys->next
-    switch (xn, yn) {
-    | (End, End) => End
-    | (Next(x, xs), End) => Next((Some(x), None), zipLongest(xs, empty))
-    | (End, Next(y, ys)) => Next((None, Some(y)), zipLongest(empty, ys))
-    | (Next(x, xs), Next(y, ys)) => Next((Some(x), Some(y)), zipLongest(xs, ys))
-    }
-  }
-}
-
 let rec zip = (xs, ys) =>
   (. ()) => {
     switch (xs->next, ys->next) {
@@ -497,17 +485,22 @@ let findMapi = (xs, f) =>
 
 let findMap = (xs, f) => findMapi(xs, (~value, ~index as _) => f(value))
 
-let equals = (xs, ys, eq) =>
-  zipLongest(xs, ys)->everyOrEmpty(((x, y)) =>
+let equals = (xs, ys, eq) => {
+  let xs = xs->map(x => Some(x))->endWith(None)
+  let ys = ys->map(y => Some(y))->endWith(None)
+  zip(xs, ys)->everyOrEmpty(((x, y)) =>
     switch (x, y) {
     | (Some(x), Some(y)) => eq(x, y)
     | (None, None) => true
     | _ => false
     }
   )
+}
 
-let compare = (xs, ys, cmp) =>
-  zipLongest(xs, ys)
+let compare = (xs, ys, cmp) => {
+  let xs = xs->map(x => Some(x))->endWith(None)
+  let ys = ys->map(y => Some(y))->endWith(None)
+  zip(xs, ys)
   ->map(((x, y)) =>
     switch (x, y) {
     | (Some(x), Some(y)) => cmp(x, y)
@@ -518,6 +511,7 @@ let compare = (xs, ys, cmp) =>
   )
   ->find(i => i !== 0)
   ->Option.getWithDefault(0)
+}
 
 let length = xs => xs->reduce(0, (sum, _) => sum + 1)
 
@@ -596,6 +590,7 @@ let toExactlyOne = xs =>
 
 let isSortedBy = (xs, cmp) => xs->pairwise->everyOrEmpty(((a, b)) => cmp(a, b) <= 0)
 
+// stopped here!
 let windowBehind = (xs, size) => {
   if size <= 0 {
     ArgumentOfOfRange(`windowBehind requires a size greater than zero.`)->raise

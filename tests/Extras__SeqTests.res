@@ -339,51 +339,6 @@ let dropTests = [
   ),
 ]
 
-let zipLongestTests = [
-  seqEqual(
-    ~title="zipLongest",
-    ~expectation="when same length",
-    ~a=() => S.zipLongest(oneTwoThree, oneTwoThree),
-    ~b=[(Some(1), Some(1)), (Some(2), Some(2)), (Some(3), Some(3))],
-  ),
-  seqEqual(
-    ~title="zipLongest",
-    ~expectation="when second longer => fill with None",
-    ~a=() => S.zipLongest(oneTwoThree, oneToFive),
-    ~b=[
-      (Some(1), Some(1)),
-      (Some(2), Some(2)),
-      (Some(3), Some(3)),
-      (None, Some(4)),
-      (None, Some(5)),
-    ],
-  ),
-  seqEqual(
-    ~title="zipLongest",
-    ~expectation="when first longer => fill with None",
-    ~a=() => S.zipLongest(oneToFive, oneTwoThree),
-    ~b=[
-      (Some(1), Some(1)),
-      (Some(2), Some(2)),
-      (Some(3), Some(3)),
-      (Some(4), None),
-      (Some(5), None),
-    ],
-  ),
-  seqEqual(
-    ~title="zipLongest",
-    ~expectation="when both empty => empty",
-    ~a=() => S.zipLongest(S.empty, S.empty),
-    ~b=[],
-  ),
-  seqEqual(
-    ~title="zipLongest",
-    ~expectation="when None of different length",
-    ~a=() => S.zipLongest(S.replicate(~count=3, ~value=None), S.replicate(~count=1, ~value=None)),
-    ~b=[(Some(None), Some(None)), (Some(None), None), (Some(None), None)],
-  ),
-]
-
 let zipTests = [
   seqEqual(
     ~title="zip",
@@ -652,50 +607,55 @@ let interleaveTests = [
   ),
 ]
 
-let interleaveManyTests = [
-  seqEqual(
-    ~title="interleaveMany",
-    ~expectation="when one singleton",
-    ~a=() => S.interleaveMany([S.singleton(1)]),
-    ~b=[1],
-  ),
-  seqEqual(
-    ~title="interleaveMany",
-    ~expectation="when one",
-    ~a=() => S.interleaveMany([oneTwoThree]),
-    ~b=[1, 2, 3],
-  ),
-  seqEqual(
-    ~title="interleaveMany",
-    ~expectation="when two",
-    ~a=() => S.interleaveMany([oneTwoThree, fourFiveSix]),
-    ~b=[1, 4, 2, 5, 3, 6],
-  ),
-  seqEqual(
-    ~title="interleaveMany",
-    ~expectation="when two and first longer",
-    ~a=() => S.interleaveMany([oneToFive, fourFiveSix]),
-    ~b=[1, 4, 2, 5, 3, 6, 4, 5],
-  ),
-  seqEqual(
-    ~title="interleaveMany",
-    ~expectation="when two and second longer",
-    ~a=() => S.interleaveMany([fourFiveSix, oneToFive]),
-    ~b=[4, 1, 5, 2, 6, 3, 4, 5],
-  ),
-  seqEqual(
-    ~title="interleaveMany",
-    ~expectation="when many",
-    ~a=() => S.interleaveMany([oneToFive, oneTwoThree, fourFiveSix]),
-    ~b=[1, 1, 4, 2, 2, 5, 3, 3, 6, 4, 5],
-  ),
-  seqEqual(
-    ~title="interleaveMany",
-    ~expectation="when many",
-    ~a=() => S.interleaveMany([S.empty, oneToFive, S.empty, oneTwoThree, S.empty, fourFiveSix]),
-    ~b=[1, 1, 4, 2, 2, 5, 3, 3, 6, 4, 5],
-  ),
-]
+// ISSUE - Can't write my tests to validate length is expected because toArray
+// might call an extra unfold method. Maybe this is a real bug.
+let interleaveManyTests = {
+  let manualTests = [
+    seqEqual(
+      ~title="interleaveMany",
+      ~expectation="when one singleton",
+      ~a=() => S.interleaveMany([S.singleton(1)]),
+      ~b=[1],
+    ),
+    seqEqual(
+      ~title="interleaveMany",
+      ~expectation="when one",
+      ~a=() => S.interleaveMany([oneTwoThree]),
+      ~b=[1, 2, 3],
+    ),
+    seqEqual(
+      ~title="interleaveMany",
+      ~expectation="when two",
+      ~a=() => S.interleaveMany([oneTwoThree, fourFiveSix]),
+      ~b=[1, 4, 2, 5, 3, 6],
+    ),
+    seqEqual(
+      ~title="interleaveMany",
+      ~expectation="when two and first longer",
+      ~a=() => S.interleaveMany([oneToFive, fourFiveSix]),
+      ~b=[1, 4, 2, 5, 3, 6, 4, 5],
+    ),
+    seqEqual(
+      ~title="interleaveMany",
+      ~expectation="when two and second longer",
+      ~a=() => S.interleaveMany([fourFiveSix, oneToFive]),
+      ~b=[4, 1, 5, 2, 6, 3, 4, 5],
+    ),
+    seqEqual(
+      ~title="interleaveMany",
+      ~expectation="when many",
+      ~a=() => S.interleaveMany([oneToFive, oneTwoThree, fourFiveSix]),
+      ~b=[1, 1, 4, 2, 2, 5, 3, 3, 6, 4, 5],
+    ),
+    seqEqual(
+      ~title="interleaveMany",
+      ~expectation="when many",
+      ~a=() => S.interleaveMany([S.empty, oneToFive, S.empty, oneTwoThree, S.empty, fourFiveSix]),
+      ~b=[1, 1, 4, 2, 2, 5, 3, 3, 6, 4, 5],
+    ),
+  ]
+  manualTests
+}
 
 let iterateTests = makeSeqEqualsTests(
   ~title="iterate",
@@ -1630,6 +1590,5 @@ let tests =
     windowAheadTests,
     windowBehindTests,
     windowTests,
-    zipLongestTests,
     zipTests,
   ]->Belt.Array.flatMap(i => i)
