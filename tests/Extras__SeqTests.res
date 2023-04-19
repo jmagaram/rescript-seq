@@ -821,6 +821,31 @@ let intersperseTests = makeSeqEqualsTests(
   ],
 )
 
+let intersperseWithTests = {
+  let incrementer = () => {
+    let count = ref(0)
+    let f = () => {
+      count := count.contents + 1
+      count.contents->intToString
+    }
+    f
+  }
+
+  makeSeqEqualsTests(
+    ~title="intersperseWith",
+    [
+      ([]->S.fromArray->S.intersperseWith(incrementer()), [], ""),
+      (["a"]->S.fromArray->S.intersperseWith(incrementer()), ["a"], ""),
+      (["a", "b"]->S.fromArray->S.intersperseWith(incrementer()), ["a", "1", "b"], ""),
+      (
+        ["a", "b", "c"]->S.fromArray->S.intersperseWith(incrementer()),
+        ["a", "1", "b", "2", "c"],
+        "",
+      ),
+    ],
+  )
+}
+
 let dropWhileTests =
   [
     (S.empty, falseAlways, [], ""),
@@ -1499,6 +1524,7 @@ let tests =
     initTests,
     interleaveTests,
     intersperseTests,
+    intersperseWithTests,
     isEqualTests,
     isSortedByTests,
     iterateTests,

@@ -351,6 +351,9 @@ let rec sortedMerge = (xx, yy, cmp) => {
     }
 }
 
+let intersperseWith = (xx, separator) =>
+  xx->mapi((x, inx) => inx == 0 ? singleton(x) : singleton(x)->startWith(separator()))->flatten
+
 let intersperse = (xx, separator) =>
   xx->mapi((x, inx) => inx == 0 ? singleton(x) : singleton(x)->startWith(separator))->flatten
 
