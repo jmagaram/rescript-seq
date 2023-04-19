@@ -34,11 +34,11 @@ module Node = {
 
 let empty = (. ()) => Node.end
 
-let nextNode = (xs: t<'a>) => xs(.)
-let next = xs => xs->nextNode->Node.toOption
+let nextNode = (xx: t<'a>) => xx(.)
+let next = xx => xx->nextNode->Node.toOption
 
-let cons = (x, xs) => (. ()) => Next(x, xs)
-let startWith = (xs, x) => cons(x, xs)
+let cons = (x, xx) => (. ()) => Next(x, xx)
+let startWith = (xx, x) => cons(x, xx)
 
 let singleton = x => cons(x, empty)
 
@@ -47,46 +47,46 @@ This is a foundation method for many of the functions in this library. It must
 not be recursive to prevent stack overflows. This consumes at least 1 item in
 `xs`.
 */
-let findNode = (xs, f) => {
+let findNode = (xx, f) => {
   let found = ref(None)
-  let current = ref(xs)
+  let current = ref(xx)
   let break = ref(false)
   while !break.contents {
     switch current.contents->nextNode {
     | End => break := true
-    | Next(x, xs) as node =>
+    | Next(x, xx) as node =>
       switch f(x) {
       | true =>
         found := Some(node)
         break := true
       | false => ()
       }
-      current := xs
+      current := xx
     }
   }
   found.contents->Option.getWithDefault(End)
 }
 
-let find = (xs, f) => xs->findNode(f)->Node.head
+let find = (xx, f) => xx->findNode(f)->Node.head
 
-let mapNext = (xs, f) => (. ()) => xs->nextNode->Node.mapNext(f)
+let mapNext = (xx, f) => (. ()) => xx->nextNode->Node.mapNext(f)
 
-let rec concat = (xs, ys) =>
+let rec concat = (xx, yy) =>
   (. ()) => {
-    switch xs->nextNode {
-    | End => ys->nextNode
-    | Next(x, xs) => Next(x, concat(xs, ys))
+    switch xx->nextNode {
+    | End => yy->nextNode
+    | Next(x, xx) => Next(x, concat(xx, yy))
     }
   }
 
-let endWith = (xs, x) => concat(xs, singleton(x))
-let prepend = (xs, ys) => concat(ys, xs)
+let endWith = (xx, x) => concat(xx, singleton(x))
+let prepend = (xx, yy) => concat(yy, xx)
 
-let rec flatMap = (xs, f) =>
+let rec flatMap = (xx, f) =>
   (. ()) =>
-    switch xs->nextNode {
+    switch xx->nextNode {
     | End => End
-    | Next(x, xs) => concat(f(x), flatMap(xs, f))(.)
+    | Next(x, xx) => concat(f(x), flatMap(xx, f))(.)
     }
 
 let flatten = xxs => xxs->flatMap(i => i)
