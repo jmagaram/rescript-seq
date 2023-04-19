@@ -477,28 +477,56 @@ let findMapi = (xs, f) =>
 
 let findMap = (xs, f) => findMapi(xs, (~value, ~index as _) => f(value))
 
-let rec map2 = (xs, ys, f) =>
-  (. ()) =>
-    xs
-    ->next
-    ->Option.flatMap(((x, xs)) => ys->next->Option.map(((y, ys)) => Next(f(x, y), map2(xs, ys, f))))
-    ->Option.getWithDefault(End)
+let rec map2 = (xx, yy, f) =>
+  (. ()) => {
+    let xx = xx->next
+    let yy = yy->next
+    Ex.Option.map2(xx, yy, ((x, xx), (y, yy)) => Next(
+      f(x, y),
+      map2(xx, yy, f),
+    ))->Option.getWithDefault(End)
+  }
 
-let rec map3 = (xs, ys, zs, f) =>
-  (. ()) =>
-    xs
-    ->next
-    ->Option.flatMap(((x, xs)) =>
-      ys
-      ->next
-      ->Option.flatMap(((y, ys)) =>
-        zs->next->Option.map(((z, zs)) => Next(f(x, y, z), map3(xs, ys, zs, f)))
-      )
-    )
-    ->Option.getWithDefault(End)
+let rec map3 = (xx, yy, zz, f) =>
+  (. ()) => {
+    let xx = xx->next
+    let yy = yy->next
+    let zz = zz->next
+    Ex.Option.map3(xx, yy, zz, ((x, xx), (y, yy), (z, zz)) => Next(
+      f(x, y, z),
+      map3(xx, yy, zz, f),
+    ))->Option.getWithDefault(End)
+  }
 
-let zip = (xs, ys) => map2(xs, ys, (x, y) => (x, y))
-let zip3 = (xs, ys, zs) => map3(xs, ys, zs, (x, y, z) => (x, y, z))
+let rec map4 = (xx, yy, zz, qq, f) =>
+  (. ()) => {
+    let xx = xx->next
+    let yy = yy->next
+    let zz = zz->next
+    let qq = qq->next
+    Ex.Option.map4(xx, yy, zz, qq, ((x, xx), (y, yy), (z, zz), (q, qq)) => Next(
+      f(x, y, z, q),
+      map4(xx, yy, zz, qq, f),
+    ))->Option.getWithDefault(End)
+  }
+
+let rec map5 = (xx, yy, zz, qq, mm, f) =>
+  (. ()) => {
+    let xx = xx->next
+    let yy = yy->next
+    let zz = zz->next
+    let qq = qq->next
+    let mm = mm->next
+    Ex.Option.map5(xx, yy, zz, qq, mm, ((x, xx), (y, yy), (z, zz), (q, qq), (m, mm)) => Next(
+      f(x, y, z, q, m),
+      map5(xx, yy, zz, qq, mm, f),
+    ))->Option.getWithDefault(End)
+  }
+
+let zip = (xx, yy) => map2(xx, yy, (x, y) => (x, y))
+let zip3 = (xx, yy, zz) => map3(xx, yy, zz, (x, y, z) => (x, y, z))
+let zip4 = (xx, yy, zz, qq) => map4(xx, yy, zz, qq, (x, y, z, q) => (x, y, z, q))
+let zip5 = (xx, yy, zz, qq, mm) => map5(xx, yy, zz, qq, mm, (x, y, z, q, m) => (x, y, z, q, m))
 
 let equals = (xs, ys, eq) => {
   let xs = xs->map(x => Some(x))->endWith(None)
