@@ -34,8 +34,8 @@ module Node = {
 
 let empty = (. ()) => Node.end
 
-let next = (xs: t<'a>) => xs(.)
-let nextToOption = xs => xs->next->Node.toOption
+let nextNode = (xs: t<'a>) => xs(.)
+let next = xs => xs->nextNode->Node.toOption
 
 let cons = (x, xs) => (. ()) => Next(x, xs)
 let startWith = (xs, x) => cons(x, xs)
@@ -52,7 +52,7 @@ let findNode = (xs, f) => {
   let current = ref(xs)
   let break = ref(false)
   while !break.contents {
-    switch current.contents->next {
+    switch current.contents->nextNode {
     | End => break := true
     | Next(x, xs) as node =>
       switch f(x) {
@@ -69,12 +69,12 @@ let findNode = (xs, f) => {
 
 let find = (xs, f) => xs->findNode(f)->Node.head
 
-let mapNext = (xs, f) => (. ()) => xs->next->Node.mapNext(f)
+let mapNext = (xs, f) => (. ()) => xs->nextNode->Node.mapNext(f)
 
 let rec concat = (xs, ys) =>
   (. ()) => {
-    switch xs->next {
-    | End => ys->next
+    switch xs->nextNode {
+    | End => ys->nextNode
     | Next(x, xs) => Next(x, concat(xs, ys))
     }
   }
@@ -84,7 +84,7 @@ let prepend = (xs, ys) => concat(ys, xs)
 
 let rec flatMap = (xs, f) =>
   (. ()) =>
-    switch xs->next {
+    switch xs->nextNode {
     | End => End
     | Next(x, xs) => concat(f(x), flatMap(xs, f))(.)
     }
@@ -93,33 +93,33 @@ let flatten = xxs => xxs->flatMap(i => i)
 
 let rec map = (xs, f) =>
   (. ()) => {
-    switch xs->next {
+    switch xs->nextNode {
     | End => End
     | Next(x, xs) => Next(f(x), map(xs, f))
     }
   }
 
 let head = xs =>
-  switch xs->next {
+  switch xs->nextNode {
   | End => None
   | Next(x, _) => Some(x)
   }
 
 let headTail = xs =>
-  switch xs->next {
+  switch xs->nextNode {
   | End => None
   | Next(xs, x) => Some(xs, x)
   }
 
 let forEach = (xs, f) => {
-  let curr = ref(xs->next)
+  let curr = ref(xs->nextNode)
   let break = ref(false)
   while !break.contents {
     switch curr.contents {
     | End => break := true
     | Next(x, xs) => {
         f(x)
-        curr := xs->next
+        curr := xs->nextNode
       }
     }
   }
@@ -136,7 +136,7 @@ module Indexed = {
 let indexed = xs => {
   let rec go = (xs, index) =>
     (. ()) =>
-      switch xs->next {
+      switch xs->nextNode {
       | End => End
       | Next(x, xs) => Next(Indexed.make(~value=x, ~index), go(xs, index + 1))
       }
@@ -166,7 +166,7 @@ let rec infinite = f => (. ()) => Next(f(), infinite(f))
 
 let rec tap = (xs, f) =>
   (. ()) =>
-    switch xs->next {
+    switch xs->nextNode {
     | End => End
     | Next(x, xs) => {
         f(x)
@@ -177,14 +177,14 @@ let rec tap = (xs, f) =>
 let cycleNonEmpty = xs => {
   let rec go = ys =>
     (. ()) =>
-      switch ys->next {
+      switch ys->nextNode {
       | End => go(xs)(.)
       | Next(y, ys) => Next(y, go(ys))
       }
   go(xs)
 }
 
-let cycle = xs => xs->mapNext((x, xs') => cons(x, xs')->concat(xs->cycleNonEmpty)->next)
+let cycle = xs => xs->mapNext((x, xs') => cons(x, xs')->concat(xs->cycleNonEmpty)->nextNode)
 
 let fromString = s =>
   switch s->Js.String2.length {
@@ -275,7 +275,7 @@ let drop = (xs, count) =>
 
 let rec filter = (xs, f) =>
   (. ()) => {
-    switch xs->next {
+    switch xs->nextNode {
     | End => End
     | Next(x, xs) =>
       switch f(x) {
@@ -323,7 +323,7 @@ let filterOk = xs =>
 let scani = (xs, ~zero, f) => {
   let rec go = (xs, sum) =>
     (. ()) =>
-      switch xs->next {
+      switch xs->nextNode {
       | End => End
       | Next((x, index), xs) => {
           let sum = f(~sum, ~value=x, ~index)
@@ -375,7 +375,7 @@ module UncurriedDeferred = {
 
 let rec cache = seq =>
   UncurriedDeferred.memoize((. ()) =>
-    switch seq->next {
+    switch seq->nextNode {
     | End => End
     | Next(value, seq) => Next(value, cache(seq))
     }
@@ -480,21 +480,19 @@ let findMap = (xs, f) => findMapi(xs, (~value, ~index as _) => f(value))
 let rec map2 = (xs, ys, f) =>
   (. ()) =>
     xs
-    ->nextToOption
-    ->Option.flatMap(((x, xs)) =>
-      ys->nextToOption->Option.map(((y, ys)) => Next(f(x, y), map2(xs, ys, f)))
-    )
+    ->next
+    ->Option.flatMap(((x, xs)) => ys->next->Option.map(((y, ys)) => Next(f(x, y), map2(xs, ys, f))))
     ->Option.getWithDefault(End)
 
 let rec map3 = (xs, ys, zs, f) =>
   (. ()) =>
     xs
-    ->nextToOption
+    ->next
     ->Option.flatMap(((x, xs)) =>
       ys
-      ->nextToOption
+      ->next
       ->Option.flatMap(((y, ys)) =>
-        zs->nextToOption->Option.map(((z, zs)) => Next(f(x, y, z), map3(xs, ys, zs, f)))
+        zs->next->Option.map(((z, zs)) => Next(f(x, y, z), map3(xs, ys, zs, f)))
       )
     )
     ->Option.getWithDefault(End)
@@ -533,7 +531,7 @@ let compare = (xs, ys, cmp) => {
 let length = xs => xs->reduce(0, (sum, _) => sum + 1)
 
 let isEmpty = xs =>
-  switch xs->next {
+  switch xs->nextNode {
   | End => true
   | _ => false
   }
@@ -558,8 +556,8 @@ let maxBy = (xs, cmp) =>
 
 let rec interleave = (xs, ys) => {
   (. ()) => {
-    switch xs->next {
-    | End => ys->next
+    switch xs->nextNode {
+    | End => ys->nextNode
     | Next(x, xs) => Next(x, interleave(ys, xs))
     }
   }
@@ -669,7 +667,7 @@ let allSome = xs => {
 }
 
 let toOption = xs =>
-  switch xs->next {
+  switch xs->nextNode {
   | End => None
   | Next(x, xs) => Some(xs->startWith(x))
   }
