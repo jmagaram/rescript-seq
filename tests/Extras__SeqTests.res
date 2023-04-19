@@ -445,7 +445,7 @@ let windowAheadBehindTests = (~title, ~function, ~data) =>
           ->function(size)
           ->S.map(ss => ss->Js.Array2.joinWith(""))
           ->S.intersperse(",")
-          ->S.toString,
+          ->S.joinString,
         ~b=expectedResult,
       )
     }
@@ -1184,17 +1184,17 @@ let isEqualTests = [
   ),
 ]
 
-let toStringTests = [
+let joinStringTests = [
   foldEqual(
-    ~title="toString",
+    ~title="joinString",
     ~expectation="",
-    ~a=() => ["a", "b", "c"]->S.fromArray->S.toString,
+    ~a=() => ["a", "b", "c"]->S.fromArray->S.joinString,
     ~b="abc",
   ),
   foldEqual(
-    ~title="toString",
+    ~title="joinString",
     ~expectation="when empty",
-    ~a=() => []->S.fromArray->S.toString,
+    ~a=() => []->S.fromArray->S.joinString,
     ~b="",
   ),
 ]
@@ -1510,7 +1510,7 @@ let tests =
     toArrayTests,
     toExactlyOneTests,
     toOptionTests,
-    toStringTests,
+    joinStringTests,
     unfoldTests,
     windowAheadTests,
     windowBehindTests,

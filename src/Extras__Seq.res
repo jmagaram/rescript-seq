@@ -461,7 +461,7 @@ let toArray = xx =>
     xx
   })
 
-let toString = xx => xx->reduce("", (total, i) => total ++ i)
+let joinString = xx => xx->reduce("", (total, i) => total ++ i)
 
 let forEachi = (xx, f) => xx->indexed->forEach(((value, index)) => f(~value, ~index))
 
