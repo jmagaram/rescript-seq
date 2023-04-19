@@ -319,14 +319,14 @@ let filterOk = xs =>
 
 let scani = (xs, ~zero, f) => {
   let rec go = (xs, sum) =>
-    switch xs->next {
-    | End => (. ()) => End
-    | Next((x, index), xs) =>
-      (. ()) => {
-        let sum = f(~sum, ~value=x, ~index)
-        Next(sum, go(xs, sum))
+    (. ()) =>
+      switch xs->next {
+      | End => End
+      | Next((x, index), xs) => {
+          let sum = f(~sum, ~value=x, ~index)
+          Next(sum, go(xs, sum))
+        }
       }
-    }
   concat(singleton(zero), go(xs->indexed, zero))
 }
 

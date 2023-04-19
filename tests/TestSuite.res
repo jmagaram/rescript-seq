@@ -12,7 +12,7 @@ let isLocalDevelopment = () => {
   }
 }
 
-let keywords = ["Seq", "scan"]
+let keywords = ["Seq"]
 let onlyShowFailures = false
 let throwIfAnyTestFails = !isLocalDevelopment()
 
