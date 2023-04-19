@@ -625,43 +625,6 @@ let transforming = [
     seen == [1, 2, 3, 4, 5] && items == [1, 2, 3, 4, 5]
   }),
   areEqual(
-    ~title="chunkBySize",
-    ~expectation="when not empty and longer than chunk size",
-    ~a=() => [1, 2, 3, 4, 5, 6, 7]->S.fromArray->S.chunkBySize(3),
-    ~b=[[1, 2, 3], [4, 5, 6], [7]],
-  ),
-  areEqual(
-    ~title="chunkBySize",
-    ~expectation="when not empty and shorter than chunk size",
-    ~a=() => [1, 2, 3]->S.fromArray->S.chunkBySize(6),
-    ~b=[[1, 2, 3]],
-  ),
-  areEqual(
-    ~title="chunkBySize",
-    ~expectation="when not empty and equal to chunk size",
-    ~a=() => [1, 2, 3]->S.fromArray->S.chunkBySize(3),
-    ~b=[[1, 2, 3]],
-  ),
-  T.make(
-    ~category="Seq",
-    ~title="chunkBySize",
-    ~expectation="when size = 0 => throw",
-    ~predicate=() => R.fromTryCatch(() => [1, 2, 3]->S.fromArray->S.chunkBySize(0))->Result.isError,
-  ),
-  T.make(
-    ~category="Seq",
-    ~title="chunkBySize",
-    ~expectation="when size < 0 => throw",
-    ~predicate=() =>
-      R.fromTryCatch(() => [1, 2, 3]->S.fromArray->S.chunkBySize(-1))->Result.isError,
-  ),
-  areEqual(
-    ~title="chunkBySize",
-    ~expectation="when empty => empty",
-    ~a=() => []->S.fromArray->S.chunkBySize(3),
-    ~b=[],
-  ),
-  areEqual(
     ~title="window",
     ~expectation="when empty => empty",
     ~a=() => S.empty->S.window(5),
@@ -876,6 +839,43 @@ let transforming = [
     ~expectation="when many",
     ~a=() => S.interleaveMany([S.empty, oneToFive, S.empty, oneTwoThree, S.empty, fourFiveSix]),
     ~b=[1, 1, 4, 2, 2, 5, 3, 3, 6, 4, 5],
+  ),
+  areEqual(
+    ~title="chunkBySize",
+    ~expectation="when not empty and longer than chunk size",
+    ~a=() => [1, 2, 3, 4, 5, 6, 7]->S.fromArray->S.chunkBySize(3),
+    ~b=[[1, 2, 3], [4, 5, 6], [7]],
+  ),
+  areEqual(
+    ~title="chunkBySize",
+    ~expectation="when not empty and shorter than chunk size",
+    ~a=() => [1, 2, 3]->S.fromArray->S.chunkBySize(6),
+    ~b=[[1, 2, 3]],
+  ),
+  areEqual(
+    ~title="chunkBySize",
+    ~expectation="when not empty and equal to chunk size",
+    ~a=() => [1, 2, 3]->S.fromArray->S.chunkBySize(3),
+    ~b=[[1, 2, 3]],
+  ),
+  T.make(
+    ~category="Seq",
+    ~title="chunkBySize",
+    ~expectation="when size = 0 => throw",
+    ~predicate=() => R.fromTryCatch(() => [1, 2, 3]->S.fromArray->S.chunkBySize(0))->Result.isError,
+  ),
+  T.make(
+    ~category="Seq",
+    ~title="chunkBySize",
+    ~expectation="when size < 0 => throw",
+    ~predicate=() =>
+      R.fromTryCatch(() => [1, 2, 3]->S.fromArray->S.chunkBySize(-1))->Result.isError,
+  ),
+  areEqual(
+    ~title="chunkBySize",
+    ~expectation="when empty => empty",
+    ~a=() => []->S.fromArray->S.chunkBySize(3),
+    ~b=[],
   ),
 ]
 

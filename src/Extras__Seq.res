@@ -332,19 +332,19 @@ let scani = (xs, ~zero, f) => {
 
 let scan = (xs, zero, f) => scani(xs, ~zero, (~sum, ~value, ~index as _) => f(sum, value))
 
-let map2 = (s1, s2, f) => zip(s1, s2)->map(((a, b)) => f(a, b))
+let map2 = (xs, ys, f) => zip(xs, ys)->map(((x, y)) => f(x, y))
 
-let rec sortedMerge = (s1, s2, cmp) => {
+let rec sortedMerge = (xs, ys, cmp) => {
   (. ()) =>
-    switch (s1(.), s2(.)) {
-    | (End, Next(_, _) as s2) => s2
-    | (Next(_, _) as s1, End) => s1
-    | (Next(v1, s1), Next(v2, s2)) => {
-        let order = cmp(v1, v2)
+    switch (xs(.), ys(.)) {
+    | (End, Next(_, _) as ys) => ys
+    | (Next(_, _) as xs, End) => xs
+    | (Next(x, xs), Next(y, ys)) => {
+        let order = cmp(x, y)
         if order <= 0 {
-          Next(v1, sortedMerge(s1, concat(v2->singleton, s2), cmp))
+          Next(x, sortedMerge(xs, concat(y->singleton, ys), cmp))
         } else {
-          Next(v2, sortedMerge(concat(v1->singleton, s1), s2, cmp))
+          Next(y, sortedMerge(concat(x->singleton, xs), ys, cmp))
         }
       }
     | (End, End) => End
@@ -382,9 +382,22 @@ let rec cache = seq =>
 
 let allPairs = (xx: t<'a>, yy: t<'b>) => xx->flatMap(x => yy->map(y => (x, y)))
 
-// partition, split at index? consume until...take until and rest...
+let dropUntil = (xs, predicate) =>
+  (. ()) =>
+    xs
+    ->headTails
+    ->find(((x, _)) => predicate(x))
+    ->Option.map(((x, xs)) => Node.next(x, xs))
+    ->Option.getWithDefault(Node.end)
 
-// like head and tail? extract?
+let dropWhile = (xs, predicate) =>
+  (. ()) =>
+    xs
+    ->headTails
+    ->find(((x, _)) => false == predicate(x))
+    ->Option.map(((x, xs)) => Next(x, xs))
+    ->Option.getWithDefault(Node.end)
+
 // could someone write this themselves, and how? EOF
 let consumeN = (seq, n) => {
   if n <= 0 {
@@ -405,22 +418,7 @@ let consumeN = (seq, n) => {
   {"consumed": consumed, "isEmpty": isEmpty.contents, "tail": seq.contents}
 }
 
-let dropUntil = (xs, predicate) =>
-  (. ()) =>
-    xs
-    ->headTails
-    ->find(((x, _)) => predicate(x))
-    ->Option.map(((x, xs)) => Node.next(x, xs))
-    ->Option.getWithDefault(Node.end)
-
-let dropWhile = (xs, predicate) =>
-  (. ()) =>
-    xs
-    ->headTails
-    ->find(((x, _)) => false == predicate(x))
-    ->Option.map(((x, xs)) => Next(x, xs))
-    ->Option.getWithDefault(Node.end)
-
+// max size?
 let rec chunkBySize = (seq, length) => {
   if length <= 0 {
     ArgumentOfOfRange(
@@ -441,13 +439,13 @@ let rec chunkBySize = (seq, length) => {
 }
 
 // returns internal data structure
-let window = (seq, length) => {
+let window = (xs, length) => {
   if length <= 0 {
     ArgumentOfOfRange(
       `windowed requires a length > 0. You asked for ${length->Belt.Int.toString}`,
     )->raise
   }
-  seq
+  xs
   ->scani(~zero=[], (~sum, ~value, ~index as _) => {
     if Js.Array2.length(sum) >= length {
       sum->Js.Array2.shift->ignore
@@ -467,24 +465,24 @@ let reduce = (xs, zero, concat) => {
   sum.contents
 }
 
-let reducei = (seq, zero, concat) =>
-  seq->indexed->reduce(zero, (sum, (value, index)) => concat(~sum, ~value, ~index))
+let reducei = (xs, zero, concat) =>
+  xs->indexed->reduce(zero, (sum, (value, index)) => concat(~sum, ~value, ~index))
 
 let last = xs => xs->reduce(None, (_, x) => Some(x))
 
-let toArray = seq =>
-  seq->reduce([], (arr, i) => {
-    arr->Js.Array2.push(i)->ignore
-    arr
+let toArray = xs =>
+  xs->reduce([], (xs, i) => {
+    xs->Js.Array2.push(i)->ignore
+    xs
   })
 
-let toString = seq => seq->reduce("", (total, i) => total ++ i)
+let toString = xs => xs->reduce("", (total, i) => total ++ i)
 
-let forEachi = (seq, f) => seq->indexed->forEach(((value, index)) => f(~value, ~index))
+let forEachi = (xs, f) => xs->indexed->forEach(((value, index)) => f(~value, ~index))
 
-let some = (seq, predicate) => {
+let some = (xs, predicate) => {
   let break = ref(false)
-  let curr = ref(seq->next)
+  let curr = ref(xs->next)
   let result = ref(false)
   while result.contents !== true && curr.contents !== End {
     switch curr.contents {
@@ -498,9 +496,9 @@ let some = (seq, predicate) => {
   result.contents
 }
 
-let everyOrEmpty = (seq, predicate) => {
+let everyOrEmpty = (xs, predicate) => {
   let break = ref(false)
-  let curr = ref(seq->next)
+  let curr = ref(xs->next)
   let foundInvalid = ref(false)
   while foundInvalid.contents === false && curr.contents !== End {
     switch curr.contents {
