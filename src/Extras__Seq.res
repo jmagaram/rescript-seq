@@ -307,15 +307,6 @@ let rec takeUntil = (xs, f) =>
     }
   })
 
-let rec zip = (xs, ys) =>
-  (. ()) => {
-    switch (xs->next, ys->next) {
-    | (End, _) => End
-    | (_, End) => End
-    | (Next(x, xs), Next(y, ys)) => Next((x, y), zip(xs, ys))
-    }
-  }
-
 let filterMap = (xs, f) => xs->map(f)->filter(Option.isSome)->map(Option.getUnsafe)
 
 let filterSome = xs => xs->filterMap(x => x)
@@ -485,34 +476,6 @@ let findMapi = (xs, f) =>
 
 let findMap = (xs, f) => findMapi(xs, (~value, ~index as _) => f(value))
 
-let equals = (xs, ys, eq) => {
-  let xs = xs->map(x => Some(x))->endWith(None)
-  let ys = ys->map(y => Some(y))->endWith(None)
-  zip(xs, ys)->everyOrEmpty(((x, y)) =>
-    switch (x, y) {
-    | (Some(x), Some(y)) => eq(x, y)
-    | (None, None) => true
-    | _ => false
-    }
-  )
-}
-
-let compare = (xs, ys, cmp) => {
-  let xs = xs->map(x => Some(x))->endWith(None)
-  let ys = ys->map(y => Some(y))->endWith(None)
-  zip(xs, ys)
-  ->map(((x, y)) =>
-    switch (x, y) {
-    | (Some(x), Some(y)) => cmp(x, y)
-    | (None, Some(_)) => -1
-    | (Some(_), None) => 1
-    | (None, None) => 0
-    }
-  )
-  ->find(i => i !== 0)
-  ->Option.getWithDefault(0)
-}
-
 let rec map2 = (xs, ys, f) =>
   (. ()) => {
     switch xs->next {
@@ -540,6 +503,37 @@ let rec map3 = (xs, ys, zs, f) =>
       }
     }
   }
+
+let zip = (xs, ys) => map2(xs, ys, (x, y) => (x, y))
+let zip3 = (xs, ys, zs) => map3(xs, ys, zs, (x, y, z) => (x, y, z))
+
+let equals = (xs, ys, eq) => {
+  let xs = xs->map(x => Some(x))->endWith(None)
+  let ys = ys->map(y => Some(y))->endWith(None)
+  zip(xs, ys)->everyOrEmpty(((x, y)) =>
+    switch (x, y) {
+    | (Some(x), Some(y)) => eq(x, y)
+    | (None, None) => true
+    | _ => false
+    }
+  )
+}
+
+let compare = (xs, ys, cmp) => {
+  let xs = xs->map(x => Some(x))->endWith(None)
+  let ys = ys->map(y => Some(y))->endWith(None)
+  zip(xs, ys)
+  ->map(((x, y)) =>
+    switch (x, y) {
+    | (Some(x), Some(y)) => cmp(x, y)
+    | (None, Some(_)) => -1
+    | (Some(_), None) => 1
+    | (None, None) => 0
+    }
+  )
+  ->find(i => i !== 0)
+  ->Option.getWithDefault(0)
+}
 
 let length = xs => xs->reduce(0, (sum, _) => sum + 1)
 

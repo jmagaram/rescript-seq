@@ -43,6 +43,7 @@ let takeUntil: (t<'a>, 'a => bool) => t<'a>
 let dropWhile: (t<'a>, 'a => bool) => t<'a>
 let dropUntil: (t<'a>, 'a => bool) => t<'a>
 let zip: (t<'a>, t<'b>) => t<('a, 'b)>
+let zip3: (t<'a>, t<'b>, t<'c>) => t<('a, 'b, 'c)>
 let map2: (t<'a>, t<'b>, ('a, 'b) => 'c) => t<'c>
 let map3: (t<'a>, t<'b>, t<'c>, ('a, 'b, 'c) => 'd) => t<'d>
 let scan: (t<'a>, 'b, ('b, 'a) => 'b) => t<'b>

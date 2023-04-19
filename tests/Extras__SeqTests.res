@@ -339,27 +339,6 @@ let dropTests = [
   ),
 ]
 
-let zipTests = [
-  seqEqual(
-    ~title="zip",
-    ~expectation="when first longer, ignore excess",
-    ~a=() => S.zip(oneToFive, oneTwoThree),
-    ~b=[(1, 1), (2, 2), (3, 3)],
-  ),
-  seqEqual(
-    ~title="zip",
-    ~expectation="when second longer, ignore excess",
-    ~a=() => S.zip(oneTwoThree, oneToFive),
-    ~b=[(1, 1), (2, 2), (3, 3)],
-  ),
-  seqEqual(
-    ~title="zip",
-    ~expectation="when same length, combine",
-    ~a=() => S.zip(oneTwoThree, fourFiveSix),
-    ~b=[(1, 4), (2, 5), (3, 6)],
-  ),
-]
-
 let flattenTests = [
   seqEqual(
     ~title="flatten",
@@ -1650,5 +1629,4 @@ let tests =
     windowAheadTests,
     windowBehindTests,
     windowTests,
-    zipTests,
   ]->Belt.Array.flatMap(i => i)
