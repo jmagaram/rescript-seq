@@ -485,45 +485,32 @@ let toString = xs => xs->reduce("", (total, i) => total ++ i)
 
 let forEachi = (xs, f) => xs->indexed->forEach(((value, index)) => f(~value, ~index))
 
-let some = (xs, predicate) => xs->find(predicate)->Option.isSome
+let some = (xs, f) => xs->find(f)->Option.isSome
 
-let everyOrEmpty = (xs, predicate) => xs->find(i => !predicate(i))->Option.isNone
+let everyOrEmpty = (xs, f) => xs->find(i => !f(i))->Option.isNone
 
-let findMapi = (seq, f) => {
-  let seq = seq->indexed
-  let curr = ref(seq->next)
-  let found = ref(None)
-  while found.contents->Option.isNone && curr.contents !== End {
-    switch curr.contents {
-    | End => ()
-    | Next((value, index), seq) => {
-        switch f(~value, ~index) {
-        | None => ()
-        | Some(_) as m => found := m
-        }
-        curr := seq->next
-      }
-    }
-  }
-  found.contents
-}
+let findMapi = (xs, f) =>
+  xs
+  ->mapi((~value, ~index) => f(~value, ~index))
+  ->find(Option.isSome(_))
+  ->Option.map(Option.getUnsafe)
 
-let findMap = (seq, f) => findMapi(seq, (~value, ~index as _) => f(value))
+let findMap = (xs, f) => findMapi(xs, (~value, ~index as _) => f(value))
 
-let equals = (s1: t<'a>, s2: t<'b>, eq) =>
-  zipLongest(s1, s2)->everyOrEmpty(((a, b)) =>
-    switch (a, b) {
-    | (Some(a), Some(b)) => eq(a, b)
+let equals = (xs, ys, eq) =>
+  zipLongest(xs, ys)->everyOrEmpty(((x, y)) =>
+    switch (x, y) {
+    | (Some(x), Some(y)) => eq(x, y)
     | (None, None) => true
     | _ => false
     }
   )
 
-let compare = (s1, s2, cmp) =>
-  zipLongest(s1, s2)
-  ->map(((a, b)) =>
-    switch (a, b) {
-    | (Some(v1), Some(v2)) => cmp(v1, v2)
+let compare = (xs, ys, cmp) =>
+  zipLongest(xs, ys)
+  ->map(((x, y)) =>
+    switch (x, y) {
+    | (Some(x), Some(y)) => cmp(x, y)
     | (None, Some(_)) => -1
     | (Some(_), None) => 1
     | (None, None) => 0
@@ -532,29 +519,29 @@ let compare = (s1, s2, cmp) =>
   ->find(i => i !== 0)
   ->Option.getWithDefault(0)
 
-let length = seq => seq->reduce(0, (sum, _) => sum + 1)
+let length = xs => xs->reduce(0, (sum, _) => sum + 1)
 
-let isEmpty = seq =>
-  switch seq->next {
+let isEmpty = xs =>
+  switch xs->next {
   | End => true
   | _ => false
   }
 
-let tail = seq => seq->drop(1)
+let tail = xs => xs->drop(1)
 
-let minBy = (seq, compare) =>
-  seq->reduce(None, (sum, i) => {
+let minBy = (xs, cmp) =>
+  xs->reduce(None, (sum, x) => {
     switch sum {
-    | None => Some(i)
-    | Some(sum) => Some(compare(i, sum) < 0 ? i : sum)
+    | None => Some(x)
+    | Some(sum) => Some(cmp(x, sum) < 0 ? x : sum)
     }
   })
 
-let maxBy = (seq, compare) =>
-  seq->reduce(None, (sum, i) => {
+let maxBy = (xs, cmp) =>
+  xs->reduce(None, (sum, x) => {
     switch sum {
-    | None => Some(i)
-    | Some(sum) => Some(compare(i, sum) > 0 ? i : sum)
+    | None => Some(x)
+    | Some(sum) => Some(cmp(x, sum) > 0 ? x : sum)
     }
   })
 
@@ -600,9 +587,9 @@ let interleaveMany = xxs => {
 let toExactlyOne = xs =>
   switch xs->headTail {
   | None => None
-  | Some(head, tail) =>
-    switch tail->isEmpty {
-    | true => Some(head)
+  | Some(x, xs) =>
+    switch xs->isEmpty {
+    | true => Some(x)
     | false => None
     }
   }
@@ -643,10 +630,10 @@ let windowAhead = (xs, size) => {
   }
 }
 
-let allOk = seq => {
-  seq
-  ->scan(Ok(empty), (sum, i) =>
-    switch i {
+let allOk = xs => {
+  xs
+  ->scan(Ok(empty), (sum, x) =>
+    switch x {
     | Ok(ok) => sum->Result.map(oks => concat(oks, singleton(ok)))
     | Error(_) as err => err
     }
@@ -656,10 +643,10 @@ let allOk = seq => {
   ->Option.getUnsafe
 }
 
-let allSome = seq => {
-  seq
-  ->scan(Some(empty), (sum, i) =>
-    switch i {
+let allSome = xs => {
+  xs
+  ->scan(Some(empty), (sum, x) =>
+    switch x {
     | Some(ok) => sum->Option.map(oks => concat(oks, singleton(ok)))
     | None => None
     }
@@ -669,8 +656,8 @@ let allSome = seq => {
   ->Option.flatMap(i => i)
 }
 
-let toOption = seq =>
-  switch seq->next {
+let toOption = xs =>
+  switch xs->next {
   | End => None
-  | Next(head, tail) => Some(tail->startWith(head))
+  | Next(x, xs) => Some(xs->startWith(x))
   }
