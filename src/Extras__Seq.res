@@ -401,7 +401,7 @@ let rec cache = seq =>
     }
   )
 
-let allPairs = (xx: t<'a>, yy: t<'b>) => xx->flatMap(x => yy->map(y => (x, y)))
+let allPairs = (xx, yy) => xx->flatMap(x => yy->map(y => (x, y)))
 
 let dropUntil = (xs, predicate) =>
   (. ()) =>
@@ -444,7 +444,6 @@ let chunkBySize = (xs, length) => {
   ->drop(1)
 }
 
-// returns internal data structure
 let window = (xs, length) => {
   if length <= 0 {
     ArgumentOfOfRange(
@@ -486,21 +485,7 @@ let toString = xs => xs->reduce("", (total, i) => total ++ i)
 
 let forEachi = (xs, f) => xs->indexed->forEach(((value, index)) => f(~value, ~index))
 
-let some = (xs, predicate) => {
-  let break = ref(false)
-  let curr = ref(xs->next)
-  let result = ref(false)
-  while result.contents !== true && curr.contents !== End {
-    switch curr.contents {
-    | End => break := true
-    | Next(value, seq) => {
-        result := predicate(value)
-        curr := seq->next
-      }
-    }
-  }
-  result.contents
-}
+let some = (xs, predicate) => xs->find(predicate)->Option.isSome
 
 let everyOrEmpty = (xs, predicate) => {
   let break = ref(false)

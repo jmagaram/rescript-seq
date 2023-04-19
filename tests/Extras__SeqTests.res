@@ -1126,6 +1126,12 @@ let someTests = [
     ~a=() => oneToFive->S.some(i => i == 99),
     ~b=false,
   ),
+  foldEqual(
+    ~title="some",
+    ~expectation="millions",
+    ~a=() => S.range(~start=1, ~end=999_999)->S.some(i => i === 999_999),
+    ~b=true,
+  ),
 ]
 
 let everyTests = [
