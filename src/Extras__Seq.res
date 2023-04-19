@@ -602,42 +602,36 @@ let toExactlyOne = xx =>
 
 let isSortedBy = (xx, cmp) => xx->pairwise->everyOrEmpty(((a, b)) => cmp(a, b) <= 0)
 
-// one result for every item
-// includes previous items to make size <= requested size
-// which is first? ["a","b","c"]
-// stopped here!
 let windowBehind = (xx, size) => {
   if size <= 0 {
     ArgumentOfOfRange(`windowBehind requires a size greater than zero.`)->raise
-  } else {
-    xx
-    ->scan([], (sum, i) => {
-      if sum->Js.Array2.length === size {
-        sum->Js.Array2.shift->ignore
-      }
-      sum->Js.Array2.push(i)->ignore
-      sum
-    })
-    ->drop(1)
   }
+  xx
+  ->scan([], (sum, i) => {
+    if sum->Js.Array2.length === size {
+      sum->Js.Array2.shift->ignore
+    }
+    sum->Js.Array2.push(i)->ignore
+    sum
+  })
+  ->drop(1)
 }
 
 let windowAhead = (xx, size) => {
   if size <= 0 {
     ArgumentOfOfRange(`windowAhead requires a size greater than zero.`)->raise
-  } else {
-    xx
-    ->map(i => Some(i))
-    ->concat(replicate(~count=size - 1, ~value=None))
-    ->scani(~zero=[], (~sum, ~value as i, ~index) => {
-      if index >= size {
-        sum->Js.Array2.shift->ignore
-      }
-      i->Option.forEach(i => sum->Js.Array2.push(i)->ignore)
-      sum
-    })
-    ->drop(size)
   }
+  xx
+  ->map(i => Some(i))
+  ->concat(replicate(~count=size - 1, ~value=None))
+  ->scani(~zero=[], (~sum, ~value as i, ~index) => {
+    if index >= size {
+      sum->Js.Array2.shift->ignore
+    }
+    i->Option.forEach(i => sum->Js.Array2.push(i)->ignore)
+    sum
+  })
+  ->drop(size)
 }
 
 let allOk = xx => {
