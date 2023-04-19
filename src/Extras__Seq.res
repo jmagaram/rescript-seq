@@ -37,6 +37,7 @@ let empty = (. ()) => Node.end
 let next = (xs: t<'a>) => xs(.)
 
 let cons = (x, xs) => (. ()) => Next(x, xs)
+let startWith = (xs, x) => cons(x, xs)
 
 let singleton = x => cons(x, empty)
 
@@ -149,7 +150,7 @@ let init = (~count, f) => unfold(0, i => i < count ? Some(f(~index=i), i + 1) : 
 
 let replicate = (~count, ~value) => unfold(0, i => i < count ? Some(value, i + 1) : None)
 
-let infinite = f => unfold(0, _ => Some(f(), 0))
+let rec infinite = f => (. ()) => Next(f(), infinite(f))
 
 let iterate = (seed, f) => unfold(seed, i => Some(i, f(i)))
 
@@ -164,8 +165,6 @@ let rec tap = (xs, f) =>
     f(x)
     Next(x, tap(xs, f))
   })
-
-let startWith = (xs, x) => cons(x, xs)
 
 let flatten = xxs => xxs->flatMap(i => i)
 
