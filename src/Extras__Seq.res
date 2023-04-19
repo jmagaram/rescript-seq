@@ -36,6 +36,10 @@ let empty = (. ()) => Node.end
 
 let next = (xs: t<'a>) => xs(.)
 
+let cons = (x, xs) => (. ()) => Next(x, xs)
+
+let singleton = x => cons(x, empty)
+
 /**
 This is a foundation method for many of the functions in this library. It must
 not be recursive to prevent stack overflows. This consumes at least 1 item in
@@ -65,15 +69,15 @@ let find = (xs, f) => xs->findNode(f)->Node.head
 
 let mapNext = (xs, f) => (. ()) => xs->next->Node.mapNext(f)
 
-let mapBoth = (xs, ~onEmpty, ~onNext) =>
-  (. ()) =>
-    switch xs->next {
-    | End => onEmpty()
-    | Next(x, xs) => onNext(x, xs)
-    }
-
 let rec concat = (xs, ys) =>
-  xs->mapBoth(~onEmpty=() => ys->next, ~onNext=(x, xs) => Node.next(x, concat(xs, ys)))
+  (. ()) => {
+    switch xs->next {
+    | End => ys->next
+    | Next(x, xs) => Next(x, concat(xs, ys))
+    }
+  }
+
+let prepend = (xs, ys) => concat(ys, xs)
 
 let rec flatMap = (xs, f) =>
   (. ()) =>
@@ -82,13 +86,25 @@ let rec flatMap = (xs, f) =>
     | Next(x, xs) => concat(f(x), flatMap(xs, f))(.)
     }
 
-let rec map = (xs, f) => xs->mapNext((x, xs) => Node.next(f(x), map(xs, f)))
+let rec map = (xs, f) =>
+  (. ()) => {
+    switch xs->next {
+    | End => End
+    | Next(x, xs) => Next(f(x), map(xs, f))
+    }
+  }
 
-let cons = (x, xs) => (. ()) => Next(x, xs)
+let head = xs =>
+  switch xs->next {
+  | End => None
+  | Next(x, _) => Some(x)
+  }
 
-let head = xs => xs->next->Node.head
-
-let headTail = xs => xs->next->Node.toOption
+let headTail = xs =>
+  switch xs->next {
+  | End => None
+  | Next(xs, x) => Some(xs, x)
+  }
 
 let forEach = (xs, f) => {
   let curr = ref(xs->next)
@@ -114,17 +130,19 @@ module Indexed = {
 
 let indexed = xs => {
   let rec go = (xs, index) =>
-    xs->mapNext((x, xs) => Next(Indexed.make(~value=x, ~index), go(xs, index + 1)))
+    (. ()) =>
+      switch xs->next {
+      | End => End
+      | Next(x, xs) => Next(Indexed.make(~value=x, ~index), go(xs, index + 1))
+      }
   go(xs, 0)
 }
-
-let singleton = x => cons(x, empty)
 
 let rec unfold = (seed, f) =>
   (. ()) =>
     switch f(seed) {
-    | None => Node.end
-    | Some(x, seed) => Node.next(x, unfold(seed, f))
+    | None => End
+    | Some(x, seed) => Next(x, unfold(seed, f))
     }
 
 let init = (~count, f) => unfold(0, i => i < count ? Some(f(~index=i), i + 1) : None)
@@ -134,8 +152,6 @@ let replicate = (~count, ~value) => unfold(0, i => i < count ? Some(value, i + 1
 let infinite = f => unfold(0, _ => Some(f(), 0))
 
 let iterate = (seed, f) => unfold(seed, i => Some(i, f(i)))
-
-let prepend = (xs, ys) => concat(ys, xs)
 
 let range = (~start, ~end) => {
   start <= end
