@@ -531,20 +531,19 @@ let zip5 = (xx, yy, zz, qq, mm) => map5(xx, yy, zz, qq, mm, (x, y, z, q, m) => (
 let equals = (xx, yy, eq) => {
   let xx = xx->map(x => Some(x))->endWith(None)
   let yy = yy->map(y => Some(y))->endWith(None)
-  zip(xx, yy)->everyOrEmpty(((x, y)) =>
+  map2(xx, yy, (x, y) =>
     switch (x, y) {
-    | (Some(x), Some(y)) => eq(x, y)
     | (None, None) => true
+    | (Some(x), Some(y)) => eq(x, y)
     | _ => false
     }
-  )
+  )->everyOrEmpty(i => i)
 }
 
 let compare = (xx, yy, cmp) => {
   let xx = xx->map(x => Some(x))->endWith(None)
   let yy = yy->map(y => Some(y))->endWith(None)
-  zip(xx, yy)
-  ->map(((x, y)) =>
+  map2(xx, yy, (x, y) =>
     switch (x, y) {
     | (Some(x), Some(y)) => cmp(x, y)
     | (None, Some(_)) => -1
