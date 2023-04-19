@@ -602,6 +602,9 @@ let toExactlyOne = xx =>
 
 let isSortedBy = (xx, cmp) => xx->pairwise->everyOrEmpty(((a, b)) => cmp(a, b) <= 0)
 
+// one result for every item
+// includes previous items to make size <= requested size
+// which is first? ["a","b","c"]
 // stopped here!
 let windowBehind = (xx, size) => {
   if size <= 0 {

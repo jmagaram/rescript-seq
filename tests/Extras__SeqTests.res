@@ -481,56 +481,47 @@ let windowAheadTests = [
   ),
 ]
 
-let windowBehindTests = [
-  seqEqual(
-    ~title="windowBehind",
-    ~expectation="when empty and size > 1",
-    ~a=() => S.empty->S.windowBehind(3)->S.map(i => i->Js.Array2.copy->concatInts),
-    ~b=[],
-  ),
-  seqEqual(
-    ~title="windowBehind",
-    ~expectation="when empty and size = 1",
-    ~a=() => S.empty->S.windowBehind(1)->S.map(i => i->Js.Array2.copy->concatInts),
-    ~b=[],
-  ),
-  seqEqual(
-    ~title="windowBehind",
-    ~expectation="when not empty and size > length",
-    ~a=() => oneTwoThree->S.windowBehind(9)->S.map(i => i->Js.Array2.copy->concatInts),
-    ~b=["1", "12", "123"],
-  ),
-  seqEqual(
-    ~title="windowBehind",
-    ~expectation="when not empty and size < length",
-    ~a=() => oneTwoThree->S.windowBehind(2)->S.map(i => i->Js.Array2.copy->concatInts),
-    ~b=["1", "12", "23"],
-  ),
-  seqEqual(
-    ~title="windowBehind",
-    ~expectation="when not empty and size = length",
-    ~a=() => oneTwoThree->S.windowBehind(3)->S.map(i => i->Js.Array2.copy->concatInts),
-    ~b=["1", "12", "123"],
-  ),
-  seqEqual(
-    ~title="windowBehind",
-    ~expectation="when singleton and size > length",
-    ~a=() => S.singleton(1)->S.windowBehind(9)->S.map(i => i->Js.Array2.copy->concatInts),
-    ~b=["1"],
-  ),
-  seqEqual(
-    ~title="windowBehind",
-    ~expectation="when singleton and size = 1",
-    ~a=() => S.singleton(1)->S.windowBehind(1)->S.map(i => i->Js.Array2.copy->concatInts),
-    ~b=["1"],
-  ),
+let windowBehindTests = {
+  let strOrEmpty = s => s == "" ? "(empty)" : s
+  let oneTest = (input, size, expectedResult) => {
+    foldEqual(
+      ~title="windowBehind",
+      ~expectation=`${strOrEmpty(input)} size ${size->intToString} => ${strOrEmpty(
+          expectedResult,
+        )}`,
+      ~a=() =>
+        input
+        ->S.fromString
+        ->S.windowBehind(size)
+        ->S.map(ss => ss->Js.Array2.joinWith(""))
+        ->S.intersperse(",")
+        ->S.toString,
+      ~b=expectedResult,
+    )
+  }
+  [
+    ("", 1, ""),
+    ("", 2, ""),
+    ("a", 1, "a"),
+    ("a", 2, "a"),
+    ("ab", 1, "a,b"),
+    ("ab", 2, "a,ab"),
+    ("abc", 2, "a,ab,bc"),
+    ("abc", 3, "a,ab,abc"),
+    ("abc", 4, "a,ab,abc"),
+    ("abcde", 1, "a,b,c,d,e"),
+    ("abcdefg", 3, "a,ab,abc,bcd,cde,def,efg"),
+    ("abcdefg", 3, "a,ab,abc,bcd,cde,def,efg"),
+    ("abcdefg", 7, "a,ab,abc,abcd,abcde,abcdef,abcdefg"),
+  ]->Js.Array2.map(((input, size, expected)) => oneTest(input, size, expected))
+}->Js.Array2.concat([
   willThrow(~title="windowBehind", ~expectation="when size == 0 => throw", ~f=() =>
     oneToFive->S.windowBehind(0)
   ),
   willThrow(~title="windowBehind", ~expectation="when size < 0 => throw", ~f=() =>
     oneToFive->S.windowBehind(-1)
   ),
-]
+])
 
 let pairwiseTests = [
   seqEqual(
