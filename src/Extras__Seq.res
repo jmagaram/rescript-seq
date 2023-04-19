@@ -590,36 +590,6 @@ let rec interleave = (xx, yy) => {
   }
 }
 
-let interleaveMany = xxx => {
-  switch xxx->Js.Array2.length {
-  | 0 => empty
-  | length => {
-      let xxx = xxx->Js.Array2.map(i => Some(i))
-      let remain = ref(length)
-      let consumeHead = inx => {
-        xxx
-        ->Js.Array2.unsafe_get(inx)
-        ->Option.flatMap(xx => {
-          switch xx->headTail {
-          | None =>
-            remain := remain.contents - 1
-            xxx->Js.Array2.unsafe_set(inx, None)
-            None
-          | Some(h, t) =>
-            xxx->Js.Array2.unsafe_set(inx, Some(t))
-            Some(h)
-          }
-        })
-      }
-      range(~start=0, ~end=length - 1)
-      ->cycle
-      ->map(consumeHead)
-      ->takeWhile(_ => remain.contents > 0)
-      ->filterSome
-    }
-  }
-}
-
 let toExactlyOne = xx =>
   switch xx->headTail {
   | None => None

@@ -586,56 +586,6 @@ let interleaveTests = [
   ),
 ]
 
-// ISSUE - Can't write my tests to validate length is expected because toArray
-// might call an extra unfold method. Maybe this is a real bug.
-let interleaveManyTests = {
-  let manualTests = [
-    seqEqual(
-      ~title="interleaveMany",
-      ~expectation="when one singleton",
-      ~a=() => S.interleaveMany([S.singleton(1)]),
-      ~b=[1],
-    ),
-    seqEqual(
-      ~title="interleaveMany",
-      ~expectation="when one",
-      ~a=() => S.interleaveMany([oneTwoThree]),
-      ~b=[1, 2, 3],
-    ),
-    seqEqual(
-      ~title="interleaveMany",
-      ~expectation="when two",
-      ~a=() => S.interleaveMany([oneTwoThree, fourFiveSix]),
-      ~b=[1, 4, 2, 5, 3, 6],
-    ),
-    seqEqual(
-      ~title="interleaveMany",
-      ~expectation="when two and first longer",
-      ~a=() => S.interleaveMany([oneToFive, fourFiveSix]),
-      ~b=[1, 4, 2, 5, 3, 6, 4, 5],
-    ),
-    seqEqual(
-      ~title="interleaveMany",
-      ~expectation="when two and second longer",
-      ~a=() => S.interleaveMany([fourFiveSix, oneToFive]),
-      ~b=[4, 1, 5, 2, 6, 3, 4, 5],
-    ),
-    seqEqual(
-      ~title="interleaveMany",
-      ~expectation="when many",
-      ~a=() => S.interleaveMany([oneToFive, oneTwoThree, fourFiveSix]),
-      ~b=[1, 1, 4, 2, 2, 5, 3, 3, 6, 4, 5],
-    ),
-    seqEqual(
-      ~title="interleaveMany",
-      ~expectation="when many",
-      ~a=() => S.interleaveMany([S.empty, oneToFive, S.empty, oneTwoThree, S.empty, fourFiveSix]),
-      ~b=[1, 1, 4, 2, 2, 5, 3, 3, 6, 4, 5],
-    ),
-  ]
-  manualTests
-}
-
 let iterateTests = makeSeqEqualsTests(
   ~title="iterate",
   [
@@ -1568,7 +1518,6 @@ let tests =
     indexedTests,
     infiniteTests,
     initTests,
-    interleaveManyTests,
     interleaveTests,
     intersperseTests,
     isEqualTests,
