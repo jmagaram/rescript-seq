@@ -216,14 +216,18 @@ let fromOption = opt =>
 let mapi = (xs, f) => xs->indexed->map(((x, index)) => f(~value=x, ~index))
 
 let takeAtMost = (xs, count) => {
-  let rec go = xs =>
-    xs->mapNext(((x, index), xs) =>
-      switch index >= count {
-      | true => End
-      | false => Next(x, go(xs))
-      }
-    )
-  go(xs->indexed)
+  if count == 0 {
+    empty
+  } else {
+    let rec go = xs =>
+      xs->mapNext(((x, index), xs) =>
+        switch index >= count {
+        | true => End
+        | false => Next(x, go(xs))
+        }
+      )
+    go(xs->indexed)
+  }
 }
 
 let headTails = xs =>

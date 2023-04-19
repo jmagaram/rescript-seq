@@ -50,52 +50,12 @@ let oneToFive = S.init(~count=5, (~index) => index + 1)
 let constructors = [
   areEqual(~title="singleton", ~expectation="has one item in it", ~a=() => S.singleton(3), ~b=[3]),
   areEqual(~title="empty", ~expectation="has no items", ~a=() => S.empty, ~b=[]),
-  // areEqual(
-  //   ~title="unfold",
-  //   ~expectation="when generate zero items, function never called",
-  //   ~a=() => {
-  //     let callCount = ref(0)
-  //     S.unfold(1, i => {
-  //       callCount := callCount.contents + 1
-  //       Some(i, i + 1)
-  //     })
-  //     ->S.cycle
-  //     ->S.takeAtMost(0)
-  //     ->ignore
-  //     S.singleton(callCount.contents)
-  //   },
-  //   ~b=[0],
-  // ),
   areEqual(~title="cons", ~expectation="when a + empty => a", ~a=() => S.cons(1, S.empty), ~b=[1]),
   areEqual(
     ~title="cons",
     ~expectation="when a + bcd => abcd",
     ~a=() => S.cons(1, S.range(~start=2, ~end=4)),
     ~b=[1, 2, 3, 4],
-  ),
-  areEqual(
-    ~title="init",
-    ~expectation="when count is < 0 => empty",
-    ~a=() => S.init(~count=-1, (~index) => index->intToString),
-    ~b=[],
-  ),
-  areEqual(
-    ~title="init",
-    ~expectation="when count is 0 => empty",
-    ~a=() => S.init(~count=0, (~index) => index->intToString),
-    ~b=[],
-  ),
-  areEqual(
-    ~title="init",
-    ~expectation="when count is 1 => singleton",
-    ~a=() => S.init(~count=1, (~index) => index->intToString),
-    ~b=["0"],
-  ),
-  areEqual(
-    ~title="init",
-    ~expectation="when count > 2 => map each index",
-    ~a=() => S.init(~count=3, (~index) => index->intToString),
-    ~b=["0", "1", "2"],
   ),
   areEqual(
     ~title="replicate",
@@ -290,29 +250,6 @@ let constructors = [
     ~a=() => Some(1)->S.fromOption,
     ~b=[1],
   ),
-  areEqual(
-    ~title="unfold",
-    ~expectation="generate many items",
-    ~a=() => S.unfold(1, x => x <= 5 ? Some(x, x + 1) : None),
-    ~b=[1, 2, 3, 4, 5],
-  ),
-  areEqual(
-    ~title="unfold",
-    ~expectation="generate zero items",
-    ~a=() => S.unfold(1, _ => None),
-    ~b=[],
-  ),
-  areEqual(
-    ~title="unfold",
-    ~expectation="generate millions of items",
-    ~a=() => {
-      let count = 9_999_999
-      let last = ref(-1)
-      S.unfold(1, i => i <= count ? Some(i, i + 1) : None)->S.forEach(i => last := i)
-      S.singleton(last.contents)
-    },
-    ~b=[9_999_999],
-  ),
 ]
 
 let transforming = [
@@ -387,36 +324,6 @@ let transforming = [
     ~expectation="when items, index starts at 0",
     ~a=() => oneTwoThree->S.indexed,
     ~b=[(1, 0), (2, 1), (3, 2)],
-  ),
-  areEqual(
-    ~title="takeAtMost",
-    ~expectation="when 0 => empty",
-    ~a=() => oneTwoThree->S.takeAtMost(0),
-    ~b=[],
-  ),
-  areEqual(
-    ~title="takeAtMost",
-    ~expectation="when empty => empty",
-    ~a=() => S.empty->S.takeAtMost(99),
-    ~b=[],
-  ),
-  areEqual(
-    ~title="takeAtMost",
-    ~expectation="when n = all => all",
-    ~a=() => oneTwoThree->S.takeAtMost(3),
-    ~b=[1, 2, 3],
-  ),
-  areEqual(
-    ~title="takeAtMost",
-    ~expectation="when n > all => all",
-    ~a=() => oneTwoThree->S.takeAtMost(9),
-    ~b=[1, 2, 3],
-  ),
-  areEqual(
-    ~title="takeAtMost",
-    ~expectation="when a subset",
-    ~a=() => oneTwoThree->S.takeAtMost(2),
-    ~b=[1, 2],
   ),
   areEqual(
     ~title="takeWhile",
@@ -846,6 +753,99 @@ let makeSeqEqualsTests = (~title, xs) =>
   xs->Js.Array2.mapi(((source, result, note), inx) =>
     areEqual(~title, ~expectation=`index ${inx->intToString} ${note}`, ~a=() => source, ~b=result)
   )
+
+let takeAtMostTests = makeSeqEqualsTests(
+  ~title="takeAtMost",
+  [
+    (S.empty->S.takeAtMost(0), [], ""),
+    (S.empty->S.takeAtMost(1), [], ""),
+    (S.singleton(1)->S.takeAtMost(0), [], ""),
+    (S.singleton(1)->S.takeAtMost(1), [1], ""),
+    (S.singleton(1)->S.takeAtMost(2), [1], ""),
+    (oneToFive->S.takeAtMost(0), [], ""),
+    (oneToFive->S.takeAtMost(1), [1], ""),
+    (oneToFive->S.takeAtMost(3), [1, 2, 3], ""),
+    (oneToFive->S.takeAtMost(5), [1, 2, 3, 4, 5], ""),
+    (oneToFive->S.takeAtMost(6), [1, 2, 3, 4, 5], ""),
+  ],
+)->Js.Array2.concat([
+  consumeEqual(
+    ~title="takeAtMost",
+    ~expectation="millions",
+    ~a=() => S.range(~start=1, ~end=999_999)->S.last,
+    ~b=Some(999_999),
+  ),
+  T.make(
+    ~category="Seq",
+    ~title="takeAtMost",
+    ~expectation="if zero completely lazy",
+    ~predicate=() => {
+      S.unfold(0, _ => {
+        Js.Exn.raiseError("oops!")
+      })
+      ->S.takeAtMost(0)
+      ->S.toArray
+      ->ignore
+      true
+    },
+  ),
+])
+
+let unfoldTests =
+  makeSeqEqualsTests(
+    ~title="unfold",
+    [
+      (S.unfold(1, i => i <= 5 ? Some(i, i + 1) : None), [1, 2, 3, 4, 5], ""),
+      (S.unfold(1, _ => None), [], "zero items"),
+      (S.unfold(1, i => i < 100 ? Some(i, i * 2) : None), [1, 2, 4, 8, 16, 32, 64], ""),
+    ],
+  )->Js.Array2.concat([
+    consumeEqual(
+      ~title="unfold",
+      ~expectation="millions",
+      ~a=() => S.unfold(1, i => i <= 999_999 ? Some(i, i + 1) : None)->S.last,
+      ~b=Some(999_999),
+    ),
+  ])
+// areEqual(
+//   ~title="unfold",
+//   ~expectation="when generate zero items, function never called",
+//   ~a=() => {
+//     let callCount = ref(0)
+//     S.unfold(1, i => {
+//       callCount := callCount.contents + 1
+//       Some(i, i + 1)
+//     })
+//     ->S.cycle
+//     ->S.takeAtMost(0)
+//     ->ignore
+//     S.singleton(callCount.contents)
+//   },
+//   ~b=[0],
+// ),
+
+let initTests =
+  makeSeqEqualsTests(
+    ~title="init",
+    [
+      (S.init(~count=1, (~index) => index * 2), [0], ""),
+      (S.init(~count=2, (~index) => index * 2), [0, 2], ""),
+      (S.init(~count=3, (~index) => index * 2), [0, 2, 4], ""),
+    ],
+  )->Js.Array2.concat([
+    consumeEqual(
+      ~title="init",
+      ~expectation="tens",
+      ~a=() => S.init(~count=100, (~index) => index)->S.last,
+      ~b=Some(99),
+    ),
+    consumeEqual(
+      ~title="init",
+      ~expectation="millions",
+      ~a=() => S.init(~count=1_000_000, (~index) => index)->S.last,
+      ~b=Some(999_999),
+    ),
+  ])
 
 let chunkBySizeTests = {
   let process = (xs, n) => xs->S.chunkBySize(n)->S.map(concatInts)
@@ -1504,9 +1504,12 @@ let findTests = [
 
 let tests =
   [
+    initTests,
+    unfoldTests,
     findTests,
     dropUntilTests,
     dropWhileTests,
+    takeAtMostTests,
     takeUntilTests,
     filterTests,
     filterMapTests,
