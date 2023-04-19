@@ -35,6 +35,7 @@ module Node = {
 let empty = (. ()) => Node.end
 
 let next = (xs: t<'a>) => xs(.)
+let nextToOption = xs => xs->next->Node.toOption
 
 let cons = (x, xs) => (. ()) => Next(x, xs)
 let startWith = (xs, x) => cons(x, xs)
@@ -477,32 +478,26 @@ let findMapi = (xs, f) =>
 let findMap = (xs, f) => findMapi(xs, (~value, ~index as _) => f(value))
 
 let rec map2 = (xs, ys, f) =>
-  (. ()) => {
-    switch xs->next {
-    | End => End
-    | Next(x, xs) =>
-      switch ys->next {
-      | End => End
-      | Next(y, ys) => Next(f(x, y), map2(xs, ys, f))
-      }
-    }
-  }
+  (. ()) =>
+    xs
+    ->nextToOption
+    ->Option.flatMap(((x, xs)) =>
+      ys->nextToOption->Option.map(((y, ys)) => Next(f(x, y), map2(xs, ys, f)))
+    )
+    ->Option.getWithDefault(End)
 
 let rec map3 = (xs, ys, zs, f) =>
-  (. ()) => {
-    switch xs->next {
-    | End => End
-    | Next(x, xs) =>
-      switch ys->next {
-      | End => End
-      | Next(y, ys) =>
-        switch zs->next {
-        | End => End
-        | Next(z, zs) => Next(f(x, y, z), map3(xs, ys, zs, f))
-        }
-      }
-    }
-  }
+  (. ()) =>
+    xs
+    ->nextToOption
+    ->Option.flatMap(((x, xs)) =>
+      ys
+      ->nextToOption
+      ->Option.flatMap(((y, ys)) =>
+        zs->nextToOption->Option.map(((z, zs)) => Next(f(x, y, z), map3(xs, ys, zs, f)))
+      )
+    )
+    ->Option.getWithDefault(End)
 
 let zip = (xs, ys) => map2(xs, ys, (x, y) => (x, y))
 let zip3 = (xs, ys, zs) => map3(xs, ys, zs, (x, y, z) => (x, y, z))
