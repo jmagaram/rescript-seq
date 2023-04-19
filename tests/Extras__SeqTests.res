@@ -1158,43 +1158,26 @@ let lengthTests = [
 ]
 
 let equalsTests = [
+  ("", "", true),
+  ("", "a", false),
+  ("a", "", false),
+  ("a", "a", true),
+  ("a", "aa", false),
+  ("aa", "a", false),
+  ("aa", "aa", true),
+  ("aa", "aaa", false),
+]->Js.Array2.map(((xs, ys, expected)) =>
   foldEqual(
     ~title="equals",
-    ~expectation="if shorter first => false",
-    ~a=() => S.equals(oneTwoThree, oneToFive, (x: int, y: int) => x == y),
-    ~b=false,
-  ),
-  foldEqual(
-    ~title="equals",
-    ~expectation="if longer first => false",
-    ~a=() => S.equals(oneToFive, oneTwoThree, (x: int, y: int) => x == y),
-    ~b=false,
-  ),
-  foldEqual(
-    ~title="equals",
-    ~expectation="if same values => true",
-    ~a=() => S.equals(oneTwoThree, oneTwoThree, (x: int, y: int) => x == y),
-    ~b=true,
-  ),
-  foldEqual(
-    ~title="equals",
-    ~expectation="if different values => false",
-    ~a=() => S.equals(S.singleton(1), S.singleton(2), (x: int, y: int) => x == y),
-    ~b=false,
-  ),
-  foldEqual(
-    ~title="equals",
-    ~expectation="can compare different types",
-    ~a=() => S.equals(S.singleton(1), S.singleton("1"), (x: int, y: string) => x->intToString == y),
-    ~b=true,
-  ),
-  foldEqual(
-    ~title="equals",
-    ~expectation="can compare different types",
-    ~a=() => S.equals(S.singleton(1), S.singleton("1"), (x: int, y: string) => x->intToString == y),
-    ~b=true,
-  ),
-]
+    ~expectation=`${xs},${ys} => ${expected ? "true" : "false"}`,
+    ~a=() => {
+      let xs = xs->S.fromString
+      let ys = ys->S.fromString
+      S.equals(xs, ys, (i, j) => i == j)
+    },
+    ~b=expected,
+  )
+)
 
 let compareTests = [
   foldEqual(
