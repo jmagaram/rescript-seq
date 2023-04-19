@@ -71,6 +71,12 @@ let map4 = (a, b, c, d, m) =>
   | _ => None
   }
 
+let map5 = (a, b, c, d, e, m) =>
+  switch (a, b, c, d, e) {
+  | (Some(a), Some(b), Some(c), Some(d), Some(e)) => Some(m(a, b, c, d, e))
+  | _ => None
+  }
+
 let orElseWith = (a, b) =>
   switch a {
   | Some(_) as a => a
