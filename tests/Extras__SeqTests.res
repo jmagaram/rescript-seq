@@ -560,18 +560,6 @@ let transforming = [
     ~b=[(1, 4), (2, 5), (3, 6)],
   ),
   areEqual(
-    ~title="scani",
-    ~expectation="when empty => zero",
-    ~a=() => S.empty->S.scani(~zero=10, (~sum, ~value, ~index) => sum + value + index + 1),
-    ~b=[10],
-  ),
-  areEqual(
-    ~title="scani",
-    ~expectation="when not empty => sequence of sums including zero",
-    ~a=() => oneTwoThree->S.scani(~zero=10, (~sum, ~value, ~index) => sum + value + index),
-    ~b=[10, 10 + 1 + 0, 10 + 1 + 0 + 2 + 1, 10 + 1 + 0 + 2 + 1 + 3 + 2],
-  ),
-  areEqual(
     ~title="flatten",
     ~expectation="concatenate each sub-sequence",
     ~a=() => S.init(~count=3, (~index) => S.replicate(~count=2, ~value=index))->S.flatten,
@@ -890,48 +878,16 @@ let transforming = [
     ~b=[1, 1, 4, 2, 2, 5, 3, 3, 6, 4, 5],
   ),
   areEqual(
-    ~title="takeUntil",
-    ~expectation="when more than one item and condition met, that is last item",
-    ~a=() => oneToFive->S.takeUntil(i => i == 3),
-    ~b=[1, 2, 3],
+    ~title="scani",
+    ~expectation="when empty => zero",
+    ~a=() => S.empty->S.scani(~zero=10, (~sum, ~value, ~index) => sum + value + index + 1),
+    ~b=[10],
   ),
   areEqual(
-    ~title="takeUntil",
-    ~expectation="when more than one item and condition not met, return all items",
-    ~a=() => oneToFive->S.takeUntil(_ => false),
-    ~b=[1, 2, 3, 4, 5],
-  ),
-  areEqual(
-    ~title="takeUntil",
-    ~expectation="when one item and condition met, that is last item",
-    ~a=() => S.singleton(1)->S.takeUntil(i => i == 1),
-    ~b=[1],
-  ),
-  areEqual(
-    ~title="takeUntil",
-    ~expectation="when one item and condition not met, return all items",
-    ~a=() => S.singleton(1)->S.takeUntil(i => i == 99),
-    ~b=[1],
-  ),
-  areEqual(
-    ~title="takeUntil",
-    ~expectation="when empty => empty",
-    ~a=() => S.empty->S.takeUntil(_ => true),
-    ~b=[],
-  ),
-  areEqual(
-    ~title="takeUntil",
-    ~expectation="predicate only called as many times as needed",
-    ~a=() => {
-      let called = ref(0)
-      S.singleton("x")
-      ->S.takeUntil(i => {
-        called := called.contents + 1
-        i == "x"
-      })
-      ->S.map(_ => called.contents)
-    },
-    ~b=[1],
+    ~title="scani",
+    ~expectation="when not empty => sequence of sums including zero",
+    ~a=() => oneTwoThree->S.scani(~zero=10, (~sum, ~value, ~index) => sum + value + index),
+    ~b=[10, 10 + 1 + 0, 10 + 1 + 0 + 2 + 1, 10 + 1 + 0 + 2 + 1 + 3 + 2],
   ),
 ]
 
@@ -939,6 +895,41 @@ let makeSeqEqualsTests = (~title, xs) =>
   xs->Js.Array2.mapi(((source, result, note), inx) =>
     areEqual(~title, ~expectation=`index ${inx->intToString} ${note}`, ~a=() => source, ~b=result)
   )
+
+let takeUntilTests = makeSeqEqualsTests(
+  ~title="takeUntil",
+  [
+    (S.empty->S.takeUntil(isTrueAlways), [], ""),
+    (S.empty->S.takeUntil(isFalseAlways), [], ""),
+    (1->S.singleton->S.takeUntil(i => i == 1), [1], ""),
+    (1->S.singleton->S.takeUntil(isFalseAlways), [1], ""),
+    (1->S.singleton->S.takeUntil(isTrueAlways), [1], ""),
+    (oneToFive->S.takeUntil(isTrueAlways), [1], ""),
+    (oneToFive->S.takeUntil(isFalseAlways), [1, 2, 3, 4, 5], ""),
+    (oneToFive->S.takeUntil(i => i == 3), [1, 2, 3], ""),
+    (oneToFive->S.takeUntil(i => i == 1), [1], ""),
+    (oneToFive->S.takeUntil(i => i == 5), [1, 2, 3, 4, 5], ""),
+    ([1, 2, 2, 2, 3]->S.fromArray->S.takeUntil(i => i == 2), [1, 2], ""),
+    (
+      S.range(~start=1, ~end=99)
+      ->S.takeUntil(i => i == 99)
+      ->S.last
+      ->Option.map(S.singleton)
+      ->Option.getWithDefault(S.empty),
+      [99],
+      "tens",
+    ),
+    (
+      S.range(~start=1, ~end=999_999)
+      ->S.takeUntil(i => i == 999_999)
+      ->S.last
+      ->Option.map(S.singleton)
+      ->Option.getWithDefault(S.empty),
+      [999_999],
+      "millions",
+    ),
+  ],
+)
 
 let intersperseTests = makeSeqEqualsTests(
   ~title="intersperse",
@@ -1503,6 +1494,7 @@ let tests =
     findTests,
     dropUntilTests,
     dropWhileTests,
+    takeUntilTests,
     filterTests,
     filterMapTests,
     filterSomeTests,

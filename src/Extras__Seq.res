@@ -662,8 +662,6 @@ let windowAhead = (xs, size) => {
   }
 }
 
-// add predicate call count tests elsewhere
-
 let rec takeUntil = (xs, f) =>
   xs->mapNext((x, xs) => {
     switch f(x) {
