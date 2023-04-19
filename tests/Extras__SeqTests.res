@@ -1180,37 +1180,26 @@ let equalsTests = [
 )
 
 let compareTests = [
+  ("", "", 0),
+  ("", "a", -1),
+  ("a", "", 1),
+  ("a", "a", 0),
+  ("a", "aa", -1),
+  ("aa", "a", 1),
+  ("aa", "aa", 0),
+  ("aa", "aaa", -1),
+]->Js.Array2.map(((xs, ys, expected)) =>
   foldEqual(
     ~title="compare",
-    ~expectation="",
-    ~a=() => S.compare([1, 2, 3]->S.fromArray, [1, 2, 3]->S.fromArray, Ex.Cmp.int),
-    ~b=0,
-  ),
-  foldEqual(
-    ~title="compare",
-    ~expectation="",
-    ~a=() => S.compare([1, 2, 3]->S.fromArray, [1, 2, 3, 4]->S.fromArray, Ex.Cmp.int),
-    ~b=-1,
-  ),
-  foldEqual(
-    ~title="compare",
-    ~expectation="",
-    ~a=() => S.compare([1, 2, 3, 4]->S.fromArray, [1, 2, 3]->S.fromArray, Ex.Cmp.int),
-    ~b=1,
-  ),
-  foldEqual(
-    ~title="compare",
-    ~expectation="",
-    ~a=() => S.compare([]->S.fromArray, []->S.fromArray, Ex.Cmp.int),
-    ~b=0,
-  ),
-  foldEqual(
-    ~title="compare",
-    ~expectation="",
-    ~a=() => S.compare([1, 2, 3, 4]->S.fromArray, [1, 3, 3, 4]->S.fromArray, Ex.Cmp.int),
-    ~b=-1,
-  ),
-]
+    ~expectation=`${xs},${ys} => ${expected->intToString}`,
+    ~a=() => {
+      let xs = xs->S.fromString
+      let ys = ys->S.fromString
+      S.compare(xs, ys, Ex.Cmp.string)
+    },
+    ~b=expected,
+  )
+)
 
 let headTailTests = [
   foldEqual(

@@ -76,8 +76,8 @@ let findMapi: (t<'a>, (~value: 'a, ~index: int) => option<'b>) => option<'b>
 let length: t<'a> => int
 let isEmpty: t<'a> => bool
 let isSortedBy: (t<'a>, ('a, 'a) => int) => bool
-let equals: (t<'a>, t<'b>, ('a, 'b) => bool) => bool
-let compare: (t<'a>, t<'b>, ('a, 'b) => int) => int
+let equals: (t<'a>, t<'a>, ('a, 'a) => bool) => bool
+let compare: (t<'a>, t<'a>, ('a, 'a) => int) => int
 let head: t<'a> => option<'a>
 let tail: t<'a> => t<'a>
 let headTail: t<'a> => option<('a, t<'a>)>
