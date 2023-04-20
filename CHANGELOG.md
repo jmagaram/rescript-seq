@@ -2,6 +2,7 @@
 
 - `Trampoline` module to eliminate recursion in functions
 - `Option.map5`
+- Lazy sequences in `Seq` module; will split into separate repository
 
 ## Version 0.21.0
 

@@ -12,8 +12,9 @@ let isLocalDevelopment = () => {
   }
 }
 
-let keywords = ["Seq"]
+let keywords = []
 let onlyShowFailures = true
+let filter = test => keywords->Js.Array2.every(word => test->Test.hasKeyword(word))
 let throwIfAnyTestFails = !isLocalDevelopment()
 
 let tests =
@@ -33,7 +34,7 @@ let tests =
   ]->Array.concatMany
 
 Ex.Task.Result.make(
-  ~promise=() => Ex.Test.runSuite(tests, ~keywords, ~onlyShowFailures),
+  ~promise=() => Ex.Test.runSuite(tests, ~filter, ~onlyShowFailures),
   ~onError=e => e,
 )
 ->Ex.Task.map(i =>
