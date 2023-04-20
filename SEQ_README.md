@@ -37,6 +37,113 @@ Add `@jmagaram/rescript-seq` to `bs-dependencies` in your `bsconfig.json`:
 }
 ```
 
+## Functions
+
+```rescript
+type t<'a> // A lazy sequence of `a`
+
+// Construct
+
+let characters: Js.String2.t => t<Js.String2.t>
+let cons: ('a, t<'a>) => t<'a>
+let cycle: t<'a> => t<'a>
+let empty: t<'a>
+let endWith: (t<'a>, 'a) => t<'a>
+let forever: 'a => t<'a>
+let foreverWith: (unit => 'a) => t<'a>
+let fromArray: (~start: int=?, ~end: int=?, array<'a>) => t<'a>
+let fromList: list<'a> => t<'a>
+let fromOption: option<'a> => t<'a>
+let init: (int, int => 'a) => t<'a>
+let iterate: ('a, 'a => 'a) => t<'a>
+let range: (int, int) => t<int>
+let rangeMap: (int, int, int => 'a) => t<'a>
+let repeat: (int, 'a) => t<'a>
+let repeatWith: (int, unit => 'a) => t<'a>
+let singleton: 'a => t<'a>
+let startWith: (t<'a>, 'a) => t<'a>
+let unfold: ('a, 'a => option<('b, 'a)>) => t<'b>
+
+// Transform
+
+let cache: t<'a> => t<'a>
+let chunkBySize: (t<'a>, int) => t<Js.Array2.t<'a>>
+let drop: (t<'a>, int) => t<'a>
+let dropUntil: (t<'a>, 'a => bool) => t<'a>
+let dropWhile: (t<'a>, 'a => bool) => t<'a>
+let filter: (t<'a>, 'a => bool) => t<'a>
+let filteri: (t<'a>, ('a, int) => bool) => t<'a>
+let filterMap: (t<'a>, 'a => option<'b>) => t<'b>
+let filterMapi: (t<'a>, ('a, int) => option<'b>) => t<'b>
+let filterOk: t<result<'a, 'b>> => t<'a>
+let filterSome: t<option<'a>> => t<'a>
+let flatMap: (t<'a>, 'a => t<'b>) => t<'b>
+let flatten: t<t<'a>> => t<'a>
+let indexed: t<'a> => t<('a, int)>
+let intersperse: (t<'a>, 'a) => t<'a>
+let intersperseWith: (t<'a>, unit => 'a) => t<'a>
+let map: (t<'a>, 'a => 'b) => t<'b>
+let mapi: (t<'a>, ('a, int) => 'b) => t<'b>
+let pairwise: t<'a> => t<('a, 'a)>
+let scan: (t<'a>, 'b, ('b, 'a) => 'b) => t<'b>
+let scani: (t<'a>, ~zero: 'b, (~sum: 'b, ~val: 'a, ~inx: int) => 'b) => t<'b>
+let takeAtMost: (t<'a>, int) => t<'a>
+let takeUntil: (t<'a>, 'a => bool) => t<'a>
+let takeWhile: (t<'a>, 'a => bool) => t<'a>
+let tap: (t<'a>, 'a => unit) => t<'a>
+let window: (t<'a>, int) => t<Js.Array2.t<'a>>
+let windowAhead: (t<'a>, int) => t<Js.Array2.t<'a>>
+let windowBehind: (t<'a>, int) => t<Js.Array2.t<'a>>
+
+// Combine
+
+let allPairs: (t<'a>, t<'b>) => t<('a, 'b)>
+let concat: (t<'a>, t<'a>) => t<'a>
+let interleave: (t<'a>, t<'a>) => t<'a>
+let map2: (t<'a>, t<'b>, ('a, 'b) => 'c) => t<'c>
+let map3: (t<'a>, t<'b>, t<'c>, ('a, 'b, 'c) => 'd) => t<'d>
+let map4: (t<'a>, t<'b>, t<'c>, t<'d>, ('a, 'b, 'c, 'd) => 'e) => t<'e>
+let map5: (t<'a>, t<'b>, t<'c>, t<'d>, t<'e>, ('a, 'b, 'c, 'd, 'e) => 'f) => t<'f>
+let prepend: (t<'a>, t<'a>) => t<'a>
+let sortedMerge: (t<'a>, t<'a>, ('a, 'a) => int) => t<'a>
+let zip: (t<'a>, t<'b>) => t<('a, 'b)>
+let zip3: (t<'a>, t<'b>, t<'c>) => t<('a, 'b, 'c)>
+let zip4: (t<'a>, t<'b>, t<'c>, t<'d>) => t<('a, 'b, 'c, 'd)>
+let zip5: (t<'a>, t<'b>, t<'c>, t<'d>, t<'e>) => t<('a, 'b, 'c, 'd, 'e)>
+
+// Reduce, consume, and calculate
+
+let allOk: t<result<'a, 'b>> => result<t<'a>, 'b>
+let allSome: t<option<'a>> => option<t<'a>>
+let compare: (t<'a>, t<'b>, ('a, 'b) => int) => int
+let consume: t<'a> => unit
+let equals: (t<'a>, t<'b>, ('a, 'b) => bool) => bool
+let everyOrEmpty: (t<'a>, 'a => bool) => bool
+let exactlyOne: t<'a> => option<'a>
+let find: (t<'a>, 'a => bool) => option<'a>
+let findMap: (t<'a>, 'a => option<'b>) => option<'b>
+let findMapi: (t<'a>, ('a, int) => option<'b>) => option<'b>
+let forEach: (t<'a>, 'a => unit) => unit
+let forEachi: (t<'a>, ('a, int) => unit) => unit
+let head: t<'a> => option<'a>
+let headTail: t<'a> => option<('a, t<'a>)>
+let headTails: t<'a> => t<('a, t<'a>)>
+let isEmpty: t<'a> => bool
+let isSortedBy: (t<'a>, ('a, 'a) => int) => bool
+let joinString: t<string> => string
+let last: t<'a> => option<'a>
+let length: t<'a> => int
+let maxBy: (t<'a>, ('a, 'a) => int) => option<'a>
+let minBy: (t<'a>, ('a, 'a) => int) => option<'a>
+let orElse: (t<'a>, t<'a>) => t<'a>
+let reduce: (t<'a>, 'b, ('b, 'a) => 'b) => 'b
+let reducei: (t<'a>, ~zero: 'b, (~sum: 'b, ~val: 'a, ~inx: int) => 'b) => 'b
+let some: (t<'a>, 'a => bool) => bool
+let tail: t<'a> => t<'a>
+let toArray: t<'a> => Js.Array2.t<'a>
+let toOption: t<'a> => option<t<'a>>
+```
+
 ## Usage examples
 
 ```rescript
@@ -76,113 +183,4 @@ let fibs = count =>
   ->Seq.map(Belt.Int.toString)
   ->Seq.intersperse(", ")
   ->Seq.joinString
-```
-
-## Functions
-
-### Construct
-
-```rescript
-let empty: t<'a>
-let singleton: 'a => t<'a>
-let unfold: ('seed, 'seed => option<('a, 'seed)>) => t<'a>
-let init: (int, int => 'a) => t<'a>
-let repeat: (int, 'a) => t<'a>
-let repeatWith: (int, unit => 'a) => t<'a>
-let infinite: (unit => 'a) => t<'a>
-let iterate: ('a, 'a => 'a) => t<'a>
-let cycle: t<'a> => t<'a>
-let range: (int, int) => t<int>
-let rangeMap: (int, int, int => 'a) => t<'a>
-let fromArray: (~start: int=?, ~end: int=?, array<'a>) => t<'a>
-let fromList: list<'a> => t<'a>
-let fromOption: option<'a> => t<'a>
-let characters: string => t<string>
-let cons: ('a, t<'a>) => t<'a>
-let startWith: (t<'a>, 'a) => t<'a>
-let endWith: (t<'a>, 'a) => t<'a>
-```
-
-### Transform
-
-```rescript
-let prepend: (t<'a>, t<'a>) => t<'a>
-let concat: (t<'a>, t<'a>) => t<'a>
-let flatten: t<t<'a>> => t<'a>
-let flatMap: (t<'a>, 'a => t<'b>) => t<'b>
-let map: (t<'a>, 'a => 'b) => t<'b>
-let mapi: (t<'a>, ('a, int) => 'b) => t<'b>
-let indexed: t<'a> => t<('a, int)>
-let filter: (t<'a>, 'a => bool) => t<'a>
-let filteri: (t<'a>, ('a, int) => bool) => t<'a>
-let filterMap: (t<'a>, 'a => option<'b>) => t<'b>
-let filterSome: t<option<'a>> => t<'a>
-let filterOk: t<result<'a, 'b>> => t<'a>
-let takeAtMost: (t<'a>, int) => t<'a>
-let takeWhile: (t<'a>, 'a => bool) => t<'a>
-let takeUntil: (t<'a>, 'a => bool) => t<'a>
-let drop: (t<'a>, int) => t<'a>
-let dropWhile: (t<'a>, 'a => bool) => t<'a>
-let dropUntil: (t<'a>, 'a => bool) => t<'a>
-let scan: (t<'a>, 'b, ('b, 'a) => 'b) => t<'b>
-let scani: (t<'a>, ~zero: 'b, (~sum: 'b, ~val: 'a, ~inx: int) => 'b) => t<'b>
-let cache: t<'a> => t<'a>
-let tap: (t<'a>, 'a => unit) => t<'a>
-let chunkBySize: (t<'a>, int) => t<array<'a>>
-let pairwise: t<'a> => t<('a, 'a)>
-let window: (t<'a>, int) => t<array<'a>>
-let windowBehind: (t<'a>, int) => t<array<'a>>
-let windowAhead: (t<'a>, int) => t<array<'a>>
-let allPairs: (t<'a>, t<'b>) => t<('a, 'b)>
-let intersperse: (t<'a>, 'a) => t<'a>
-let intersperseWith: (t<'a>, unit => 'a) => t<'a>
-let orElse: (t<'a>, t<'a>) => t<'a>
-```
-
-### Combine
-
-```rescript
-let map2: (t<'a>, t<'b>, ('a, 'b) => 'c) => t<'c>
-let map3: (t<'a>, t<'b>, t<'c>, ('a, 'b, 'c) => 'd) => t<'d>
-let map4: (t<'a>, t<'b>, t<'c>, t<'d>, ('a, 'b, 'c, 'd) => 'e) => t<'e>
-let map5: (t<'a>, t<'b>, t<'c>, t<'d>, t<'e>, ('a, 'b, 'c, 'd, 'e) => 'f) => t<'f>
-let zip: (t<'a>, t<'b>) => t<('a, 'b)>
-let zip3: (t<'a>, t<'b>, t<'c>) => t<('a, 'b, 'c)>
-let zip4: (t<'a>, t<'b>, t<'c>, t<'d>) => t<('a, 'b, 'c, 'd)>
-let zip5: (t<'a>, t<'b>, t<'c>, t<'d>, t<'e>) => t<('a, 'b, 'c, 'd, 'e)>
-let sortedMerge: (t<'a>, t<'a>, ('a, 'a) => int) => t<'a>
-let interleave: (t<'a>, t<'a>) => t<'a>
-```
-
-### Calculate and consume
-
-```rescript
-let reduce: (t<'a>, 'b, ('b, 'a) => 'b) => 'b
-let reducei: (t<'a>, ~zero: 'b, (~sum: 'b, ~val: 'a, ~inx: int) => 'b) => 'b
-let forEach: (t<'a>, 'a => unit) => unit
-let forEachi: (t<'a>, ('a, int) => unit) => unit
-let some: (t<'a>, 'a => bool) => bool
-let everyOrEmpty: (t<'a>, 'a => bool) => bool
-let find: (t<'a>, 'a => bool) => option<'a>
-let findMap: (t<'a>, 'a => option<'b>) => option<'b>
-let findMapi: (t<'a>, ('a, int) => option<'b>) => option<'b>
-let length: t<'a> => int
-let isEmpty: t<'a> => bool
-let isSortedBy: (t<'a>, ('a, 'a) => int) => bool
-let equals: (t<'a>, t<'a>, ('a, 'a) => bool) => bool
-let compare: (t<'a>, t<'a>, ('a, 'a) => int) => int
-let head: t<'a> => option<'a>
-let tail: t<'a> => t<'a>
-let headTail: t<'a> => option<('a, t<'a>)>
-let minBy: (t<'a>, ('a, 'a) => int) => option<'a>
-let maxBy: (t<'a>, ('a, 'a) => int) => option<'a>
-let last: t<'a> => option<'a>
-let toArray: t<'a> => array<'a>
-let joinString: t<string> => string
-let exactlyOne: t<'a> => option<'a>
-let toOption: t<'a> => option<t<'a>>
-let allOk: t<result<'ok, 'err>> => result<t<'ok>, 'err>
-let allSome: t<option<'a>> => option<t<'a>>
-let consume: t<'a> => unit
-
 ```
