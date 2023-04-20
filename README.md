@@ -8,7 +8,7 @@ General-purpose utilities for [ReScript](https://rescript-lang.org) projects. In
 
 ## Lazy sequences
 
-See [Lazy sequence README](../blob/master/SEQ_README.md)
+See [Lazy sequence README](SEQ_README.md)
 
 ## Task and TaskResult
 
@@ -16,7 +16,7 @@ Inspired by [TaskEither in fp-ts](https://gcanti.github.io/fp-ts/modules/TaskEit
 
 ## Union
 
-The **`Union`** module provides functors to create tagged and untagged discriminated unions of 2, 3, 4, or 5 items. This is useful for interop with JavaScript libraries that produce or expect simple types like `string | number` and more complex types where the choices are tagged differently than how ReScript does it. See [usage examples](https://github.com/jmagaram/rescript-extras/blob/master/tests/Extras__UnionTests.res). Capabilities:
+The **`Union`** module provides functors to create tagged and untagged discriminated unions of 2, 3, 4, or 5 items. This is useful for interop with JavaScript libraries that produce or expect simple types like `string | number` and more complex types where the choices are tagged differently than how ReScript does it. See [usage examples](tests/Extras__UnionTests.res). Capabilities:
 
 - Discriminate (pattern match) on any programmable criteria, like `typeof`, `instance of`, lightweight shape detection (such as a tag), or parsing with a JSON parsing library.
 - All types can participate in a union.
