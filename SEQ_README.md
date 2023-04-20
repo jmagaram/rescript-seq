@@ -12,9 +12,9 @@ Highlights:
 - All APIs documented; some with code examples
 - Comprehensive test suite
 - Written 100% in ReScript; look at the tests and code to gain deeper understanding of how it works
-- Full suite of functions based on researching the other libraries and languages
+- Full [suite of >90 functions](#functions) based on researching other libraries and languages
 - Ready for your contributions! :two_men_holding_hands:
-- Easily **construct sequences** using `fromArray`, `range`, `unfold`, `cycle`, `repeat` and others.
+- **Build** with `fromArray`, `range`, `unfold`, `cycle`, `repeat` and others.
 - **Transform** sequences with `map`, `filter`, `takeAtMost`, `dropWhile`, `scan`, `tap`, `window`, and others.
 - **Combine** multiple sequences with `zip`, `zip3`, `map2`, `map3`, `sortedMerge`, `interleave` and others.
 - **Calculate** values with `reduce`, `some`, `findMap`, `isSortedBy`, `minBy`, `toArray` and others.
