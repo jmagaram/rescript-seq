@@ -4,22 +4,22 @@ A _sequence_ is a list whose elements are computed only on demand. Sequences are
 
 Sequences are an important and convenient data structure in [F# (Seq module)](https://fsharp.github.io/fsharp-core-docs/reference/fsharp-collections-seqmodule.html) , [OCaml (Seq module)](https://v2.ocaml.org/api/Seq.html), [Rust std::iter](https://doc.rust-lang.org/std/iter/trait.Iterator.html), [`C# IEnumerable<T>`](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1?view=net-8.0), and [Python (itertools)](https://docs.python.org/3/library/itertools.html). There are many libraries that help consume iterables in JavaScript as well.
 
-:boom: This is a comprehensive library for creating and consuming sequences in ReScript.:boom:
+:boom: **This is a comprehensive library for creating and consuming sequences in ReScript.**:boom:
 
 Highlights:
 
-- Data-first for ReScript
-- API documentation
-- Enables elegant, concise code solutions.
+- Enables more elegant and concise solutions to problems than using imperative code and arrays
+- All APIs documented; some with code examples
 - Comprehensive test suite
-- Ready for your contributions!
-- Supports nearly all the [Iterator helpers](https://github.com/tc39/proposal-iterator-helpers) proposal now.
-- Full suite of tools based on researching most of the other libraries and taking what seemed to be the best and most useful
-- Easily construct sequences using `fromArray`, `range`, `unfold`, `cycle`, `repeat` and other methods. In one or two lines you can create fibonacci sequence, enumerate the digits, etc.
-- Manipulate sequences with `map`, `mapi`, `filter`, `takeAtMost`, `dropWhile`, `scan`, `tap`, `pairwise`, `window`, `allPairs` and many more.
-- Combine multiple sequences with `zip`, `zip3`, `map2`, `map3`, `sortedMerge`, `interleave` and others.
-- Calculate values using `reduce`, `some`, `findMap`, `isSortedBy`, `minBy`, `forEach`, `tap`, `toArray`, and many others.
-  Works the same in the browser and in node. See the [examples](#examples) section for more examples.
+- Written 100% in ReScript; look at the tests and code to gain deeper understanding of how it works
+- Full suite of functions based on researching the other libraries and languages
+- Ready for your contributions! :two_men_holding_hands:
+- Easily **construct sequences** using `fromArray`, `range`, `unfold`, `cycle`, `repeat` and others.
+- **Transform** sequences with `map`, `filter`, `takeAtMost`, `dropWhile`, `scan`, `tap`, `window`, and others.
+- **Combine** multiple sequences with `zip`, `zip3`, `map2`, `map3`, `sortedMerge`, `interleave` and others.
+- **Calculate** values with `reduce`, `some`, `findMap`, `isSortedBy`, `minBy`, `toArray` and others.
+
+See the [examples](#examples) section.
 
 ## Install
 
