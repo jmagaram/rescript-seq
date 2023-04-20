@@ -8,7 +8,7 @@ let empty: t<'a>
 let singleton: 'a => t<'a>
 let unfold: ('seed, 'seed => option<('a, 'seed)>) => t<'a>
 let init: (~count: int, (~index: int) => 'a) => t<'a>
-let replicate: (~count: int, ~value: 'a) => t<'a>
+let replicate: (int, 'a) => t<'a>
 let infinite: (unit => 'a) => t<'a>
 let iterate: ('a, 'a => 'a) => t<'a>
 let cycle: t<'a> => t<'a>
@@ -16,7 +16,7 @@ let range: (~start: int, ~end: int) => t<int>
 let fromArray: (~start: int=?, ~end: int=?, array<'a>) => t<'a>
 let fromList: list<'a> => t<'a>
 let fromOption: option<'a> => t<'a>
-let fromString: string => t<string>
+let characters: string => t<string>
 let cons: ('a, t<'a>) => t<'a>
 
 // =========

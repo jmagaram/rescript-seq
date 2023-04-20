@@ -76,9 +76,9 @@ let basicConstructorTests = [
     ~b=[1],
   ),
   seqEqual(
-    ~title="fromString",
+    ~title="characters",
     ~expectation="get letters",
-    ~a=() => "abc"->S.fromString,
+    ~a=() => "abc"->S.characters,
     ~b=["a", "b", "c"],
   ),
   seqEqual(~title="startWith", ~expectation="when empty", ~a=() => S.empty->S.startWith(1), ~b=[1]),
@@ -207,19 +207,19 @@ let flatMapTests = [
   seqEqual(
     ~title="flatMap",
     ~expectation="when map to several items => flatten",
-    ~a=() => oneTwoThree->S.flatMap(i => S.replicate(~count=3, ~value=i)),
+    ~a=() => oneTwoThree->S.flatMap(i => S.replicate(3, i)),
     ~b=[1, 1, 1, 2, 2, 2, 3, 3, 3],
   ),
   seqEqual(
     ~title="flatMap",
     ~expectation="when original is empty => empty",
-    ~a=() => S.empty->S.flatMap(_ => S.replicate(~count=5, ~value="x")),
+    ~a=() => S.empty->S.flatMap(_ => S.replicate(5, "x")),
     ~b=[],
   ),
   seqEqual(
     ~title="flatMap",
     ~expectation="when original is one item",
-    ~a=() => S.singleton(1)->S.flatMap(i => S.replicate(~count=5, ~value=i)),
+    ~a=() => S.singleton(1)->S.flatMap(i => S.replicate(5, i)),
     ~b=[1, 1, 1, 1, 1],
   ),
   seqEqual(
@@ -240,9 +240,7 @@ let flatMapTests = [
     ~title="flatMap",
     ~expectation="a million stack won't overflow",
     ~predicate=() => {
-      S.replicate(~count=1000, ~value=0)
-      ->S.flatMap(_ => S.replicate(~count=1000, ~value=0))
-      ->S.forEach(_ => ())
+      S.replicate(1000, 0)->S.flatMap(_ => S.replicate(1000, 0))->S.forEach(_ => ())
       true
     },
   ),
@@ -334,7 +332,7 @@ let dropTests = [
   seqEqual(
     ~title="drop",
     ~expectation="when drop a million items => no stack overflow",
-    ~a=() => S.concat(S.replicate(~count=999_999, ~value="x"), S.singleton("y"))->S.drop(999_999),
+    ~a=() => S.concat(S.replicate(999_999, "x"), S.singleton("y"))->S.drop(999_999),
     ~b=["y"],
   ),
 ]
@@ -343,7 +341,7 @@ let flattenTests = [
   seqEqual(
     ~title="flatten",
     ~expectation="concatenate each sub-sequence",
-    ~a=() => S.init(~count=3, (~index) => S.replicate(~count=2, ~value=index))->S.flatten,
+    ~a=() => S.init(~count=3, (~index) => S.replicate(2, index))->S.flatten,
     ~b=[0, 0, 1, 1, 2, 2],
   ),
   seqEqual(
@@ -441,7 +439,7 @@ let windowAheadBehindTests = (~title, ~function, ~data) =>
           )}`,
         ~a=() =>
           input
-          ->S.fromString
+          ->S.characters
           ->function(size)
           ->S.map(ss => ss->Js.Array2.joinWith(""))
           ->S.intersperse(",")
@@ -452,10 +450,10 @@ let windowAheadBehindTests = (~title, ~function, ~data) =>
     data->Js.Array2.map(((input, size, expected)) => oneTest(input, size, expected))
   }->Js.Array2.concat([
     willThrow(~title, ~expectation="when size == 0 => throw", ~f=() =>
-      "abc"->S.fromString->function(0)
+      "abc"->S.characters->function(0)
     ),
     willThrow(~title, ~expectation="when size < 0 => throw", ~f=() =>
-      "abc"->S.fromString->function(-1)
+      "abc"->S.characters->function(-1)
     ),
   ])
 
@@ -596,9 +594,10 @@ let fromArrayTests = {
 let replicateTests = makeSeqEqualsTests(
   ~title="replicate",
   [
-    (S.replicate(~count=0, ~value=1), [], ""),
-    (S.replicate(~count=1, ~value=1), [1], ""),
-    (S.replicate(~count=2, ~value=1), [1, 1], ""),
+    (S.replicate(0, "x"), [], ""),
+    (S.replicate(1, "x"), ["x"], "x"),
+    (S.replicate(2, "x"), ["x", "x"], ""),
+    (S.replicate(3, "x"), ["x", "x", "x"], ""),
   ],
 )
 
@@ -944,9 +943,7 @@ let filterTests =
       ~title="filteri",
       ~expectation="when skipping millions => no stack problem",
       ~a=() =>
-        S.replicate(~count=999_999, ~value=1)
-        ->S.concat(2->S.singleton)
-        ->S.filteri((value, _) => value != 1),
+        S.replicate(999_999, 1)->S.concat(2->S.singleton)->S.filteri((value, _) => value != 1),
       ~b=[2],
     ),
   ])
@@ -1092,7 +1089,7 @@ let lengthTests = [
   foldEqual(
     ~title="length",
     ~expectation="millions",
-    ~a=() => S.replicate(~count=999_999, ~value=1)->S.length,
+    ~a=() => S.replicate(999_999, 1)->S.length,
     ~b=999_999,
   ),
 ]
@@ -1111,8 +1108,8 @@ let equalsTests = [
     ~title="equals",
     ~expectation=`${xs},${ys} => ${expected ? "true" : "false"}`,
     ~a=() => {
-      let xs = xs->S.fromString
-      let ys = ys->S.fromString
+      let xs = xs->S.characters
+      let ys = ys->S.characters
       S.equals(xs, ys, (i, j) => i == j)
     },
     ~b=expected,
@@ -1133,8 +1130,8 @@ let compareTests = [
     ~title="compare",
     ~expectation=`${xs},${ys} => ${expected->intToString}`,
     ~a=() => {
-      let xs = xs->S.fromString
-      let ys = ys->S.fromString
+      let xs = xs->S.characters
+      let ys = ys->S.characters
       S.compare(xs, ys, Ex.Cmp.string)
     },
     ~b=expected,
@@ -1424,8 +1421,8 @@ let map2Tests = {
       ~title="map2",
       ~expectation=`${xs},${ys} => ${expected}`,
       ~predicate=() => {
-        let xs = xs->S.fromString
-        let ys = ys->S.fromString
+        let xs = xs->S.characters
+        let ys = ys->S.characters
         let expected = expected == "" ? S.empty : expected->Js.String2.split(",")->S.fromArray
         let actual = S.map2(xs, ys, (x, y) => x ++ y)
         S.equals(expected, actual, (i, j) => i == j)
@@ -1452,9 +1449,9 @@ let map3Tests = {
       ~title="map3",
       ~expectation=`${xs},${ys},${zs} => ${expected}`,
       ~predicate=() => {
-        let xs = xs->S.fromString
-        let ys = ys->S.fromString
-        let zs = zs->S.fromString
+        let xs = xs->S.characters
+        let ys = ys->S.characters
+        let zs = zs->S.characters
         let expected = expected == "" ? S.empty : expected->Js.String2.split(",")->S.fromArray
         let actual = S.map3(xs, ys, zs, (x, y, z) => x ++ y ++ z)
         S.equals(expected, actual, (i, j) => i == j)

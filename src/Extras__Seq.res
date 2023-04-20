@@ -152,7 +152,7 @@ let rec unfold = (seed, f) =>
 
 let init = (~count, f) => unfold(0, i => i < count ? Some(f(~index=i), i + 1) : None)
 
-let replicate = (~count, ~value) => unfold(0, i => i < count ? Some(value, i + 1) : None)
+let replicate = (count, value) => unfold(0, i => i < count ? Some(value, i + 1) : None)
 
 let iterate = (seed, f) => unfold(seed, i => Some(i, f(i)))
 
@@ -186,7 +186,7 @@ let cycleNonEmpty = xx => {
 
 let cycle = xx => xx->mapNext((x, xx') => cons(x, xx')->concat(xx->cycleNonEmpty)->nextNode)
 
-let fromString = s =>
+let characters = s =>
   switch s->Js.String2.length {
   | 0 => empty
   | len => range(~start=0, ~end=len - 1)->map(inx => s->Js.String2.charAt(inx))
@@ -418,7 +418,7 @@ let chunkBySize = (xx, length) => {
   }
   xx
   ->map(i => Some(i))
-  ->concat(replicate(~count=length - 1, ~value=None))
+  ->concat(replicate(length - 1, None))
   ->scani(~zero=[], (~sum, ~val, ~inx) => {
     switch val {
     | None => sum
@@ -631,7 +631,7 @@ let windowAhead = (xx, size) => {
   }
   xx
   ->map(i => Some(i))
-  ->concat(replicate(~count=size - 1, ~value=None))
+  ->concat(replicate(size - 1, None))
   ->scani(~zero=[], (~sum, ~val as i, ~inx) => {
     if inx >= size {
       sum->Js.Array2.shift->ignore
