@@ -7,7 +7,7 @@ exception ArgumentOfOfRange(string)
 let empty: t<'a>
 let singleton: 'a => t<'a>
 let unfold: ('seed, 'seed => option<('a, 'seed)>) => t<'a>
-let init: (~count: int, (~index: int) => 'a) => t<'a>
+let init: (int, int => 'a) => t<'a>
 let replicate: (int, 'a) => t<'a>
 let infinite: (unit => 'a) => t<'a>
 let iterate: ('a, 'a => 'a) => t<'a>

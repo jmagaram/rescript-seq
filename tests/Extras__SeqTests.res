@@ -331,7 +331,7 @@ let flattenTests = [
   seqEqual(
     ~title="flatten",
     ~expectation="concatenate each sub-sequence",
-    ~a=() => S.init(~count=3, (~index) => S.replicate(2, index))->S.flatten,
+    ~a=() => S.init(3, inx => S.replicate(2, inx))->S.flatten,
     ~b=[0, 0, 1, 1, 2, 2],
   ),
   seqEqual(
@@ -684,21 +684,21 @@ let initTests =
   makeSeqEqualsTests(
     ~title="init",
     [
-      (S.init(~count=1, (~index) => index * 2), [0], ""),
-      (S.init(~count=2, (~index) => index * 2), [0, 2], ""),
-      (S.init(~count=3, (~index) => index * 2), [0, 2, 4], ""),
+      (S.init(1, inx => inx * 2), [0], ""),
+      (S.init(2, inx => inx * 2), [0, 2], ""),
+      (S.init(3, inx => inx * 2), [0, 2, 4], ""),
     ],
   )->Js.Array2.concat([
     foldEqual(
       ~title="init",
       ~expectation="tens",
-      ~a=() => S.init(~count=100, (~index) => index)->S.last,
+      ~a=() => S.init(100, inx => inx)->S.last,
       ~b=Some(99),
     ),
     foldEqual(
       ~title="init",
       ~expectation="millions",
-      ~a=() => S.init(~count=1_000_000, (~index) => index)->S.last,
+      ~a=() => S.range(0, 999_999)->S.last,
       ~b=Some(999_999),
     ),
   ])

@@ -150,7 +150,7 @@ let rec unfold = (seed, f) =>
     | Some(x, seed) => Next(x, unfold(seed, f))
     }
 
-let init = (~count, f) => unfold(0, i => i < count ? Some(f(~index=i), i + 1) : None)
+let init = (count, f) => unfold(0, i => i < count ? Some(f(i), i + 1) : None)
 
 let replicate = (count, value) => unfold(0, i => i < count ? Some(value, i + 1) : None)
 
