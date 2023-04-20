@@ -1,7 +1,7 @@
 ## Version 0.22.0
 
-- Allow test filtering by keyword
 - `Trampoline` module to eliminate recursion in functions
+- `Option.map5`
 
 ## Version 0.21.0
 
