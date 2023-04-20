@@ -154,6 +154,8 @@ let init = (count, f) => unfold(0, i => i < count ? Some(f(i), i + 1) : None)
 
 let repeat = (count, value) => unfold(0, i => i < count ? Some(value, i + 1) : None)
 
+let rec repeatInfinite = value => (. ()) => Next(value, repeatInfinite(value))
+
 let repeatWith = (count, value) => unfold(1, i => i <= count ? Some(value(), i + 1) : None)
 
 let iterate = (seed, f) => unfold(seed, i => Some(i, f(i)))

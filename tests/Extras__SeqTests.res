@@ -612,6 +612,15 @@ let repeatWithTests = makeSeqEqualsTests(
   ],
 )
 
+let repeatInfiniteTests = [
+  foldEqual(
+    ~title="repeatInfinite",
+    ~expectation="millions",
+    ~a=() => S.repeatInfinite("x")->S.indexed->S.takeUntil(((_, inx)) => inx == 999_999)->S.last,
+    ~b=Some(("x", 999_999)),
+  ),
+]
+
 let takeAtMostTests = makeSeqEqualsTests(
   ~title="takeAtMost",
   [
@@ -1565,6 +1574,7 @@ let tests =
     rangeTests,
     reduceTests,
     repeatTests,
+    repeatInfiniteTests,
     repeatWithTests,
     scanTests,
     someTests,
