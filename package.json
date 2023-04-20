@@ -1,6 +1,6 @@
 {
   "name": "@jmagaram/rescript-extras",
-  "version": "0.21.0",
+  "version": "0.22.0",
   "module": "",
   "description": "Useful general-purpose utility functions and modules for ReScript projects.",
   "keywords": [
@@ -9,7 +9,7 @@
   "main": "index.js",
   "scripts": {
     "test": "node tests/TestSuite.bs.js",
-    "test:local":  "NODE_ENV=development node tests/TestSuite.bs.js",
+    "test:local": "NODE_ENV=development node tests/TestSuite.bs.js",
     "test:watch": "nodemon --exec \"NODE_ENV=development node\" tests/TestSuite.bs.js",
     "res:build": "rescript build -with-deps",
     "res:dev": "rescript build -with-deps -w",
