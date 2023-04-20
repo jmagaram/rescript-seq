@@ -95,6 +95,9 @@ indexes can optionally be provided.
 */
 let fromArray: (~start: int=?, ~end: int=?, array<'a>) => t<'a>
 
+/**
+`fromList` generates a sequence from a list.
+*/
 let fromList: list<'a> => t<'a>
 
 /**
@@ -111,7 +114,7 @@ None->Seq.fromOption // []
 let fromOption: option<'a> => t<'a>
 
 /**
-`characters(s)` is the sequence of characters in the input string.
+`characters(s)` is the sequence of characters in the string `s`.
 */
 let characters: string => t<string>
 
@@ -146,24 +149,68 @@ end.
 */
 let endWith: (t<'a>, 'a) => t<'a>
 
+/**
+`prepend(xx, yy)` is all items in `yy` followed by all items in `xx`. See
+`concat` for the same functionality but the arguments reversed.
+*/
 let prepend: (t<'a>, t<'a>) => t<'a>
 
+/**
+`concat(xx, yy)` is all items in `xx` followed by all items in `yy`. See
+`prepend` for the same functionality but the arguments reversed.
+*/
 let concat: (t<'a>, t<'a>) => t<'a>
 
+/**
+`flatten` creates a sequence by concatenating every item in each sub-sequence.
+Analogous to the JavaScript `Array.flat` with a depth of 1.
+*/
 let flatten: t<t<'a>> => t<'a>
 
+/**
+`flatMap(source, mapper)` creates a sequence by calling the `mapper` callback on
+each item in the source sequence and then concatenating every item produced.
+Also known as `bind`. Analogous to `Array.flatMap` in JavaScript.
+*/
 let flatMap: (t<'a>, 'a => t<'b>) => t<'b>
 
+/**
+`map(source, mapper)` is the sequence that results by calling the `mapper` callback on
+each item in `source`.
+*/
 let map: (t<'a>, 'a => 'b) => t<'b>
 
+/**
+`map(source, mapper)` is the sequence that results by calling the `mapper`
+callback on each item in `source`. The callback receives the zero-based index of
+each item.
+*/
 let mapi: (t<'a>, ('a, int) => 'b) => t<'b>
 
+/**
+`indexed` builds a new sequence whose elements are the corresponding elements of
+the input sequence paired with the integer index (from 0) of each element.
+*/
 let indexed: t<'a> => t<('a, int)>
 
+/**
+`filter` builds a new sequence containing only the elements of the source for
+which the given predicate returns "true". Similar to `Array.filter` in
+JavaScript.
+*/
 let filter: (t<'a>, 'a => bool) => t<'a>
 
+/**
+`filteri` builds a new sequence containing only the elements of the source for
+which the given predicate returns "true". The callback receives the zero-based
+index of each item.
+*/
 let filteri: (t<'a>, ('a, int) => bool) => t<'a>
 
+/**
+`filterMap(source, mapper)` builds a new sequence containing only the elements of `source` for
+which the `mapper` callback returns `Some`.
+*/
 let filterMap: (t<'a>, 'a => option<'b>) => t<'b>
 
 /**
@@ -314,15 +361,70 @@ let isEmpty: t<'a> => bool
 let isSortedBy: (t<'a>, ('a, 'a) => int) => bool
 let equals: (t<'a>, t<'a>, ('a, 'a) => bool) => bool
 let compare: (t<'a>, t<'a>, ('a, 'a) => int) => int
+
+/**
+`head` is the first item in the sequence. Returns `None` if the sequence is
+empty.
+*/
 let head: t<'a> => option<'a>
+
+/**
+`tail` is the sequence that starts after the head (first item). Equivalent to
+`drop` with `1`.
+*/
 let tail: t<'a> => t<'a>
+
+/**
+`headTail` deconstructs the sequence into its head (first item) and the tail
+(the rest, possibly empty). If the sequence is empty returns `None`.
+*/
 let headTail: t<'a> => option<('a, t<'a>)>
+
+/**
+`minBy(seq, compare)` eagerly consumes the entire sequence and returns the
+minimum item according to the comparator function. Returns `None` if the
+sequence is empty.
+*/
 let minBy: (t<'a>, ('a, 'a) => int) => option<'a>
+
+/**
+`maxBy(seq, compare)` eagerly consumes the entire sequence and returns the
+maximum item according to the comparator function. Returns `None` if the
+sequence is empty.
+*/
 let maxBy: (t<'a>, ('a, 'a) => int) => option<'a>
+
+/**
+`last` eagerly consumes the entire sequence and returns a `Some` for the last
+item in it, or `None` if the sequence is empty.
+*/
 let last: t<'a> => option<'a>
+
+/**
+`toArray` eagerly consumes the entire sequence and converts it to an array.
+*/
 let toArray: t<'a> => array<'a>
+
+/**
+`joinString` concatenates every string in the input sequence. Empty sequences
+return the empty string. See `intersperse` to insert a separator character
+between pairs of strings.
+*/
 let joinString: t<string> => string
+
+/**
+`exactlyOne` checks if the sequence has exactly one item in it, and if so
+returns it as `Some`.
+*/
 let exactlyOne: t<'a> => option<'a>
+
+/**
+`toOption` checks if the sequence is empty and if so returns `None`. Otherwise
+returns a `Some` non-empty sequence.
+
+**Note:** To check if the sequence is empty, this function eagerly consumes the
+first item and then "puts it back".
+*/
 let toOption: t<'a> => option<t<'a>>
 
 /**
@@ -333,14 +435,14 @@ validation stops when the first `Error` is encountered.
 let allOk: t<result<'ok, 'err>> => result<t<'ok>, 'err>
 
 /**
-`allSome` returns a `Some` sequence (possibly empty) if all input values were
-`Some`. Otherwise returns `None.`
+`allSome` returns a `Some` sequence (possibly empty), if all input
+values were `Some`. Otherwise returns `None.`
 */
 let allSome: t<option<'a>> => option<t<'a>>
 
 /**
 `consume` eagerly iterates through every item in the sequence. This is only
 useful if side-effects are performed via `tap` or other functions in the
-pipeline.
+pipeline. Equivalent to `forEach` where the supplied function does nothing.
 */
 let consume: t<'a> => unit
