@@ -1520,6 +1520,30 @@ let orElseTests = makeSeqEqualsTests(
   ],
 )
 
+let sampleFibonacci = {
+  let fib = Extras__SeqSamples.fibonacci
+  makeSeqEqualsTests(
+    ~title="sampleFibonacci",
+    [(fib()->S.takeAtMost(12), [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89], "")],
+  )
+}
+
+let sampleZipAll = {
+  let z = Extras__SeqSamples.zipAll
+  let compute = (xx, yy) => z(xx->S.fromArray, yy->S.fromArray)
+  makeSeqEqualsTests(
+    ~title="sampleZipAll",
+    [
+      (
+        compute([1, 2], ["x", "y", "z"]),
+        [(Some(1), Some("x")), (Some(2), Some("y")), (None, Some("z"))],
+        "",
+      ),
+      (compute([], ["x", "y", "z"]), [(None, Some("x")), (None, Some("y")), (None, Some("z"))], ""),
+    ],
+  )
+}
+
 let tests =
   [
     allOkTests,
@@ -1576,6 +1600,8 @@ let tests =
     reduceTests,
     repeatTests,
     repeatWithTests,
+    sampleFibonacci,
+    sampleZipAll,
     scanTests,
     someTests,
     sortedMergeTests,
