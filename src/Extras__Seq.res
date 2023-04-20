@@ -156,7 +156,7 @@ let replicate = (count, value) => unfold(0, i => i < count ? Some(value, i + 1) 
 
 let iterate = (seed, f) => unfold(seed, i => Some(i, f(i)))
 
-let range = (~start, ~end) => {
+let range = (start, end) => {
   start <= end
     ? unfold(start, i => i <= end ? Some(i, i + 1) : None)
     : unfold(start, i => i >= end ? Some(i, i - 1) : None)
@@ -189,7 +189,7 @@ let cycle = xx => xx->mapNext((x, xx') => cons(x, xx')->concat(xx->cycleNonEmpty
 let characters = s =>
   switch s->Js.String2.length {
   | 0 => empty
-  | len => range(~start=0, ~end=len - 1)->map(inx => s->Js.String2.charAt(inx))
+  | len => range(0, len - 1)->map(inx => s->Js.String2.charAt(inx))
   }
 
 let fromArray = (~start=?, ~end=?, xx: array<'a>) => {
@@ -215,7 +215,7 @@ let fromArray = (~start=?, ~end=?, xx: array<'a>) => {
           `The end index ${start->Belt.Int.toString} is outside the array bounds.`,
         )->raise
       }
-      range(~start, ~end)->map(inx => xx->Js.Array2.unsafe_get(inx))
+      range(start, end)->map(inx => xx->Js.Array2.unsafe_get(inx))
     }
   }
 }

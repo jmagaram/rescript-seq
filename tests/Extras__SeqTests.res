@@ -60,7 +60,7 @@ let basicConstructorTests = [
   seqEqual(
     ~title="cons",
     ~expectation="when a + bcd => abcd",
-    ~a=() => S.cons(1, S.range(~start=2, ~end=4)),
+    ~a=() => S.cons(1, S.range(2, 4)),
     ~b=[1, 2, 3, 4],
   ),
   seqEqual(
@@ -156,24 +156,14 @@ let allPairsTests = makeSeqEqualsTests(
 )
 
 let rangeTests = [
-  seqEqual(
-    ~title="range",
-    ~expectation="can count up",
-    ~a=() => S.range(~start=3, ~end=7),
-    ~b=[3, 4, 5, 6, 7],
-  ),
+  seqEqual(~title="range", ~expectation="can count up", ~a=() => S.range(3, 7), ~b=[3, 4, 5, 6, 7]),
   seqEqual(
     ~title="range",
     ~expectation="can count down",
-    ~a=() => S.range(~start=7, ~end=3),
+    ~a=() => S.range(7, 3),
     ~b=[7, 6, 5, 4, 3],
   ),
-  seqEqual(
-    ~title="range",
-    ~expectation="can have single value",
-    ~a=() => S.range(~start=3, ~end=3),
-    ~b=[3],
-  ),
+  seqEqual(~title="range", ~expectation="can have single value", ~a=() => S.range(3, 3), ~b=[3]),
 ]
 
 let concatTests = [
@@ -619,7 +609,7 @@ let takeAtMostTests = makeSeqEqualsTests(
   foldEqual(
     ~title="takeAtMost",
     ~expectation="millions",
-    ~a=() => S.range(~start=1, ~end=999_999)->S.last,
+    ~a=() => S.range(1, 999_999)->S.last,
     ~b=Some(999_999),
   ),
   T.make(
@@ -726,7 +716,7 @@ let chunkBySizeTests = {
       (oneTwoThree->process(3), ["123"], ""),
       (oneTwoThree->process(4), ["123"], "millions"),
       (
-        S.range(~start=0, ~end=9)
+        S.range(0, 9)
         ->S.cycle
         ->S.takeAtMost(1_000_000)
         ->S.chunkBySize(10)
@@ -762,7 +752,7 @@ let scanTests = {
       (S.singleton(1)->scanConcat, ["0", "01"], ""),
       (S.empty->scanConcat, ["0"], "always includes the zero"),
       (
-        S.range(~start=1, ~end=999_999)
+        S.range(1, 999_999)
         ->S.scan(-1, (_, i) => i)
         ->S.map(intToString)
         ->S.last
@@ -790,7 +780,7 @@ let takeUntilTests = makeSeqEqualsTests(
     (oneToFive->S.takeUntil(i => i == 5), [1, 2, 3, 4, 5], ""),
     ([1, 2, 2, 2, 3]->S.fromArray->S.takeUntil(i => i == 2), [1, 2], ""),
     (
-      S.range(~start=1, ~end=99)
+      S.range(1, 99)
       ->S.takeUntil(i => i == 99)
       ->S.last
       ->Option.map(S.singleton)
@@ -799,7 +789,7 @@ let takeUntilTests = makeSeqEqualsTests(
       "tens",
     ),
     (
-      S.range(~start=1, ~end=999_999)
+      S.range(1, 999_999)
       ->S.takeUntil(i => i == 999_999)
       ->S.last
       ->Option.map(S.singleton)
@@ -857,9 +847,9 @@ let dropWhileTests =
     (oneToFive, i => i < 3, [3, 4, 5], ""),
     (oneToFive, i => i <= 5, [], ""),
     (oneToFive, i => i <= 1, [2, 3, 4, 5], ""),
-    (S.range(~start=1, ~end=99), i => i != 99, [99], "tens"),
-    (S.range(~start=1, ~end=9_999), i => i != 9_999, [9_999], "thousands"),
-    (S.range(~start=1, ~end=999_999), i => i != 999_999, [999_999], "millions"),
+    (S.range(1, 99), i => i != 99, [99], "tens"),
+    (S.range(1, 9_999), i => i != 9_999, [9_999], "thousands"),
+    (S.range(1, 999_999), i => i != 999_999, [999_999], "millions"),
   ]->Js.Array2.mapi(((source, predicate, result, note), inx) =>
     seqEqual(
       ~title="dropWhile",
@@ -900,7 +890,7 @@ let filterMapTests =
     (oneToFive, i => i == 3 || i == 5 ? Some(i) : None, [3, 5], ""),
     (oneToFive, i => i == 5 ? Some(99) : None, [99], ""),
     (oneToFive, i => i == 1 || i == 3 ? Some(i * 2) : None, [2, 6], ""),
-    (S.range(~start=1, ~end=999_999), i => i == 999_999 ? Some(-i) : None, [-999_999], "millions"),
+    (S.range(1, 999_999), i => i == 999_999 ? Some(-i) : None, [-999_999], "millions"),
   ]->Js.Array2.mapi(((source, f, result, note), inx) =>
     seqEqual(
       ~title="filterMap",
@@ -922,7 +912,7 @@ let filterTests =
     (oneToFive, i => i == 3 || i == 5, [3, 5], ""),
     (oneToFive, i => i == 5, [5], ""),
     (oneToFive, i => i == 1 || i == 3, [1, 3], ""),
-    (S.range(~start=1, ~end=999_999), i => i == 999_999, [999_999], "millions"),
+    (S.range(1, 999_999), i => i == 999_999, [999_999], "millions"),
   ]
   ->Js.Array2.mapi(((source, predicate, result, note), inx) =>
     seqEqual(
@@ -960,7 +950,7 @@ let dropUntilTests =
     (oneToFive, i => i == 3, [3, 4, 5], ""),
     (oneToFive, i => i == 5, [5], ""),
     (oneToFive, i => i == 1, [1, 2, 3, 4, 5], ""),
-    (S.range(~start=1, ~end=999_999), i => i == 999_999, [999_999], "millions"),
+    (S.range(1, 999_999), i => i == 999_999, [999_999], "millions"),
   ]->Js.Array2.mapi(((source, predicate, result, note), inx) =>
     seqEqual(
       ~title="dropUntil",
@@ -1005,7 +995,7 @@ let someTests = [
   foldEqual(
     ~title="some",
     ~expectation="millions",
-    ~a=() => S.range(~start=1, ~end=999_999)->S.some(i => i === 999_999),
+    ~a=() => S.range(1, 999_999)->S.some(i => i === 999_999),
     ~b=true,
   ),
 ]
@@ -1032,7 +1022,7 @@ let everyTests = [
   foldEqual(
     ~title="every",
     ~expectation="millions",
-    ~a=() => S.range(~start=1, ~end=999_999)->S.everyOrEmpty(i => i >= 1 && i <= 999_999),
+    ~a=() => S.range(1, 999_999)->S.everyOrEmpty(i => i >= 1 && i <= 999_999),
     ~b=true,
   ),
 ]
@@ -1059,7 +1049,7 @@ let findMapTests = [
   foldEqual(
     ~title="findMap",
     ~expectation="millions",
-    ~a=() => S.range(~start=1, ~end=999_999)->S.findMap(i => i == 999_999 ? Some("x") : None),
+    ~a=() => S.range(1, 999_999)->S.findMap(i => i == 999_999 ? Some("x") : None),
     ~b=Some("x"),
   ),
 ]
@@ -1293,7 +1283,7 @@ let toOptionTests = [
 let reduceTests = {
   let add = (total, x) => total + x
   let lastSeen = (_: option<'a>, x: 'a) => Some(x)
-  let oneUpTo = n => S.range(~start=1, ~end=n)
+  let oneUpTo = n => S.range(1, n)
   [
     (() => S.empty->S.reduce(-1, add), -1),
     (() => S.singleton(99)->S.reduce(1, add), 100),
@@ -1310,10 +1300,10 @@ let lastTests = {
   [
     (S.empty, None),
     (1->S.singleton, Some(1)),
-    (S.range(~start=1, ~end=9), Some(9)),
-    (S.range(~start=1, ~end=99), Some(99)),
-    (S.range(~start=1, ~end=999), Some(999)),
-    (S.range(~start=1, ~end=999999), Some(999999)),
+    (S.range(1, 9), Some(9)),
+    (S.range(1, 99), Some(99)),
+    (S.range(1, 999), Some(999)),
+    (S.range(1, 999999), Some(999999)),
   ]->Js.Array2.mapi(((xs, result), index) =>
     foldEqual(
       ~title="last",
@@ -1401,8 +1391,8 @@ let findTests = [
   (() => [1, 2, 3]->S.fromArray, i => i == 2, Some(2), "when many and is middle"),
   (() => [1, 2, 3]->S.fromArray, i => i == 3, Some(3), "when many and is last"),
   (() => [1, 2, 3]->S.fromArray, _ => false, None, "when many and predicate false"),
-  (() => S.range(~start=1, ~end=999_999), i => i == 999_999, Some(999_999), "when million"),
-  (() => S.range(~start=1, ~end=999_999), _ => false, None, "when million"),
+  (() => S.range(1, 999_999), i => i == 999_999, Some(999_999), "when million"),
+  (() => S.range(1, 999_999), _ => false, None, "when million"),
 ]->Js.Array2.mapi(((source, predicate, result, note), index) =>
   T.make(
     ~category="Seq",
@@ -1479,7 +1469,7 @@ let consumeTests = [
     ~expectation="enumerates sequence for side effects",
     ~predicate=() => {
       let lastSeen = ref(0)
-      S.range(~start=0, ~end=999_999)->S.tap(i => lastSeen := i)->S.consume
+      S.range(0, 999_999)->S.tap(i => lastSeen := i)->S.consume
       lastSeen.contents == 999_999
     },
   ),

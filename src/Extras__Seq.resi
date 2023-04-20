@@ -12,7 +12,7 @@ let replicate: (int, 'a) => t<'a>
 let infinite: (unit => 'a) => t<'a>
 let iterate: ('a, 'a => 'a) => t<'a>
 let cycle: t<'a> => t<'a>
-let range: (~start: int, ~end: int) => t<int>
+let range: (int, int) => t<int>
 let fromArray: (~start: int=?, ~end: int=?, array<'a>) => t<'a>
 let fromList: list<'a> => t<'a>
 let fromOption: option<'a> => t<'a>
