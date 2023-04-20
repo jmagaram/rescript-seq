@@ -936,6 +936,20 @@ let filterMapTests =
     )
   )
 
+let filterMapiTests = makeSeqEqualsTests(
+  ~title="filterMapi",
+  [
+    (oneTwoThree->S.filterMapi((num, inx) => num == 2 && inx == 1 ? Some(num) : None), [2], ""),
+    (oneTwoThree->S.filterMapi((_, inx) => Some(inx)), [0, 1, 2], ""),
+    (S.empty->S.filterMapi((_, inx) => Some(inx)), [], ""),
+    (
+      S.range(1, 999_999)->S.filterMapi((num, inx) => num == 999_999 ? Some(inx) : None),
+      [999_998],
+      "",
+    ),
+  ],
+)
+
 let filterTests =
   [
     (S.empty, falseAlways, [], ""),
@@ -1561,6 +1575,7 @@ let tests =
     equalsTests,
     everyTests,
     filterMapTests,
+    filterMapiTests,
     filterOkTests,
     filterSomeTests,
     filterTests,

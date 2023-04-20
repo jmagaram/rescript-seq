@@ -313,6 +313,9 @@ let rec takeUntil = (xx, f) =>
     }
   })
 
+let filterMapi = (xx, f) =>
+  xx->indexed->map(((x, inx)) => f(x, inx))->filter(Option.isSome)->map(Option.getUnsafe)
+
 let filterMap = (xx, f) => xx->map(f)->filter(Option.isSome)->map(Option.getUnsafe)
 
 let filterSome = xx => xx->filterMap(x => x)
