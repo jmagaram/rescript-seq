@@ -5,6 +5,9 @@ type t<'a>
 
 exception ArgumentOfOfRange(string)
 
+/**
+`empty` is a sequence with nothing in it; analogous to an empty array.
+*/
 let empty: t<'a>
 
 /**
@@ -163,10 +166,22 @@ let filteri: (t<'a>, ('a, int) => bool) => t<'a>
 
 let filterMap: (t<'a>, 'a => option<'b>) => t<'b>
 
+/**
+`filterSome` is the sequence of all the `Some` items in the source sequence.
+`None` items are ignored.
+*/
 let filterSome: t<option<'a>> => t<'a>
 
+/**
+`filterOk` is the sequence of all the `Ok` items in the source sequence. `Error`
+items are ignored.
+*/
 let filterOk: t<result<'a, 'b>> => t<'a>
 
+/**
+`takeAtMost(n)` is the sequence of the first `n` items in the source; remaining
+items are discarded.
+*/
 let takeAtMost: (t<'a>, int) => t<'a>
 
 /**
@@ -183,6 +198,10 @@ beginning of xx up to **and including** the first item where `predicate` is
 */
 let takeUntil: (t<'a>, 'a => bool) => t<'a>
 
+/**
+`drop(xx, count)` is the sequence `xx` that begins after the first `count` items
+are discarded.
+*/
 let drop: (t<'a>, int) => t<'a>
 
 /**
