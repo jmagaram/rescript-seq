@@ -154,7 +154,7 @@ let init = (count, f) => unfold(0, i => i < count ? Some(f(i), i + 1) : None)
 
 let repeat = (count, value) => unfold(0, i => i < count ? Some(value, i + 1) : None)
 
-let rec repeatInfinite = value => (. ()) => Next(value, repeatInfinite(value))
+let rec forever = value => (. ()) => Next(value, forever(value))
 
 let repeatWith = (count, value) => unfold(1, i => i <= count ? Some(value(), i + 1) : None)
 
@@ -168,7 +168,7 @@ let range = (start, end) => {
 
 let rangeMap = (start, end, f) => range(start, end)->map(f)
 
-let rec infinite = f => (. ()) => Next(f(), infinite(f))
+let rec foreverWith = f => (. ()) => Next(f(), foreverWith(f))
 
 let rec tap = (xx, f) =>
   (. ()) =>

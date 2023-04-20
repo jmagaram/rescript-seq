@@ -45,21 +45,21 @@ let init: (int, int => 'a) => t<'a>
 let repeat: (int, 'a) => t<'a>
 
 /**
-`repeatInfinite(item)` is the sequence of `item` repeated forever.
-*/
-let repeatInfinite: 'a => t<'a>
-
-/**
 `repeatWith(count, f)` is the sequence of length `count` where `f()` is called
 to generate every item.
 */
 let repeatWith: (int, unit => 'a) => t<'a>
 
 /**
-`infinite(f)` creates an infinite sequence comprised of calling the function `f`
-for each element.
+`forever(item)` is the sequence of `item` repeated forever.
 */
-let infinite: (unit => 'a) => t<'a>
+let forever: 'a => t<'a>
+
+/**
+`foreverWith(f)` creates an infinite sequence comprised of calling the function
+`f` each time an item is generated.
+*/
+let foreverWith: (unit => 'a) => t<'a>
 
 /**
 `iterate(seed, f)` creates an infinite sequence starting with `seed` and

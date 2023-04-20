@@ -110,7 +110,7 @@ let cycleTests = [
   seqEqual(
     ~title="cycle",
     ~expectation="when infinite => can still cycle",
-    ~a=() => S.infinite(() => 1)->S.cycle->S.takeAtMost(5),
+    ~a=() => S.forever(1)->S.cycle->S.takeAtMost(5),
     ~b=[1, 1, 1, 1, 1],
   ),
   seqEqual(
@@ -119,7 +119,7 @@ let cycleTests = [
     ~a=() => {
       let generated = []
       let items =
-        S.infinite(() => {
+        S.foreverWith(() => {
           let r = Js.Math.random()
           generated->Js.Array2.push(r)->ignore
           r
@@ -348,7 +348,7 @@ let flattenTests = [
   seqEqual(
     ~title="flatten",
     ~expectation="concatenate each sub-sequence",
-    ~a=() => S.infinite(() => S.empty)->S.takeAtMost(5)->S.flatten,
+    ~a=() => S.forever(S.empty)->S.takeAtMost(5)->S.flatten,
     ~b=[],
   ),
 ]
@@ -612,11 +612,11 @@ let repeatWithTests = makeSeqEqualsTests(
   ],
 )
 
-let repeatInfiniteTests = [
+let foreverTests = [
   foldEqual(
     ~title="repeatInfinite",
     ~expectation="millions",
-    ~a=() => S.repeatInfinite("x")->S.indexed->S.takeUntil(((_, inx)) => inx == 999_999)->S.last,
+    ~a=() => S.forever("x")->S.indexed->S.takeUntil(((_, inx)) => inx == 999_999)->S.last,
     ~b=Some(("x", 999_999)),
   ),
 ]
@@ -674,16 +674,16 @@ let takeAtMostTests = makeSeqEqualsTests(
   ),
 ])
 
-let infiniteTests = [
+let foreverWithTests = [
   seqEqual(
-    ~title="infinite",
+    ~title="foreverWith",
     ~expectation="values are generated",
-    ~a=() => S.infinite(() => 1)->S.takeAtMost(5),
+    ~a=() => S.foreverWith(() => 1)->S.takeAtMost(5),
     ~b=[1, 1, 1, 1, 1],
   ),
-  T.make(~category="Seq", ~title="infinite", ~expectation="millions", ~predicate=() => {
+  T.make(~category="Seq", ~title="foreverWith", ~expectation="millions", ~predicate=() => {
     let callCount = ref(0)
-    S.infinite(() => {
+    S.foreverWith(() => {
       callCount := callCount.contents + 1
       callCount.contents
     })
@@ -1396,7 +1396,7 @@ let memoizeTests = [
     ~title="cache",
     ~expectation="calculations only done once",
     ~predicate=() => {
-      let randoms = S.infinite(() => Js.Math.random())->S.takeAtMost(4)->S.cache
+      let randoms = S.foreverWith(() => Js.Math.random())->S.takeAtMost(4)->S.cache
       let nums1 = randoms->S.toArray
       let nums2 = randoms->S.toArray
       let nums3 = randoms->S.toArray
@@ -1406,9 +1406,9 @@ let memoizeTests = [
   T.make(
     ~category="Seq",
     ~title="cache",
-    ~expectation="all lazy; can cache infinite",
+    ~expectation="all lazy; can cache foreverWith",
     ~predicate=() => {
-      let randoms = S.infinite(() => Js.Math.random())->S.cache->S.takeAtMost(4)
+      let randoms = S.foreverWith(() => Js.Math.random())->S.cache->S.takeAtMost(4)
       let nums1 = randoms->S.toArray
       let nums2 = randoms->S.toArray
       let nums3 = randoms->S.toArray
@@ -1552,7 +1552,8 @@ let tests =
     headTailTests,
     headTests,
     indexedTests,
-    infiniteTests,
+    foreverTests,
+    foreverWithTests,
     initTests,
     interleaveTests,
     intersperseTests,
@@ -1574,7 +1575,6 @@ let tests =
     rangeTests,
     reduceTests,
     repeatTests,
-    repeatInfiniteTests,
     repeatWithTests,
     scanTests,
     someTests,
