@@ -119,8 +119,8 @@ let fromOption: option<'a> => t<'a>
 let characters: string => t<string>
 
 /**
-`cons(x, xx)` constructs the sequence that begins with the element `x` 
-followed by the sequence `xx`.
+`cons(x, xx)` constructs the sequence that begins with the element `x` followed
+by the sequence `xx`. This is the same as `startsWith` but the arguments are reversed.
 
 ## Examples
 
@@ -222,13 +222,13 @@ let filterMapi: (t<'a>, ('a, int) => option<'b>) => t<'b>
 
 /**
 `filterSome` is the sequence of all the `Some` items in the source sequence.
-`None` items are ignored.
+`None` items are discarded.
 */
 let filterSome: t<option<'a>> => t<'a>
 
 /**
 `filterOk` is the sequence of all the `Ok` items in the source sequence. `Error`
-items are ignored.
+items are discarded.
 */
 let filterOk: t<result<'a, 'b>> => t<'a>
 
@@ -239,44 +239,52 @@ items are discarded.
 let takeAtMost: (t<'a>, int) => t<'a>
 
 /**
-`takeWhile(xx, predicate)` is the sequence that includes all items from the
-beginning of xx up to **but not including** the item where `predicate` is
+`takeWhile(source, predicate)` is the sequence that includes all items from the
+beginning of `source` up to **but not including** the item where `predicate` is
 `false`.
 */
 let takeWhile: (t<'a>, 'a => bool) => t<'a>
 
 /**
-`takeUntil(xx, predicate)` is the sequence that includes all items from the
-beginning of xx up to **and including** the first item where `predicate` is
+`takeUntil(source, predicate)` is the sequence that includes all items from the
+beginning of `source` up to **and including** the first item where `predicate` is
 `false`.
 */
 let takeUntil: (t<'a>, 'a => bool) => t<'a>
 
 /**
-`drop(xx, count)` is the sequence `xx` that begins after the first `count` items
-are discarded.
+`drop(source, count)` is the sequence that begins after the first `count` items
+are discarded from `source`.
 */
 let drop: (t<'a>, int) => t<'a>
 
 /**
-`dropWhile(xx, predicate)` is the sequence that skips items from the
-beginning of xx and **starts** at the first item where predicate is `false`.
+`dropWhile(source, predicate)` is the sequence that skips items from the
+beginning of `source` and **starts** at the first item where predicate is
+`false`. See `dropUntil` to include the last `true` item.
 */
 let dropWhile: (t<'a>, 'a => bool) => t<'a>
 
 /**
-`dropUntil(xx, predicate)` is the sequence that skips items from the
-beginning of xx and **starts** at the first item where predicate is `true`.
+`dropUntil(source, predicate)` is the sequence that skips items from the
+beginning of `source` and **starts** at the first item where predicate is
+`true`. See `dropWhile` to exclude the first `true` item.
 */
 let dropUntil: (t<'a>, 'a => bool) => t<'a>
 
 /**
-`scan` is conceptually related to `reduce`. However instead of performing an
-eager evaluation and returning the final accumulator, it returns a sequence of
-accumulators (partial sums).
+`scan(source, zero, accumulator)` is conceptually related to `reduce`. However
+instead of performing an eager evaluation and returning the final accumulator,
+it returns a sequence of accumulators (partial sums).
 */
 let scan: (t<'a>, 'b, ('b, 'a) => 'b) => t<'b>
 
+/**
+`scan(source, zero, accumulator)` is conceptually related to `reduce`. However
+instead of performing an eager evaluation and returning the final accumulator,
+it returns a sequence of accumulators (partial sums). The callback receives the
+zero-based index of each item.
+*/
 let scani: (t<'a>, ~zero: 'b, (~sum: 'b, ~val: 'a, ~inx: int) => 'b) => t<'b>
 
 /**
@@ -294,79 +302,251 @@ without modification. This is equivalent to `map` with the identity function.
 */
 let tap: (t<'a>, 'a => unit) => t<'a>
 
+/**
+`chunkBySize(source, size)` divides the input sequence into non-overlapping
+arrays with at most `size` items in each. The final chunk might have fewer than
+`size` items.
+*/
 let chunkBySize: (t<'a>, int) => t<array<'a>>
 
 /**
 `pairwise` is the sequence of each element and its predecessor, with the
 exception of the first element that is only returned as the predecessor of the
-second. Returns the empty sequence if the input sequence only has a single item.
+second. Returns the empty sequence if the source only has a single item.
 */
 let pairwise: t<'a> => t<('a, 'a)>
 
 /**
-`window(size)` returns a sequence yielding sliding windows of the specified size
-containing elements drawn from the input sequence. Each window is returned as a
-**shared** array. If the `size` is longer than the input sequence, no windows
-are returned.
+`window(source, size)` returns a sequence of sliding overlapping windows of the
+specified size containing elements drawn from `source`. If `size` is longer than
+`source`, no windows are returned. Each window is returned as a separate, fresh
+array.
 */
 let window: (t<'a>, int) => t<array<'a>>
 
+/**
+`windowBehind(source, size)` is useful for performing computations on each item
+in a sequence and some of its predecessors. This function returns a sequence of
+sliding overlapping windows of items drawn from `source` containing at most
+`size` items. Each item in `source` is the **last** item in each window and is
+preceded by at most `size-1` items.
+
+**Note:** Each window is returned as a shared array. Use `map` to copy each
+array to its own instance if necessary.
+*/
 let windowBehind: (t<'a>, int) => t<array<'a>>
+
+/**
+`windowAhead(source, size)` is useful for performing computations on each item
+in a sequence and some of the items that follow it. This function returns a sequence of
+sliding overlapping windows of items drawn from `source` containing at most
+`size` items. Each item in `source` is the **first** item in each window and is
+followed by at most `size-1` items.
+
+**Note:** Each window is returned as a shared array. Use `map` to copy each
+array to its own instance if necessary.
+*/
 let windowAhead: (t<'a>, int) => t<array<'a>>
 
 /**
-`allPairs(xx,yy)` is the sequence that contains all pairings of items from the
-first and second sequences.
+`allPairs(seq1, seq2)` contains all pairings of items from the first and second
+sequences.
 */
 let allPairs: (t<'a>, t<'b>) => t<('a, 'b)>
 
 /**
 `intersperse(separator)` is the sequence formed by inserting `separator` between
 each pair of items in the input sequence. If the input sequence is empty or has
-a single value it is not changed in any way.
+a single value it is not modified. See `intersperseWith` if the separator needs
+to be computed or might be different each time it is used.
 */
 let intersperse: (t<'a>, 'a) => t<'a>
 
+/**
+`intersperseWith(separator)` is the sequence formed by inserting a computed
+`separator` between each pair of items in the input sequence. If the input
+sequence is empty or has a single value it is not modified. See `intersperse` if
+the separator is a constant value.
+*/
 let intersperseWith: (t<'a>, unit => 'a) => t<'a>
 
 /**
-`orElse(xx,yy)` is the sequence `xx` unless it is empty, in which case `yy` is
-substituted.
+`orElse(source, otherwise)` is the sequence `source` unless it is empty, in
+which case `otherwise` is substituted.
 */
 let orElse: (t<'a>, t<'a>) => t<'a>
 
+/**
+`map2(seq1, seq2, mapper)` is the sequence formed by applying the `mapper`
+function to corresponding items from the source sequences. If one sequence ends
+before any of the others, the remaining elements in the longer sequences are
+ignored.
+*/
 let map2: (t<'a>, t<'b>, ('a, 'b) => 'c) => t<'c>
+
+/**
+`map3(seq1, seq2, seq3, mapper)` is the sequence formed by applying the `mapper`
+function to corresponding items from the source sequences. If one sequence ends
+before any of the others, the remaining elements in the longer sequences are
+ignored.
+*/
 let map3: (t<'a>, t<'b>, t<'c>, ('a, 'b, 'c) => 'd) => t<'d>
+
+/**
+`map4(seq1, seq2, seq3, seq4, mapper)` is the sequence formed by applying the
+`mapper` function to corresponding items from the source sequences. If one
+sequence ends before any of the others, the remaining elements in the longer
+sequences are ignored.
+*/
 let map4: (t<'a>, t<'b>, t<'c>, t<'d>, ('a, 'b, 'c, 'd) => 'e) => t<'e>
+
+/**
+`map5(seq1, seq2, seq3, seq4, seq5, mapper)` is the sequence formed by applying
+the `mapper` function to corresponding items from the source sequences. If one
+sequence ends before any of the others, the remaining elements in the longer
+sequences are ignored.
+*/
 let map5: (t<'a>, t<'b>, t<'c>, t<'d>, t<'e>, ('a, 'b, 'c, 'd, 'e) => 'f) => t<'f>
 
+/**
+`zip(seq1, seq2, mapper)` is the sequence formed by combining corresponding
+items from the source sequences into a tuple. If one sequence ends before any of
+the others, the remaining elements in the longer sequences are ignored.
+*/
 let zip: (t<'a>, t<'b>) => t<('a, 'b)>
+
+/**
+`zip3(seq1, seq2, seq3, mapper)` is the sequence formed by combining corresponding
+items from the source sequences into a tuple. If one sequence ends before any of
+the others, the remaining elements in the longer sequences are ignored.
+*/
 let zip3: (t<'a>, t<'b>, t<'c>) => t<('a, 'b, 'c)>
+
+/**
+`zip4(seq1, seq2, seq3, seq4, mapper)` is the sequence formed by combining
+corresponding items from the source sequences into a tuple. If one sequence ends
+before any of the others, the remaining elements in the longer sequences are
+ignored.
+*/
 let zip4: (t<'a>, t<'b>, t<'c>, t<'d>) => t<('a, 'b, 'c, 'd)>
+
+/**
+`zip5(seq1, seq2, seq3, seq4, seq5, mapper)` is the sequence formed by combining
+corresponding items from the source sequences into a tuple. If one sequence ends
+before any of the others, the remaining elements in the longer sequences are
+ignored.
+*/
 let zip5: (t<'a>, t<'b>, t<'c>, t<'d>, t<'e>) => t<('a, 'b, 'c, 'd, 'e)>
 
+/**
+`sortedMerge(seq1, seq2, compare)` takes two **sorted** sequences and merges
+them into a single **sorted** sequence based on the `compare` function. Once one
+of the sequences are exhaused, all the remaining items from the other sequence
+are included. 
+*/
 let sortedMerge: (t<'a>, t<'a>, ('a, 'a) => int) => t<'a>
 
 /**
-`interleave(xx,yy)` is the sequence built by alternately taking items from `xx`
-and `yy`. When one of those sequences is empty, the remaining items from the
-other sequence are returned.
+`interleave(seq1, seq2)` is the sequence built by alternately taking items from `seq1`
+and `seq2`. When one of those sequences is empty, the remaining items from the
+other sequence are included.
 */
 let interleave: (t<'a>, t<'a>) => t<'a>
 
+/**
+`reduce(source, zero, accumulator)` invokes `accomulator` successively for every
+item in `source`. The calculation is initialized with the provided `zero` value.
+The function only terminates if the sequence is finite. Analogous to
+`Array.reduce` in JavaScript.
+*/
 let reduce: (t<'a>, 'b, ('b, 'a) => 'b) => 'b
+
+/**
+`reducei(source, zero, accumulator)` invokes `accomulator` successively for
+every item in `source`. The calculation is initialized with the provided `zero`
+value. The function only terminates if the sequence is finite. The accumulator
+receives the zero-based index of each item. Analogous to `Array.reduce` in
+JavaScript.
+*/
 let reducei: (t<'a>, ~zero: 'b, (~sum: 'b, ~val: 'a, ~inx: int) => 'b) => 'b
+
+/**
+`forEach(source, f)` eagerly applies `f` to each item in the sequence. This does
+not return any value. It is useful for performing side-effects like logging
+values to the console.
+*/
 let forEach: (t<'a>, 'a => unit) => unit
+
+/**
+`forEachi(source, f)` eagerly applies `f` to each item in the sequence. The
+callback receives the zero-based index of each item. This does not return any
+value. It is useful for performing side-effects like logging values to the
+console.
+*/
 let forEachi: (t<'a>, ('a, int) => unit) => unit
+
+/**
+`some(source, predicate)` returns `true` if there exists at least one item where
+the supplied predicate is `true`. Returns `false` for an empty sequence or when
+no item satisfies the predicate. Analogous to `Array.some` in JavaScript.
+*/
 let some: (t<'a>, 'a => bool) => bool
+
+/**
+`every(source, predicate)` returns `true` if the input sequence is empty or the
+supplied predicate is `true` for every item. Analogous to the `for all`
+existential quantifier in mathematics and `Array.every` in JavaScript.
+*/
 let everyOrEmpty: (t<'a>, 'a => bool) => bool
+
+/**
+`find(source, predicate)` tries to find the first item where `predicate` is
+`true`. Returns `None` for an empty sequence or if no such item can be found.
+*/
 let find: (t<'a>, 'a => bool) => option<'a>
+
+/**
+`findMap(source, mapper)` tries to find the first item where `mapper` returns
+`Some`. Returns `None` for an empty sequence or if no such item can be found.
+*/
 let findMap: (t<'a>, 'a => option<'b>) => option<'b>
+
+/**
+`findMapi(source, mapper)` tries to find the first item where `mapper` returns
+`Some`. The callback receives the zero-based index of each item. Returns `None`
+for an empty sequence or if no such item can be found.
+*/
 let findMapi: (t<'a>, ('a, int) => option<'b>) => option<'b>
+
+/**
+`length` returns the number of items in the sequence.
+*/
 let length: t<'a> => int
+
+/**
+`isEmpty` determines if the sequence has any items in it.
+*/
 let isEmpty: t<'a> => bool
+
+/**
+`isSortedBy(source, compare)` determines if the sequence is sorted according to
+the provided compare function. Returns `true` for an empty sequence.
+*/
 let isSortedBy: (t<'a>, ('a, 'a) => int) => bool
+
+/**
+`equals(seq1, seq2, areEqual)` determines if two sequences have exactly the same
+length and corresponding items in each sequence are equal according to the
+`compare` function.
+*/
 let equals: (t<'a>, t<'a>, ('a, 'a) => bool) => bool
+
+/**
+`compare(seq1, seq2, compare)` compares two sequences using the given comparison
+function, element by element. Returns the first non-zero result. If the end of a
+sequence is reached it return -1 if the first sequence is shorter and 1 if the
+second sequence is shorter.
+*/
 let compare: (t<'a>, t<'a>, ('a, 'a) => int) => int
 
 /**
@@ -442,14 +622,15 @@ validation stops when the first `Error` is encountered.
 let allOk: t<result<'ok, 'err>> => result<t<'ok>, 'err>
 
 /**
-`allSome` returns a `Some` sequence (possibly empty), if all input
+`allSome` returns a `Some` sequence (possibly empty) if all input
 values were `Some`. Otherwise returns `None.`
 */
 let allSome: t<option<'a>> => option<t<'a>>
 
 /**
-`consume` eagerly iterates through every item in the sequence. This is only
-useful if side-effects are performed via `tap` or other functions in the
-pipeline. Equivalent to `forEach` where the supplied function does nothing.
+`consume` eagerly iterates through every item in the sequence and returns
+nothing. This is useful if side-effects are performed via `tap` or other
+functions in the pipeline. Equivalent to `forEach` where the supplied function
+does nothing.
 */
 let consume: t<'a> => unit
