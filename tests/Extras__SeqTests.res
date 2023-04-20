@@ -155,16 +155,27 @@ let allPairsTests = makeSeqEqualsTests(
   ],
 )
 
-let rangeTests = [
-  seqEqual(~title="range", ~expectation="can count up", ~a=() => S.range(3, 7), ~b=[3, 4, 5, 6, 7]),
-  seqEqual(
-    ~title="range",
-    ~expectation="can count down",
-    ~a=() => S.range(7, 3),
-    ~b=[7, 6, 5, 4, 3],
-  ),
-  seqEqual(~title="range", ~expectation="can have single value", ~a=() => S.range(3, 3), ~b=[3]),
-]
+let rangeTests = makeSeqEqualsTests(
+  ~title="range",
+  [
+    (S.range(1, 1), [1], ""),
+    (S.range(1, 2), [1, 2], ""),
+    (S.range(4, 6), [4, 5, 6], ""),
+    (S.range(6, 1), [6, 5, 4, 3, 2, 1], ""),
+    (S.range(-3, 3), [-3, -2, -1, 0, 1, 2, 3], ""),
+  ],
+)
+
+let rangeMapTests = makeSeqEqualsTests(
+  ~title="rangeMap",
+  [
+    (S.rangeMap(1, 1, intToString), ["1"], ""),
+    (S.rangeMap(1, 2, intToString), ["1", "2"], ""),
+    (S.rangeMap(4, 6, intToString), ["4", "5", "6"], ""),
+    (S.rangeMap(6, 1, intToString), ["6", "5", "4", "3", "2", "1"], ""),
+    (S.rangeMap(-3, 3, intToString), ["-3", "-2", "-1", "0", "1", "2", "3"], ""),
+  ],
+)
 
 let concatTests = [
   seqEqual(
@@ -1535,6 +1546,7 @@ let tests =
     orElseTests,
     pairwiseTests,
     prependTests,
+    rangeMapTests,
     rangeTests,
     reduceTests,
     replicateTests,

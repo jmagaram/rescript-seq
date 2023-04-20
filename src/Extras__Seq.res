@@ -162,6 +162,8 @@ let range = (start, end) => {
     : unfold(start, i => i >= end ? Some(i, i - 1) : None)
 }
 
+let rangeMap = (start, end, f) => range(start, end)->map(f)
+
 let rec infinite = f => (. ()) => Next(f(), infinite(f))
 
 let rec tap = (xx, f) =>
