@@ -683,7 +683,6 @@ let infiniteTests = [
     callCount.contents == 999_999 + 1
   }),
 ]
-
 let unfoldTests =
   makeSeqEqualsTests(
     ~title="unfold",
@@ -691,6 +690,13 @@ let unfoldTests =
       (S.unfold(1, i => i <= 5 ? Some(i, i + 1) : None), [1, 2, 3, 4, 5], ""),
       (S.unfold(1, _ => None), [], "zero items"),
       (S.unfold(1, i => i < 100 ? Some(i, i * 2) : None), [1, 2, 4, 8, 16, 32, 64], ""),
+      (
+        S.unfold((0, 1), ((a, b)) => a + b <= 100 ? Some(a + b, (b, a + b)) : None)->S.prepend(
+          [0, 1]->S.fromArray,
+        ),
+        [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89],
+        "fibonacci",
+      ),
     ],
   )->Js.Array2.concat([
     foldEqual(
