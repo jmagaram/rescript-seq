@@ -152,9 +152,9 @@ let rec unfold = (seed, f) =>
 
 let init = (count, f) => unfold(0, i => i < count ? Some(f(i), i + 1) : None)
 
-let replicate = (count, value) => unfold(0, i => i < count ? Some(value, i + 1) : None)
+let repeat = (count, value) => unfold(0, i => i < count ? Some(value, i + 1) : None)
 
-let replicateWith = (count, value) => unfold(1, i => i <= count ? Some(value(), i + 1) : None)
+let repeatWith = (count, value) => unfold(1, i => i <= count ? Some(value(), i + 1) : None)
 
 let iterate = (seed, f) => unfold(seed, i => Some(i, f(i)))
 
@@ -422,7 +422,7 @@ let chunkBySize = (xx, length) => {
   }
   xx
   ->map(i => Some(i))
-  ->concat(replicate(length - 1, None))
+  ->concat(repeat(length - 1, None))
   ->scani(~zero=[], (~sum, ~val, ~inx) => {
     switch val {
     | None => sum
@@ -635,7 +635,7 @@ let windowAhead = (xx, size) => {
   }
   xx
   ->map(i => Some(i))
-  ->concat(replicate(size - 1, None))
+  ->concat(repeat(size - 1, None))
   ->scani(~zero=[], (~sum, ~val as i, ~inx) => {
     if inx >= size {
       sum->Js.Array2.shift->ignore

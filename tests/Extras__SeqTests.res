@@ -208,19 +208,19 @@ let flatMapTests = [
   seqEqual(
     ~title="flatMap",
     ~expectation="when map to several items => flatten",
-    ~a=() => oneTwoThree->S.flatMap(i => S.replicate(3, i)),
+    ~a=() => oneTwoThree->S.flatMap(i => S.repeat(3, i)),
     ~b=[1, 1, 1, 2, 2, 2, 3, 3, 3],
   ),
   seqEqual(
     ~title="flatMap",
     ~expectation="when original is empty => empty",
-    ~a=() => S.empty->S.flatMap(_ => S.replicate(5, "x")),
+    ~a=() => S.empty->S.flatMap(_ => S.repeat(5, "x")),
     ~b=[],
   ),
   seqEqual(
     ~title="flatMap",
     ~expectation="when original is one item",
-    ~a=() => S.singleton(1)->S.flatMap(i => S.replicate(5, i)),
+    ~a=() => S.singleton(1)->S.flatMap(i => S.repeat(5, i)),
     ~b=[1, 1, 1, 1, 1],
   ),
   seqEqual(
@@ -241,7 +241,7 @@ let flatMapTests = [
     ~title="flatMap",
     ~expectation="a million stack won't overflow",
     ~predicate=() => {
-      S.replicate(1000, 0)->S.flatMap(_ => S.replicate(1000, 0))->S.forEach(_ => ())
+      S.repeat(1000, 0)->S.flatMap(_ => S.repeat(1000, 0))->S.forEach(_ => ())
       true
     },
   ),
@@ -333,7 +333,7 @@ let dropTests = [
   seqEqual(
     ~title="drop",
     ~expectation="when drop a million items => no stack overflow",
-    ~a=() => S.concat(S.replicate(999_999, "x"), S.singleton("y"))->S.drop(999_999),
+    ~a=() => S.concat(S.repeat(999_999, "x"), S.singleton("y"))->S.drop(999_999),
     ~b=["y"],
   ),
 ]
@@ -342,7 +342,7 @@ let flattenTests = [
   seqEqual(
     ~title="flatten",
     ~expectation="concatenate each sub-sequence",
-    ~a=() => S.init(3, inx => S.replicate(2, inx))->S.flatten,
+    ~a=() => S.init(3, inx => S.repeat(2, inx))->S.flatten,
     ~b=[0, 0, 1, 1, 2, 2],
   ),
   seqEqual(
@@ -592,23 +592,23 @@ let fromArrayTests = {
   Js.Array2.concat(basicTests, throwsTests)
 }
 
-let replicateTests = makeSeqEqualsTests(
-  ~title="replicate",
+let repeatTests = makeSeqEqualsTests(
+  ~title="repeat",
   [
-    (S.replicate(0, "x"), [], ""),
-    (S.replicate(1, "x"), ["x"], "x"),
-    (S.replicate(2, "x"), ["x", "x"], ""),
-    (S.replicate(3, "x"), ["x", "x", "x"], ""),
+    (S.repeat(0, "x"), [], ""),
+    (S.repeat(1, "x"), ["x"], "x"),
+    (S.repeat(2, "x"), ["x", "x"], ""),
+    (S.repeat(3, "x"), ["x", "x", "x"], ""),
   ],
 )
 
-let replicateWithTests = makeSeqEqualsTests(
-  ~title="replicateWith",
+let repeatWithTests = makeSeqEqualsTests(
+  ~title="repeatWith",
   [
-    (S.replicateWith(0, () => "x"), [], ""),
-    (S.replicateWith(1, () => "x"), ["x"], "x"),
-    (S.replicateWith(2, () => "x"), ["x", "x"], ""),
-    (S.replicateWith(3, () => "x"), ["x", "x", "x"], ""),
+    (S.repeatWith(0, () => "x"), [], ""),
+    (S.repeatWith(1, () => "x"), ["x"], "x"),
+    (S.repeatWith(2, () => "x"), ["x", "x"], ""),
+    (S.repeatWith(3, () => "x"), ["x", "x", "x"], ""),
   ],
 )
 
@@ -953,8 +953,7 @@ let filterTests =
     seqEqual(
       ~title="filteri",
       ~expectation="when skipping millions => no stack problem",
-      ~a=() =>
-        S.replicate(999_999, 1)->S.concat(2->S.singleton)->S.filteri((value, _) => value != 1),
+      ~a=() => S.repeat(999_999, 1)->S.concat(2->S.singleton)->S.filteri((value, _) => value != 1),
       ~b=[2],
     ),
   ])
@@ -1100,7 +1099,7 @@ let lengthTests = [
   foldEqual(
     ~title="length",
     ~expectation="millions",
-    ~a=() => S.replicate(999_999, 1)->S.length,
+    ~a=() => S.repeat(999_999, 1)->S.length,
     ~b=999_999,
   ),
 ]
@@ -1559,8 +1558,8 @@ let tests =
     rangeMapTests,
     rangeTests,
     reduceTests,
-    replicateTests,
-    replicateWithTests,
+    repeatTests,
+    repeatWithTests,
     scanTests,
     someTests,
     sortedMergeTests,
