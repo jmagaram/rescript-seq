@@ -1,4 +1,4 @@
-## Version 0.23.0
+## Version 0.24.0
 
 - Remove `Seq` module code; separate repository
 
