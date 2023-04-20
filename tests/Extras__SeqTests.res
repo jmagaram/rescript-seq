@@ -602,6 +602,16 @@ let replicateTests = makeSeqEqualsTests(
   ],
 )
 
+let replicateWithTests = makeSeqEqualsTests(
+  ~title="replicateWith",
+  [
+    (S.replicateWith(0, () => "x"), [], ""),
+    (S.replicateWith(1, () => "x"), ["x"], "x"),
+    (S.replicateWith(2, () => "x"), ["x", "x"], ""),
+    (S.replicateWith(3, () => "x"), ["x", "x", "x"], ""),
+  ],
+)
+
 let takeAtMostTests = makeSeqEqualsTests(
   ~title="takeAtMost",
   [
@@ -1550,6 +1560,7 @@ let tests =
     rangeTests,
     reduceTests,
     replicateTests,
+    replicateWithTests,
     scanTests,
     someTests,
     sortedMergeTests,

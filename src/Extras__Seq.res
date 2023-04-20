@@ -154,6 +154,8 @@ let init = (count, f) => unfold(0, i => i < count ? Some(f(i), i + 1) : None)
 
 let replicate = (count, value) => unfold(0, i => i < count ? Some(value, i + 1) : None)
 
+let replicateWith = (count, value) => unfold(1, i => i <= count ? Some(value(), i + 1) : None)
+
 let iterate = (seed, f) => unfold(seed, i => Some(i, f(i)))
 
 let range = (start, end) => {
