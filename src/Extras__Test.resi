@@ -6,6 +6,7 @@ let make: (~category: string, ~title: string, ~expectation: string, ~predicate: 
 let category: t => string
 let title: t => string
 let expectation: t => string
+let hasKeyword: (t, string) => bool
 
 let makeAsync: (
   ~category: string,
@@ -20,9 +21,4 @@ type summary = {
   ran: int,
 }
 
-let runSuite: (
-  ~keywords: array<string>=?,
-  ~filter: t => bool=?,
-  ~onlyShowFailures: bool=?,
-  array<t>,
-) => promise<summary>
+let runSuite: (~filter: t => bool=?, ~onlyShowFailures: bool=?, array<t>) => promise<summary>

@@ -12,21 +12,15 @@ let category = i => i.category
 let title = i => i.title
 let expectation = i => i.expectation
 
-let hasKeyword = (i, xs) => {
-  let match = (~text, ~keyword) => {
+let hasKeyword = (i, word) => {
+  let match = (~text, ~word) => {
     let text = text->String.trim->String.toLocaleLowerCase
-    let keyword = keyword->String.trim->String.toLocaleLowerCase
+    let keyword = word->String.trim->String.toLocaleLowerCase
     text->Js.String2.includes(keyword)
   }
-  switch xs {
-  | [] => true
-  | xs =>
-    xs->Js.Array2.every(x =>
-      match(~text=i->category, ~keyword=x) ||
-      match(~text=i->title, ~keyword=x) ||
-      match(~text=i->expectation, ~keyword=x)
-    )
-  }
+  match(~text=i->category, ~word) ||
+  match(~text=i->title, ~word) ||
+  match(~text=i->expectation, ~word)
 }
 
 type summary = {
@@ -68,7 +62,7 @@ let run = async i => {
 
 let toString = i => `${i.category} | ${i.title} | ${i.expectation}`
 
-let runSuite = async (~keywords=[], ~filter=_ => true, ~onlyShowFailures=false, tests) => {
+let runSuite = async (~filter=_ => true, ~onlyShowFailures=false, tests) => {
   let log = Js.Console.log
   let logSection = n => {
     log("")
@@ -77,7 +71,6 @@ let runSuite = async (~keywords=[], ~filter=_ => true, ~onlyShowFailures=false, 
   let results =
     await tests
     ->Array.keep(filter)
-    ->Array.keep(test => hasKeyword(test, keywords))
     ->SortArray.stableSortBy(cmp)
     ->Array.map(i => i->run)
     ->Js.Promise2.all
