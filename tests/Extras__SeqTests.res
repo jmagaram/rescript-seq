@@ -16,9 +16,9 @@ let trueAlways = _ => true
 
 let falseAlways = _ => false
 
-let oneTwoThree = S.init(~count=3, (~index) => index + 1)
-let fourFiveSix = S.init(~count=3, (~index) => index + 4)
-let oneToFive = S.init(~count=5, (~index) => index + 1)
+let oneTwoThree = S.range(1, 3)
+let fourFiveSix = S.range(4, 6)
+let oneToFive = S.range(1, 5)
 
 let seqEqual = (~title, ~expectation, ~a, ~b) =>
   T.make(~category="Seq", ~title, ~expectation, ~predicate=() => {
