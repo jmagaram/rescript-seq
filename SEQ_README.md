@@ -1,4 +1,4 @@
-# Sequences for ReScript
+# Lazy Sequences for ReScript
 
 A sequence is a list whose elements are computed only on demand. Sequences are produced and transformed lazily (one element at a time) rather than eagerly (all elements at once). This allows constructing conceptually infinite sequences. A sequence can provide better performance than an `array` when not all elements are used. Sequences are similar to [JavaScript iterables](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols).
 

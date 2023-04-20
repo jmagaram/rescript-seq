@@ -1,4 +1,4 @@
-# Research and notes
+# Research
 
 Here is information about the functions provided in other iterable tool packages.
 

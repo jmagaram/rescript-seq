@@ -1,14 +1,35 @@
 # ReScript Extras
 
-General-purpose utilities for [ReScript](https://rescript-lang.org) projects. Includes [Lazy Sequences (see README)](SEQ_README.md). Also extensions to `Option`, `Result`, and `Array`. Also a lazy-promise `Task` and `TaskResult`, `NonEmptyArray`, comparison utilities in `Cmp`, and a simple test runner `Test`. Use `Union` and `Literal` functors to create and pattern match on tagged and untagged discriminated unions of any kind, which can be helpful for interop with JavaScript libraries. To install:
+Utilities for [ReScript](https://rescript-lang.org). Includes:
 
-1. `npm install @jmagaram/rescript-extras`
-2. Add `@jmagaram/rescript-extras` to `bs-dependencies` in your `bsconfig.json`
-3. In your code, `module E = Extras`
+- Lazy Sequences with a `Seq` module; [see comprehensive README](SEQ_README.md)
+- A lazy-promise `Task` and `TaskResult`
+- Untagged `Union` and `Literal` to construct and pattern match on discriminated unions of any kind
+- Useful extensions to `Option`, `Result`, and `Array`
+- `NonEmptyArray`
+- Comparison utilities
+- `Trampoline` module to remove recursion
+- A simple `Test` runner
 
-## Lazy sequences
+## To install
 
-See [Lazy sequence README](SEQ_README.md)
+```sh
+npm install @jmagaram/rescript-extras
+```
+
+Add to your `bsconfig.json`...
+
+```diff
+{
+  ...
++ "bs-dependencies": ["@jmagaram/rescript-extras"]
++ "bsc-flags": ["-open @jmagaram/rescript-extras"],
+}
+```
+
+## Lazy sequences (Seq module)
+
+See [Seq README](SEQ_README.md)
 
 ## Task and TaskResult
 
@@ -26,13 +47,13 @@ The **`Union`** module provides functors to create tagged and untagged discrimin
 
 This implementation does not utilize any special compiler support and so there are some limitations:
 
-- Pattern matching must rely on a `match` function, not the usual matching syntax. Each case is distinguished by `A` | `B` | `C` | `D`. This can be easily improved by extending or wrapping the produced module; see the [test file for examples](https://github.com/jmagaram/rescript-extras/blob/master/tests/Extras__UnionTests.res).
+- Pattern matching must rely on a `match` function, not the usual matching syntax. Each case is distinguished by `A` | `B` | `C` | `D`. This can be easily improved by extending or wrapping the produced module; see the [test file for examples](tests/Extras__UnionTests.res).
 - Literal support and functors are a bit cumbersome
 - No genType support
 - No recursive type definition
 
 **Note:** It is possible to create untagged unions with a library like
-[rescript-struct](https://github.com/DZakh/rescript-struct) and not use the functors defined in this package. See the [usage examples](https://github.com/jmagaram/rescript-extras/blob/master/tests/Extras__UnionTests.res) for a comparision of the two approaches. This works very well and avoids abstractions, but requires a bit more code.
+[rescript-struct](https://github.com/DZakh/rescript-struct) and not use the functors defined in this package. See the [usage examples](tests/Extras__UnionTests.res) for a comparision of the two approaches. This works very well and avoids abstractions, but requires a bit more code.
 
 **Note:** The Rescript compiler has a new feature for untagged unions that works great with pattern matching support. There are limitations on which types can be included in the union, literal support is very nice, pattern matching is not customizable, and custom equality is not provided.
 
@@ -66,10 +87,10 @@ Similar to the `Types` module, includes functions to safely inspect unknown valu
 
 Functors **`MakeCompare`** and **`MakeEquals`** add sorting and equality functions to your custom data types.
 
+## Trampoline
+
+Simple tools to remove recursion and avoid stack overflows.
+
 ## Test runner
 
 Super-simple test runner. Make tests using **`make`** and **`makeAsync`**. Run them using **`runSuite`**.
-
-## Other
-
-Various conversion functions like **`Option.toArray`**, **`Option.fromError`**, **`Array.fromOption`**, etc.

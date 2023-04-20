@@ -11,3 +11,5 @@ module Literal = Extras__Literal
 module Union = Extras__Union
 module Pattern = Extras__Pattern
 module Functions = Extras__Trampoline
+module Seq = Extras__Seq
+module Trampoline = Extras__Trampoline

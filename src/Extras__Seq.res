@@ -1,6 +1,6 @@
 module Option = Belt.Option
 module Result = Belt.Result
-module Ex = Extras
+module OptionEx = Extras__Option
 
 exception ArgumentOfOfRange(string)
 
@@ -199,7 +199,7 @@ let characters = s =>
   }
 
 let fromArray = (~start=?, ~end=?, xx: array<'a>) => {
-  switch xx->Ex.Array.isEmpty {
+  switch xx->Extras__Array.isEmpty {
   | true =>
     start
     ->Option.orElse(end)
@@ -498,7 +498,7 @@ let rec map2 = (xx, yy, f) =>
   (. ()) => {
     let xx = xx->next
     let yy = yy->next
-    Ex.Option.map2(xx, yy, ((x, xx), (y, yy)) => Next(
+    Extras__Option.map2(xx, yy, ((x, xx), (y, yy)) => Next(
       f(x, y),
       map2(xx, yy, f),
     ))->Option.getWithDefault(End)
@@ -509,7 +509,7 @@ let rec map3 = (xx, yy, zz, f) =>
     let xx = xx->next
     let yy = yy->next
     let zz = zz->next
-    Ex.Option.map3(xx, yy, zz, ((x, xx), (y, yy), (z, zz)) => Next(
+    OptionEx.map3(xx, yy, zz, ((x, xx), (y, yy), (z, zz)) => Next(
       f(x, y, z),
       map3(xx, yy, zz, f),
     ))->Option.getWithDefault(End)
@@ -521,7 +521,7 @@ let rec map4 = (xx, yy, zz, qq, f) =>
     let yy = yy->next
     let zz = zz->next
     let qq = qq->next
-    Ex.Option.map4(xx, yy, zz, qq, ((x, xx), (y, yy), (z, zz), (q, qq)) => Next(
+    OptionEx.map4(xx, yy, zz, qq, ((x, xx), (y, yy), (z, zz), (q, qq)) => Next(
       f(x, y, z, q),
       map4(xx, yy, zz, qq, f),
     ))->Option.getWithDefault(End)
@@ -534,7 +534,7 @@ let rec map5 = (xx, yy, zz, qq, mm, f) =>
     let zz = zz->next
     let qq = qq->next
     let mm = mm->next
-    Ex.Option.map5(xx, yy, zz, qq, mm, ((x, xx), (y, yy), (z, zz), (q, qq), (m, mm)) => Next(
+    OptionEx.map5(xx, yy, zz, qq, mm, ((x, xx), (y, yy), (z, zz), (q, qq), (m, mm)) => Next(
       f(x, y, z, q, m),
       map5(xx, yy, zz, qq, mm, f),
     ))->Option.getWithDefault(End)
