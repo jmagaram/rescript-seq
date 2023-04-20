@@ -6,6 +6,7 @@ If you want to add some functions or improve the package, start by posting an is
 
 - Include a code sample
 - Look at other docs and try to make it fit in
+- Code for samples should run through tests
 
 ## Tests
 
