@@ -1,6 +1,6 @@
 # ReScript Extras
 
-General-purpose utilities for [ReScript](https://rescript-lang.org) projects. Includes [Lazy Sequences (see README)](../blob/master/SEQ_README.md). Also extensions to `Option`, `Result`, and `Array`. Also a lazy-promise `Task` and `TaskResult`, `NonEmptyArray`, comparison utilities in `Cmp`, and a simple test runner `Test`. Use `Union` and `Literal` functors to create and pattern match on tagged and untagged discriminated unions of any kind, which can be helpful for interop with JavaScript libraries. To install:
+General-purpose utilities for [ReScript](https://rescript-lang.org) projects. Includes [Lazy Sequences (see README)](SEQ_README.md). Also extensions to `Option`, `Result`, and `Array`. Also a lazy-promise `Task` and `TaskResult`, `NonEmptyArray`, comparison utilities in `Cmp`, and a simple test runner `Test`. Use `Union` and `Literal` functors to create and pattern match on tagged and untagged discriminated unions of any kind, which can be helpful for interop with JavaScript libraries. To install:
 
 1. `npm install @jmagaram/rescript-extras`
 2. Add `@jmagaram/rescript-extras` to `bs-dependencies` in your `bsconfig.json`
