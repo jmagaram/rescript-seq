@@ -1,7 +1,3 @@
-## Version 0.24.0
-
-- Remove `Seq` module code; separate repository
-
 ## Version 0.22.0
 
 - `Trampoline` module to eliminate recursion in functions

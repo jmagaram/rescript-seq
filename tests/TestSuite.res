@@ -13,7 +13,7 @@ let isLocalDevelopment = () => {
 }
 
 let keywords = []
-let onlyShowFailures = false
+let onlyShowFailures = true
 let filter = test => keywords->Js.Array2.every(word => test->Test.hasKeyword(word))
 let throwIfAnyTestFails = !isLocalDevelopment()
 
@@ -29,6 +29,7 @@ let tests =
     Extras__UnionTests.tests,
     Extras__PatternTests.tests,
     Extras__UnknownTests.tests,
+    Extras__SeqTests.tests,
     Extras__TrampolineTests.tests,
   ]->Array.concatMany
 
