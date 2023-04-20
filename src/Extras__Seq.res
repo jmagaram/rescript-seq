@@ -675,3 +675,11 @@ let toOption = xx =>
   }
 
 let consume = xx => xx->forEach(_ => ())
+
+let orElse = (xx, yy) =>
+  (. ()) => {
+    switch xx->nextNode {
+    | End => yy->nextNode
+    | Next(_, _) as nxt => nxt
+    }
+  }

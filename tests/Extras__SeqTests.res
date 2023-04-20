@@ -1488,6 +1488,16 @@ let consumeTests = [
   ),
 ]
 
+let orElseTests = makeSeqEqualsTests(
+  ~title="orElse",
+  [
+    (S.empty->S.orElse(S.empty), [], ""),
+    (S.empty->S.orElse(oneTwoThree), [1, 2, 3], ""),
+    (S.singleton(1)->S.orElse(fourFiveSix), [1], ""),
+    (oneTwoThree->S.orElse(fourFiveSix), [1, 2, 3], ""),
+  ],
+)
+
 let tests =
   [
     allOkTests,
@@ -1535,6 +1545,7 @@ let tests =
     map3Tests,
     memoizeTests,
     minByMaxByTests,
+    orElseTests,
     pairwiseTests,
     prependTests,
     rangeTests,
