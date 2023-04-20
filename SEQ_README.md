@@ -23,7 +23,7 @@ See the [examples](#examples) section.
 
 ## Install
 
-This is part of the [rescript-extras package](#README.md) right now; see install instructions there.
+This is part of the [rescript-extras package](README.md) right now; see install instructions there.
 
 ## Functions
 
