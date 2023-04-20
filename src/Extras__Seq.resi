@@ -20,12 +20,12 @@ let fromList: list<'a> => t<'a>
 let fromOption: option<'a> => t<'a>
 let characters: string => t<string>
 let cons: ('a, t<'a>) => t<'a>
+let startWith: (t<'a>, 'a) => t<'a>
+let endWith: (t<'a>, 'a) => t<'a>
 
 // =========
 // Transform
 // =========
-let startWith: (t<'a>, 'a) => t<'a>
-let endWith: (t<'a>, 'a) => t<'a>
 let prepend: (t<'a>, t<'a>) => t<'a>
 let concat: (t<'a>, t<'a>) => t<'a>
 let flatten: t<t<'a>> => t<'a>
@@ -39,22 +39,13 @@ let filterMap: (t<'a>, 'a => option<'b>) => t<'b>
 let filterSome: t<option<'a>> => t<'a>
 let filterOk: t<result<'a, 'b>> => t<'a>
 let takeAtMost: (t<'a>, int) => t<'a>
-let drop: (t<'a>, int) => t<'a>
 let takeWhile: (t<'a>, 'a => bool) => t<'a>
 let takeUntil: (t<'a>, 'a => bool) => t<'a>
+let drop: (t<'a>, int) => t<'a>
 let dropWhile: (t<'a>, 'a => bool) => t<'a>
 let dropUntil: (t<'a>, 'a => bool) => t<'a>
-let zip: (t<'a>, t<'b>) => t<('a, 'b)>
-let zip3: (t<'a>, t<'b>, t<'c>) => t<('a, 'b, 'c)>
-let zip4: (t<'a>, t<'b>, t<'c>, t<'d>) => t<('a, 'b, 'c, 'd)>
-let zip5: (t<'a>, t<'b>, t<'c>, t<'d>, t<'e>) => t<('a, 'b, 'c, 'd, 'e)>
-let map2: (t<'a>, t<'b>, ('a, 'b) => 'c) => t<'c>
-let map3: (t<'a>, t<'b>, t<'c>, ('a, 'b, 'c) => 'd) => t<'d>
-let map4: (t<'a>, t<'b>, t<'c>, t<'d>, ('a, 'b, 'c, 'd) => 'e) => t<'e>
-let map5: (t<'a>, t<'b>, t<'c>, t<'d>, t<'e>, ('a, 'b, 'c, 'd, 'e) => 'f) => t<'f>
 let scan: (t<'a>, 'b, ('b, 'a) => 'b) => t<'b>
 let scani: (t<'a>, ~zero: 'b, (~sum: 'b, ~val: 'a, ~inx: int) => 'b) => t<'b>
-let sortedMerge: (t<'a>, t<'a>, ('a, 'a) => int) => t<'a>
 let cache: t<'a> => t<'a>
 let tap: (t<'a>, 'a => unit) => t<'a>
 let chunkBySize: (t<'a>, int) => t<array<'a>>
@@ -65,8 +56,21 @@ let windowAhead: (t<'a>, int) => t<array<'a>>
 let allPairs: (t<'a>, t<'b>) => t<('a, 'b)>
 let intersperse: (t<'a>, 'a) => t<'a>
 let intersperseWith: (t<'a>, unit => 'a) => t<'a>
-let interleave: (t<'a>, t<'a>) => t<'a>
 let orElse: (t<'a>, t<'a>) => t<'a>
+
+// =======
+// Combine
+// =======
+let map2: (t<'a>, t<'b>, ('a, 'b) => 'c) => t<'c>
+let map3: (t<'a>, t<'b>, t<'c>, ('a, 'b, 'c) => 'd) => t<'d>
+let map4: (t<'a>, t<'b>, t<'c>, t<'d>, ('a, 'b, 'c, 'd) => 'e) => t<'e>
+let map5: (t<'a>, t<'b>, t<'c>, t<'d>, t<'e>, ('a, 'b, 'c, 'd, 'e) => 'f) => t<'f>
+let zip: (t<'a>, t<'b>) => t<('a, 'b)>
+let zip3: (t<'a>, t<'b>, t<'c>) => t<('a, 'b, 'c)>
+let zip4: (t<'a>, t<'b>, t<'c>, t<'d>) => t<('a, 'b, 'c, 'd)>
+let zip5: (t<'a>, t<'b>, t<'c>, t<'d>, t<'e>) => t<('a, 'b, 'c, 'd, 'e)>
+let sortedMerge: (t<'a>, t<'a>, ('a, 'a) => int) => t<'a>
+let interleave: (t<'a>, t<'a>) => t<'a>
 
 // =======
 // Consume
@@ -93,7 +97,7 @@ let maxBy: (t<'a>, ('a, 'a) => int) => option<'a>
 let last: t<'a> => option<'a>
 let toArray: t<'a> => array<'a>
 let joinString: t<string> => string
-let toExactlyOne: t<'a> => option<'a>
+let exactlyOne: t<'a> => option<'a>
 let toOption: t<'a> => option<t<'a>>
 let allOk: t<result<'ok, 'err>> => result<t<'ok>, 'err>
 let allSome: t<option<'a>> => option<t<'a>>

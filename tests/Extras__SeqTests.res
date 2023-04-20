@@ -1231,23 +1231,23 @@ let joinStringTests = [
   ),
 ]
 
-let toExactlyOneTests = [
+let exactlyOneTests = [
   foldEqual(
-    ~title="toExactlyOne",
+    ~title="exactlyOne",
     ~expectation="when empty => None",
-    ~a=() => S.empty->S.toExactlyOne,
+    ~a=() => S.empty->S.exactlyOne,
     ~b=None,
   ),
   foldEqual(
-    ~title="toExactlyOne",
+    ~title="exactlyOne",
     ~expectation="when singleton => Some",
-    ~a=() => S.singleton(1)->S.toExactlyOne,
+    ~a=() => S.singleton(1)->S.exactlyOne,
     ~b=Some(1),
   ),
   foldEqual(
-    ~title="toExactlyOne",
+    ~title="exactlyOne",
     ~expectation="when many => None",
-    ~a=() => oneTwoThree->S.toExactlyOne,
+    ~a=() => oneTwoThree->S.exactlyOne,
     ~b=None,
   ),
 ]
@@ -1568,7 +1568,7 @@ let tests =
     takeWhileTests,
     tapTests,
     toArrayTests,
-    toExactlyOneTests,
+    exactlyOneTests,
     toOptionTests,
     joinStringTests,
     unfoldTests,

@@ -602,7 +602,7 @@ let rec interleave = (xx, yy) => {
   }
 }
 
-let toExactlyOne = xx =>
+let exactlyOne = xx =>
   switch xx->headTail {
   | None => None
   | Some(x, xx) =>
