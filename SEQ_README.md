@@ -1,114 +1,188 @@
-# Seq (Lazy Sequences)
+# Sequences for ReScript
 
-## General notes
+A sequence is a list whose elements are computed only on demand. Sequences are produced and transformed lazily (one element at a time) rather than eagerly (all elements at once). This allows constructing conceptually infinite sequences. A sequence can provide better performance than an `array` when not all elements are used. Sequences are similar to [JavaScript iterables](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols).
 
-mark some as @inline
-toTask?
-AVOID recursion, tested with big stuff until ocaml source code
-partition really useful, byPredicate, byString, and map it first
-to iterator
-split on
-want help! permutations and others
-MORE LINQ has interleave MANY
-LeftJoin?
-Run length encode, item,
-toDelimitedString
+Sequences are a very important and convenient data structure in [F#](https://fsharp.github.io/fsharp-core-docs/reference/fsharp-collections-seqmodule.html) , [OCaml](https://v2.ocaml.org/api/Seq.html), [Rust](https://doc.rust-lang.org/std/iter/trait.Iterator.html), [`C# Enumerables`](https://learn.microsoft.com/en-us/dotnet/api/system.linq.enumerable?view=net-8.0#methods), and [Python](https://docs.python.org/3/library/itertools.html). There are many libraries that help consume iterables in `Javascript`.
 
-### Ideas
+This is a comprehensive library for creating and consuming sequences in `ReScript`.
 
-### Contribution guide
+Highlights:
 
-## Tests
+- Data-first for ReScript
+- API documentation
+- Enables elegant, concise code solutions.
+- Comprehensive test suite
+- Ready for your contributions!
+- Supports nearly all the [Iterator helpers](https://github.com/tc39/proposal-iterator-helpers) proposal now.
+- Full suite of tools based on researching most of the other libraries and taking what seemed to be the best and most useful
+- Easily construct sequences using `fromArray`, `range`, `unfold`, `cycle`, `repeat` and other methods. In one or two lines you can create fibonacci sequence, enumerate the digits, etc.
+- Manipulate sequences with `map`, `mapi`, `filter`, `takeAtMost`, `dropWhile`, `scan`, `tap`, `pairwise`, `window`, `allPairs` and many more.
+- Combine multiple sequences with `zip`, `zip3`, `map2`, `map3`, `sortedMerge`, `interleave` and others.
+- Calculate values using `reduce`, `some`, `findMap`, `isSortedBy`, `minBy`, `forEach`, `tap`, `toArray`, and many others.
+  Works the same in the browser and in node. See the [examples](#examples) section for more examples.
 
-- Do one stress test to ensure no stack overflows, especially with recursion
+## Install
 
-## Coding style
+```sh
+npm install @jmagaram/rescript-seq
+```
 
-- Use `xx`, `yy`, `zz` for sequences
-- Use `x`, `y`, `z` for items in those sequences
-- Use `xxx` for a nested sequence
-- Use `inx` for index variables
+Add `@jmagaram/rescript-seq` to `bs-dependencies` in your `bsconfig.json`:
 
-## TC39 Proposal
+```diff
+{
+  ...
++ "bs-dependencies": ["@jmagaram/rescript-seq"]
++ "bsc-flags": ["-open @jmagaram/rescript-seq"],
+}
+```
 
-[Iterator helpers](https://github.com/tc39/proposal-iterator-helpers)
+## Usage examples
 
-### Supported
+```rescript
+let intToString = Belt.Int.toString
+type point = {x: int, y: int}
+let localMinimums = points =>
+  points
+  ->Seq.fromArray
+  ->Seq.window(3)
+  ->Seq.filterMap(pp => pp[1].y < pp[0].y && pp[1].y < pp[2].y ? Some(pp[1]) : None)
+  ->Seq.map(p => `(${p.x->intToString},${p.y->intToString})`)
+  ->Seq.intersperse(", ")
+  ->Seq.joinString
 
-map, filter, take, drop, flatMap, reduce, toArray, forEach, some, every, find
+let validateDocs = (documents, validate) =>
+  switch documents
+  ->Seq.fromArray
+  ->Seq.filter(doc => doc["status"] == "unprocessed")
+  ->Seq.map(validate)
+  ->Seq.allOk {
+  | Ok(docs) => docs->Seq.map(doc => doc["title"])->Seq.forEach(Js.log)
+  | Error(err) => Js.log(`First error: ${err}`)
+  }
 
-### Not supported
+let numbers =
+  Seq.infinite(() => Js.Math.random())
+  ->Seq.filter(i => i < 0.3)
+  ->Seq.pairwise
+  ->Seq.filter(((a, b)) => a < b)
+  ->Seq.takeAtMost(1000)
+  ->Seq.toArray
 
-from (iterator)
+let fibs = count =>
+  Seq.unfold((0, 1), ((a, b)) => a + b <= 100 ? Some(a + b, (b, a + b)) : None)
+  ->Seq.prepend([0, 1]->Seq.fromArray)
+  ->Seq.takeAtMost(count)
+  ->Seq.map(Belt.Int.toString)
+  ->Seq.intersperse(", ")
+  ->Seq.joinString
+```
 
-## oCaml
+## Functions
 
-[oCaml Module Seq](https://v2.ocaml.org/api/Seq.html)
+### Construct
 
-### Supported
+```rescript
+let empty: t<'a>
+let singleton: 'a => t<'a>
+let unfold: ('seed, 'seed => option<('a, 'seed)>) => t<'a>
+let init: (int, int => 'a) => t<'a>
+let repeat: (int, 'a) => t<'a>
+let repeatWith: (int, unit => 'a) => t<'a>
+let infinite: (unit => 'a) => t<'a>
+let iterate: ('a, 'a => 'a) => t<'a>
+let cycle: t<'a> => t<'a>
+let range: (int, int) => t<int>
+let rangeMap: (int, int, int => 'a) => t<'a>
+let fromArray: (~start: int=?, ~end: int=?, array<'a>) => t<'a>
+let fromList: list<'a> => t<'a>
+let fromOption: option<'a> => t<'a>
+let characters: string => t<string>
+let cons: ('a, t<'a>) => t<'a>
+let startWith: (t<'a>, 'a) => t<'a>
+let endWith: (t<'a>, 'a) => t<'a>
+```
 
-isEmpty, uncons, length, iter, fold_left, iteri, fold_lefti, for_all, exists, find, find_map, compare, empty, return, cons, init, unfold, equal, repeat, forever, iterate, cycle, map, mapi, filter, filter_map, take, drop, take_while, drop_while, memoize, append, concat, flat_map, zip, sorted_merge, scan, product, concat_map, interleave
+### Transform
 
-### Not supported
+```rescript
+let prepend: (t<'a>, t<'a>) => t<'a>
+let concat: (t<'a>, t<'a>) => t<'a>
+let flatten: t<t<'a>> => t<'a>
+let flatMap: (t<'a>, 'a => t<'b>) => t<'b>
+let map: (t<'a>, 'a => 'b) => t<'b>
+let mapi: (t<'a>, ('a, int) => 'b) => t<'b>
+let indexed: t<'a> => t<('a, int)>
+let filter: (t<'a>, 'a => bool) => t<'a>
+let filteri: (t<'a>, ('a, int) => bool) => t<'a>
+let filterMap: (t<'a>, 'a => option<'b>) => t<'b>
+let filterSome: t<option<'a>> => t<'a>
+let filterOk: t<result<'a, 'b>> => t<'a>
+let takeAtMost: (t<'a>, int) => t<'a>
+let takeWhile: (t<'a>, 'a => bool) => t<'a>
+let takeUntil: (t<'a>, 'a => bool) => t<'a>
+let drop: (t<'a>, int) => t<'a>
+let dropWhile: (t<'a>, 'a => bool) => t<'a>
+let dropUntil: (t<'a>, 'a => bool) => t<'a>
+let scan: (t<'a>, 'b, ('b, 'a) => 'b) => t<'b>
+let scani: (t<'a>, ~zero: 'b, (~sum: 'b, ~val: 'a, ~inx: int) => 'b) => t<'b>
+let cache: t<'a> => t<'a>
+let tap: (t<'a>, 'a => unit) => t<'a>
+let chunkBySize: (t<'a>, int) => t<array<'a>>
+let pairwise: t<'a> => t<('a, 'a)>
+let window: (t<'a>, int) => t<array<'a>>
+let windowBehind: (t<'a>, int) => t<array<'a>>
+let windowAhead: (t<'a>, int) => t<array<'a>>
+let allPairs: (t<'a>, t<'b>) => t<('a, 'b)>
+let intersperse: (t<'a>, 'a) => t<'a>
+let intersperseWith: (t<'a>, unit => 'a) => t<'a>
+let orElse: (t<'a>, t<'a>) => t<'a>
+```
 
-iter2, fold_left2, for_all2, exists2, group, once, map_product, unzip, partition_map, partition, ints, map2
+### Combine
 
-## F#
+```rescript
+let map2: (t<'a>, t<'b>, ('a, 'b) => 'c) => t<'c>
+let map3: (t<'a>, t<'b>, t<'c>, ('a, 'b, 'c) => 'd) => t<'d>
+let map4: (t<'a>, t<'b>, t<'c>, t<'d>, ('a, 'b, 'c, 'd) => 'e) => t<'e>
+let map5: (t<'a>, t<'b>, t<'c>, t<'d>, t<'e>, ('a, 'b, 'c, 'd, 'e) => 'f) => t<'f>
+let zip: (t<'a>, t<'b>) => t<('a, 'b)>
+let zip3: (t<'a>, t<'b>, t<'c>) => t<('a, 'b, 'c)>
+let zip4: (t<'a>, t<'b>, t<'c>, t<'d>) => t<('a, 'b, 'c, 'd)>
+let zip5: (t<'a>, t<'b>, t<'c>, t<'d>, t<'e>) => t<('a, 'b, 'c, 'd, 'e)>
+let sortedMerge: (t<'a>, t<'a>, ('a, 'a) => int) => t<'a>
+let interleave: (t<'a>, t<'a>) => t<'a>
+```
 
-[F# Seq module](https://fsharp.github.io/fsharp-core-docs/reference/fsharp-collections-seqmodule.html#cache)
+### Calculate and consume
 
-### Supported
+```rescript
+let reduce: (t<'a>, 'b, ('b, 'a) => 'b) => 'b
+let reducei: (t<'a>, ~zero: 'b, (~sum: 'b, ~val: 'a, ~inx: int) => 'b) => 'b
+let forEach: (t<'a>, 'a => unit) => unit
+let forEachi: (t<'a>, ('a, int) => unit) => unit
+let some: (t<'a>, 'a => bool) => bool
+let everyOrEmpty: (t<'a>, 'a => bool) => bool
+let find: (t<'a>, 'a => bool) => option<'a>
+let findMap: (t<'a>, 'a => option<'b>) => option<'b>
+let findMapi: (t<'a>, ('a, int) => option<'b>) => option<'b>
+let length: t<'a> => int
+let isEmpty: t<'a> => bool
+let isSortedBy: (t<'a>, ('a, 'a) => int) => bool
+let equals: (t<'a>, t<'a>, ('a, 'a) => bool) => bool
+let compare: (t<'a>, t<'a>, ('a, 'a) => int) => int
+let head: t<'a> => option<'a>
+let tail: t<'a> => t<'a>
+let headTail: t<'a> => option<('a, t<'a>)>
+let minBy: (t<'a>, ('a, 'a) => int) => option<'a>
+let maxBy: (t<'a>, ('a, 'a) => int) => option<'a>
+let last: t<'a> => option<'a>
+let toArray: t<'a> => array<'a>
+let joinString: t<string> => string
+let exactlyOne: t<'a> => option<'a>
+let toOption: t<'a> => option<t<'a>>
+let allOk: t<result<'ok, 'err>> => result<t<'ok>, 'err>
+let allSome: t<option<'a>> => option<t<'a>>
+let consume: t<'a> => unit
 
-allPairs, append, cache, choose, chunkBySize, collect, compareWith, concat, empty, exists, filter, fold, forAll, head, indexed, init, initInfinite, isEmpty, iter, iteri, last, length, map, map2, mapFold, mapi, maxBy, minBy, ofArray, ofList, pairwise, pick, replicate, scan, singleton, skip, skipWhile, tail, takeWhile, toArray, truncate, tryExactlyOne, tryFind, tryHead, tryLast, tryPick, unfold, where, windowed, zip, zip3
-
-### Not supported
-
-average, averageBy, cast, contains, countBy, delay, distinctBy, exactlyOne, except, exists2, findBack, findIndex, fold2, foldBack, foldBack2, forAll2, groupBy, insertAt, insertManyAt, item (nth), iter2, iteri2, map3, mapFoldBack, mapi2, max, min, permute, readonly, **reduce** (simplified fold throw if empty), reduceBack, removeAt, removeManyAt, rev, scanBack, sort, sortBy, sortByDescending, sortDescending, sortWith, splitInto, sum, sumBy, toList, transpose, take (throws like takeExactly), tryFindBack, tryFindIndex, tryFindIndexBack, tryItem, updateAt
-
-## Rust
-
-[Rust std::iter](https://doc.rust-lang.org/stable/std/iter/) and [more docs](https://doc.rust-lang.org/std/iter/trait.Iterator.html)
-
-### Supported
-
-all, any, array_chunks, chain, cmp_by, count, cycle, enumerate, eq_by, filter, filter_map, find, find_map, flat_map, flatten, fold, for_each, inspect, intersperse, intersperseWith, is_sorted_by, last, map, max_by, min_by, partial_cmp_by, product, scan, skip, skip_while, take, take_while, zip
-
-### Not supported
-
-advance_by, cloned, cmp, collect, collect_into, copied, eq, fuse, ge, gt, partitioned, try_fold, is_sorted, is_sorted_by_key, le, lt, map_while, max, min, ne, next_chunk, nth, partial_cmp, partition, partition_in_place, peekable, position, **reduce** ( to option), rev, rPosition, size_hint, step_by, sum, try_collect, try_find, try_fold, try_for_each, try_reduce, unzip, some kind of **remainder** ability
-
-## Itertools (Python)
-
-[Reference](https://docs.python.org/3/library/itertools.html)
-
-### Supported
-
-cycle, repeat, accumulate, chain, dropwhile, filterfalse, pairwise, takewhile, zip_longest, product,
-
-### Not supported
-
-count, compress, groupby, islice, starmap, tee, permutations, combinations, combinations_with_replacement, recipes: all_equal, subslices
-
-## Itertools (Javascript)
-
-[Reference for JS itertools](https://github.com/iter-tools/iter-tools/blob/v7.5.0/API.md)
-
-### Supported
-
-range, drop, dropWhile, enumerate, filter, flat, flatMap, interpose, map, prepend, take, takeWhile, tap, window, batch, collate, concat, join, zip, deepEqual, every, find, findBest, first, isEmpty, reduce, size, some, takeLast, fork, arrayFrom, forEach, toString, toArray, firstHighest, firstLowest, roundRobin, windowBehind, windowAhead, isSorted
-
-### Not supported
-
-range (with step), repeat (constant), objectEntries, objectKeys, objectValues, append (one value), distinct, interposeSeq, reverse, slice, takeSorted, bisect, split, splitGroups, splitOn, splitWhen, compress, joinWith, firstOr, includes, includesAny, **many async flavors**, startsWith, startsWithAny, str, takeLastOr, objectFrom, toObject, lastHighest, lastLowest, zipAll
-
-## MoreLINQ
-
-[MoreLINQ on Github](https://github.com/morelinq/MoreLINQ)
-
-### Supported
-
-takeUntil, dropUntil, consume
-
-### Not supported
-
-endsWith, fallbackIfEmpty, flatten (recursive), tagFirstLast, toMap, toObject
+```
