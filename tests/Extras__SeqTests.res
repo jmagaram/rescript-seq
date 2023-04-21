@@ -154,22 +154,24 @@ let allPairsTests = makeSeqEqualsTests(
     ),
   ],
 )->Js.Array2.concat([
-  T.make(
-    ~category="Seq",
+  foldEqual(
     ~title="allPairs",
-    ~expectation="second sequence is cached",
-    ~predicate=() => {
-      let set = ref(Belt.Set.Int.empty)
-      let _ = S.allPairs(
-        ["x", "y"]->S.fromArray,
-        S.repeatWith(2, () => {
+    ~expectation="both sequences appear cached",
+    ~a=() => {
+      let callCount = ref(0)
+      let generateRandomInt = () => {
           let num = Js.Math.random_int(1, 100)
-          set := set.contents->Belt.Set.Int.add(num)
+        callCount := callCount.contents + 1
           num
-        }),
-      )->S.consume
-      set.contents->Belt.Set.Int.size == 2
+      }
+      let _ =
+        S.allPairs(S.repeatWith(10, generateRandomInt), S.repeatWith(10, generateRandomInt))
+        ->S.tap(Js.log)
+        ->S.consume
+      Js.log(callCount.contents)
+      callCount.contents
     },
+    ~b=20,
   ),
 ])
 
