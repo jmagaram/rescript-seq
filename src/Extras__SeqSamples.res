@@ -3,7 +3,7 @@ module Option = Belt.Option
 let intToString = Belt.Int.toString
 
 /**
-A few ways of constructing simple sequences.
+Examples of constructing simple sequences.
 */
 let aa = Seq.range(1, 100)
 let bb = Seq.iterate(2, i => i * 2)->Seq.takeWhile(i => i < 1000)
