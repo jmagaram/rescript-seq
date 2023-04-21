@@ -115,7 +115,6 @@ let forEach: (t<'a>, 'a => unit) => unit
 let forEachi: (t<'a>, ('a, int) => unit) => unit
 let head: t<'a> => option<'a>
 let headTail: t<'a> => option<('a, t<'a>)>
-let headTails: t<'a> => t<('a, t<'a>)>
 let isEmpty: t<'a> => bool
 let isSortedBy: (t<'a>, ('a, 'a) => int) => bool
 let joinString: t<string> => string
