@@ -19,7 +19,7 @@ Highlights:
 - **Combine** multiple sequences with `zip`, `zip3`, `map2`, `map3`, `sortedMerge`, `interleave` and others.
 - **Calculate** values with `reduce`, `some`, `findMap`, `isSortedBy`, `minBy`, `toArray` and others.
 
-See the [examples](#examples) section.
+See code [examples](src/Extras__SeqSamples.res).
 
 ## Install
 
