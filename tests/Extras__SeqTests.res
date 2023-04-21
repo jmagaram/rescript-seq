@@ -1538,15 +1538,15 @@ let sampleFibonacci = {
   let fib = Extras__SeqSamples.fibonacci
   makeSeqEqualsTests(
     ~title="sampleFibonacci",
-    [(fib()->S.takeAtMost(12), [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89], "")],
+    [(fib(12)->S.fromArray, [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89], "")],
   )
 }
 
-let sampleZipAll = {
-  let z = Extras__SeqSamples.zipAll
+let sampleZipLongest = {
+  let z = Extras__SeqSamples.zipLongest
   let compute = (xx, yy) => z(xx->S.fromArray, yy->S.fromArray)
   makeSeqEqualsTests(
-    ~title="sampleZipAll",
+    ~title="sampleZipLongest",
     [
       (
         compute([1, 2], ["x", "y", "z"]),
@@ -1556,6 +1556,54 @@ let sampleZipAll = {
       (compute([], ["x", "y", "z"]), [(None, Some("x")), (None, Some("y")), (None, Some("z"))], ""),
     ],
   )
+}
+
+let sampleBinaryDigits = {
+  let getDigits = Extras__SeqSamples.binary
+  makeSeqEqualsTests(
+    ~title="sampleBinaryDigits",
+    [
+      (15->getDigits, [1, 1, 1, 1], ""),
+      (8->getDigits, [1, 0, 0, 0], ""),
+      (435_195->getDigits, [1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1], ""),
+    ],
+  )
+}
+
+let sampleChunkBySize = {
+  let getChunks = Extras__SeqSamples.chunk
+  makeSeqEqualsTests(
+    ~title="sampleChunkBySize",
+    [
+      ([1, 2, 3]->getChunks(2), [[1, 2], [3]], ""),
+      ([]->getChunks(8), [], ""),
+      ([1, 2, 3]->getChunks(1), [[1], [2], [3]], ""),
+    ],
+  )
+}
+
+let sampleLocalMinimums = {
+  let getMins = Extras__SeqSamples.localMinimums
+  [
+    foldEqual(
+      ~title="sampleLocalMinimums",
+      ~a=() => [(4, 4), (7, 0), (10, 12)]->getMins,
+      ~b="(7, 0)",
+      ~expectation="",
+    ),
+    foldEqual(
+      ~title="sampleLocalMinimums",
+      ~a=() => [(4, 4), (7, 0), (10, 12), (15, -1), (99, 3)]->getMins,
+      ~b="(7, 0), (15, -1)",
+      ~expectation="",
+    ),
+    foldEqual(
+      ~title="sampleLocalMinimums",
+      ~a=() => [(4, 4), (7, 19), (10, 99)]->getMins,
+      ~b="There are no local minimums.",
+      ~expectation="",
+    ),
+  ]
 }
 
 let tests =
@@ -1574,8 +1622,9 @@ let tests =
     dropWhileTests,
     equalsTests,
     everyTests,
-    filterMapTests,
+    exactlyOneTests,
     filterMapiTests,
+    filterMapTests,
     filterOkTests,
     filterSomeTests,
     filterTests,
@@ -1586,13 +1635,13 @@ let tests =
     flatMapTests,
     flattenTests,
     forEachTests,
+    foreverTests,
+    foreverWithTests,
     fromArrayTests,
     fromListTests,
     headTailTests,
     headTests,
     indexedTests,
-    foreverTests,
-    foreverWithTests,
     initTests,
     interleaveTests,
     intersperseTests,
@@ -1600,11 +1649,12 @@ let tests =
     isEqualTests,
     isSortedByTests,
     iterateTests,
+    joinStringTests,
     lastTests,
     lengthTests,
-    mapTests,
     map2Tests,
     map3Tests,
+    mapTests,
     memoizeTests,
     minByMaxByTests,
     orElseTests,
@@ -1616,7 +1666,10 @@ let tests =
     repeatTests,
     repeatWithTests,
     sampleFibonacci,
-    sampleZipAll,
+    sampleBinaryDigits,
+    sampleChunkBySize,
+    sampleZipLongest,
+    sampleLocalMinimums,
     scanTests,
     someTests,
     sortedMergeTests,
@@ -1625,9 +1678,7 @@ let tests =
     takeWhileTests,
     tapTests,
     toArrayTests,
-    exactlyOneTests,
     toOptionTests,
-    joinStringTests,
     unfoldTests,
     windowAheadTests,
     windowBehindTests,

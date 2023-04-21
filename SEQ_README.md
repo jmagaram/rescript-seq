@@ -12,8 +12,8 @@ Highlights:
 - All APIs documented; some with code examples
 - Comprehensive test suite
 - Written 100% in ReScript; look at the tests and code to gain deeper understanding of how it works
-- Full [suite of >90 functions](#functions) based on researching other libraries and languages
-- Ready for your contributions! :two_men_holding_hands:
+- Full [suite of > 90 functions](#functions) based on researching other libraries and languages
+- Ready for your contributions! :two_men_holding_hands: There are many other useful functions, and it would be great to have `async` versions of nearly everything.
 - **Build** with `fromArray`, `range`, `unfold`, `cycle`, `repeat` and others.
 - **Transform** sequences with `map`, `filter`, `takeAtMost`, `dropWhile`, `scan`, `tap`, `window`, and others.
 - **Combine** multiple sequences with `zip`, `zip3`, `map2`, `map3`, `sortedMerge`, `interleave` and others.

@@ -1,6 +1,6 @@
-## Version 0.23.0
+## Version 1.0.0
 
-- Add back `Seq`
+- Add `Seq` module
 
 ## Version 0.22.0
 
