@@ -1258,6 +1258,12 @@ let joinStringTests = [
     ~a=() => []->S.fromArray->S.joinString,
     ~b="",
   ),
+  foldEqual(
+    ~title="joinString",
+    ~expectation="when singleton",
+    ~a=() => ["x"]->S.fromArray->S.joinString,
+    ~b="x",
+  ),
 ]
 
 let exactlyOneTests = [
