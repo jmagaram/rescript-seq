@@ -401,7 +401,10 @@ let rec cache = seq =>
     }
   )
 
-let allPairs = (xx, yy) => xx->flatMap(x => yy->map(y => (x, y)))
+let allPairs = (xx, yy) => {
+  let yy = yy->cache
+  xx->flatMap(x => yy->map(y => (x, y)))
+}
 
 let dropUntil = (xx, predicate) =>
   (. ()) =>

@@ -153,7 +153,25 @@ let allPairsTests = makeSeqEqualsTests(
       "",
     ),
   ],
-)
+)->Js.Array2.concat([
+  T.make(
+    ~category="Seq",
+    ~title="allPairs",
+    ~expectation="second sequence is cached",
+    ~predicate=() => {
+      let set = ref(Belt.Set.Int.empty)
+      let _ = S.allPairs(
+        ["x", "y"]->S.fromArray,
+        S.repeatWith(2, () => {
+          let num = Js.Math.random_int(1, 100)
+          set := set.contents->Belt.Set.Int.add(num)
+          num
+        }),
+      )->S.consume
+      set.contents->Belt.Set.Int.size == 2
+    },
+  ),
+])
 
 let rangeTests = makeSeqEqualsTests(
   ~title="range",
