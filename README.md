@@ -29,7 +29,7 @@ Add to your `bsconfig.json`...
 
 ## Lazy sequences (Seq module)
 
-See [Seq README](SEQ_README.md)
+See [Seq README](SEQ_README.md). This really should be its own package.
 
 ## Task and TaskResult
 
