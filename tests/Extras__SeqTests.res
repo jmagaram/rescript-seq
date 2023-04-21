@@ -1606,6 +1606,18 @@ let sampleLocalMinimums = {
   ]
 }
 
+let sampleRunningTotal = {
+  let f = Extras__SeqSamples.runningTotal
+  makeSeqEqualsTests(
+    ~title="sampleRunningTotal",
+    [
+      ([1, 2, 3, 4]->f, [0, 1, 3, 6, 10], ""),
+      ([]->f, [0], ""),
+      ([3, 3, 3, 3]->f, [0, 3, 6, 9, 12], ""),
+    ],
+  )
+}
+
 let tests =
   [
     allOkTests,
@@ -1670,6 +1682,7 @@ let tests =
     sampleChunkBySize,
     sampleZipLongest,
     sampleLocalMinimums,
+    sampleRunningTotal,
     scanTests,
     someTests,
     sortedMergeTests,
