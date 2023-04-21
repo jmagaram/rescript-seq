@@ -9,13 +9,13 @@ let aa = Seq.range(1, 100)
 let bb = Seq.iterate(2, i => i * 2)->Seq.takeWhile(i => i < 1000)
 let cc = Seq.foreverWith(() => Js.Math.random())
 let dd = [1, 3, 7, 2]->Seq.fromArray->Seq.cycle
-let ee = "the world!"->Seq.characters->Seq.intersperse(",")
+let ee = "banana"->Seq.characters->Seq.intersperse(",")
 let ff = Seq.repeat(100, "x")->Seq.toArray
 let gg = Seq.rangeMap(99, 1, i => i * 3)
 let hh = Seq.singleton("Hello!")
 
 /**
-Pointless number crunching just to see how it flows.
+Pointless number crunching to see how it flows.
 */
 let nums =
   Seq.range(1, 999_999)
@@ -25,7 +25,7 @@ let nums =
   ->Seq.filterMap(((a, b)) => a < b ? Some(a + b) : None)
   ->Seq.takeAtMost(623)
   ->Seq.tap(n => {
-    if n == 100 {
+    if mod(n, 100) == 0 {
       Js.log(`Saw ${n->Belt.Int.toString}. Interesting!`)
     }
   })
