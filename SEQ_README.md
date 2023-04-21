@@ -4,7 +4,7 @@ A _sequence_ is a list whose elements are computed only on demand. Sequences are
 
 Sequences are an important and convenient data structure in [F# (Seq module)](https://fsharp.github.io/fsharp-core-docs/reference/fsharp-collections-seqmodule.html) , [OCaml (Seq module)](https://v2.ocaml.org/api/Seq.html), [Rust std::iter](https://doc.rust-lang.org/std/iter/trait.Iterator.html), [C# .net IEnumerable<T>](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1?view=net-8.0), and [Python (itertools)](https://docs.python.org/3/library/itertools.html). There are many libraries that help consume iterables in JavaScript as well.
 
-:boom: **This is a comprehensive library for creating and consuming sequences in ReScript.**:boom:
+**This is a full-featured and developer-friendly library for creating and consuming sequences in ReScript.**
 
 Highlights:
 
