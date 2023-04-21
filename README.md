@@ -2,7 +2,7 @@
 
 Utilities for [ReScript](https://rescript-lang.org). Includes:
 
-- Lazy Sequences with a `Seq` module; [see comprehensive README](SEQ_README.md)
+- Lazy Sequences with a `Seq` module; [see README](SEQ_README.md) for overview, functions, samples, etc.
 - A lazy-promise `Task` and `TaskResult`
 - Untagged `Union` and `Literal` to construct and pattern match on discriminated unions of any kind
 - Useful extensions to `Option`, `Result`, and `Array`
