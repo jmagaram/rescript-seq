@@ -2,17 +2,19 @@
 
 A _sequence_ is a list whose elements are computed only on demand. Sequences are produced and transformed lazily (one element at a time) rather than eagerly (all at once). This allows constructing conceptually infinite sequences. When your data is an `array`, as it almost always is, a single `fromArray` function wraps it in a sequence and makes it possible to analyze and transform it with far more flexibility and power than what is possible using only the built-in array functions. A sequence can also provide better performance than an `array` when not all elements are used. Sequences are similar to [JavaScript iterables](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols).
 
-Sequences are an important data structure in [F# (Seq module)](https://fsharp.github.io/fsharp-core-docs/reference/fsharp-collections-seqmodule.html) , [OCaml (Seq module)](https://v2.ocaml.org/api/Seq.html), [Rust std::iter](https://doc.rust-lang.org/std/iter/trait.Iterator.html), [C# .net IEnumerable<T>](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1?view=net-8.0), and [Python (itertools)](https://docs.python.org/3/library/itertools.html). There are many JavaScript libraries for consuming iterables as well. **This is a full-featured library for creating and consuming sequences in ReScript.**
+Sequences are an important data structure in [F# (Seq module)](https://fsharp.github.io/fsharp-core-docs/reference/fsharp-collections-seqmodule.html) , [OCaml (Seq module)](https://v2.ocaml.org/api/Seq.html), [Rust std::iter](https://doc.rust-lang.org/std/iter/trait.Iterator.html), [C# .net IEnumerable<T>](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1?view=net-8.0), and [Python (itertools)](https://docs.python.org/3/library/itertools.html). There are many JavaScript libraries for consuming iterables as well.
+
+**This is a full-featured library for creating and consuming sequences in ReScript.**
 
 Highlights:
 
-- Enables more elegant and concise solutions to problems than using imperative code and arrays
+- Enables more elegant and concise solutions than using imperative code and arrays
 - All APIs documented; some with code examples
 - Comprehensive test suite
-- Written 100% in ReScript; look at the tests and code to gain deeper understanding of how it works
+- Written 100% in ReScript. Look at the tests and code to gain deeper understanding of how it works.
 - Full [suite of > 90 functions](#functions) based on researching other libraries and languages
 - Ready for your contributions! :two_men_holding_hands: There are many other useful functions, and it would be great to have `async` versions.
-- **Build sequences** using `fromArray`, `range`, `unfold`, `cycle`, `repeat` and others. This overlaps in functionality with [JavaScript generators](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Generator).
+- **Build sequences** using `fromArray`, `range`, `unfold`, `cycle`, `repeat` and others. This enables functionality similar to [JavaScript generators](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Generator).
 - **Transform** sequences with `map`, `filter`, `takeAtMost`, `dropWhile`, `scan`, `tap`, `window`, and others.
 - **Combine** multiple sequences with `zip`, `zip3`, `map2`, `map3`, `sortedMerge`, `interleave` and others.
 - **Calculate** values with `reduce`, `some`, `findMap`, `isSortedBy`, `minBy`, `toArray` and others.
