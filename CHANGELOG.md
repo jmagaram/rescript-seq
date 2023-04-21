@@ -1,3 +1,7 @@
+## Version 1.0.1
+
+- Fix bug in `allPairs` where sequences are not cached.
+
 ## Version 1.0.0
 
 - Add `Seq` module
