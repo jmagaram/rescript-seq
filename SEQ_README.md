@@ -2,9 +2,7 @@
 
 A _sequence_ is a list whose elements are computed only on demand. Sequences are produced and transformed lazily (one element at a time) rather than eagerly (all at once). This allows constructing conceptually infinite sequences. When your data is an `array`, as it almost always is, a single `fromArray` function wraps it in a sequence and makes it possible to analyze and transform it with far more flexibility and power than what is possible using only the built-in array functions. A sequence can also provide better performance than an `array` when not all elements are used. Sequences are similar to [JavaScript iterables](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols).
 
-Sequences are an important data structure in [F# (Seq module)](https://fsharp.github.io/fsharp-core-docs/reference/fsharp-collections-seqmodule.html) , [OCaml (Seq module)](https://v2.ocaml.org/api/Seq.html), [Rust std::iter](https://doc.rust-lang.org/std/iter/trait.Iterator.html), [C# .net IEnumerable<T>](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1?view=net-8.0), and [Python (itertools)](https://docs.python.org/3/library/itertools.html). There are many JavaScript libraries for consuming iterables as well.
-
-**This is a full-featured library for creating and consuming sequences in ReScript.**
+Sequences are an important data structure in [F# (Seq module)](https://fsharp.github.io/fsharp-core-docs/reference/fsharp-collections-seqmodule.html) , [OCaml (Seq module)](https://v2.ocaml.org/api/Seq.html), [Rust std::iter](https://doc.rust-lang.org/std/iter/trait.Iterator.html), [C# .net IEnumerable<T>](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1?view=net-8.0), and [Python (itertools)](https://docs.python.org/3/library/itertools.html). There are many JavaScript libraries for consuming iterables as well. **This is a full-featured library for creating and consuming sequences in ReScript.**
 
 Highlights:
 
