@@ -42,7 +42,7 @@ let foldEqual = (~title, ~expectation, ~a, ~b) =>
     let pass = aValue == b
     if !pass {
       Js.Console.log(`===== NOT EQUAL : ${title} : ${expectation} =====`)
-      Js.Console.log(`A: ${a->Obj.magic}`)
+      Js.Console.log(`A: ${aValue->Obj.magic}`)
       Js.Console.log(`B: ${b->Obj.magic}`)
     }
     pass
