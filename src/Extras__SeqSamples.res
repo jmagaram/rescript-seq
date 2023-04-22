@@ -2,8 +2,8 @@ module Seq = Extras__Seq
 module Option = Belt.Option
 let intToString = Belt.Int.toString
 
-// Wrap any array in a sequence and then have access to all the Seq functions to
-// filter, map, reduce, and analyze it. When you're done, call `toArray`.
+// Wrap any array in a sequence and then use all the Seq functions to filter,
+// map, reduce, and analyze it. When you're done, call `toArray`.
 
 let arr = ["w", "v", "q", "s", "p", "x"]
 let s1 = arr->Seq.fromArray
@@ -11,7 +11,7 @@ let s2 = arr->Seq.fromArray(~start=2)
 let s3 = arr->Seq.fromArray(~end=4)
 
 /**
-Examples of constructing simple sequences.
+Creating simple sequences.
 */
 let aa = Seq.range(1, 100)
 let bb = Seq.iterate(2, i => i * 2)->Seq.takeWhile(i => i < 1000)
