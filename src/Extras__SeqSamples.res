@@ -3,7 +3,9 @@ module Option = Belt.Option
 let intToString = Belt.Int.toString
 
 // Wrap any array in a sequence and then use all the Seq functions to filter,
-// map, reduce, and analyze it. When you're done, call `toArray`.
+// map, reduce, and analyze it. This process does NOT copy the array; it just
+// creates a lightweight function to iterate through its elements. When you're
+// done, call `toArray`.
 
 let arr = ["w", "v", "q", "s", "p", "x"]
 let s1 = arr->Seq.fromArray
@@ -34,7 +36,7 @@ let nums =
   ->Seq.takeAtMost(623)
   ->Seq.tap(n => {
     if mod(n, 100) == 0 {
-      Js.log(`Saw ${n->Belt.Int.toString}. Interesting!`)
+      Js.log(`Saw ${n->intToString}. Interesting!`)
     }
   })
   ->Seq.flatMap(n => Seq.rangeMap(1, n, i => i * 2))
