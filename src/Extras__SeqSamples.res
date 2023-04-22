@@ -3,13 +3,12 @@ module Option = Belt.Option
 let intToString = Belt.Int.toString
 
 // Wrap any array in a sequence and then have access to all the Seq functions to
-// filter, map, reduce, and analyze it. When you're done, call `toArray` to make
-// a new array with your changes.
+// filter, map, reduce, and analyze it. When you're done, call `toArray`.
 
 let arr = ["w", "v", "q", "s", "p", "x"]
-let f1 = arr->Seq.fromArray
-let f2 = arr->Seq.fromArray(~start=2)
-let f3 = arr->Seq.fromArray(~end=4)
+let s1 = arr->Seq.fromArray
+let s2 = arr->Seq.fromArray(~start=2)
+let s3 = arr->Seq.fromArray(~end=4)
 
 /**
 Examples of constructing simple sequences.
@@ -130,3 +129,87 @@ similar to `reduce` but returns intermediate results. For example, the running
 total of [1, 2, 3, 4] is [0, 1, 3, 6, 10] 
 */
 let runningTotal = nums => nums->Seq.fromArray->Seq.scan(0, (sum, i) => sum + i)
+
+type match<'a> =
+  | Empty
+  | Singleton('a)
+  | HeadTail('a, Seq.t<'a>)
+
+let match = xx =>
+  switch xx->Seq.headTail {
+  | None => Empty
+  | Some(x, xx) =>
+    switch xx->Seq.toOption {
+    | None => Singleton(x)
+    | Some(_) => HeadTail(x, xx)
+    }
+  }
+
+let rec combinations = xx => {
+  open Seq
+  switch xx->headTail {
+  | None => empty->singleton
+  | Some(x, xx) => combinations(xx)->flatMap(xx => concat(xx->singleton, cons(x, xx)->singleton))
+  }
+}
+
+let rec combos = (xx, max) => {
+  open Seq
+  if max == 0 {
+    empty->singleton
+  } else if max == 1 {
+    xx->map(singleton)
+  } else {
+    switch xx->headTail {
+    | None => empty->singleton
+    | Some(x, xx) => {
+        let m = combos(xx, max)
+        let n = combos(xx, max - 1)->map(xx => cons(x, xx))->orElse(x->singleton->singleton)
+        concat(m, n)
+      }
+    }
+  }
+}
+
+// let rec combos = (xx, max) => {
+//   open Seq
+//   switch max == 0 {
+//   | true => empty->singleton
+//   | false =>
+//     switch xx->headTail {
+//     | None => empty->singleton
+//     | Some(x, xx) =>
+//       switch max == 1 {
+//       | true => concat(x->singleton, xx)
+//       | false => combos(xx, max - 1)->flatMap(xx => concat(xx->singleton, cons(x, xx)->singleton))
+//       }
+//     }
+//   }
+// }
+
+// let combos = (~xx, ~minLength, ~maxLength) => {
+//   open Seq
+//   let rec go = (~xx, ~prefixLength) => {
+//     switch prefixLength >= maxLength {
+//     | true => empty->singleton
+//     | false =>
+//       switch xx->headTail {
+//       | None => empty->singleton
+//       | Some(x, xx) =>
+//         switch prefixLength < maxLength {
+//         | true => {
+//             let withoutHead = go(~xx, ~prefixLength)
+//             withoutHead->flatMap(xx =>
+//               concat(xx->singleton, prefixLength < maxLength ? cons(x, xx)->singleton : Seq.empty)
+//             )
+//           }
+//         | false =>
+//           go(~xx, ~prefixLength=prefixLength + 1)->flatMap(xx =>
+//             concat(xx->singleton, cons(x, xx)->singleton->filter(_ => prefixLength < maxLength))
+//           )
+//         }
+//       }
+//     }
+//   }
+//   go(~xx, ~prefixLength=0)
+// }
