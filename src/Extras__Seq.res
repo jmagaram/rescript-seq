@@ -695,3 +695,12 @@ let orElse = (xx, yy) =>
     | Next(_, _) as nxt => nxt
     }
   }
+
+let reverse = xx =>
+  (. ()) => {
+    let xx = xx->toArray
+    switch xx->Js.Array2.length {
+    | 0 => End
+    | _ => xx->fromArray(~start=xx->Js.Array2.length - 1, ~end=0)->nextNode
+    }
+  }

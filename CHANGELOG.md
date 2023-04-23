@@ -1,6 +1,7 @@
 ## Version 1.0.1
 
 - Fix bug in `allPairs` where sequences are not cached.
+- `Seq.reverse`
 
 ## Version 1.0.0
 

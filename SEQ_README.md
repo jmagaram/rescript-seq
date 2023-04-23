@@ -35,6 +35,7 @@ type t<'a> // A lazy sequence of `a`
 let characters: Js.String2.t => t<Js.String2.t>
 let cons: ('a, t<'a>) => t<'a>
 let cycle: t<'a> => t<'a>
+let reverse: (unit, t<'a>) => t<'a>
 let empty: t<'a>
 let endWith: (t<'a>, 'a) => t<'a>
 let forever: 'a => t<'a>
@@ -73,6 +74,7 @@ let intersperseWith: (t<'a>, unit => 'a) => t<'a>
 let map: (t<'a>, 'a => 'b) => t<'b>
 let mapi: (t<'a>, ('a, int) => 'b) => t<'b>
 let pairwise: t<'a> => t<('a, 'a)>
+let reverse: t<'a> => t<'a>
 let scan: (t<'a>, 'b, ('b, 'a) => 'b) => t<'b>
 let scani: (t<'a>, ~zero: 'b, (~sum: 'b, ~val: 'a, ~inx: int) => 'b) => t<'b>
 let takeAtMost: (t<'a>, int) => t<'a>

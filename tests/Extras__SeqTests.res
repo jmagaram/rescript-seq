@@ -160,9 +160,9 @@ let allPairsTests = makeSeqEqualsTests(
     ~a=() => {
       let callCount = ref(0)
       let generateRandomInt = () => {
-          let num = Js.Math.random_int(1, 100)
+        let num = Js.Math.random_int(1, 100)
         callCount := callCount.contents + 1
-          num
+        num
       }
       let _ =
         S.allPairs(
@@ -1550,6 +1550,24 @@ let consumeTests = [
   ),
 ]
 
+let reverseTests = makeSeqEqualsTests(
+  ~title="reverse",
+  [
+    (S.empty->S.reverse, [], ""),
+    (S.singleton(1)->S.reverse, [1], ""),
+    (oneToFive->S.reverse, [5, 4, 3, 2, 1], ""),
+  ],
+)->Js.Array2.concat([
+  T.make(~category="Seq", ~title="reverse", ~expectation="completely lazy", ~predicate=() => {
+    S.repeatWith(3, () => {Js.Exn.raiseError("boom!")})
+    ->S.reverse
+    ->S.takeAtMost(0)
+    ->S.consume
+    ->ignore
+    true
+  }),
+])
+
 let orElseTests = makeSeqEqualsTests(
   ~title="orElse",
   [
@@ -1703,6 +1721,7 @@ let tests =
     reduceTests,
     repeatTests,
     repeatWithTests,
+    reverseTests,
     sampleFibonacci,
     sampleBinaryDigits,
     sampleChunkBySize,
