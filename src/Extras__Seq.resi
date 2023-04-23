@@ -78,7 +78,7 @@ let cycle: t<'a> => t<'a>
 
 /**
 `range(start, end)` is the sequence integers from `start` to `end` (inclusive).
-If `start` is greater than `end` the sequence of numbers is descending.
+If `start` is greater than `end` the sequence of numbers descends.
 */
 let range: (int, int) => t<int>
 
