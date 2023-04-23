@@ -165,10 +165,10 @@ let allPairsTests = makeSeqEqualsTests(
           num
       }
       let _ =
-        S.allPairs(S.repeatWith(10, generateRandomInt), S.repeatWith(10, generateRandomInt))
-        ->S.tap(Js.log)
-        ->S.consume
-      Js.log(callCount.contents)
+        S.allPairs(
+          S.repeatWith(10, generateRandomInt),
+          S.repeatWith(10, generateRandomInt),
+        )->S.consume
       callCount.contents
     },
     ~b=20,
