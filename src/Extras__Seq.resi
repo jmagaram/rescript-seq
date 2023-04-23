@@ -636,8 +636,8 @@ does nothing.
 let consume: t<'a> => unit
 
 /**
-`reverse` eagerly converts the entire sequence to an array, and then returns a
-sequence corresponding to the elements in the reverse order.
+`reverse` eagerly converts the entire sequence to a new array, and then returns
+a sequence corresponding to the elements in the reverse order.
 */
 let reverse: t<'a> => t<'a>
 
