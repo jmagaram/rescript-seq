@@ -1578,6 +1578,16 @@ let orElseTests = makeSeqEqualsTests(
   ],
 )
 
+let delayTests = makeSeqEqualsTests(
+  ~title="delay",
+  [
+    (S.delay(() => S.empty), [], ""),
+    (S.delay(() => S.singleton(1)), [1], ""),
+    (S.delay(() => oneToFive), [1, 2, 3, 4, 5], ""),
+    (S.delay(() => Js.Exn.raiseError("Boom!"))->S.takeAtMost(0), [], ""),
+  ],
+)
+
 let sampleFibonacci = {
   let fib = Extras__SeqSamples.fibonacci
   makeSeqEqualsTests(
@@ -1673,6 +1683,7 @@ let tests =
     concatTests,
     consumeTests,
     cycleTests,
+    delayTests,
     dropTests,
     dropUntilTests,
     dropWhileTests,

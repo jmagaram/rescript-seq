@@ -9,6 +9,8 @@ and node<'a> =
   | End
   | Next('a, t<'a>)
 
+let delay = generator => (. ()) => generator()(.)
+
 module Node = {
   let end = End
 
@@ -697,10 +699,10 @@ let orElse = (xx, yy) =>
   }
 
 let reverse = xx =>
-  (. ()) => {
+  delay(() => {
     let xx = xx->toArray
     switch xx->Js.Array2.length {
-    | 0 => End
-    | _ => xx->fromArray(~start=xx->Js.Array2.length - 1, ~end=0)->nextNode
+    | 0 => empty
+    | _ => xx->fromArray(~start=xx->Js.Array2.length - 1, ~end=0)
     }
-  }
+  })

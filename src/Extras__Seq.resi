@@ -640,3 +640,8 @@ let consume: t<'a> => unit
 sequence corresponding to the elements in the reverse order.
 */
 let reverse: t<'a> => t<'a>
+
+/**
+`delay` returns a sequence that is built from the given lazy specifcation of a sequence.
+*/
+let delay: (unit => t<'a>) => t<'a>

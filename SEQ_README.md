@@ -35,6 +35,7 @@ type t<'a> // A lazy sequence of `a`
 let characters: Js.String2.t => t<Js.String2.t>
 let cons: ('a, t<'a>) => t<'a>
 let cycle: t<'a> => t<'a>
+let delay:()=>t<'a>=>t<'a>
 let reverse: (unit, t<'a>) => t<'a>
 let empty: t<'a>
 let endWith: (t<'a>, 'a) => t<'a>
