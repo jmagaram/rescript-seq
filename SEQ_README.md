@@ -78,6 +78,7 @@ let pairwise: t<'a> => t<('a, 'a)>
 let reverse: t<'a> => t<'a>
 let scan: (t<'a>, 'b, ('b, 'a) => 'b) => t<'b>
 let scani: (t<'a>, ~zero: 'b, (~sum: 'b, ~val: 'a, ~inx: int) => 'b) => t<'b>
+let sortBy: (t<'a>, ('a, 'a) => int) => t<'a>
 let takeAtMost: (t<'a>, int) => t<'a>
 let takeUntil: (t<'a>, 'a => bool) => t<'a>
 let takeWhile: (t<'a>, 'a => bool) => t<'a>

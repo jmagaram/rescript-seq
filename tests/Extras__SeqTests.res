@@ -6,6 +6,7 @@ module Option = Belt.Option
 module Result = Belt.Result
 
 let intToString = Belt.Int.toString
+let intCompare = Ex.Cmp.int
 
 let concatInts = xs =>
   xs->Js.Array2.length == 0 ? "_" : xs->Js.Array2.map(intToString)->Js.Array2.joinWith("")
@@ -1578,13 +1579,54 @@ let orElseTests = makeSeqEqualsTests(
   ],
 )
 
+let sortByTests = makeSeqEqualsTests(
+  ~title="sortBy",
+  [
+    (S.empty->S.sortBy(intCompare), [], ""),
+    (S.singleton(1)->S.sortBy(intCompare), [1], ""),
+    ([1, 5, 2, 9, 7, 3]->S.fromArray->S.sortBy(intCompare), [1, 2, 3, 5, 7, 9], ""),
+  ],
+)->Js.Array2.concat([
+  T.make(~category="Seq", ~title="sortBy", ~expectation="completely lazy", ~predicate=() => {
+    S.repeatWith(3, () => {Js.Exn.raiseError("boom!")})
+    ->S.sortBy(intCompare)
+    ->S.takeAtMost(0)
+    ->S.consume
+    ->ignore
+    true
+  }),
+  T.make(~category="Seq", ~title="sortBy", ~expectation="stable", ~predicate=() => {
+    let sortByFirst = (a, b) => {
+      let (afst, _) = a
+      let (bfst, _) = b
+      intCompare(afst, bfst)
+    }
+    let data = [
+      (2, "x"),
+      (1, "x"),
+      (2, "y"),
+      (4, "x"),
+      (3, "x"),
+      (1, "y"),
+      (3, "y"),
+      (2, "z"),
+      (4, "y"),
+      (1, "z"),
+      (3, "z"),
+      (4, "z"),
+    ]
+    let sorted = data->S.fromArray->S.sortBy(sortByFirst)->S.map(((_, letter)) => letter)->S.toArray
+    sorted == "xyzxyzxyzxyz"->Js.String2.split("")
+  }),
+])
+
 let delayTests = makeSeqEqualsTests(
   ~title="delay",
   [
     (S.delay(() => S.empty), [], ""),
     (S.delay(() => S.singleton(1)), [1], ""),
     (S.delay(() => oneToFive), [1, 2, 3, 4, 5], ""),
-    (S.delay(() => Js.Exn.raiseError("Boom!"))->S.takeAtMost(0), [], ""),
+    (S.delay(() => Js.Exn.raiseError("boom!"))->S.takeAtMost(0), [], ""),
   ],
 )
 
@@ -1739,6 +1781,7 @@ let tests =
     sampleZipLongest,
     scanTests,
     someTests,
+    sortByTests,
     sortedMergeTests,
     takeAtMostTests,
     takeUntilTests,

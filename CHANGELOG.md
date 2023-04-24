@@ -1,7 +1,9 @@
-## Version 1.0.1
+## Version 1.1.0
 
 - Fix bug in `allPairs` where sequences are not cached.
 - `Seq.reverse`
+- `Seq.sortBy`
+- `Seq.delay`
 
 ## Version 1.0.0
 

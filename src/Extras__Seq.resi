@@ -646,3 +646,11 @@ let reverse: t<'a> => t<'a>
 sequence.
 */
 let delay: (unit => t<'a>) => t<'a>
+
+/**
+`sortBy(source, compare)` consumes the entire `source` sequence as soon as that
+sequence is iterated. As such it should not be used with large or infinite
+sequences. The function uses a stable sort (the original order of equal elements
+is preserved) based on the provided `compare` function.
+*/
+let sortBy: (t<'a>, ('a, 'a) => int) => t<'a>

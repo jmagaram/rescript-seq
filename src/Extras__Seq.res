@@ -706,3 +706,10 @@ let reverse = xx =>
     | _ => xx->fromArray(~start=xx->Js.Array2.length - 1, ~end=0)
     }
   })
+
+let sortBy = (xx, compare) =>
+  delay(() => {
+    let xx = xx->toArray
+    xx->Js.Array2.sortInPlaceWith(compare)->ignore
+    xx->fromArray
+  })
