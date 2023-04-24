@@ -32,7 +32,7 @@ type t<'a> // A lazy sequence of `a`
 
 // Construct
 
-let characters: Js.String2.t => t<Js.String2.t>
+let characters: string => t<string>
 let cons: ('a, t<'a>) => t<'a>
 let cycle: t<'a> => t<'a>
 let delay:()=>t<'a>=>t<'a>
