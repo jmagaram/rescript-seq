@@ -716,7 +716,8 @@ let scanTests = {
   makeSeqEqualsTests(
     ~title="scan",
     [
-      (oneTwoThree->scanConcat, ["0", "01", "012", "0123"], ""),
+      (S.range(1, 5)->scanConcat, ["0", "01", "012", "0123", "01234", "012345"], ""),
+      (S.range(1, 2)->scanConcat, ["0", "01", "012"], ""),
       (S.singleton(1)->scanConcat, ["0", "01"], ""),
       (S.empty->scanConcat, ["0"], "always includes the zero"),
       (
@@ -748,15 +749,6 @@ let takeUntilTests = makeSeqEqualsTests(
     (oneToFive->S.takeUntil(i => i == 5), [1, 2, 3, 4, 5], ""),
     ([1, 2, 2, 2, 3]->S.fromArray->S.takeUntil(i => i == 2), [1, 2], ""),
     (
-      S.range(1, 99)
-      ->S.takeUntil(i => i == 99)
-      ->S.last
-      ->Option.map(S.singleton)
-      ->Option.getWithDefault(S.empty),
-      [99],
-      "tens",
-    ),
-    (
       S.range(1, 999_999)
       ->S.takeUntil(i => i == 999_999)
       ->S.last
@@ -787,7 +779,6 @@ let intersperseWithTests = {
     }
     f
   }
-
   makeSeqEqualsTests(
     ~title="intersperseWith",
     [
@@ -942,16 +933,26 @@ let dropUntilTests =
   )
 
 let forEachTests = [
-  T.make(~category="Seq", ~title="forEach", ~expectation="", ~predicate=() => {
-    let result = []
-    oneToFive->S.forEach(i => result->Js.Array2.push(i)->ignore)
-    result == [1, 2, 3, 4, 5]
-  }),
-  T.make(~category="Seq", ~title="forEachi", ~expectation="", ~predicate=() => {
-    let result = []
-    oneToFive->S.forEachi((n, inx) => result->Js.Array2.push((n, inx))->ignore)
-    result == [(1, 0), (2, 1), (3, 2), (4, 3), (5, 4)]
-  }),
+  valueEqual(
+    ~title="forEach",
+    ~expectation="",
+    ~a=() => {
+      let result = []
+      oneToFive->S.forEach(i => result->Js.Array2.push(i)->ignore)
+      result
+    },
+    ~b=[1, 2, 3, 4, 5],
+  ),
+  valueEqual(
+    ~title="forEachi",
+    ~expectation="",
+    ~a=() => {
+      let result = []
+      oneToFive->S.forEachi((n, inx) => result->Js.Array2.push((n, inx))->ignore)
+      result
+    },
+    ~b=[(1, 0), (2, 1), (3, 2), (4, 3), (5, 4)],
+  ),
 ]
 
 let someTests = [
