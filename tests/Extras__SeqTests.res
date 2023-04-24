@@ -367,38 +367,24 @@ let tapTests = [
   ),
 ]
 
-let windowTests = [
-  seqEqual(
+let windowTests =
+  makeSeqEqualsTests(
     ~title="window",
-    ~expectation="when empty => empty",
-    ~a=() => S.empty->S.window(5),
-    ~b=[],
-  ),
-  T.make(~category="Seq", ~title="window", ~expectation="when size = 0 => throw", ~predicate=() =>
-    R.fromTryCatch(() => [1, 2, 3]->S.fromArray->S.window(0))->Result.isError
-  ),
-  T.make(~category="Seq", ~title="window", ~expectation="when size < 0 => throw", ~predicate=() =>
-    R.fromTryCatch(() => [1, 2, 3]->S.fromArray->S.window(-1))->Result.isError
-  ),
-  seqEqual(
-    ~title="window",
-    ~expectation="when size < length",
-    ~a=() => oneToFive->S.window(3)->S.map(concatInts),
-    ~b=["123", "234", "345"],
-  ),
-  seqEqual(
-    ~title="window",
-    ~expectation="when size = length",
-    ~a=() => oneToFive->S.window(5)->S.map(concatInts),
-    ~b=["12345"],
-  ),
-  seqEqual(
-    ~title="window",
-    ~expectation="when size > length => empty",
-    ~a=() => oneToFive->S.window(6)->S.map(concatInts),
-    ~b=[],
-  ),
-]
+    [
+      (S.range(1, 5)->S.window(3)->S.map(concatInts), ["123", "234", "345"], ""),
+      (S.range(1, 5)->S.window(2)->S.map(concatInts), ["12", "23", "34", "45"], ""),
+      (S.range(1, 5)->S.window(1)->S.map(concatInts), ["1", "2", "3", "4", "5"], ""),
+      (S.range(1, 5)->S.window(999_999)->S.map(concatInts), [], ""),
+      (S.range(1, 5)->S.takeAtMost(0)->S.window(1)->S.map(concatInts), [], ""),
+    ],
+  )->Js.Array2.concat([
+    T.make(~category="Seq", ~title="window", ~expectation="when size = 0 => throw", ~predicate=() =>
+      R.fromTryCatch(() => [1, 2, 3]->S.fromArray->S.window(0))->Result.isError
+    ),
+    T.make(~category="Seq", ~title="window", ~expectation="when size < 0 => throw", ~predicate=() =>
+      R.fromTryCatch(() => [1, 2, 3]->S.fromArray->S.window(-1))->Result.isError
+    ),
+  ])
 
 let windowAheadBehindTests = (~title, ~function, ~data) =>
   {
@@ -467,59 +453,26 @@ let windowBehindTests = windowAheadBehindTests(
   ],
 )
 
-let pairwiseTests = [
-  seqEqual(
-    ~title="pairwise",
-    ~expectation="when empty => empty",
-    ~a=() => S.empty->S.pairwise,
-    ~b=[],
-  ),
-  seqEqual(
-    ~title="pairwise",
-    ~expectation="when singleton => None",
-    ~a=() => S.singleton(5)->S.pairwise,
-    ~b=[],
-  ),
-  seqEqual(
-    ~title="pairwise",
-    ~expectation="when multiple",
-    ~a=() => oneTwoThree->S.pairwise,
-    ~b=[(1, 2), (2, 3)],
-  ),
-]
+let pairwiseTests = makeSeqEqualsTests(
+  ~title="pairwise",
+  [
+    (S.empty->S.pairwise, [], ""),
+    (S.singleton(1)->S.pairwise, [], ""),
+    (S.range(1, 2)->S.pairwise, [(1, 2)], ""),
+    (S.range(1, 5)->S.pairwise, [(1, 2), (2, 3), (3, 4), (4, 5)], ""),
+  ],
+)
 
-let interleaveTests = [
-  seqEqual(
-    ~title="interleave",
-    ~expectation="when first shorter",
-    ~a=() => S.interleave(fourFiveSix, oneToFive),
-    ~b=[4, 1, 5, 2, 6, 3, 4, 5],
-  ),
-  seqEqual(
-    ~title="interleave",
-    ~expectation="when second shorter",
-    ~a=() => S.interleave(oneToFive, fourFiveSix),
-    ~b=[1, 4, 2, 5, 3, 6, 4, 5],
-  ),
-  seqEqual(
-    ~title="interleave",
-    ~expectation="when second empty",
-    ~a=() => S.interleave(oneToFive, S.empty),
-    ~b=[1, 2, 3, 4, 5],
-  ),
-  seqEqual(
-    ~title="interleave",
-    ~expectation="when first empty",
-    ~a=() => S.interleave(S.empty, oneToFive),
-    ~b=[1, 2, 3, 4, 5],
-  ),
-  seqEqual(
-    ~title="interleave",
-    ~expectation="when both empty",
-    ~a=() => S.interleave(S.empty, S.empty),
-    ~b=[],
-  ),
-]
+let interleaveTests = makeSeqEqualsTests(
+  ~title="interleave",
+  [
+    (S.interleave(S.empty, S.empty), [], ""),
+    (S.interleave(S.range(1, 3), S.range(4, 6)), [1, 4, 2, 5, 3, 6], ""),
+    (S.interleave(S.range(4, 7), S.singleton(1)), [4, 1, 5, 6, 7], ""),
+    (S.interleave(S.singleton(1), S.range(4, 7)), [1, 4, 5, 6, 7], ""),
+    (S.interleave(S.range(1, 3), S.range(4, 6)), [1, 4, 2, 5, 3, 6], ""),
+  ],
+)
 
 let iterateTests = makeSeqEqualsTests(
   ~title="iterate",
