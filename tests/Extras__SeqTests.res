@@ -580,42 +580,50 @@ let takeAtMostTests = makeSeqEqualsTests(
       true
     },
   ),
-  T.make(
-    ~category="Seq",
+  valueEqual(
     ~title="takeAtMost",
-    ~expectation="if 3, generator function called 3 times",
-    ~predicate=() => {
+    ~expectation="if take 999_999, generator function called 999_999 times",
+    ~a=() => {
       let callCount = ref(0)
-      S.unfold(0, _ => {
+      S.foreverWith(() => {
         callCount := callCount.contents + 1
-        Some(1, 1)
+        callCount.contents
       })
-      ->S.takeAtMost(3)
-      ->S.toArray
-      ->ignore
-      callCount.contents == 3 + 1 // extra for the toArray to find the end?
+      ->S.takeAtMost(999_999)
+      ->S.consume
+      callCount.contents
     },
+    ~b=999_999,
   ),
 ])
 
-let foreverWithTests = [
-  seqEqual(
+let foreverWithTests = {
+  let callCount = () => {
+    let count = ref(0)
+    () => {
+      count := count.contents + 1
+      count.contents
+    }
+  }
+  makeSeqEqualsTests(
     ~title="foreverWith",
-    ~expectation="values are generated",
-    ~a=() => S.foreverWith(() => 1)->S.takeAtMost(5),
-    ~b=[1, 1, 1, 1, 1],
-  ),
-  T.make(~category="Seq", ~title="foreverWith", ~expectation="millions", ~predicate=() => {
-    let callCount = ref(0)
-    S.foreverWith(() => {
-      callCount := callCount.contents + 1
-      callCount.contents
-    })
-    ->S.takeAtMost(999_999)
-    ->S.forEach(_ => ())
-    callCount.contents == 999_999 + 1
-  }),
-]
+    [
+      (S.foreverWith(callCount())->S.takeAtMost(0), [], ""),
+      (S.foreverWith(callCount())->S.takeAtMost(1), [1], ""),
+      (S.foreverWith(callCount())->S.takeAtMost(5), [1, 2, 3, 4, 5], ""),
+      (
+        S.foreverWith(callCount())
+        ->S.takeAtMost(999_999)
+        ->S.last
+        ->Option.map(S.singleton)
+        ->Option.getWithDefault(S.empty),
+        [999_999],
+        "",
+      ),
+    ],
+  )
+}
+
 let unfoldTests =
   makeSeqEqualsTests(
     ~title="unfold",

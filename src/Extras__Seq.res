@@ -158,6 +158,8 @@ let repeat = (count, value) => unfold(0, i => i < count ? Some(value, i + 1) : N
 
 let rec forever = value => (. ()) => Next(value, forever(value))
 
+let rec foreverWith = f => (. ()) => Next(f(), delay(() => foreverWith(f)))
+
 let repeatWith = (count, value) => unfold(1, i => i <= count ? Some(value(), i + 1) : None)
 
 let iterate = (seed, f) => unfold(seed, i => Some(i, f(i)))
@@ -169,8 +171,6 @@ let range = (start, end) => {
 }
 
 let rangeMap = (start, end, f) => range(start, end)->map(f)
-
-let rec foreverWith = f => (. ()) => Next(f(), foreverWith(f))
 
 let rec tap = (xx, f) =>
   (. ()) =>
@@ -250,8 +250,8 @@ let takeAtMost = (xx, count) => {
   } else {
     let rec go = xx =>
       xx->mapNext(((x, index), xx) =>
-        switch index >= count {
-        | true => End
+        switch index == count - 1 {
+        | true => Next(x, empty)
         | false => Next(x, go(xx))
         }
       )
