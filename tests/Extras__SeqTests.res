@@ -1141,7 +1141,7 @@ let minByMaxByTests = [
   ),
 ]
 
-let isEqualTests = [
+let isEmptyTests = [
   valueEqual(
     ~title="isEmpty",
     ~expectation="when empty => true",
@@ -1177,53 +1177,24 @@ let joinStringTests = [
   ),
 ]
 
-let exactlyOneTests = [
-  valueEqual(
-    ~title="exactlyOne",
-    ~expectation="when empty => None",
-    ~a=() => S.empty->S.exactlyOne,
-    ~b=None,
-  ),
-  valueEqual(
-    ~title="exactlyOne",
-    ~expectation="when singleton => Some",
-    ~a=() => S.singleton(1)->S.exactlyOne,
-    ~b=Some(1),
-  ),
-  valueEqual(
-    ~title="exactlyOne",
-    ~expectation="when many => None",
-    ~a=() => oneTwoThree->S.exactlyOne,
-    ~b=None,
-  ),
-]
+let exactlyOneTests = makeValueEqualTests(
+  ~title="exactlyOne",
+  [
+    (() => S.empty->S.exactlyOne, None, ""),
+    (() => S.singleton(1)->S.exactlyOne, Some(1), ""),
+    (() => S.range(1, 2)->S.exactlyOne, None, ""),
+  ],
+)
 
-let isSortedByTests = [
-  valueEqual(
-    ~title="isSortedBy",
-    ~expectation="when empty => true",
-    ~a=() => S.empty->S.isSortedBy(Ex.Cmp.int),
-    ~b=true,
-  ),
-  valueEqual(
-    ~title="isSortedBy",
-    ~expectation="when singleton => true",
-    ~a=() => S.singleton(4)->S.isSortedBy(Ex.Cmp.int),
-    ~b=true,
-  ),
-  valueEqual(
-    ~title="isSortedBy",
-    ~expectation="when sorted => true",
-    ~a=() => [1, 2, 2, 3, 4, 5]->S.fromArray->S.isSortedBy(Ex.Cmp.int),
-    ~b=true,
-  ),
-  valueEqual(
-    ~title="isSortedBy",
-    ~expectation="when not sorted => false",
-    ~a=() => [1, 2, 2, 3, 4, 2, 5]->S.fromArray->S.isSortedBy(Ex.Cmp.int),
-    ~b=false,
-  ),
-]
+let isSortedByTests = makeValueEqualTests(
+  ~title="isSortedBy",
+  [
+    (() => S.empty->S.isSortedBy(Ex.Cmp.int), true, ""),
+    (() => S.singleton(3)->S.isSortedBy(Ex.Cmp.int), true, ""),
+    (() => [1, 4, 4, 6, 7, 8, 9, 10]->S.fromArray->S.isSortedBy(Ex.Cmp.int), true, ""),
+    (() => [1, 4, 4, 6, 7, 8, 0, 10]->S.fromArray->S.isSortedBy(Ex.Cmp.int), false, ""),
+  ],
+)
 
 let toOptionTests = [
   valueEqual(
@@ -1643,7 +1614,7 @@ let tests =
     interleaveTests,
     intersperseTests,
     intersperseWithTests,
-    isEqualTests,
+    isEmptyTests,
     isSortedByTests,
     iterateTests,
     joinStringTests,
