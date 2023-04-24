@@ -230,63 +230,51 @@ let rangeMapTests = makeSeqEqualsTests(
 let concatTests = makeSeqEqualsTests(
   ~title="concat",
   [
-    (S.concat(oneTwoThree, oneTwoThree), [1, 2, 3, 1, 2, 3], ""),
+    (S.concat(oneTwoThree, fourFiveSix), [1, 2, 3, 4, 5, 6], ""),
     (S.concat(S.empty, oneTwoThree), [1, 2, 3], ""),
     (S.concat(oneTwoThree, S.empty), [1, 2, 3], ""),
     (S.concat(S.empty, S.empty), [], ""),
   ],
 )
 
-let flatMapTests = [
-  seqEqual(
+let prependTests = makeSeqEqualsTests(
+  ~title="prepend",
+  [
+    (S.prepend(oneTwoThree, fourFiveSix), [4, 5, 6, 1, 2, 3], ""),
+    (S.prepend(S.empty, oneTwoThree), [1, 2, 3], ""),
+    (S.prepend(oneTwoThree, S.empty), [1, 2, 3], ""),
+    (S.prepend(S.empty, S.empty), [], ""),
+  ],
+)
+
+let flatMapTests =
+  makeSeqEqualsTests(
     ~title="flatMap",
-    ~expectation="when map to several items => flatten",
-    ~a=() => oneTwoThree->S.flatMap(i => S.repeat(3, i)),
-    ~b=[1, 1, 1, 2, 2, 2, 3, 3, 3],
-  ),
-  seqEqual(
-    ~title="flatMap",
-    ~expectation="when original is empty => empty",
-    ~a=() => S.empty->S.flatMap(_ => S.repeat(5, "x")),
-    ~b=[],
-  ),
-  seqEqual(
-    ~title="flatMap",
-    ~expectation="when original is one item",
-    ~a=() => S.singleton(1)->S.flatMap(i => S.repeat(5, i)),
-    ~b=[1, 1, 1, 1, 1],
-  ),
-  seqEqual(
-    ~title="flatMap",
-    ~expectation="when mapped result is empty => empty",
-    ~a=() => oneTwoThree->S.flatMap(_ => S.empty),
-    ~b=[],
-  ),
-  seqEqual(
-    ~title="flatMap",
-    ~expectation="when mapped result is one item",
-    ~a=() => oneTwoThree->S.flatMap(i => S.singleton(i->intToString)),
-    ~b=["1", "2", "3"],
-  ),
-]->Js.Array2.concat([
-  T.make(
-    ~category="Seq",
-    ~title="flatMap",
-    ~expectation="a million stack won't overflow",
-    ~predicate=() => {
-      S.repeat(1000, 0)->S.flatMap(_ => S.repeat(1000, 0))->S.forEach(_ => ())
-      true
-    },
-  ),
-])
+    [
+      (S.empty->S.flatMap(i => S.repeat(i, i)), [], ""),
+      (S.singleton(2)->S.flatMap(i => S.repeat(i, 6)), [6, 6], ""),
+      (S.singleton(2)->S.flatMap(_ => S.empty), [], ""),
+      (S.range(1, 3)->S.flatMap(i => S.repeat(i, i)), [1, 2, 2, 3, 3, 3], ""),
+      (S.range(1, 3)->S.flatMap(_ => S.empty), [], ""),
+      (S.range(1, 3)->S.flatMap(i => S.singleton(i)), [1, 2, 3], ""),
+    ],
+  )->Js.Array2.concat([
+    valueEqual(
+      ~title="flatMap",
+      ~expectation="million won't overflow",
+      ~a=() =>
+        S.repeat(1000, 1)->S.flatMap(_ => S.repeat(1000, 1))->S.concat(S.singleton(999))->S.last,
+      ~b=Some(999),
+    ),
+  ])
 
 let mapTests = makeSeqEqualsTests(
   ~title="map",
   [
-    (oneToFive->S.map(i => i + 1), [2, 3, 4, 5, 6], ""),
+    (S.range(1, 5)->S.map(i => i + 1), [2, 3, 4, 5, 6], ""),
     (S.singleton(1)->S.map(i => i + 1), [2], ""),
     (S.empty->S.map(i => i + 1), [], ""),
-    (oneTwoThree->S.mapi((n, inx) => n * inx), [0, 2, 6], ""),
+    (S.range(1, 3)->S.mapi((n, inx) => n * inx), [0, 2, 6], ""),
   ],
 )
 
@@ -299,134 +287,84 @@ let indexedTests = makeSeqEqualsTests(
   ],
 )
 
-let takeWhileTests = [
-  seqEqual(
-    ~title="takeWhile",
-    ~expectation="when some match, return them",
-    ~a=() => oneToFive->S.takeWhile(i => i <= 3),
-    ~b=[1, 2, 3],
-  ),
-  seqEqual(
-    ~title="takeWhile",
-    ~expectation="when none match, return empty",
-    ~a=() => oneToFive->S.takeWhile(_ => false),
-    ~b=[],
-  ),
-  seqEqual(
-    ~title="takeWhile",
-    ~expectation="when empty, return empty",
-    ~a=() => S.empty->S.takeWhile(_ => true),
-    ~b=[],
-  ),
-  seqEqual(
-    ~title="takeWhile",
-    ~expectation="when only first matches, return it",
-    ~a=() => oneToFive->S.takeWhile(i => i == 1),
-    ~b=[1],
-  ),
-]
+let takeWhileTests = makeSeqEqualsTests(
+  ~title="takeWhile",
+  [
+    (S.range(1, 5)->S.takeWhile(i => i <= 3), [1, 2, 3], ""),
+    (S.range(1, 5)->S.takeWhile(i => i == 1), [1], ""),
+    (S.range(1, 5)->S.takeWhile(_ => false), [], ""),
+    (S.range(1, 5)->S.takeWhile(i => i <= 5), [1, 2, 3, 4, 5], ""),
+    (S.empty->S.takeWhile(_ => true), [], ""),
+    (S.range(1, 5)->S.takeWhile(_ => false), [], ""),
+  ],
+)
 
-let dropTests = [
-  seqEqual(
+let dropTests =
+  makeSeqEqualsTests(
     ~title="drop",
-    ~expectation="when count = 0 => original seq by value",
-    ~a=() => oneToFive->S.drop(0),
-    ~b=[1, 2, 3, 4, 5],
-  ),
-  seqEqual(
-    ~title="drop",
-    ~expectation="when count = 0 => original seq by ===",
-    ~a=() => S.singleton(oneToFive->S.drop(0) === oneToFive),
-    ~b=[true],
-  ),
-  seqEqual(
-    ~title="drop",
-    ~expectation="when count == length => empty",
-    ~a=() => oneToFive->S.drop(5),
-    ~b=[],
-  ),
-  seqEqual(
-    ~title="drop",
-    ~expectation="when count > length => empty",
-    ~a=() => oneToFive->S.drop(Int32.max_int),
-    ~b=[],
-  ),
-  seqEqual(
-    ~title="drop",
-    ~expectation="when count < length => subset",
-    ~a=() => oneToFive->S.drop(2),
-    ~b=[3, 4, 5],
-  ),
-  seqEqual(
-    ~title="drop",
-    ~expectation="when count == 1 => just skip first",
-    ~a=() => oneToFive->S.drop(1),
-    ~b=[2, 3, 4, 5],
-  ),
-  seqEqual(
-    ~title="drop",
-    ~expectation="when drop a million items => no stack overflow",
-    ~a=() => S.concat(S.repeat(999_999, "x"), S.singleton("y"))->S.drop(999_999),
-    ~b=["y"],
-  ),
-]
+    [
+      (oneTwoThree->S.drop(0), [1, 2, 3], ""),
+      (oneTwoThree->S.drop(1), [2, 3], ""),
+      (oneTwoThree->S.drop(3), [], ""),
+      (oneTwoThree->S.drop(4), [], ""),
+      (S.empty->S.drop(0), [], ""),
+      (S.empty->S.drop(1), [], ""),
+      (S.singleton(4)->S.drop(0), [4], ""),
+      (S.singleton(4)->S.drop(1), [], ""),
+    ],
+  )->Js.Array2.concat([
+    valueEqual(
+      ~title="drop",
+      ~expectation="if drop 0, return same seq instance",
+      ~a=() => oneToFive->S.drop(0) === oneToFive,
+      ~b=true,
+    ),
+    valueEqual(
+      ~title="drop",
+      ~expectation="while drop a million, no overflow",
+      ~a=() => S.range(1, 999_999)->S.endWith(1_000_000)->S.drop(999_999)->S.last,
+      ~b=Some(1_000_000),
+    ),
+  ])
 
-let flattenTests = [
-  seqEqual(
-    ~title="flatten",
-    ~expectation="concatenate each sub-sequence",
-    ~a=() => S.init(3, inx => S.repeat(2, inx))->S.flatten,
-    ~b=[0, 0, 1, 1, 2, 2],
-  ),
-  seqEqual(
-    ~title="flatten",
-    ~expectation="concatenate each sub-sequence",
-    ~a=() => S.forever(S.empty)->S.takeAtMost(5)->S.flatten,
-    ~b=[],
-  ),
-]
+let flattenTests = makeSeqEqualsTests(
+  ~title="flatten",
+  [
+    (S.singleton(S.empty)->S.flatten, [], ""),
+    (S.range(1, 3)->S.map(i => S.repeat(i, i))->S.flatten, [1, 2, 2, 3, 3, 3], ""),
+    (S.empty->S.flatten, [], ""),
+  ],
+)
 
-let sortedMergeTests = [
-  seqEqual(
-    ~title="sortedMerge",
-    ~expectation="",
-    ~a=() =>
-      S.sortedMerge(
-        [1, 4, 4, 6, 7, 9, 11]->S.fromArray,
-        [2, 3, 3, 5, 7, 10, 12]->S.fromArray,
-        Ex.Cmp.int,
-      ),
-    ~b=[1, 2, 3, 3, 4, 4, 5, 6, 7, 7, 9, 10, 11, 12],
-  ),
-  seqEqual(
-    ~title="sortedMerge",
-    ~expectation="first empty",
-    ~a=() => S.sortedMerge([]->S.fromArray, [2, 3, 3, 5, 7, 10, 12]->S.fromArray, Ex.Cmp.int),
-    ~b=[2, 3, 3, 5, 7, 10, 12],
-  ),
-  seqEqual(
-    ~title="sortedMerge",
-    ~expectation="second empty",
-    ~a=() => S.sortedMerge([1, 2, 2, 4]->S.fromArray, S.empty, Ex.Cmp.int),
-    ~b=[1, 2, 2, 4],
-  ),
-]
-
-let prependTests = [
-  seqEqual(
-    ~title="prepend",
-    ~expectation="",
-    ~a=() => oneToFive->S.prepend(fourFiveSix),
-    ~b=[4, 5, 6, 1, 2, 3, 4, 5],
-  ),
-]
+let sortedMergeTests = {
+  let merge = (nums1, nums2, nums3) =>
+    seqEqual(
+      ~title="sortedMerge",
+      ~expectation="",
+      ~a=() => S.sortedMerge(nums1->S.fromArray, nums2->S.fromArray, intCompare),
+      ~b=nums3,
+    )
+  [
+    merge([], [], []),
+    merge([], [1, 2, 3], [1, 2, 3]),
+    merge([1, 2, 3], [], [1, 2, 3]),
+    merge([1, 2, 3], [1, 2, 3], [1, 1, 2, 2, 3, 3]),
+    merge([4, 5, 6], [1, 2, 3], [1, 2, 3, 4, 5, 6]),
+    merge([1, 1, 3, 6, 6, 8, 8, 9], [0, 2, 2, 7, 9], [0, 1, 1, 2, 2, 3, 6, 6, 7, 8, 8, 9, 9]),
+  ]
+}
 
 let tapTests = [
-  T.make(~category="Seq", ~title="tap", ~expectation="can inspect each value", ~predicate=() => {
-    let seen = []
-    let items = oneToFive->S.tap(i => seen->Js.Array2.push(i)->ignore)->S.toArray
-    seen == [1, 2, 3, 4, 5] && items == [1, 2, 3, 4, 5]
-  }),
+  valueEqual(
+    ~title="tap",
+    ~expectation="can inspect every value",
+    ~a=() => {
+      let seen = []
+      S.range(1, 5)->S.tap(i => seen->Js.Array2.push(i)->ignore)->S.consume
+      seen
+    },
+    ~b=[1, 2, 3, 4, 5],
+  ),
 ]
 
 let windowTests = [
