@@ -1,3 +1,7 @@
+## Version 1.1.1
+
+- Fix bug in `Seq.takeAtMost` where generator function was called 1 too many times; not lazy enough
+
 ## Version 1.1.0
 
 - Fix bug in `allPairs` where sequences are not cached.
