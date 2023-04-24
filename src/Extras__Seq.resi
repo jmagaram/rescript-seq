@@ -654,3 +654,8 @@ sequences. The function uses a stable sort (the original order of equal elements
 is preserved) based on the provided `compare` function.
 */
 let sortBy: (t<'a>, ('a, 'a) => int) => t<'a>
+
+/**
+`combinations(source, size)` generates all combinations of 1 to `size` items from the `source`.
+*/
+let combinations: (t<'a>, int) => t<t<'a>>

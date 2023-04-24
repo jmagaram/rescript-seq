@@ -1575,6 +1575,77 @@ let sampleRunningTotal = {
   )
 }
 
+let sampleCombinations = {
+  let combos = Extras__Seq.combinations
+  let sortWords = (a: string, b: string) => a < b ? -1 : a > b ? 1 : 0
+  let sortLettersInWord = word =>
+    word->Js.String2.split("")->Belt.SortArray.stableSortBy(sortWords)->Js.Array2.joinWith("")
+  // from "a,b,c"
+  // to "ab,bc,c"
+  let combosAsString = (words, max) =>
+    words
+    ->Js.String2.split(",")
+    ->S.fromArray
+    ->combos(max)
+    ->S.map(words =>
+      words
+      ->S.map(sortLettersInWord)
+      ->S.toArray
+      ->Belt.SortArray.stableSortBy(sortWords)
+      ->Js.Array2.joinWith("")
+    )
+    ->S.toArray
+    ->Belt.SortArray.stableSortBy(sortWords)
+    ->Js.Array2.joinWith(",")
+  let normalizeExpectedOutput = words =>
+    words
+    ->Js.String2.split(",")
+    ->Belt.Array.map(sortLettersInWord)
+    ->Belt.SortArray.stableSortBy(sortWords)
+    ->Js.Array2.joinWith(",")
+  let makeTest = (source, size, expectedResult) => (
+    () => source->combosAsString(size),
+    expectedResult->normalizeExpectedOutput,
+    "",
+  )
+  let comboCount = (words, max) => words->Js.String2.split(",")->S.fromArray->combos(max)->S.length
+  makeValueEqualTests(
+    ~title="combinations",
+    [
+      makeTest("", 1, ""),
+      makeTest("", 2, ""),
+      makeTest("a", 1, "a"),
+      makeTest("a", 2, "a"),
+      makeTest("a,b", 1, "a,b"),
+      makeTest("a,b", 2, "a,b,ab"),
+      makeTest("a,b,c", 1, "a,b,c"),
+      makeTest("a,b,c", 2, "a,b,c,ab,ac,bc"),
+      makeTest("a,b,c", 3, "a,b,c,ab,ac,bc,abc"),
+      makeTest("a,b,c", 99, "a,b,c,ab,ac,bc,abc"),
+      makeTest("a,b,c,d", 99, "a,b,c,d,ab,ac,ad,bc,bd,cd,abc,abd,acd,bcd,abcd"),
+    ],
+  )->Js.Array2.concat([
+    valueEqual(
+      ~title="combinations",
+      ~expectation="combo count for 5 items from 15",
+      ~a=() => "a,b,c,d,e,f,g,h,i,j,k,l,m,n,o"->comboCount(5),
+      ~b=3003 + 1365 + 455 + 105 + 15,
+    ),
+    valueEqual(
+      ~title="combinations",
+      ~expectation="combo count for 1 items from 10",
+      ~a=() => "a,b,c,d,e,f,g,h,i,j"->comboCount(1),
+      ~b=10,
+    ),
+    valueEqual(
+      ~title="combinations",
+      ~expectation="zillions but take a few",
+      ~a=() => S.range(1, 100)->combos(100)->S.takeAtMost(10)->S.last->Option.isSome,
+      ~b=true,
+    ),
+  ])
+}
+
 let tests =
   [
     allOkTests,
@@ -1635,6 +1706,7 @@ let tests =
     repeatWithTests,
     reverseTests,
     sampleBinaryDigits,
+    sampleCombinations,
     sampleChunkBySize,
     sampleFibonacci,
     sampleLocalMinimums,

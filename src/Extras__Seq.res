@@ -720,3 +720,24 @@ let sortBy = (xx, compare) =>
     xx->Js.Array2.sortInPlaceWith(compare)->ignore
     xx->fromArray
   })
+
+let combinations = (xx, k) => {
+  let rec go = (xx, acc, k) =>
+    switch k {
+    | 0 => acc
+    | k =>
+      switch xx->headTail {
+      | None => acc
+      | Some(x, xx) => {
+          let acc =
+            acc
+            ->concat((1, x->singleton)->singleton)
+            ->concat(
+              acc->filterMap(((size, xx)) => size < k ? Some((size + 1, cons(x, xx))) : None),
+            )
+          go(xx, acc, k)
+        }
+      }
+    }
+  go(xx, empty, k)->map(((_size, xx)) => xx) // return size too?
+}
