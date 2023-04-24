@@ -245,17 +245,24 @@ let fromOption = opt =>
 let mapi = (xx, f) => xx->indexed->map(((x, inx)) => f(x, inx))
 
 let takeAtMost = (xx, count) => {
-  if count == 0 {
-    empty
-  } else {
-    let rec go = xx =>
-      xx->mapNext(((x, index), xx) =>
-        switch index == count - 1 {
-        | true => Next(x, empty)
-        | false => Next(x, go(xx))
+  switch count {
+  | 0 => empty
+  | n if n < 0 =>
+    ArgumentOfOfRange(
+      `takeAtMost requires a count of 0 or more. You requested ${count->Belt.Int.toString}`,
+    )->raise
+  | count =>
+    let rec go = (xx, count) =>
+      (. ()) =>
+        switch count {
+        | 0 => End
+        | count =>
+          switch xx->nextNode {
+          | End => End
+          | Next(x, xx) => Next(x, go(xx, count - 1))
+          }
         }
-      )
-    go(xx->indexed)
+    go(xx, count)
   }
 }
 
