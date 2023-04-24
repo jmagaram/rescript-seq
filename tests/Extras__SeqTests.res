@@ -971,7 +971,7 @@ let someTests = makeValueEqualTests(
     (() => S.empty->S.some(_ => true), false, "if empty is false"),
     (() => S.empty->S.some(_ => false), false, "if empty is false"),
     (() => S.range(1, 3)->S.some(i => i == 2), true, ""),
-    (() => S.range(1, 3)->S.some(i => false), false, ""),
+    (() => S.range(1, 3)->S.some(_ => false), false, ""),
     (() => S.range(1, 999_999)->S.some(i => i == 999_999), true, "millions"),
   ],
 )
@@ -983,7 +983,7 @@ let everyTests = makeValueEqualTests(
     (() => S.empty->S.everyOrEmpty(_ => false), true, "if empty is true"),
     (() => S.range(1, 3)->S.everyOrEmpty(i => i >= 1), true, ""),
     (() => S.range(1, 3)->S.everyOrEmpty(_ => false), false, ""),
-    (() => S.range(1, 999_999)->S.everyOrEmpty(i => true), true, "millions"),
+    (() => S.range(1, 999_999)->S.everyOrEmpty(_ => true), true, "millions"),
   ],
 )
 
