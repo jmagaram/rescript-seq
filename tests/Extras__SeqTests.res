@@ -77,6 +77,16 @@ let makeSeqEqualsTests = (~title, xs) =>
     seqEqual(~title, ~expectation=`index ${inx->intToString} ${note}`, ~a=() => source, ~b=result)
   )
 
+/**
+Makes a series of value equal tests when fed an array of tuples. The tuple
+parameters are (1) a lazy value, (2) the expected value, and (3) a note. Uses
+the ReScript recursive equality test.
+*/
+let makeValueEqualTests = (~title, tests) =>
+  tests->Js.Array2.mapi(((lazyA, b, note), index) =>
+    valueEqual(~title, ~a=lazyA, ~b, ~expectation=`Index ${index->Belt.Int.toString} ${note}`)
+  )
+
 // =============================================================================
 // The tests. Use one let statement to make an array of tests for function being
 // tested. Then add that array of values to the collection at the end of this
@@ -955,59 +965,27 @@ let forEachTests = [
   ),
 ]
 
-let someTests = [
-  valueEqual(
-    ~title="some",
-    ~expectation="if empty => false",
-    ~a=() => S.empty->S.some(_ => true),
-    ~b=false,
-  ),
-  valueEqual(
-    ~title="some",
-    ~expectation="if some predicate true => true",
-    ~a=() => oneToFive->S.some(i => i == 2),
-    ~b=true,
-  ),
-  valueEqual(
-    ~title="some",
-    ~expectation="if no predicate true => false",
-    ~a=() => oneToFive->S.some(i => i == 99),
-    ~b=false,
-  ),
-  valueEqual(
-    ~title="some",
-    ~expectation="millions",
-    ~a=() => S.range(1, 999_999)->S.some(i => i === 999_999),
-    ~b=true,
-  ),
-]
+let someTests = makeValueEqualTests(
+  ~title="some",
+  [
+    (() => S.empty->S.some(_ => true), false, "if empty is false"),
+    (() => S.empty->S.some(_ => false), false, "if empty is false"),
+    (() => S.range(1, 3)->S.some(i => i == 2), true, ""),
+    (() => S.range(1, 3)->S.some(i => false), false, ""),
+    (() => S.range(1, 999_999)->S.some(i => i == 999_999), true, "millions"),
+  ],
+)
 
-let everyTests = [
-  valueEqual(
-    ~title="every",
-    ~expectation="if empty => true",
-    ~a=() => S.empty->S.everyOrEmpty(_ => false),
-    ~b=true,
-  ),
-  valueEqual(
-    ~title="every",
-    ~expectation="if all true => true",
-    ~a=() => oneToFive->S.everyOrEmpty(i => i >= 1 && i <= 5),
-    ~b=true,
-  ),
-  valueEqual(
-    ~title="every",
-    ~expectation="if any false => false",
-    ~a=() => oneToFive->S.everyOrEmpty(i => i != 3),
-    ~b=false,
-  ),
-  valueEqual(
-    ~title="every",
-    ~expectation="millions",
-    ~a=() => S.range(1, 999_999)->S.everyOrEmpty(i => i >= 1 && i <= 999_999),
-    ~b=true,
-  ),
-]
+let everyTests = makeValueEqualTests(
+  ~title="everyOrEmpty",
+  [
+    (() => S.empty->S.everyOrEmpty(_ => true), true, "if empty is true"),
+    (() => S.empty->S.everyOrEmpty(_ => false), true, "if empty is true"),
+    (() => S.range(1, 3)->S.everyOrEmpty(i => i >= 1), true, ""),
+    (() => S.range(1, 3)->S.everyOrEmpty(_ => false), false, ""),
+    (() => S.range(1, 999_999)->S.everyOrEmpty(i => true), true, "millions"),
+  ],
+)
 
 let findMapTests = [
   valueEqual(
