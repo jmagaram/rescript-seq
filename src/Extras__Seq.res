@@ -733,11 +733,12 @@ let combinations = (xx, k) => {
     | k =>
       switch xx->headTail {
       | None => acc
-      | Some(x, xx) => acc
+      | Some(x, xx) =>
+        acc
         ->concat((1, x->singleton)->singleton)
         ->concat(acc->filterMap(((len, xx)) => len < k ? Some((len + 1, cons(x, xx))) : None))
         ->go(xx, k)
       }
     }
-  go(empty, xx, k)
+  delay(() => go(empty, xx, k))
 }

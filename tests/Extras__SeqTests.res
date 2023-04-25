@@ -1584,6 +1584,22 @@ let combinations = {
       ~b=true,
       ~expectation="millions",
     ),
+    valueEqual(
+      ~title="combinations",
+      ~a=() =>
+        S.repeatWith(3, () => {Js.Exn.raiseError("oops!")})
+        ->S.combinations(1000)
+        ->S.takeAtMost(0)
+        ->S.last,
+      ~b=None,
+      ~expectation="totally lazy",
+    ),
+    // valueEqual(
+    //   ~title="combinations",
+    //   ~a=() => S.foreverWith(() => 3)->S.combinations(1000)->S.takeAtMost(0)->S.last,
+    //   ~b=None,
+    //   ~expectation="totally lazy",
+    // ),
   ]
   [simpleCombos, otherTests]->Belt.Array.flatMap(i => i)
 }
