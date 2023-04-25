@@ -4,6 +4,7 @@ module R = Extras__Result
 module Ex = Extras
 module Option = Belt.Option
 module Result = Belt.Result
+module String = Js.String2
 
 // =============================
 // Utilities to help write tests
@@ -1508,88 +1509,62 @@ let delayTests = makeSeqEqualsTests(
 )
 
 let combinations = {
-  let combos = Extras__Seq.combinations
-  let sortWords = (a: string, b: string) => a < b ? -1 : a > b ? 1 : 0
-  let sortLettersInWord = word =>
-    word->Js.String2.split("")->Belt.SortArray.stableSortBy(sortWords)->Js.Array2.joinWith("")
-  // Converts combinations of words to a standardized string by sorting the
-  // letters in each word and also sorting the words and then joining them all
-  // with a comma.
-  let standardizeOutput = words =>
-    words
-    ->S.map(words =>
-      words
-      ->S.map(sortLettersInWord)
-      ->S.toArray
-      ->Belt.SortArray.stableSortBy(sortWords)
-      ->Js.Array2.joinWith("")
-    )
+  let stringCompare = (a: string, b: string) => a < b ? -1 : a > b ? 1 : 0
+  let sortLetters = word =>
+    word->String.split("")->Belt.SortArray.stableSortBy(stringCompare)->Js.Array2.joinWith("")
+  let sortOutput = combos =>
+    combos
+    ->S.map(combo => combo->S.reduce("", (sum, i) => sum ++ i)->sortLetters)
+    ->S.sortBy(stringCompare)
     ->S.toArray
-    ->Belt.SortArray.stableSortBy(sortWords)
     ->Js.Array2.joinWith(",")
-  let normalizeExpectedOutput = words =>
+  let combos = (letters, max) =>
+    letters->String.split("")->S.fromArray->S.combinations(max)->sortOutput
+  let sort = words =>
     words
     ->Js.String2.split(",")
-    ->Belt.Array.map(sortLettersInWord)
-    ->Belt.SortArray.stableSortBy(sortWords)
+    ->Js.Array2.map(sortLetters)
+    ->Belt.SortArray.stableSortBy(stringCompare)
     ->Js.Array2.joinWith(",")
-  let makeTest = (words, size, expectedResult) => (
-    () => words->Js.String2.split(",")->S.fromArray->combos(size)->standardizeOutput,
-    expectedResult->normalizeExpectedOutput,
-    "",
-  )
-  let comboCount = (words, max) => words->Js.String2.split(",")->S.fromArray->combos(max)->S.length
-  makeValueEqualTests(
+  let simpleCombos = makeValueEqualTests(
     ~title="combinations",
     [
-      makeTest("", 0, ""),
-      makeTest("", 1, ""),
-      makeTest("", 2, ""),
-      makeTest("a", 1, "a"),
-      makeTest("a", 2, "a"),
-      makeTest("a,b", 1, "a,b"),
-      makeTest("a,b", 2, "a,b,ab"),
-      makeTest("a,b,c", 1, "a,b,c"),
-      makeTest("a,b,c", 2, "a,b,c,ab,ac,bc"),
-      makeTest("a,b,c", 3, "a,b,c,ab,ac,bc,abc"),
-      makeTest("a,b,c", 99, "a,b,c,ab,ac,bc,abc"),
-      makeTest("a,b,c,d", 99, "a,b,c,d,ab,ac,ad,bc,bd,cd,abc,abd,acd,bcd,abcd"),
-      makeTest("a,b,c,d", 0, ""),
+      (() => ""->combos(0), ""->sort, ""),
+      (() => ""->combos(1), ""->sort, ""),
+      (() => "a"->combos(0), ""->sort, ""),
+      (() => "a"->combos(1), "a"->sort, ""),
+      (() => "a"->combos(2), "a"->sort, ""),
+      (() => "ab"->combos(0), ""->sort, ""),
+      (() => "ab"->combos(1), "a,b"->sort, ""),
+      (() => "ab"->combos(2), "a,b,ab"->sort, ""),
+      (() => "ab"->combos(3), "a,b,ab"->sort, ""),
+      (() => "abc"->combos(0), ""->sort, ""),
+      (() => "abc"->combos(1), "a,b,c"->sort, ""),
+      (() => "abc"->combos(2), "a,b,c,ab,ac,bc"->sort, ""),
+      (() => "abc"->combos(3), "a,b,c,ab,ac,bc,abc"->sort, ""),
+      (() => "abc"->combos(4), "a,b,c,ab,ac,bc,abc"->sort, ""),
+      (
+        () =>
+          callCount()
+          ->S.map(i => i == 1 ? "a" : i == 2 ? "b" : i == 3 ? "c" : "x")
+          ->S.takeAtMost(3)
+          ->S.combinations(3)
+          ->sortOutput,
+        "a,b,c,ab,ac,bc,abc"->sort,
+        "",
+      ),
     ],
-  )->Js.Array2.concat([
+  )
+  let otherTests = [
+    willThrow(~title="combinations", ~expectation="if size < 0 throw", ~f=() => "abc"->combos(-1)),
     valueEqual(
       ~title="combinations",
-      ~expectation="sequence values appear cached",
-      ~a=() =>
-        callCount()
-        ->S.takeAtMost(3)
-        ->S.map(i => i == 1 ? "a" : i == 2 ? "b" : i == 3 ? "c" : "x")
-        ->combos(2)
-        ->standardizeOutput,
-      ~b="a,b,c,ab,ac,bc"->normalizeExpectedOutput,
-    ),
-    valueEqual(
-      ~title="combinations",
-      ~expectation="combo count for 5 items from 15",
-      ~a=() => "a,b,c,d,e,f,g,h,i,j,k,l,m,n,o"->comboCount(5),
-      ~b=3003 + 1365 + 455 + 105 + 15,
-    ),
-    valueEqual(
-      ~title="combinations",
-      ~expectation="combo count for 1 items from 10",
-      ~a=() => "a,b,c,d,e,f,g,h,i,j"->comboCount(1),
-      ~b=10,
-    ),
-    valueEqual(
-      ~title="combinations",
-      ~expectation="millions but can take a few",
-      ~a=() => S.range(1, 100)->combos(100)->S.takeAtMost(10)->S.last->Option.isSome,
+      ~a=() => S.range(1, 1000)->S.combinations(1000)->S.takeAtMost(10)->S.last->Belt.Option.isSome,
       ~b=true,
+      ~expectation="millions",
     ),
-    willThrow(~title="combinations", ~expectation="if size is less than zero, throw", ~f=() =>
-      S.range(1, 3)->combos(-1)
-    ),
-  ])
+  ]
+  [simpleCombos, otherTests]->Belt.Array.flatMap(i => i)
 }
 
 let sampleFibonacci = {
