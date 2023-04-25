@@ -732,6 +732,20 @@ let combinations = (xx, maxSize) => {
     | None => None
     | Some(x, xx) => {
         let next = {
+          let xOnly = (1, x->singleton)
+          let xConsSum = sum->filterMap(((size, xx)) =>
+            switch size < maxSize {
+            | true => Some((size + 1, cons(x, xx)))
+            | false => None
+            }
+          )
+          cons(xOnly, xConsSum)
+        }
+        Some(next, (concat(sum, next), xx))
+      }
+    }
+  )->flatten
+}
           let xOnly = singleton((1, x->singleton))
           let xConsSum = sum->filterMap(((size, xx)) =>
             switch size < maxSize {
