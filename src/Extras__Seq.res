@@ -722,22 +722,30 @@ let sortBy = (xx, compare) =>
   })
 
 let combinations = (xx, k) => {
-  let rec go = (xx, acc, k) =>
-    switch k {
-    | 0 => acc
-    | k =>
-      switch xx->headTail {
-      | None => acc
-      | Some(x, xx) => {
-          let acc =
-            acc
-            ->concat((1, x->singleton)->singleton)
-            ->concat(
-              acc->filterMap(((size, xx)) => size < k ? Some((size + 1, cons(x, xx))) : None),
-            )
-          go(xx, acc, k)
+  switch k {
+  | 0 => empty
+  | k if k < 0 =>
+    ArgumentOfOfRange(
+      `Combinations can only be generated with a maximum size of 1 or more. You asked for ${k->Belt.Int.toString}.`,
+    )->raise
+  | k =>
+    let rec go = (xx, acc, k) =>
+      switch k {
+      | 0 => acc
+      | k =>
+        switch xx->headTail {
+        | None => acc
+        | Some(x, xx) => {
+            let acc =
+              acc
+              ->concat((1, x->singleton)->singleton)
+              ->concat(
+                acc->filterMap(((size, xx)) => size < k ? Some((size + 1, cons(x, xx))) : None),
+              )
+            go(xx, acc, k)
+          }
         }
       }
-    }
-  go(xx, empty, k)->map(((_size, xx)) => xx)
+    go(xx, empty, k)->map(((_size, xx)) => xx)
+  }
 }
