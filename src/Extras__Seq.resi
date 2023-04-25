@@ -654,3 +654,19 @@ sequences. The function uses a stable sort (the original order of equal elements
 is preserved) based on the provided `compare` function.
 */
 let sortBy: (t<'a>, ('a, 'a) => int) => t<'a>
+
+/**
+`combinations(source, size)` generates all combinations of items in `source`,
+based on their indexed position (not value), from 1 to `size` items in length.
+Each combination is returned as a `(size, sequence)` tuple. A combination is a
+unique set; the order in which items are listed is immaterial. 
+*/
+let combinations: (t<'a>, int) => t<(int, t<'a>)>
+
+/** 
+`permutations(source, size)` generates all permutations (ordered arrangements)
+of items in `source` based on their indexed position (not value), from 1 to
+`size` items in length. Each permutation is returned as a `(size, sequence)`
+tuple. 
+*/
+let permutations: (t<'a>, int) => t<(int, t<'a>)>

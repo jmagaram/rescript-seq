@@ -33,6 +33,7 @@ type t<'a> // A lazy sequence of `a`
 // Construct
 
 let characters: string => t<string>
+let combinations: (t<'a>, int) => t<(int, t<'a>)>
 let cons: ('a, t<'a>) => t<'a>
 let cycle: t<'a> => t<'a>
 let delay:()=>t<'a>=>t<'a>
@@ -46,6 +47,7 @@ let fromList: list<'a> => t<'a>
 let fromOption: option<'a> => t<'a>
 let init: (int, int => 'a) => t<'a>
 let iterate: ('a, 'a => 'a) => t<'a>
+let permutations: (t<'a>, int) => t<(int, t<'a>)>
 let range: (int, int) => t<int>
 let rangeMap: (int, int, int => 'a) => t<'a>
 let repeat: (int, 'a) => t<'a>

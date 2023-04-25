@@ -4,6 +4,7 @@ module R = Extras__Result
 module Ex = Extras
 module Option = Belt.Option
 module Result = Belt.Result
+module String = Js.String2
 
 // =============================
 // Utilities to help write tests
@@ -12,6 +13,7 @@ module Result = Belt.Result
 let intToString = Belt.Int.toString
 
 let intCompare = Ex.Cmp.int
+let stringCmp = (a: string, b: string) => a < b ? -1 : a > b ? 1 : 0
 
 let concatInts = xs =>
   xs->Js.Array2.length == 0 ? "_" : xs->Js.Array2.map(intToString)->Js.Array2.joinWith("")
@@ -24,6 +26,22 @@ let falseAlways = _ => false
 let oneTwoThree = S.range(1, 3)
 let fourFiveSix = S.range(4, 6)
 let oneToFive = S.range(1, 5)
+
+/**
+Constructs an infinite sequence that returns the number of times it has been
+invoked. Useful for tracking that various sequences are completely lazy. For
+example, if you use this sequence and do a `takeAtMost(3)` then it shouldn't be
+invoked more than 3 times. Also this is useful when testing sequences that rely
+on persistent values. For example, the `allPairs` function should cache the
+returned values before creating the pairs.
+*/
+let callCount = () => {
+  let count = ref(0)
+  S.foreverWith(() => {
+    count := count.contents + 1
+    count.contents
+  })
+}
 
 /**
 Create a test that compares two sequences for equality. Converts both sequences
@@ -1491,6 +1509,149 @@ let delayTests = makeSeqEqualsTests(
   ],
 )
 
+let (combinationTests, permutationTests) = {
+  let sortLetters = w =>
+    w->String.split("")->Belt.SortArray.stableSortBy(stringCmp)->Js.Array2.joinWith("")
+  let sortOutput = combos =>
+    combos
+    ->S.map(combo => combo->S.reduce("", (sum, i) => sum ++ i)->sortLetters)
+    ->S.sortBy(stringCmp)
+    ->S.toArray
+    ->Js.Array2.joinWith(",")
+  let sort = words =>
+    words
+    ->Js.String2.split(",")
+    ->Js.Array2.map(sortLetters)
+    ->Belt.SortArray.stableSortBy(stringCmp)
+    ->Js.Array2.joinWith(",")
+  let combos = (letters, k) => letters->String.split("")->S.fromArray->S.combinations(k)
+  let comboString = (letters, k) => combos(letters, k)->S.map(((_, combo)) => combo)->sortOutput
+  let permutes = (letters, k) => letters->String.split("")->S.fromArray->S.permutations(k)
+  let permuteString = (letters, k) => permutes(letters, k)->S.map(((_, combo)) => combo)->sortOutput
+  let comboSamples = makeValueEqualTests(
+    ~title="combinations",
+    [
+      (() => ""->comboString(1), ""->sort, ""),
+      (() => "a"->comboString(1), "a"->sort, ""),
+      (() => "a"->comboString(2), "a"->sort, ""),
+      (() => "ab"->comboString(1), "a,b"->sort, ""),
+      (() => "ab"->comboString(2), "a,b,ab"->sort, ""),
+      (() => "ab"->comboString(3), "a,b,ab"->sort, ""),
+      (() => "abc"->comboString(1), "a,b,c"->sort, ""),
+      (() => "abc"->comboString(2), "a,b,c,ab,ac,bc"->sort, ""),
+      (() => "abc"->comboString(3), "a,b,c,ab,ac,bc,abc"->sort, ""),
+      (() => "abc"->comboString(4), "a,b,c,ab,ac,bc,abc"->sort, ""),
+      (
+        () =>
+          "abc"
+          ->combos(4)
+          ->S.filterMap(((size, combo)) => size == 1 ? Some(combo) : None)
+          ->sortOutput,
+        "a,c,b"->sort,
+        "check size == 1 in result",
+      ),
+      (
+        () =>
+          "abc"
+          ->combos(4)
+          ->S.filterMap(((size, combo)) => size == 3 ? Some(combo) : None)
+          ->sortOutput,
+        "abc"->sort,
+        "check size == 3 in result",
+      ),
+      (
+        () =>
+          callCount()
+          ->S.map(i => i == 1 ? "a" : i == 2 ? "b" : i == 3 ? "c" : "x")
+          ->S.takeAtMost(3)
+          ->S.combinations(3)
+          ->S.map(((_size, combo)) => combo)
+          ->sortOutput,
+        "a,b,c,ab,ac,bc,abc"->sort,
+        "values appear cached",
+      ),
+    ],
+  )
+  let permuteSamples = makeValueEqualTests(
+    ~title="permutations",
+    [
+      (() => ""->permuteString(1), ""->sort, ""),
+      (() => "a"->permuteString(1), "a"->sort, ""),
+      (() => "a"->permuteString(2), "a"->sort, ""),
+      (() => "ab"->permuteString(1), "a,b"->sort, ""),
+      (() => "ab"->permuteString(2), "a,b,ab,ba"->sort, ""),
+      (() => "ab"->permuteString(3), "a,b,ab,ba"->sort, ""),
+      (() => "abc"->permuteString(1), "a,b,c"->sort, ""),
+      (() => "abc"->permuteString(2), "a,b,c,ab,ac,bc,ba,ca,cb"->sort, ""),
+      (() => "abc"->permuteString(3), "a,b,c,ab,ac,bc,ba,ca,cb,abc,acb,bac,bca,cab,cba"->sort, ""),
+      (() => "abc"->permuteString(4), "a,b,c,ab,ac,bc,ba,ca,cb,abc,acb,bac,bca,cab,cba"->sort, ""),
+      (
+        () =>
+          "abc"
+          ->permutes(4)
+          ->S.filterMap(((size, combo)) => size == 1 ? Some(combo) : None)
+          ->sortOutput,
+        "a,c,b"->sort,
+        "check size == 1 in result",
+      ),
+      (
+        () =>
+          "abc"
+          ->permutes(4)
+          ->S.filterMap(((size, combo)) => size == 3 ? Some(combo) : None)
+          ->sortOutput,
+        "abc,acb,bac,bca,cab,cba"->sort,
+        "check size == 3 in result",
+      ),
+      (
+        () =>
+          callCount()
+          ->S.map(i => i == 1 ? "a" : i == 2 ? "b" : i == 3 ? "c" : "x")
+          ->S.takeAtMost(3)
+          ->S.permutations(3)
+          ->S.map(((_size, combo)) => combo)
+          ->sortOutput,
+        "a,b,c,ab,ac,bc,ba,ca,cb,abc,acb,bac,bca,cab,cba"->sort,
+        "values appear cached",
+      ),
+    ],
+  )
+  let miscellaneous = (title, f) => [
+    willThrow(~title, ~expectation="if size < 0 throw", ~f=() => S.range(1, 9)->f(-1)),
+    willThrow(~title, ~expectation="if size = 0 throw", ~f=() => S.range(1, 9)->f(0)),
+    valueEqual(
+      ~title,
+      ~expectation="millions - take 10",
+      ~a=() => S.range(1, 1000)->f(1000)->S.takeAtMost(10)->S.last->Belt.Option.isSome,
+      ~b=true,
+    ),
+    valueEqual(
+      ~title,
+      ~expectation="infinite - take 0",
+      ~a=() => S.foreverWith(() => 1)->f(1000)->S.takeAtMost(0)->S.last,
+      ~b=None,
+    ),
+    valueEqual(
+      ~title,
+      ~expectation="infinite - take 1",
+      ~a=() => S.foreverWith(() => 1)->f(1000)->S.takeAtMost(4)->S.last->Option.isSome,
+      ~b=true,
+    ),
+    valueEqual(
+      ~title,
+      ~a=() =>
+        S.repeatWith(3, () => {Js.Exn.raiseError("oops!")})->f(1000)->S.takeAtMost(0)->S.last,
+      ~b=None,
+      ~expectation="totally lazy",
+    ),
+  ]
+  let combinationTests =
+    [comboSamples, miscellaneous("combinations", S.combinations)]->Belt.Array.flatMap(i => i)
+  let permutationTests =
+    [permuteSamples, miscellaneous("permutations", S.permutations)]->Belt.Array.flatMap(i => i)
+  (combinationTests, permutationTests)
+}
+
 let sampleFibonacci = {
   let fib = Extras__SeqSamples.fibonacci
   makeSeqEqualsTests(
@@ -1582,6 +1743,7 @@ let tests =
     allSomeTests,
     basicConstructorTests,
     chunkBySizeTests,
+    combinationTests,
     compareTests,
     concatTests,
     consumeTests,
@@ -1627,6 +1789,7 @@ let tests =
     minByMaxByTests,
     orElseTests,
     pairwiseTests,
+    permutationTests,
     prependTests,
     rangeMapTests,
     rangeTests,

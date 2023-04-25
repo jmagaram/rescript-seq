@@ -1,6 +1,8 @@
 ## Version 1.1.1
 
 - Fix bug in `Seq.takeAtMost` where generator function was called 1 too many times; not lazy enough
+- `Seq.combinations`
+- `Seq.permutations`
 
 ## Version 1.1.0
 
