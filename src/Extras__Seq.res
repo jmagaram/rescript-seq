@@ -746,14 +746,41 @@ let combinations = (xx, maxSize) => {
     }
   )->flatten
 }
-          let xOnly = singleton((1, x->singleton))
-          let xConsSum = sum->filterMap(((size, xx)) =>
+
+let distribute: (t<'a>, 'a) => t<t<'a>> = (xx, divider) => {
+  let go = (pre, suf) =>
+    unfold((pre, suf), ((pre, suf)) =>
+      switch suf->headTail {
+      | None => None
+      | Some(x, xx) => {
+          let yield = pre->endWith(x)->endWith(divider)->concat(xx)
+          let next = (pre->endWith(x), xx)
+          Some(yield, next)
+        }
+      }
+    )
+  go(empty, xx)->startWith(cons(divider, xx))
+}
+
+let permutations = (xx, maxSize) => {
+  if maxSize <= 0 {
+    ArgumentOfOfRange(
+      `Combinations must have size >=1. You asked for ${maxSize->Belt.Int.toString}.`,
+    )->raise
+  }
+  unfold((empty, xx), ((sum, xx)) =>
+    switch xx->headTail {
+    | None => None
+    | Some(x, xx) => {
+        let next = {
+          let xOnly = (1, x->singleton)
+          let xConsSum = sum->flatMap(((size, xx)) =>
             switch size < maxSize {
-            | true => Some((size + 1, cons(x, xx)))
-            | false => None
+            | true => xx->distribute(x)->map(xx => (size + 1, xx))
+            | false => empty
             }
           )
-          concat(xOnly, xConsSum)
+          cons(xOnly, xConsSum)
         }
         Some(next, (concat(sum, next), xx))
       }
