@@ -13,6 +13,7 @@ module String = Js.String2
 let intToString = Belt.Int.toString
 
 let intCompare = Ex.Cmp.int
+let stringCmp = (a: string, b: string) => a < b ? -1 : a > b ? 1 : 0
 
 let concatInts = xs =>
   xs->Js.Array2.length == 0 ? "_" : xs->Js.Array2.map(intToString)->Js.Array2.joinWith("")
@@ -1508,8 +1509,7 @@ let delayTests = makeSeqEqualsTests(
   ],
 )
 
-let combinations = {
-  let stringCmp = (a: string, b: string) => a < b ? -1 : a > b ? 1 : 0
+let (combinationTests, permutationTests) = {
   let sortLetters = w =>
     w->String.split("")->Belt.SortArray.stableSortBy(stringCmp)->Js.Array2.joinWith("")
   let sortOutput = combos =>
@@ -1518,15 +1518,17 @@ let combinations = {
     ->S.sortBy(stringCmp)
     ->S.toArray
     ->Js.Array2.joinWith(",")
-  let combos = (letters, k) => letters->String.split("")->S.fromArray->S.combinations(k)
-  let comboString = (letters, k) => combos(letters, k)->S.map(((_, combo)) => combo)->sortOutput
   let sort = words =>
     words
     ->Js.String2.split(",")
     ->Js.Array2.map(sortLetters)
     ->Belt.SortArray.stableSortBy(stringCmp)
     ->Js.Array2.joinWith(",")
-  let simpleCombos = makeValueEqualTests(
+  let combos = (letters, k) => letters->String.split("")->S.fromArray->S.combinations(k)
+  let comboString = (letters, k) => combos(letters, k)->S.map(((_, combo)) => combo)->sortOutput
+  let permutes = (letters, k) => letters->String.split("")->S.fromArray->S.permutations(k)
+  let permuteString = (letters, k) => permutes(letters, k)->S.map(((_, combo)) => combo)->sortOutput
+  let comboSamples = makeValueEqualTests(
     ~title="combinations",
     [
       (() => ""->comboString(1), ""->sort, ""),
@@ -1570,43 +1572,84 @@ let combinations = {
       ),
     ],
   )
-  let otherTests = [
-    willThrow(~title="combinations", ~expectation="if size < 0 throw", ~f=() =>
-      "abc"->comboString(-1)
-    ),
-    willThrow(~title="combinations", ~expectation="if size = 0 throw", ~f=() =>
-      "abc"->comboString(0)
-    ),
+  let permuteSamples = makeValueEqualTests(
+    ~title="permutations",
+    [
+      (() => ""->permuteString(1), ""->sort, ""),
+      (() => "a"->permuteString(1), "a"->sort, ""),
+      (() => "a"->permuteString(2), "a"->sort, ""),
+      (() => "ab"->permuteString(1), "a,b"->sort, ""),
+      (() => "ab"->permuteString(2), "a,b,ab,ba"->sort, ""),
+      (() => "ab"->permuteString(3), "a,b,ab,ba"->sort, ""),
+      (() => "abc"->permuteString(1), "a,b,c"->sort, ""),
+      (() => "abc"->permuteString(2), "a,b,c,ab,ac,bc,ba,ca,cb"->sort, ""),
+      (() => "abc"->permuteString(3), "a,b,c,ab,ac,bc,ba,ca,cb,abc,acb,bac,bca,cab,cba"->sort, ""),
+      (() => "abc"->permuteString(4), "a,b,c,ab,ac,bc,ba,ca,cb,abc,acb,bac,bca,cab,cba"->sort, ""),
+      (
+        () =>
+          "abc"
+          ->permutes(4)
+          ->S.filterMap(((size, combo)) => size == 1 ? Some(combo) : None)
+          ->sortOutput,
+        "a,c,b"->sort,
+        "check size == 1 in result",
+      ),
+      (
+        () =>
+          "abc"
+          ->permutes(4)
+          ->S.filterMap(((size, combo)) => size == 3 ? Some(combo) : None)
+          ->sortOutput,
+        "abc,acb,bac,bca,cab,cba"->sort,
+        "check size == 3 in result",
+      ),
+      (
+        () =>
+          callCount()
+          ->S.map(i => i == 1 ? "a" : i == 2 ? "b" : i == 3 ? "c" : "x")
+          ->S.takeAtMost(3)
+          ->S.permutations(3)
+          ->S.map(((_size, combo)) => combo)
+          ->sortOutput,
+        "a,b,c,ab,ac,bc,ba,ca,cb,abc,acb,bac,bca,cab,cba"->sort,
+        "values appear cached",
+      ),
+    ],
+  )
+  let miscellaneous = (title, f) => [
+    willThrow(~title, ~expectation="if size < 0 throw", ~f=() => S.range(1, 9)->f(-1)),
+    willThrow(~title, ~expectation="if size = 0 throw", ~f=() => S.range(1, 9)->f(0)),
     valueEqual(
-      ~title="combinations",
-      ~expectation="millions",
-      ~a=() => S.range(1, 1000)->S.combinations(1000)->S.takeAtMost(10)->S.last->Belt.Option.isSome,
+      ~title,
+      ~expectation="millions - take 10",
+      ~a=() => S.range(1, 1000)->f(1000)->S.takeAtMost(10)->S.last->Belt.Option.isSome,
       ~b=true,
     ),
     valueEqual(
-      ~title="combinations",
+      ~title,
       ~expectation="infinite - take 0",
-      ~a=() => S.foreverWith(() => 1)->S.combinations(1000)->S.takeAtMost(0)->S.last,
+      ~a=() => S.foreverWith(() => 1)->f(1000)->S.takeAtMost(0)->S.last,
       ~b=None,
     ),
     valueEqual(
-      ~title="combinations",
+      ~title,
       ~expectation="infinite - take 1",
-      ~a=() => S.foreverWith(() => 1)->S.combinations(1000)->S.takeAtMost(4)->S.last->Option.isSome,
+      ~a=() => S.foreverWith(() => 1)->f(1000)->S.takeAtMost(4)->S.last->Option.isSome,
       ~b=true,
     ),
     valueEqual(
-      ~title="combinations",
-      ~expectation="totally lazy",
+      ~title,
       ~a=() =>
-        S.repeatWith(3, () => {Js.Exn.raiseError("oops!")})
-        ->S.combinations(10)
-        ->S.takeAtMost(0)
-        ->S.last,
+        S.repeatWith(3, () => {Js.Exn.raiseError("oops!")})->f(1000)->S.takeAtMost(0)->S.last,
       ~b=None,
+      ~expectation="totally lazy",
     ),
   ]
-  [simpleCombos, otherTests]->Belt.Array.flatMap(i => i)
+  let combinationTests =
+    [comboSamples, miscellaneous("combinations", S.combinations)]->Belt.Array.flatMap(i => i)
+  let permutationTests =
+    [permuteSamples, miscellaneous("permutations", S.permutations)]->Belt.Array.flatMap(i => i)
+  (combinationTests, permutationTests)
 }
 
 let sampleFibonacci = {
@@ -1700,7 +1743,7 @@ let tests =
     allSomeTests,
     basicConstructorTests,
     chunkBySizeTests,
-    combinations,
+    combinationTests,
     compareTests,
     concatTests,
     consumeTests,
@@ -1746,6 +1789,7 @@ let tests =
     minByMaxByTests,
     orElseTests,
     pairwiseTests,
+    permutationTests,
     prependTests,
     rangeMapTests,
     rangeTests,
