@@ -1509,23 +1509,22 @@ let delayTests = makeSeqEqualsTests(
 )
 
 let combinations = {
-  let stringCompare = (a: string, b: string) => a < b ? -1 : a > b ? 1 : 0
-  let sortLetters = word =>
-    word->String.split("")->Belt.SortArray.stableSortBy(stringCompare)->Js.Array2.joinWith("")
+  let stringCmp = (a: string, b: string) => a < b ? -1 : a > b ? 1 : 0
+  let sortLetters = w =>
+    w->String.split("")->Belt.SortArray.stableSortBy(stringCmp)->Js.Array2.joinWith("")
   let sortOutput = combos =>
     combos
     ->S.map(combo => combo->S.reduce("", (sum, i) => sum ++ i)->sortLetters)
-    ->S.sortBy(stringCompare)
+    ->S.sortBy(stringCmp)
     ->S.toArray
     ->Js.Array2.joinWith(",")
-  let combos = (letters, max) => letters->String.split("")->S.fromArray->S.combinations(max)
-  let comboString = (letters, max) =>
-    combos(letters, max)->S.map(((_size, combo)) => combo)->sortOutput
+  let combos = (letters, k) => letters->String.split("")->S.fromArray->S.combinations(k)
+  let comboString = (letters, k) => combos(letters, k)->S.map(((_, combo)) => combo)->sortOutput
   let sort = words =>
     words
     ->Js.String2.split(",")
     ->Js.Array2.map(sortLetters)
-    ->Belt.SortArray.stableSortBy(stringCompare)
+    ->Belt.SortArray.stableSortBy(stringCmp)
     ->Js.Array2.joinWith(",")
   let simpleCombos = makeValueEqualTests(
     ~title="combinations",
@@ -1580,37 +1579,31 @@ let combinations = {
     ),
     valueEqual(
       ~title="combinations",
+      ~expectation="millions",
       ~a=() => S.range(1, 1000)->S.combinations(1000)->S.takeAtMost(10)->S.last->Belt.Option.isSome,
       ~b=true,
-      ~expectation="millions",
     ),
     valueEqual(
       ~title="combinations",
-      ~a=() =>
-        S.repeatWith(3, () => {Js.Exn.raiseError("oops!")})
-        ->S.combinations(1000)
-        ->S.takeAtMost(0)
-        ->S.last,
-      ~b=None,
-      ~expectation="totally lazy",
-    ),
-    valueEqual(
-      ~title="combinations",
-      ~expectation="take 0 from infinite",
+      ~expectation="infinite - take 0",
       ~a=() => S.foreverWith(() => 1)->S.combinations(1000)->S.takeAtMost(0)->S.last,
       ~b=None,
     ),
     valueEqual(
       ~title="combinations",
-      ~expectation="take 1 from infinite",
-      ~a=() =>
-        S.foreverWith(() => 1)
-        ->S.combinations(1000)
-        ->S.tap(i => Js.log(i))
-        ->S.takeAtMost(4)
-        ->S.last
-        ->Option.isSome,
+      ~expectation="infinite - take 1",
+      ~a=() => S.foreverWith(() => 1)->S.combinations(1000)->S.takeAtMost(4)->S.last->Option.isSome,
       ~b=true,
+    ),
+    valueEqual(
+      ~title="combinations",
+      ~expectation="totally lazy",
+      ~a=() =>
+        S.repeatWith(3, () => {Js.Exn.raiseError("oops!")})
+        ->S.combinations(10)
+        ->S.takeAtMost(0)
+        ->S.last,
+      ~b=None,
     ),
   ]
   [simpleCombos, otherTests]->Belt.Array.flatMap(i => i)

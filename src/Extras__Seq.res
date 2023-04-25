@@ -721,21 +721,27 @@ let sortBy = (xx, compare) =>
     xx->fromArray
   })
 
-let combinations = (xx, k) => {
-  if k <= 0 {
+let combinations = (xx, maxSize) => {
+  if maxSize <= 0 {
     ArgumentOfOfRange(
-      `Combinations must have size >=1. You asked for ${k->Belt.Int.toString}.`,
+      `Combinations must have size >=1. You asked for ${maxSize->Belt.Int.toString}.`,
     )->raise
   }
-  unfold((empty, xx), ((acc, xx)) =>
+  unfold((empty, xx), ((sum, xx)) =>
     switch xx->headTail {
     | None => None
     | Some(x, xx) => {
-        let next =
-          (1, x->singleton)
-          ->singleton
-          ->concat(acc->filterMap(((len, xx)) => len < k ? Some((len + 1, cons(x, xx))) : None))
-        Some(next, (acc->concat(next), xx))
+        let next = {
+          let xOnly = singleton((1, x->singleton))
+          let xConsSum = sum->filterMap(((size, xx)) =>
+            switch size < maxSize {
+            | true => Some((size + 1, cons(x, xx)))
+            | false => None
+            }
+          )
+          concat(xOnly, xConsSum)
+        }
+        Some(next, (concat(sum, next), xx))
       }
     }
   )->flatten
