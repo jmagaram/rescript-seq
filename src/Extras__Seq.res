@@ -727,18 +727,16 @@ let combinations = (xx, k) => {
       `Combinations must have size >=1. You asked for ${k->Belt.Int.toString}.`,
     )->raise
   }
-  let rec go = (acc, xx, k) =>
-    switch k {
-    | 0 => acc
-    | k =>
-      switch xx->headTail {
-      | None => acc
-      | Some(x, xx) =>
-        acc
-        ->concat((1, x->singleton)->singleton)
-        ->concat(acc->filterMap(((len, xx)) => len < k ? Some((len + 1, cons(x, xx))) : None))
-        ->go(xx, k)
+  unfold((empty, xx), ((acc, xx)) =>
+    switch xx->headTail {
+    | None => None
+    | Some(x, xx) => {
+        let next =
+          (1, x->singleton)
+          ->singleton
+          ->concat(acc->filterMap(((len, xx)) => len < k ? Some((len + 1, cons(x, xx))) : None))
+        Some(next, (acc->concat(next), xx))
       }
     }
-  delay(() => go(empty, xx, k))
+  )->flatten
 }

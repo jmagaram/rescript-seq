@@ -1594,12 +1594,24 @@ let combinations = {
       ~b=None,
       ~expectation="totally lazy",
     ),
-    // valueEqual(
-    //   ~title="combinations",
-    //   ~a=() => S.foreverWith(() => 3)->S.combinations(1000)->S.takeAtMost(0)->S.last,
-    //   ~b=None,
-    //   ~expectation="totally lazy",
-    // ),
+    valueEqual(
+      ~title="combinations",
+      ~expectation="take 0 from infinite",
+      ~a=() => S.foreverWith(() => 1)->S.combinations(1000)->S.takeAtMost(0)->S.last,
+      ~b=None,
+    ),
+    valueEqual(
+      ~title="combinations",
+      ~expectation="take 1 from infinite",
+      ~a=() =>
+        S.foreverWith(() => 1)
+        ->S.combinations(1000)
+        ->S.tap(i => Js.log(i))
+        ->S.takeAtMost(4)
+        ->S.last
+        ->Option.isSome,
+      ~b=true,
+    ),
   ]
   [simpleCombos, otherTests]->Belt.Array.flatMap(i => i)
 }
