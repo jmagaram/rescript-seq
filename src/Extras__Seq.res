@@ -721,69 +721,60 @@ let sortBy = (xx, compare) =>
     xx->fromArray
   })
 
-let combinations = (xx, maxSize) => {
-  if maxSize <= 0 {
-    ArgumentOfOfRange(
-      `Combinations must have size >=1. You asked for ${maxSize->Belt.Int.toString}.`,
-    )->raise
-  }
-  unfold((empty, xx), ((sum, xx)) =>
-    switch xx->headTail {
-    | None => None
-    | Some(x, xx) => {
-        let next = {
-          let xOnly = (1, x->singleton)
-          let xConsSum = sum->filterMap(((size, xx)) =>
-            switch size < maxSize {
-            | true => Some((size + 1, cons(x, xx)))
-            | false => None
-            }
-          )
-          cons(xOnly, xConsSum)
-        }
-        Some(next, (concat(sum, next), xx))
-      }
-    }
-  )->flatten
-}
+/**
+`distribute(source, divider)` iterates through each item in `source` and returns
+the sequences that result when `divider` is inserted before that item, and also
+after the last item. If `source` is empty, returns a sequence consisting only of
+`divider`.
 
-let distribute: (t<'a>, 'a) => t<t<'a>> = (xx, divider) => {
+```
+[1, 2]->distribute(8) // [[8,1,2], [1,8,2], [1,2,8]]
+[1]->distribute(8) // [[8,1], [1,8]]
+[]->distribute(8) // [[8]]
+```
+*/
+let distribute = (xx, item) => {
   let go = (pre, suf) =>
     unfold((pre, suf), ((pre, suf)) =>
       switch suf->headTail {
       | None => None
       | Some(x, xx) => {
-          let yield = pre->endWith(x)->endWith(divider)->concat(xx)
+          let yield = pre->endWith(x)->endWith(item)->concat(xx)
           let next = (pre->endWith(x), xx)
           Some(yield, next)
         }
       }
     )
-  go(empty, xx)->startWith(cons(divider, xx))
+  go(empty, xx)->startWith(cons(item, xx))
 }
 
-let permutations = (xx, maxSize) => {
-  if maxSize <= 0 {
-    ArgumentOfOfRange(
-      `Combinations must have size >=1. You asked for ${maxSize->Belt.Int.toString}.`,
-    )->raise
-  }
-  unfold((empty, xx), ((sum, xx)) =>
-    switch xx->headTail {
-    | None => None
-    | Some(x, xx) => {
-        let next = {
-          let xOnly = (1, x->singleton)
-          let xConsSum = sum->flatMap(((size, xx)) =>
-            switch size < maxSize {
-            | true => xx->distribute(x)->map(xx => (size + 1, xx))
-            | false => empty
-            }
-          )
-          cons(xOnly, xConsSum)
-        }
-        Some(next, (concat(sum, next), xx))
-      }
+let (combinations, permutations) = {
+  let helper = (xx, maxSize, f) => {
+    if maxSize <= 0 {
+      ArgumentOfOfRange(
+        `Size must be 1 or more. You asked for ${maxSize->Belt.Int.toString}.`,
+      )->raise
     }
-  )->flatten
+    unfold((empty, xx), ((sum, xx)) =>
+      switch xx->headTail {
+      | None => None
+      | Some(x, xx) => {
+          let next = {
+            let xOnly = (1, x->singleton)
+            let xWithSum = sum->flatMap(((size, xx)) =>
+              switch size < maxSize {
+              | true => f(x, xx)->map(xx => (size + 1, xx))
+              | false => empty
+              }
+            )
+            cons(xOnly, xWithSum)
+          }
+          Some(next, (concat(sum, next), xx))
+        }
+      }
+    )->flatten
+  }
+  let permutations = (xx, maxSize) => helper(xx, maxSize, (x, xx) => distribute(xx, x))
+  let combinations = (xx, maxSize) => helper(xx, maxSize, (x, xx) => singleton(cons(x, xx)))
+  (combinations, permutations)
 }
