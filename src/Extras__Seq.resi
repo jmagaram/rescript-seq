@@ -656,6 +656,7 @@ is preserved) based on the provided `compare` function.
 let sortBy: (t<'a>, ('a, 'a) => int) => t<'a>
 
 /**
-`combinations(source, size)` generates all combinations of `source` of 1 to `size` items.
+`combinations(source, size)` generates all combinations of `source` from 1 to
+`size` items. Each combination is returned as a tuple of `(size, sequence)`. 
 */
-let combinations: (t<'a>, int) => t<t<'a>>
+let combinations: (t<'a>, int) => t<(int, t<'a>)>

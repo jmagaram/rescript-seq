@@ -1518,8 +1518,9 @@ let combinations = {
     ->S.sortBy(stringCompare)
     ->S.toArray
     ->Js.Array2.joinWith(",")
-  let combos = (letters, max) =>
-    letters->String.split("")->S.fromArray->S.combinations(max)->sortOutput
+  let combos = (letters, max) => letters->String.split("")->S.fromArray->S.combinations(max)
+  let comboString = (letters, max) =>
+    combos(letters, max)->S.map(((_size, combo)) => combo)->sortOutput
   let sort = words =>
     words
     ->Js.String2.split(",")
@@ -1529,34 +1530,54 @@ let combinations = {
   let simpleCombos = makeValueEqualTests(
     ~title="combinations",
     [
-      (() => ""->combos(0), ""->sort, ""),
-      (() => ""->combos(1), ""->sort, ""),
-      (() => "a"->combos(0), ""->sort, ""),
-      (() => "a"->combos(1), "a"->sort, ""),
-      (() => "a"->combos(2), "a"->sort, ""),
-      (() => "ab"->combos(0), ""->sort, ""),
-      (() => "ab"->combos(1), "a,b"->sort, ""),
-      (() => "ab"->combos(2), "a,b,ab"->sort, ""),
-      (() => "ab"->combos(3), "a,b,ab"->sort, ""),
-      (() => "abc"->combos(0), ""->sort, ""),
-      (() => "abc"->combos(1), "a,b,c"->sort, ""),
-      (() => "abc"->combos(2), "a,b,c,ab,ac,bc"->sort, ""),
-      (() => "abc"->combos(3), "a,b,c,ab,ac,bc,abc"->sort, ""),
-      (() => "abc"->combos(4), "a,b,c,ab,ac,bc,abc"->sort, ""),
+      (() => ""->comboString(1), ""->sort, ""),
+      (() => "a"->comboString(1), "a"->sort, ""),
+      (() => "a"->comboString(2), "a"->sort, ""),
+      (() => "ab"->comboString(1), "a,b"->sort, ""),
+      (() => "ab"->comboString(2), "a,b,ab"->sort, ""),
+      (() => "ab"->comboString(3), "a,b,ab"->sort, ""),
+      (() => "abc"->comboString(1), "a,b,c"->sort, ""),
+      (() => "abc"->comboString(2), "a,b,c,ab,ac,bc"->sort, ""),
+      (() => "abc"->comboString(3), "a,b,c,ab,ac,bc,abc"->sort, ""),
+      (() => "abc"->comboString(4), "a,b,c,ab,ac,bc,abc"->sort, ""),
+      (
+        () =>
+          "abc"
+          ->combos(4)
+          ->S.filterMap(((size, combo)) => size == 1 ? Some(combo) : None)
+          ->sortOutput,
+        "a,c,b"->sort,
+        "check size == 1 in result",
+      ),
+      (
+        () =>
+          "abc"
+          ->combos(4)
+          ->S.filterMap(((size, combo)) => size == 3 ? Some(combo) : None)
+          ->sortOutput,
+        "abc"->sort,
+        "check size == 3 in result",
+      ),
       (
         () =>
           callCount()
           ->S.map(i => i == 1 ? "a" : i == 2 ? "b" : i == 3 ? "c" : "x")
           ->S.takeAtMost(3)
           ->S.combinations(3)
+          ->S.map(((_size, combo)) => combo)
           ->sortOutput,
         "a,b,c,ab,ac,bc,abc"->sort,
-        "",
+        "values appear cached",
       ),
     ],
   )
   let otherTests = [
-    willThrow(~title="combinations", ~expectation="if size < 0 throw", ~f=() => "abc"->combos(-1)),
+    willThrow(~title="combinations", ~expectation="if size < 0 throw", ~f=() =>
+      "abc"->comboString(-1)
+    ),
+    willThrow(~title="combinations", ~expectation="if size = 0 throw", ~f=() =>
+      "abc"->comboString(0)
+    ),
     valueEqual(
       ~title="combinations",
       ~a=() => S.range(1, 1000)->S.combinations(1000)->S.takeAtMost(10)->S.last->Belt.Option.isSome,
