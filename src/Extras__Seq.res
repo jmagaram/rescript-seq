@@ -739,5 +739,5 @@ let combinations = (xx, k) => {
         }
       }
     }
-  go(xx, empty, k)->map(((_size, xx)) => xx) // return size too?
+  go(xx, empty, k)->map(((_size, xx)) => xx)
 }

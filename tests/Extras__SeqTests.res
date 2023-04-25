@@ -26,6 +26,22 @@ let fourFiveSix = S.range(4, 6)
 let oneToFive = S.range(1, 5)
 
 /**
+Constructs an infinite sequence that returns the number of times it has been
+invoked. Useful for tracking that various sequences are completely lazy. For
+example, if you use this sequence and do a `takeAtMost(3)` then it shouldn't be
+invoked more than 3 times. Also this is useful when testing sequences that rely
+on persistent values. For example, the `allPairs` function should cache the
+returned values before creating the pairs.
+*/
+let callCount = () => {
+  let count = ref(0)
+  S.foreverWith(() => {
+    count := count.contents + 1
+    count.contents
+  })
+}
+
+/**
 Create a test that compares two sequences for equality. Converts both sequences
 to arrays and then uses the ReScript recursive equality test.
 */
@@ -1582,11 +1598,8 @@ let sampleCombinations = {
     word->Js.String2.split("")->Belt.SortArray.stableSortBy(sortWords)->Js.Array2.joinWith("")
   // from "a,b,c"
   // to "ab,bc,c"
-  let combosAsString = (words, max) =>
+  let standardizeOutput = words =>
     words
-    ->Js.String2.split(",")
-    ->S.fromArray
-    ->combos(max)
     ->S.map(words =>
       words
       ->S.map(sortLettersInWord)
@@ -1597,6 +1610,8 @@ let sampleCombinations = {
     ->S.toArray
     ->Belt.SortArray.stableSortBy(sortWords)
     ->Js.Array2.joinWith(",")
+  let combosAsString = (words, max) =>
+    words->Js.String2.split(",")->S.fromArray->combos(max)->standardizeOutput
   let normalizeExpectedOutput = words =>
     words
     ->Js.String2.split(",")
@@ -1627,6 +1642,17 @@ let sampleCombinations = {
   )->Js.Array2.concat([
     valueEqual(
       ~title="combinations",
+      ~expectation="sequence values appear cached",
+      ~a=() =>
+        callCount()
+        ->S.takeAtMost(3)
+        ->S.map(i => i == 1 ? "a" : i == 2 ? "b" : i == 3 ? "c" : "x")
+        ->combos(2)
+        ->standardizeOutput,
+      ~b="a,b,c,ab,ac,bc"->normalizeExpectedOutput,
+    ),
+    valueEqual(
+      ~title="combinations",
       ~expectation="combo count for 5 items from 15",
       ~a=() => "a,b,c,d,e,f,g,h,i,j,k,l,m,n,o"->comboCount(5),
       ~b=3003 + 1365 + 455 + 105 + 15,
@@ -1639,7 +1665,7 @@ let sampleCombinations = {
     ),
     valueEqual(
       ~title="combinations",
-      ~expectation="zillions but take a few",
+      ~expectation="millions but can take a few",
       ~a=() => S.range(1, 100)->combos(100)->S.takeAtMost(10)->S.last->Option.isSome,
       ~b=true,
     ),
