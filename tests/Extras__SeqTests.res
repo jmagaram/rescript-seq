@@ -473,7 +473,7 @@ let windowAheadBehindTests = (~title, ~function, ~data) =>
           ->function(size)
           ->S.map(ss => ss->Js.Array2.joinWith(""))
           ->S.intersperse(",")
-          ->S.joinString,
+          ->S.join(""),
         ~b=expectedResult,
       )
     }
@@ -1212,26 +1212,19 @@ let isEmptyTests = [
   ),
 ]
 
-let joinStringTests = [
-  valueEqual(
-    ~title="joinString",
-    ~expectation="",
-    ~a=() => ["a", "b", "c"]->S.fromArray->S.joinString,
-    ~b="abc",
-  ),
-  valueEqual(
-    ~title="joinString",
-    ~expectation="when empty",
-    ~a=() => []->S.fromArray->S.joinString,
-    ~b="",
-  ),
-  valueEqual(
-    ~title="joinString",
-    ~expectation="when once",
-    ~a=() => ["x"]->S.fromArray->S.joinString,
-    ~b="x",
-  ),
-]
+let joinTests = makeValueEqualTests(
+  ~title="join",
+  [
+    (() => S.empty->S.join(""), "", "empty source"),
+    (() => S.empty->S.join(","), "", "empty source"),
+    (() => S.once("x")->S.join(""), "x", "singleton source"),
+    (() => S.once("x")->S.join(","), "x", "singleton source"),
+    (() => ["a", "b"]->S.fromArray->S.join(""), "ab", "two items in source"),
+    (() => ["a", "b"]->S.fromArray->S.join(","), "a,b", "two items in source"),
+    (() => ["a", "b", "c", "d"]->S.fromArray->S.join(""), "abcd", "many items in source"),
+    (() => ["a", "b", "c", "d"]->S.fromArray->S.join(","), "a,b,c,d", "many items in source"),
+  ],
+)
 
 let exactlyOneTests = makeValueEqualTests(
   ~title="exactlyOne",
@@ -1819,7 +1812,7 @@ let tests =
     isEmptyTests,
     isSortedByTests,
     iterateTests,
-    joinStringTests,
+    joinTests,
     lastTests,
     lengthTests,
     map2Tests,

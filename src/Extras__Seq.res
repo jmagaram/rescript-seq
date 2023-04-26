@@ -481,6 +481,12 @@ let reduce = (xx, zero, concat) => {
 let reducei = (xx, ~zero, concat) =>
   xx->indexed->reduce(zero, (sum, (val, inx)) => concat(~sum, ~val, ~inx))
 
+let join = (xx, separator) =>
+  switch separator->Js.String2.length {
+  | 0 => xx
+  | _ => xx->intersperse(separator)
+  }->reduce("", (total, i) => total ++ i)
+
 let last = xx => xx->reduce(None, (_, x) => Some(x))
 
 let toArray = xx =>
@@ -488,8 +494,6 @@ let toArray = xx =>
     xx->Js.Array2.push(i)->ignore
     xx
   })
-
-let joinString = xx => xx->reduce("", (total, i) => total ++ i)
 
 let forEachi = (xx, f) => xx->indexed->forEach(((x, inx)) => f(x, inx))
 

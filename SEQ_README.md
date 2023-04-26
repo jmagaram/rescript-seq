@@ -123,7 +123,7 @@ let head: t<'a> => option<'a>
 let headTail: t<'a> => option<('a, t<'a>)>
 let isEmpty: t<'a> => bool
 let isSortedBy: (t<'a>, ('a, 'a) => int) => bool
-let joinString: t<string> => string
+let join: t<string> => string
 let last: t<'a> => option<'a>
 let length: t<'a> => int
 let maxBy: (t<'a>, ('a, 'a) => int) => option<'a>

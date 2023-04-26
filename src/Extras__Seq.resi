@@ -593,11 +593,11 @@ let last: t<'a> => option<'a>
 let toArray: t<'a> => array<'a>
 
 /**
-`joinString` concatenates every string in the input sequence. Empty sequences
-return the empty string. See `intersperse` to insert a separator character
-between pairs of strings.
+`join(parts, separator)` concatenates every string in `parts`, separated
+by `separator`. If `parts` is empty, returns an empty string. If `parts` has
+only one string, that string is returned without using the `separator`.
 */
-let joinString: t<string> => string
+let join: (t<string>, string) => string
 
 /**
 `exactlyOne` checks if the sequence has exactly one item in it, and if so

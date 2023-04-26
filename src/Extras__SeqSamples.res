@@ -102,7 +102,7 @@ let localMinimums = points =>
   )
   ->Seq.map(Point.toString)
   ->Seq.toOption
-  ->Option.map(pp => pp->Seq.intersperse(", ")->Seq.joinString)
+  ->Option.map(pp => pp->Seq.join(", "))
   ->Option.getWithDefault("There are no local minimums.")
 
 /**
