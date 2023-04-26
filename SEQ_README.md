@@ -37,7 +37,6 @@ let combinations: (t<'a>, int) => t<(int, t<'a>)>
 let cons: ('a, t<'a>) => t<'a>
 let cycle: t<'a> => t<'a>
 let delay:()=>t<'a>=>t<'a>
-let reverse: (unit, t<'a>) => t<'a>
 let empty: t<'a>
 let endWith: (t<'a>, 'a) => t<'a>
 let forever: 'a => t<'a>
@@ -54,6 +53,7 @@ let range: (int, int) => t<int>
 let rangeMap: (int, int, int => 'a) => t<'a>
 let repeat: (int, 'a) => t<'a>
 let repeatWith: (int, unit => 'a) => t<'a>
+let reverse: (unit, t<'a>) => t<'a>
 let startWith: (t<'a>, 'a) => t<'a>
 let unfold: ('a, 'a => option<('b, 'a)>) => t<'b>
 
@@ -108,12 +108,12 @@ let zip5: (t<'a>, t<'b>, t<'c>, t<'d>, t<'e>) => t<('a, 'b, 'c, 'd, 'e)>
 
 // Reduce, consume, and calculate
 
-let allOk: t<result<'a, 'b>> => result<t<'a>, 'b>
-let allSome: t<option<'a>> => option<t<'a>>
 let compare: (t<'a>, t<'b>, ('a, 'b) => int) => int
 let consume: t<'a> => unit
 let equals: (t<'a>, t<'b>, ('a, 'b) => bool) => bool
 let every: (t<'a>, 'a => bool) => bool
+let everyOk: t<result<'a, 'b>> => result<t<'a>, 'b>
+let everySome: t<option<'a>> => option<t<'a>>
 let exactlyOne: t<'a> => option<'a>
 let find: (t<'a>, 'a => bool) => option<'a>
 let findMap: (t<'a>, 'a => option<'b>) => option<'b>

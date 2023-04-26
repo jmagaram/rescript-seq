@@ -120,7 +120,7 @@ let validate = (docs, isValidEmail) =>
     | true => Ok(doc["title"]->Js.String2.trim)
     }
   )
-  ->Seq.allOk {
+  ->Seq.everyOk {
   | Ok(titles) => titles->Seq.forEach(t => Js.log(`Is valid: ${t}`))
   | Error(title) => Js.log(`Document with title ${title} is not valid.`)
   }

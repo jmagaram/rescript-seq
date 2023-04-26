@@ -620,17 +620,17 @@ first item and then "puts it back".
 let toOption: t<'a> => option<t<'a>>
 
 /**
-`allOk` returns an `Ok` sequence (possibly empty) if all the input values were
-`Ok`. Otherwise returns the first `Error`. Useful for lazy validation because
-validation stops when the first `Error` is encountered.
+`everyOk` returns an `Ok` sequence if all the input values are `Ok` or if the
+input sequence is empty. Otherwise returns the first `Error`. This is useful for
+lazy validation because validation stops when the first `Error` is encountered.
 */
-let allOk: t<result<'ok, 'err>> => result<t<'ok>, 'err>
+let everyOk: t<result<'ok, 'err>> => result<t<'ok>, 'err>
 
 /**
-`allSome` returns a `Some` sequence (possibly empty) if all input
-values were `Some`. Otherwise returns `None.`
+`everySome` returns a `Some` sequence if all input values are `Some` or if the
+input sequence is empty. Otherwise returns `None.`
 */
-let allSome: t<option<'a>> => option<t<'a>>
+let everySome: t<option<'a>> => option<t<'a>>
 
 /**
 `consume` eagerly iterates through every item in the sequence and returns

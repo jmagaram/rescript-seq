@@ -665,7 +665,7 @@ let windowAhead = (xx, size) => {
   ->drop(size)
 }
 
-let allOk = xx => {
+let everyOk = xx => {
   xx
   ->scan(Ok(empty), (sum, x) =>
     switch x {
@@ -678,7 +678,7 @@ let allOk = xx => {
   ->Option.getUnsafe
 }
 
-let allSome = xx => {
+let everySome = xx => {
   xx
   ->scan(Some(empty), (sum, x) =>
     switch x {

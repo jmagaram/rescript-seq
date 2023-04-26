@@ -1314,7 +1314,7 @@ let lastTests = {
   )
 }
 
-let (allOkTests, allSomeTests) = {
+let (everyOkTests, everySomeTests) = {
   let validationTests = [
     ("when empty, return empty", [], Ok([])),
     ("when one error, return it", [30], Error("30")),
@@ -1326,33 +1326,33 @@ let (allOkTests, allSomeTests) = {
 
   let validate = n => n < 10 ? Ok(n * 2) : Error(n->intToString)
 
-  let allOkTests =
+  let everyOkTests =
     validationTests->Belt.Array.map(((expectation, input, expected)) =>
       valueEqual(
-        ~title="allOk",
+        ~title="everyOk",
         ~expectation,
-        ~a=() => input->S.fromArray->S.map(validate)->S.allOk->Result.map(i => i->S.toArray),
+        ~a=() => input->S.fromArray->S.map(validate)->S.everyOk->Result.map(i => i->S.toArray),
         ~b=expected,
       )
     )
 
-  let allSomeTests = {
+  let everySomeTests = {
     validationTests->Belt.Array.map(((expectation, input, expected)) =>
       valueEqual(
-        ~title="allSome",
+        ~title="everySome",
         ~expectation,
         ~a=() =>
           input
           ->S.fromArray
           ->S.map(validate)
           ->S.map(Ex.Result.toOption)
-          ->S.allSome
+          ->S.everySome
           ->Option.map(i => i->S.toArray),
         ~b=expected->Ex.Result.toOption,
       )
     )
   }
-  (allOkTests, allSomeTests)
+  (everyOkTests, everySomeTests)
 }
 
 let memoizeTests = [
@@ -1783,9 +1783,9 @@ let sampleRunningTotal = {
 
 let tests =
   [
-    allOkTests,
+    everyOkTests,
     allPairsTests,
-    allSomeTests,
+    everySomeTests,
     charatersTest,
     chunkBySizeTests,
     combinationTests,
