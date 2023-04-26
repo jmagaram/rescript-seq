@@ -3,6 +3,7 @@
 - Remove `Array.fromSeed`; use Seq module instead
 - Remove `Array.pairs`; use Seq module instead
 - Remove `Array.filterSomeWith`
+- Rename exception from the spelled-wrong `ArgumentOfOfRange` to `InvalidArgument`
 
 ## Version 1.1.1
 

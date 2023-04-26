@@ -2,7 +2,7 @@ module Option = Belt.Option
 module Result = Belt.Result
 module OptionEx = Extras__Option
 
-exception ArgumentOfOfRange(string)
+exception InvalidArgument(string)
 
 type rec t<'a> = (. unit) => node<'a>
 and node<'a> =
@@ -206,7 +206,7 @@ let fromArray = (~start=?, ~end=?, xx: array<'a>) => {
     start
     ->Option.orElse(end)
     ->Option.forEach(_ =>
-      ArgumentOfOfRange("The array is empty but you provided start and/or end indexes.")->raise
+      InvalidArgument("The array is empty but you provided start and/or end indexes.")->raise
     )
     empty
   | false => {
@@ -214,12 +214,12 @@ let fromArray = (~start=?, ~end=?, xx: array<'a>) => {
       let start = start->Option.getWithDefault(0)
       let end = end->Option.getWithDefault(len - 1)
       if start < 0 || start > len - 1 {
-        ArgumentOfOfRange(
+        InvalidArgument(
           `The start index ${start->Belt.Int.toString} is outside the array bounds.`,
         )->raise
       }
       if end < 0 || end > len - 1 {
-        ArgumentOfOfRange(
+        InvalidArgument(
           `The end index ${start->Belt.Int.toString} is outside the array bounds.`,
         )->raise
       }
@@ -248,7 +248,7 @@ let takeAtMost = (xx, count) => {
   switch count {
   | 0 => empty
   | n if n < 0 =>
-    ArgumentOfOfRange(
+    InvalidArgument(
       `takeAtMost requires a count of 0 or more. You requested ${count->Belt.Int.toString}`,
     )->raise
   | count =>
@@ -275,7 +275,7 @@ let drop = (xx, count) =>
   switch count {
   | 0 => xx
   | n if n < 0 =>
-    ArgumentOfOfRange(
+    InvalidArgument(
       `'drop' requires a count of zero or more but youu asked for ${count->Belt.Int.toString}`,
     )->raise
   | count =>
@@ -433,7 +433,7 @@ let dropWhile = (xx, predicate) =>
 
 let chunkBySize = (xx, length) => {
   if length <= 0 {
-    ArgumentOfOfRange(
+    InvalidArgument(
       `chunkByyize requires a length > 0. You asked for ${length->Belt.Int.toString}`,
     )->raise
   }
@@ -458,7 +458,7 @@ let chunkBySize = (xx, length) => {
 
 let window = (xx, length) => {
   if length <= 0 {
-    ArgumentOfOfRange(
+    InvalidArgument(
       `windowed requires a length > 0. You asked for ${length->Belt.Int.toString}`,
     )->raise
   }
@@ -633,7 +633,7 @@ let isSortedBy = (xx, cmp) => xx->pairwise->everyOrEmpty(((a, b)) => cmp(a, b) <
 
 let windowBehind = (xx, size) => {
   if size <= 0 {
-    ArgumentOfOfRange(`windowBehind requires a size greater than zero.`)->raise
+    InvalidArgument(`windowBehind requires a size greater than zero.`)->raise
   }
   xx
   ->scan([], (sum, i) => {
@@ -648,7 +648,7 @@ let windowBehind = (xx, size) => {
 
 let windowAhead = (xx, size) => {
   if size <= 0 {
-    ArgumentOfOfRange(`windowAhead requires a size greater than zero.`)->raise
+    InvalidArgument(`windowAhead requires a size greater than zero.`)->raise
   }
   xx
   ->map(i => Some(i))
@@ -751,9 +751,7 @@ let distribute = (xx, item) => {
 let (combinations, permutations) = {
   let helper = (xx, maxSize, f) => {
     if maxSize <= 0 {
-      ArgumentOfOfRange(
-        `Size must be 1 or more. You asked for ${maxSize->Belt.Int.toString}.`,
-      )->raise
+      InvalidArgument(`Size must be 1 or more. You asked for ${maxSize->Belt.Int.toString}.`)->raise
     }
     unfold((empty, xx), ((sum, xx)) =>
       switch xx->headTail {

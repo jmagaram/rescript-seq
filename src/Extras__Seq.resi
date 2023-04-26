@@ -3,7 +3,7 @@
 */
 type t<'a>
 
-exception ArgumentOfOfRange(string)
+exception InvalidArgument(string)
 
 /**
 `empty` is a sequence with nothing in it; analogous to an empty array.
