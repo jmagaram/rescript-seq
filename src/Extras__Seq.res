@@ -36,13 +36,13 @@ module Node = {
 
 let empty = (. ()) => Node.end
 
-let nextNode = (xx: t<'a>) => xx(.)
-let next = xx => xx->nextNode->Node.toOption
+let once = x => (. ()) => Next(x, empty)
 
 let cons = (x, xx) => (. ()) => Next(x, xx)
-let startWith = (xx, x) => cons(x, xx)
+let startWith = (xx, x) => (. ()) => Next(x, xx)
 
-let singleton = x => cons(x, empty)
+let nextNode = (xx: t<'a>) => xx(.)
+let next = xx => xx->nextNode->Node.toOption
 
 /**
 This is a foundation method for many of the functions in this library. It must
@@ -81,7 +81,7 @@ let rec concat = (xx, yy) =>
     }
   }
 
-let endWith = (xx, x) => concat(xx, singleton(x))
+let endWith = (xx, x) => concat(xx, once(x))
 let prepend = (xx, yy) => concat(yy, xx)
 
 let rec flatMap = (xx, f) =>
@@ -239,7 +239,7 @@ let rec fromList = xx => {
 let fromOption = opt =>
   switch opt {
   | None => empty
-  | Some(x) => singleton(x)
+  | Some(x) => once(x)
   }
 
 let mapi = (xx, f) => xx->indexed->map(((x, inx)) => f(x, inx))
@@ -347,7 +347,7 @@ let scani = (xx, ~zero, f) => {
           Next(sum, go(xx, sum))
         }
       }
-  concat(singleton(zero), go(xx->indexed, zero))
+  concat(once(zero), go(xx->indexed, zero))
 }
 
 let scan = (xx, zero, f) => scani(xx, ~zero, (~sum, ~val, ~inx as _) => f(sum, val))
@@ -360,9 +360,9 @@ let rec sortedMerge = (xx, yy, cmp) => {
     | (Next(x, xx), Next(y, yy)) => {
         let order = cmp(x, y)
         if order <= 0 {
-          Next(x, sortedMerge(xx, concat(y->singleton, yy), cmp))
+          Next(x, sortedMerge(xx, concat(y->once, yy), cmp))
         } else {
-          Next(y, sortedMerge(concat(x->singleton, xx), yy, cmp))
+          Next(y, sortedMerge(concat(x->once, xx), yy, cmp))
         }
       }
     | (End, End) => End
@@ -667,7 +667,7 @@ let allOk = xx => {
   xx
   ->scan(Ok(empty), (sum, x) =>
     switch x {
-    | Ok(ok) => sum->Result.map(oks => concat(oks, singleton(ok)))
+    | Ok(ok) => sum->Result.map(oks => concat(oks, once(ok)))
     | Error(_) as err => err
     }
   )
@@ -680,7 +680,7 @@ let allSome = xx => {
   xx
   ->scan(Some(empty), (sum, x) =>
     switch x {
-    | Some(ok) => sum->Option.map(oks => concat(oks, singleton(ok)))
+    | Some(ok) => sum->Option.map(oks => concat(oks, once(ok)))
     | None => None
     }
   )
@@ -758,7 +758,7 @@ let (combinations, permutations) = {
       | None => None
       | Some(x, xx) => {
           let next = {
-            let xOnly = (1, x->singleton)
+            let xOnly = (1, x->once)
             let xWithSum = sum->flatMap(((size, xx)) =>
               switch size < maxSize {
               | true => f(x, xx)->map(xx => (size + 1, xx))
@@ -773,6 +773,6 @@ let (combinations, permutations) = {
     )->flatten
   }
   let permutations = (xx, maxSize) => helper(xx, maxSize, (x, xx) => distribute(xx, x))
-  let combinations = (xx, maxSize) => helper(xx, maxSize, (x, xx) => singleton(cons(x, xx)))
+  let combinations = (xx, maxSize) => helper(xx, maxSize, (x, xx) => once(cons(x, xx)))
   (combinations, permutations)
 }

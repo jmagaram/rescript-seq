@@ -47,12 +47,12 @@ let fromList: list<'a> => t<'a>
 let fromOption: option<'a> => t<'a>
 let init: (int, int => 'a) => t<'a>
 let iterate: ('a, 'a => 'a) => t<'a>
+let once: 'a => t<'a>
 let permutations: (t<'a>, int) => t<(int, t<'a>)>
 let range: (int, int) => t<int>
 let rangeMap: (int, int, int => 'a) => t<'a>
 let repeat: (int, 'a) => t<'a>
 let repeatWith: (int, unit => 'a) => t<'a>
-let singleton: 'a => t<'a>
 let startWith: (t<'a>, 'a) => t<'a>
 let unfold: ('a, 'a => option<('b, 'a)>) => t<'b>
 

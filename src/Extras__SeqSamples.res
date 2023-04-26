@@ -22,7 +22,7 @@ let dd = [1, 3, 7, 2]->Seq.fromArray->Seq.cycle
 let ee = "banana"->Seq.characters->Seq.intersperse(",")
 let ff = Seq.repeat(100, "x")->Seq.toArray
 let gg = Seq.rangeMap(99, 1, i => i * 3)
-let hh = Seq.singleton("Hello!")
+let hh = Seq.once("Hello!")
 
 /**
 Pointless number crunching to see how it flows.

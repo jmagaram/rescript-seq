@@ -5,6 +5,7 @@
 - Remove `Array.filterSomeWith`
 - Rename exception from the spelled-wrong `ArgumentOfOfRange` to `InvalidArgument`
 - Rename `Array.exactlyOneValue` to `Array.exactlyOne` like `Seq.exactlyOne`
+- Rename `Seq.singleton` to `Seq.once`
 
 ## Version 1.1.1
 
