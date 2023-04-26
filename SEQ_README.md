@@ -52,7 +52,7 @@ let range: (int, int) => t<int>
 let rangeMap: (int, int, int => 'a) => t<'a>
 let repeat: (int, 'a) => t<'a>
 let repeatWith: (int, unit => 'a) => t<'a>
-let reverse: (unit, t<'a>) => t<'a>
+let reverse: t<'a> => t<'a>
 let startWith: (t<'a>, 'a) => t<'a>
 let unfold: ('a, 'a => option<('b, 'a)>) => t<'b>
 

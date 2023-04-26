@@ -47,6 +47,12 @@ let throwIfInvoked = () =>
   Js.Exn.raiseError("Tried to invoke a testing function that always fails.")
 
 /**
+`death` defines a sequence that throws an exception if it is ever iterated.
+Useful to test that sequence functions are completely lazy.
+*/
+let death = () => S.onceWith(throwIfInvoked)
+
+/**
 `toDispenser(source)` constructs a function from a sequence that returns each
 value in that sequence in turn, each time it is called. If any attempt is made
 to consume a value once the sequence is complete, an exception is thrown.
@@ -1464,19 +1470,19 @@ let consumeTests = [
   ),
 ]
 
-let reverseTests = makeSeqEqualsTests(
-  ~title="reverse",
-  [
-    (S.empty->S.reverse, [], ""),
-    (S.once(1)->S.reverse, [1], ""),
-    (S.range(1, 5)->S.reverse, [5, 4, 3, 2, 1], ""),
-  ],
-)->Js.Array2.concat([
-  T.make(~category="Seq", ~title="reverse", ~expectation="completely lazy", ~predicate=() => {
-    S.repeatWith(3, () => {Js.Exn.raiseError("boom!")})->S.reverse->S.take(0)->S.consume->ignore
-    true
-  }),
-])
+let reverseTests =
+  makeSeqEqualsTests(
+    ~title="reverse",
+    [
+      (S.empty->S.reverse, [], ""),
+      (S.once(1)->S.reverse, [1], ""),
+      (S.range(1, 5)->S.reverse, [5, 4, 3, 2, 1], ""),
+    ],
+  )->Js.Array2.concat([
+    willNotThrow(~title="reverse", ~expectation="lazy; not reversed until iterated", ~f=() =>
+      death()->S.reverse
+    ),
+  ])
 
 let orElseTests = makeSeqEqualsTests(
   ~title="orElse",
