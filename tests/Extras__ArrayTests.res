@@ -1,20 +1,6 @@
 module T = Extras__Test
 module A = Extras__Array
 
-let fromSeed = {
-  let make = (expectation, seed, generator, expected) =>
-    T.make(~category="Array", ~title="fromSeed", ~expectation, ~predicate=() =>
-      seed->A.fromSeed(generator) == expected
-    )
-  [
-    ("multiplicative", 1, i => i < 100 ? Some(i, i * 2) : None, [1, 2, 4, 8, 16, 32, 64]),
-    ("multiplicative", 28, i => i < 100 ? Some(i, i * 2) : None, [28, 56]),
-    ("multiplicative", 101, i => i < 100 ? Some(i, i * 2) : None, []),
-    ("simple range up", 5, i => i <= 20 ? Some(i, i + 5) : None, [5, 10, 15, 20]),
-    ("simple range down", 20, i => i > 15 ? Some(i, i - 1) : None, [20, 19, 18, 17, 16]),
-  ]->Belt.Array.map(((expectation, seed, f, goal)) => make(expectation, seed, f, goal))
-}
-
 let test = (~title, ~expect, ~a, ~b) =>
   T.make(~category="Array", ~title, ~expectation=expect, ~predicate=() => {
     let m = a()
@@ -70,20 +56,6 @@ let others = {
       ~b=Some(0),
     ),
     test(~title="lastIndex", ~expect="when empty, return None", ~a=() => []->A.lastIndex, ~b=None),
-    test(~title="pairs", ~expect="when empty, return empty", ~a=() => []->A.pairs, ~b=[]),
-    test(~title="pairs", ~expect="when one item, return empty", ~a=() => [1]->A.pairs, ~b=[]),
-    test(
-      ~title="pairs",
-      ~expect="when two items, return one pair",
-      ~a=() => [1, 2]->A.pairs,
-      ~b=[(1, 2)],
-    ),
-    test(
-      ~title="pairs",
-      ~expect="when many items, return all pairs",
-      ~a=() => [1, 2, 3, 4]->A.pairs,
-      ~b=[(1, 2), (2, 3), (3, 4)],
-    ),
     test(
       ~title="exactlyOneValue",
       ~expect="when empty => None",
@@ -122,19 +94,7 @@ let others = {
       ~a=() => [None, Some(1), Some(2), None]->A.filterSome,
       ~b=[1, 2],
     ),
-    test(
-      ~title="filterSomeWith",
-      ~expect="can filter by index",
-      ~a=() => ["a", "b", "c"]->A.filterSomeWith((_, inx) => inx === 1 ? Some("bb") : None),
-      ~b=["bb"],
-    ),
-    test(
-      ~title="filterSomeWith",
-      ~expect="can filter by value",
-      ~a=() => ["a", "b", "c"]->A.filterSomeWith((value, _) => value === "b" ? Some("bb") : None),
-      ~b=["bb"],
-    ),
   ]
 }
 
-let tests = [others, fromSeed]->Belt.Array.concatMany
+let tests = [others]->Belt.Array.concatMany

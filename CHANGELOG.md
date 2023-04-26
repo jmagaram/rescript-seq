@@ -1,3 +1,9 @@
+## Version 2.0.0
+
+- Remove `Array.fromSeed`; use Seq module instead
+- Remove `Array.pairs`; use Seq module instead
+- Remove `Array.filterSomeWith`
+
 ## Version 1.1.1
 
 - Fix bug in `Seq.takeAtMost` where generator function was called 1 too many times; not lazy enough

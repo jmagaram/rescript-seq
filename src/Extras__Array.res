@@ -1,23 +1,5 @@
 module Array = Belt.Array
 
-let push = Js.Array2.push
-
-let fromSeed = (state, generator) => {
-  let result = []
-  let state = ref(state)
-  let break = ref(false)
-  while !break.contents {
-    switch generator(state.contents) {
-    | None => break := true
-    | Some((item, nextState)) => {
-        result->push(item)->ignore
-        state := nextState
-      }
-    }
-  }
-  result
-}
-
 @val external fromOneValue: 'a => array<'a> = "Array.of"
 
 let fromOption = opt =>
@@ -44,15 +26,6 @@ let last = xs =>
   }
 
 let lastIndex = xs => xs->Array.length->(i => i == 0 ? None : Some(i - 1))
-
-let pairs = xs => {
-  switch xs->lastIndex {
-  | None
-  | Some(0) => []
-  | Some(last) =>
-    Array.init(last, i => (xs->Js.Array2.unsafe_get(i), xs->Js.Array2.unsafe_get(i + 1)))
-  }
-}
 
 let prepend = (a, b) => Js.Array2.concat(b, a)
 
