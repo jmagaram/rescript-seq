@@ -11,40 +11,21 @@ and node<'a> =
 
 let delay = generator => (. ()) => generator()(.)
 
-module Node = {
-  let end = End
-
-  @inline
-  let next = (x, xx) => Next(x, xx)
-
-  @inline
-  let toOption = n =>
-    switch n {
-    | End => None
-    | Next((x, xx)) => Some(x, xx)
-    }
-
-  @inline let head = n => n->toOption->Option.map(((x, _)) => x)
-
-  @inline
-  let mapNext = (n, f) =>
-    switch n {
-    | End => End
-    | Next(x, xx) => f(x, xx)
-    }
-}
-
-let empty = (. ()) => Node.end
+let empty = (. ()) => End
 
 let once = x => (. ()) => Next(x, empty)
-
 let onceWith = f => (. ()) => Next(f(), empty)
 
 let cons = (x, xx) => (. ()) => Next(x, xx)
 let startWith = (xx, x) => (. ()) => Next(x, xx)
 
 let nextNode = (xx: t<'a>) => xx(.)
-let next = xx => xx->nextNode->Node.toOption
+
+let headTail = xx =>
+  switch xx->nextNode {
+  | End => None
+  | Next(xx, x) => Some(xx, x)
+  }
 
 /**
 This is a foundation method for many of the functions in this library. It must
@@ -71,9 +52,18 @@ let findNode = (xx, f) => {
   found.contents->Option.getWithDefault(End)
 }
 
-let find = (xx, f) => xx->findNode(f)->Node.head
+let find = (xx, f) =>
+  switch xx->findNode(f) {
+  | End => None
+  | Next(x, _) => Some(x)
+  }
 
-let mapNext = (xx, f) => (. ()) => xx->nextNode->Node.mapNext(f)
+let mapNext = (xx, f) =>
+  (. ()) =>
+    switch xx->nextNode {
+    | End => End
+    | Next(x, xx) => f(x, xx)
+    }
 
 let rec concat = (xx, yy) =>
   (. ()) => {
@@ -107,12 +97,6 @@ let head = xx =>
   switch xx->nextNode {
   | End => None
   | Next(x, _) => Some(x)
-  }
-
-let headTail = xx =>
-  switch xx->nextNode {
-  | End => None
-  | Next(xx, x) => Some(xx, x)
   }
 
 let forEach = (xx, f) => {
@@ -413,8 +397,8 @@ let dropUntil = (xx, predicate) =>
     xx
     ->headTails
     ->find(((x, _)) => predicate(x))
-    ->Option.map(((x, xx)) => Node.next(x, xx))
-    ->Option.getWithDefault(Node.end)
+    ->Option.map(((x, xx)) => Next(x, xx))
+    ->Option.getWithDefault(End)
 
 let dropWhile = (xx, predicate) =>
   (. ()) =>
@@ -422,7 +406,7 @@ let dropWhile = (xx, predicate) =>
     ->headTails
     ->find(((x, _)) => false == predicate(x))
     ->Option.map(((x, xx)) => Next(x, xx))
-    ->Option.getWithDefault(Node.end)
+    ->Option.getWithDefault(End)
 
 let chunkBySize = (xx, length) => {
   if length <= 0 {
@@ -505,8 +489,8 @@ let findMap = (xx, f) => findMapi(xx, (x, _) => f(x))
 
 let rec map2 = (xx, yy, f) =>
   (. ()) => {
-    let xx = xx->next
-    let yy = yy->next
+    let xx = xx->headTail
+    let yy = yy->headTail
     Extras__Option.map2(xx, yy, ((x, xx), (y, yy)) => Next(
       f(x, y),
       map2(xx, yy, f),
@@ -515,9 +499,9 @@ let rec map2 = (xx, yy, f) =>
 
 let rec map3 = (xx, yy, zz, f) =>
   (. ()) => {
-    let xx = xx->next
-    let yy = yy->next
-    let zz = zz->next
+    let xx = xx->headTail
+    let yy = yy->headTail
+    let zz = zz->headTail
     OptionEx.map3(xx, yy, zz, ((x, xx), (y, yy), (z, zz)) => Next(
       f(x, y, z),
       map3(xx, yy, zz, f),
@@ -526,10 +510,10 @@ let rec map3 = (xx, yy, zz, f) =>
 
 let rec map4 = (xx, yy, zz, qq, f) =>
   (. ()) => {
-    let xx = xx->next
-    let yy = yy->next
-    let zz = zz->next
-    let qq = qq->next
+    let xx = xx->headTail
+    let yy = yy->headTail
+    let zz = zz->headTail
+    let qq = qq->headTail
     OptionEx.map4(xx, yy, zz, qq, ((x, xx), (y, yy), (z, zz), (q, qq)) => Next(
       f(x, y, z, q),
       map4(xx, yy, zz, qq, f),
@@ -538,11 +522,11 @@ let rec map4 = (xx, yy, zz, qq, f) =>
 
 let rec map5 = (xx, yy, zz, qq, mm, f) =>
   (. ()) => {
-    let xx = xx->next
-    let yy = yy->next
-    let zz = zz->next
-    let qq = qq->next
-    let mm = mm->next
+    let xx = xx->headTail
+    let yy = yy->headTail
+    let zz = zz->headTail
+    let qq = qq->headTail
+    let mm = mm->headTail
     OptionEx.map5(xx, yy, zz, qq, mm, ((x, xx), (y, yy), (z, zz), (q, qq), (m, mm)) => Next(
       f(x, y, z, q, m),
       map5(xx, yy, zz, qq, mm, f),
