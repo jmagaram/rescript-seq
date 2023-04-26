@@ -5,8 +5,7 @@
 - Remove `Array.filterSomeWith`
 - Rename exception from the spelled-wrong `ArgumentOfOfRange` to `InvalidArgument`
 - Rename `Array.exactlyOneValue` to `Array.exactlyOne` like `Seq.exactlyOne`
-- Rename `Seq.singleton` to `Seq.once`
-- Add `Seq.onceWith`
+- Rename `Seq.singleton` to `Seq.once` and add `Seq.onceWith`; like Rust does it
 
 ## Version 1.1.1
 
