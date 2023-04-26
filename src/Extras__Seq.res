@@ -501,7 +501,7 @@ let forEachi = (xx, f) => xx->indexed->forEach(((x, inx)) => f(x, inx))
 
 let some = (xx, f) => xx->find(f)->Option.isSome
 
-let everyOrEmpty = (xx, f) => xx->find(i => !f(i))->Option.isNone
+let every = (xx, f) => xx->find(i => !f(i))->Option.isNone
 
 let findMapi = (xx, f) =>
   xx->mapi((x, inx) => f(x, inx))->find(Option.isSome(_))->Option.map(Option.getUnsafe)
@@ -568,7 +568,7 @@ let equals = (xx, yy, eq) => {
     | (Some(x), Some(y)) => eq(x, y)
     | _ => false
     }
-  )->everyOrEmpty(i => i)
+  )->every(i => i)
 }
 
 let compare = (xx, yy, cmp) => {
@@ -631,7 +631,7 @@ let exactlyOne = xx =>
     }
   }
 
-let isSortedBy = (xx, cmp) => xx->pairwise->everyOrEmpty(((a, b)) => cmp(a, b) <= 0)
+let isSortedBy = (xx, cmp) => xx->pairwise->every(((a, b)) => cmp(a, b) <= 0)
 
 let windowBehind = (xx, size) => {
   if size <= 0 {

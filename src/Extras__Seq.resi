@@ -502,7 +502,7 @@ let some: (t<'a>, 'a => bool) => bool
 supplied predicate is `true` for every item. Analogous to the `for all`
 existential quantifier in mathematics and `Array.every` in JavaScript.
 */
-let everyOrEmpty: (t<'a>, 'a => bool) => bool
+let every: (t<'a>, 'a => bool) => bool
 
 /**
 `find(source, predicate)` tries to find the first item where `predicate` is

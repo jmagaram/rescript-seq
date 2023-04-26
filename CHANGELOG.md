@@ -6,6 +6,7 @@
 - Rename exception from the spelled-wrong `ArgumentOfOfRange` to `InvalidArgument`
 - Rename `Array.exactlyOneValue` to `Array.exactlyOne` like `Seq.exactlyOne`
 - Rename `Seq.singleton` to `Seq.once` and add `Seq.onceWith`; like Rust does it
+- Rename `Seq.everyOrEmpty` to `Seq.every` to be more like array; less cumbersome
 
 ## Version 1.1.1
 

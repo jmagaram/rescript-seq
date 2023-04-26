@@ -1035,13 +1035,13 @@ let someTests = makeValueEqualTests(
 )
 
 let everyTests = makeValueEqualTests(
-  ~title="everyOrEmpty",
+  ~title="every",
   [
-    (() => S.empty->S.everyOrEmpty(_ => true), true, "if empty is true"),
-    (() => S.empty->S.everyOrEmpty(_ => false), true, "if empty is true"),
-    (() => S.range(1, 3)->S.everyOrEmpty(i => i >= 1), true, ""),
-    (() => S.range(1, 3)->S.everyOrEmpty(_ => false), false, ""),
-    (() => S.range(1, 999_999)->S.everyOrEmpty(_ => true), true, "millions"),
+    (() => S.empty->S.every(_ => true), true, "if empty is true"),
+    (() => S.empty->S.every(_ => false), true, "if empty is true"),
+    (() => S.range(1, 3)->S.every(i => i >= 1), true, ""),
+    (() => S.range(1, 3)->S.every(_ => false), false, ""),
+    (() => S.range(1, 999_999)->S.every(_ => true), true, "millions"),
   ],
 )
 

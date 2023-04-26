@@ -113,7 +113,7 @@ let allSome: t<option<'a>> => option<t<'a>>
 let compare: (t<'a>, t<'b>, ('a, 'b) => int) => int
 let consume: t<'a> => unit
 let equals: (t<'a>, t<'b>, ('a, 'b) => bool) => bool
-let everyOrEmpty: (t<'a>, 'a => bool) => bool
+let every: (t<'a>, 'a => bool) => bool
 let exactlyOne: t<'a> => option<'a>
 let find: (t<'a>, 'a => bool) => option<'a>
 let findMap: (t<'a>, 'a => option<'b>) => option<'b>
