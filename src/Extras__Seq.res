@@ -196,12 +196,6 @@ let cycleNonEmpty = xx => {
 
 let cycle = xx => xx->mapNext((x, xx') => cons(x, xx')->concat(xx->cycleNonEmpty)->nextNode)
 
-let characters = s =>
-  switch s->Js.String2.length {
-  | 0 => empty
-  | len => range(0, len - 1)->map(inx => s->Js.String2.charAt(inx))
-  }
-
 let fromArray = (~start=?, ~end=?, xx: array<'a>) => {
   switch xx->Extras__Array.isEmpty {
   | true =>

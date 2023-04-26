@@ -15,6 +15,8 @@ let intToString = Belt.Int.toString
 let intCmp = Ex.Cmp.int
 let stringCmp = (a: string, b: string) => a < b ? -1 : a > b ? 1 : 0
 
+let characters = s => s->Js.String2.split("")->S.fromArray
+
 let joinInts = xs => xs->Js.Array2.map(intToString)->Js.Array2.joinWith("")
 
 let shorten = s => Js.String2.slice(s, ~from=0, ~to_=1000)
@@ -218,15 +220,6 @@ let startWithTests = makeSeqEqualsTests(
     ([2, 3, 4]->S.fromArray->S.startWith(1), [1, 2, 3, 4], "when start with many items"),
   ],
 )
-
-let charatersTest = [
-  seqEqual(
-    ~title="characters",
-    ~expectation="get letters",
-    ~a=() => "abc"->S.characters,
-    ~b=["a", "b", "c"],
-  ),
-]
 
 let fromListTests = makeSeqEqualsTests(
   ~title="fromList",
@@ -476,7 +469,7 @@ let windowAheadBehindTests = (~title, ~function, ~data) =>
           )}`,
         ~a=() =>
           input
-          ->S.characters
+          ->characters
           ->function(size)
           ->S.map(ss => ss->Js.Array2.joinWith(""))
           ->S.intersperse(",")
@@ -487,10 +480,10 @@ let windowAheadBehindTests = (~title, ~function, ~data) =>
     data->Js.Array2.map(((input, size, expected)) => oneTest(input, size, expected))
   }->Js.Array2.concat([
     willThrow(~title, ~expectation="when size == 0 => throw", ~f=() =>
-      "abc"->S.characters->function(0)
+      "abc"->characters->function(0)
     ),
     willThrow(~title, ~expectation="when size < 0 => throw", ~f=() =>
-      "abc"->S.characters->function(-1)
+      "abc"->characters->function(-1)
     ),
   ])
 
@@ -1116,8 +1109,8 @@ let equalsTests = [
     ~title="equals",
     ~expectation=`${xs},${ys} => ${expected ? "true" : "false"}`,
     ~a=() => {
-      let xs = xs->S.characters
-      let ys = ys->S.characters
+      let xs = xs->characters
+      let ys = ys->characters
       S.equals(xs, ys, (i, j) => i == j)
     },
     ~b=expected,
@@ -1138,8 +1131,8 @@ let compareTests = [
     ~title="compare",
     ~expectation=`${xs},${ys} => ${expected->intToString}`,
     ~a=() => {
-      let xs = xs->S.characters
-      let ys = ys->S.characters
+      let xs = xs->characters
+      let ys = ys->characters
       S.compare(xs, ys, Ex.Cmp.string)
     },
     ~b=expected,
@@ -1411,8 +1404,8 @@ let map2Tests = {
       ~title="map2",
       ~expectation=`${xs},${ys} => ${expected}`,
       ~predicate=() => {
-        let xs = xs->S.characters
-        let ys = ys->S.characters
+        let xs = xs->characters
+        let ys = ys->characters
         let expected = expected == "" ? S.empty : expected->Js.String2.split(",")->S.fromArray
         let actual = S.map2(xs, ys, (x, y) => x ++ y)
         S.equals(expected, actual, (i, j) => i == j)
@@ -1439,9 +1432,9 @@ let map3Tests = {
       ~title="map3",
       ~expectation=`${xs},${ys},${zs} => ${expected}`,
       ~predicate=() => {
-        let xs = xs->S.characters
-        let ys = ys->S.characters
-        let zs = zs->S.characters
+        let xs = xs->characters
+        let ys = ys->characters
+        let zs = zs->characters
         let expected = expected == "" ? S.empty : expected->Js.String2.split(",")->S.fromArray
         let actual = S.map3(xs, ys, zs, (x, y, z) => x ++ y ++ z)
         S.equals(expected, actual, (i, j) => i == j)
@@ -1786,7 +1779,6 @@ let tests =
     everyOkTests,
     allPairsTests,
     everySomeTests,
-    charatersTest,
     chunkBySizeTests,
     combinationTests,
     compareTests,

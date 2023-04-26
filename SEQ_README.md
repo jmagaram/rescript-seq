@@ -32,7 +32,6 @@ type t<'a> // A lazy sequence of `a`
 
 // Construct
 
-let characters: string => t<string>
 let combinations: (t<'a>, int) => t<(int, t<'a>)>
 let cons: ('a, t<'a>) => t<'a>
 let cycle: t<'a> => t<'a>

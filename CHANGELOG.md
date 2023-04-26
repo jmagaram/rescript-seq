@@ -8,6 +8,7 @@
 - Rename `Seq.singleton` to `Seq.once` and add `Seq.onceWith`; like Rust does it
 - Rename `Seq.everyOrEmpty` to `Seq.every` to be more like array; less cumbersome
 - Rename `Seq.allSome` and `Seq.allOk` to `Seq.everySome` and `Seq.everyOk`
+- Remove `Seq.characters`; many ways to split a string and with Core it will feel better since you can do `String.split` not `Js.String2.split`.
 
 ## Version 1.1.1
 

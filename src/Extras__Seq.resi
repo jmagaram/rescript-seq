@@ -119,11 +119,6 @@ None->Seq.fromOption // []
 let fromOption: option<'a> => t<'a>
 
 /**
-`characters(s)` is the sequence of characters in the string `s`.
-*/
-let characters: string => t<string>
-
-/**
 `cons(x, xx)` constructs the sequence that begins with the element `x` followed
 by the sequence `xx`. This is the same as `startsWith` but the arguments are reversed.
 
