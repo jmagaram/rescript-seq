@@ -50,6 +50,24 @@ let throwIfInvoked = () =>
   Js.Exn.raiseError("Tried to invoke a testing function that always fails.")
 
 /**
+`toDispenser(source)` constructs a function from a sequence that returns each
+value in that sequence in turn, each time it is called. If any attempt is made
+to consume a value once the sequence is complete, an exception is thrown.
+*/
+let toDispenser = xx => {
+  let xx = ref(xx)
+  () => {
+    switch xx.contents->S.headTail {
+    | None => Js.Exn.raiseError("You are attempting to consume a value past the end of a sequence.")
+    | Some(x, xx') => {
+        xx := xx'
+        x
+      }
+    }
+  }
+}
+
+/**
 `countdown(start)` is a function that returns `start` the first time it is
 called, and returns `1` less each subsequent time. If the function is called
 after the countdown has completed - meaning the value has reached `0` - an exception is thrown. This is useful for testing to ensure a callback is
@@ -855,25 +873,14 @@ let intersperseTests = makeSeqEqualsTests(
 )
 
 let intersperseWithTests = {
-  let incrementer = () => {
-    let count = ref(0)
-    let f = () => {
-      count := count.contents + 1
-      count.contents->intToString
-    }
-    f
-  }
+  let f = () => S.range(1, 100)->S.map(intToString)->toDispenser
   makeSeqEqualsTests(
     ~title="intersperseWith",
     [
-      ([]->S.fromArray->S.intersperseWith(incrementer()), [], ""),
-      (["a"]->S.fromArray->S.intersperseWith(incrementer()), ["a"], ""),
-      (["a", "b"]->S.fromArray->S.intersperseWith(incrementer()), ["a", "1", "b"], ""),
-      (
-        ["a", "b", "c"]->S.fromArray->S.intersperseWith(incrementer()),
-        ["a", "1", "b", "2", "c"],
-        "",
-      ),
+      ([]->S.fromArray->S.intersperseWith(f()), [], ""),
+      (["a"]->S.fromArray->S.intersperseWith(f()), ["a"], ""),
+      (["a", "b"]->S.fromArray->S.intersperseWith(f()), ["a", "1", "b"], ""),
+      (["a", "b", "c"]->S.fromArray->S.intersperseWith(f()), ["a", "1", "b", "2", "c"], ""),
     ],
   )
 }
