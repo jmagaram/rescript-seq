@@ -237,45 +237,30 @@ let fromListTests = makeSeqEqualsTests(
   ],
 )
 
-let cycleTests = [
-  seqEqual(~title="cycle", ~expectation="when empty => empty", ~a=() => S.empty, ~b=[]),
-  seqEqual(
+let cycleTests = makeSeqEqualsTests(
+  ~title="cycle",
+  [
+    (S.empty->S.cycle, [], "when empty => empty"),
+    (S.once(1)->S.cycle->S.takeAtMost(4), [1, 1, 1, 1], ""),
+    ([1, 2, 3]->S.fromArray->S.cycle->S.takeAtMost(9), [1, 2, 3, 1, 2, 3, 1, 2, 3], ""),
+    (S.forever(1)->S.cycle->S.takeAtMost(4), [1, 1, 1, 1], "when infinite can still cycle"),
+    (
+      callCount()->S.takeAtMost(3)->S.cycle->S.takeAtMost(6),
+      [1, 2, 3, 4, 5, 6],
+      "first value, if generated on demand, if cached and used",
+    ),
+  ],
+)->Js.Array2.concat([
+  valueEqual(
     ~title="cycle",
-    ~expectation="when one item => repeat endlessly",
-    ~a=() => S.once(1)->S.cycle->S.takeAtMost(5),
-    ~b=[1, 1, 1, 1, 1],
-  ),
-  seqEqual(
-    ~title="cycle",
-    ~expectation="when infinite => can still cycle",
-    ~a=() => S.forever(1)->S.cycle->S.takeAtMost(5),
-    ~b=[1, 1, 1, 1, 1],
-  ),
-  seqEqual(
-    ~title="cycle",
-    ~expectation="first item is cached and used",
+    ~expectation="empty determination is lazy",
     ~a=() => {
-      let generated = []
-      let items =
-        S.foreverWith(() => {
-          let r = Js.Math.random()
-          generated->Js.Array2.push(r)->ignore
-          r
-        })
-        ->S.cycle
-        ->S.takeAtMost(3)
-        ->S.toArray
-      S.once(items[0] == generated[0])
+      S.foreverWith(throwIfInvoked)->S.tap(_ => Js.log("hmm..."))->S.cycle->ignore
+      1
     },
-    ~b=[true],
+    ~b=1,
   ),
-  seqEqual(
-    ~title="cycle",
-    ~expectation="when not empty => repeat endlessly",
-    ~a=() => S.range(1, 3)->S.cycle->S.takeAtMost(16),
-    ~b=[1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1],
-  ),
-]
+])
 
 let allPairsTests = makeSeqEqualsTests(
   ~title="allPairs",
@@ -290,28 +275,13 @@ let allPairsTests = makeSeqEqualsTests(
       [(1, 4), (1, 5), (1, 6), (2, 4), (2, 5), (2, 6), (3, 4), (3, 5), (3, 6)],
       "",
     ),
+    (
+      S.allPairs(S.repeatWith(2, countdown(2)), S.repeatWith(2, countdown(2))),
+      [(2, 2), (2, 1), (1, 2), (1, 1)],
+      "cached!",
+    ),
   ],
-)->Js.Array2.concat([
-  valueEqual(
-    ~title="allPairs",
-    ~expectation="both sequences appear cached",
-    ~a=() => {
-      let callCount = ref(0)
-      let generateRandomInt = () => {
-        let num = Js.Math.random_int(1, 100)
-        callCount := callCount.contents + 1
-        num
-      }
-      let _ =
-        S.allPairs(
-          S.repeatWith(10, generateRandomInt),
-          S.repeatWith(10, generateRandomInt),
-        )->S.consume
-      callCount.contents
-    },
-    ~b=20,
-  ),
-])
+)
 
 let rangeTests = makeSeqEqualsTests(
   ~title="range",
