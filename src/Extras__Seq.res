@@ -241,25 +241,22 @@ let fromOption = opt =>
 let mapi = (xx, f) => xx->indexed->map(((x, inx)) => f(x, inx))
 
 let take = (xx, count) => {
-  switch count {
-  | 0 => empty
-  | n if n < 0 =>
+  if count < 0 {
     InvalidArgument(
       `take requires a count of 0 or more. You requested ${count->Belt.Int.toString}`,
     )->raise
-  | count =>
-    let rec go = (xx, count) =>
-      (. ()) =>
-        switch count {
-        | 0 => End
-        | count =>
-          switch xx->nextNode {
-          | End => End
-          | Next(x, xx) => Next(x, go(xx, count - 1))
-          }
-        }
-    go(xx, count)
   }
+  let rec go = (xx, count) =>
+    (. ()) =>
+      switch count {
+      | 0 => End
+      | count =>
+        switch xx->nextNode {
+        | End => End
+        | Next(x, xx) => Next(x, go(xx, count - 1))
+        }
+      }
+  go(xx, count)
 }
 
 let headTails = xx =>

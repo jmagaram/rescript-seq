@@ -652,15 +652,9 @@ let takeTests = makeSeqEqualsTests(
     ~a=() => S.range(1, 999_999)->S.last,
     ~b=Some(999_999),
   ),
-  T.make(~category="Seq", ~title="take", ~expectation="if zero completely lazy", ~predicate=() => {
-    S.unfold(0, _ => {
-      Js.Exn.raiseError("oops!")
-    })
-    ->S.take(0)
-    ->S.toArray
-    ->ignore
-    true
-  }),
+  willNotThrow(~title="take", ~expectation="if zero, do not iterate anything", ~f=() =>
+    death()->S.take(0)->S.consume
+  ),
   valueEqual(
     ~title="take",
     ~expectation="if take 999_999, generator function called 999_999 times",
