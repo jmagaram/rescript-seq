@@ -14,7 +14,7 @@ Highlights:
 - Written 100% in ReScript. Look at the tests and code to gain deeper understanding of how it works.
 - Full [suite of > 90 functions](#functions) based on researching other libraries and languages
 - **Build sequences** using `fromArray`, `range`, `unfold`, `cycle`, `repeat` and others. This enables functionality similar to [JavaScript generators](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Generator).
-- **Transform** sequences with `map`, `filter`, `takeAtMost`, `dropWhile`, `scan`, `tap`, `window`, and others.
+- **Transform** sequences with `map`, `filter`, `take`, `dropWhile`, `scan`, `tap`, `window`, and others.
 - **Combine** multiple sequences with `zip`, `zip3`, `map2`, `map3`, `sortedMerge`, `interleave` and others.
 - **Calculate** values with `reduce`, `some`, `findMap`, `isSortedBy`, `minBy`, `toArray` and others.
 - Ready for your contributions! :two_men_holding_hands: There are many other useful functions, and it would be great to have `async` versions.
@@ -81,7 +81,7 @@ let reverse: t<'a> => t<'a>
 let scan: (t<'a>, 'b, ('b, 'a) => 'b) => t<'b>
 let scani: (t<'a>, ~zero: 'b, (~sum: 'b, ~val: 'a, ~inx: int) => 'b) => t<'b>
 let sortBy: (t<'a>, ('a, 'a) => int) => t<'a>
-let takeAtMost: (t<'a>, int) => t<'a>
+let take: (t<'a>, int) => t<'a>
 let takeUntil: (t<'a>, 'a => bool) => t<'a>
 let takeWhile: (t<'a>, 'a => bool) => t<'a>
 let tap: (t<'a>, 'a => unit) => t<'a>

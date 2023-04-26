@@ -10,10 +10,11 @@
 - Rename `Seq.allSome` and `Seq.allOk` to `Seq.everySome` and `Seq.everyOk`
 - Remove `Seq.characters`; many ways to split a string and with Core it will feel better since you can do `String.split` not `Js.String2.split`.
 - Rename `Seq.joinString` to `Seq.join` like `Array.join`. Require a separator character.
+- Rename `Seq.takeAtMost` to `Seq.take` since that is the TC39 proposal name and other packages use the same name. The name is slightly inaccurate, but then so is `drop`.
 
 ## Version 1.1.1
 
-- Fix bug in `Seq.takeAtMost` where generator function was called 1 too many times; not lazy enough
+- Fix bug in `Seq.take` where generator function was called 1 too many times; not lazy enough
 - `Seq.combinations`
 - `Seq.permutations`
 

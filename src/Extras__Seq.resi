@@ -233,10 +233,10 @@ items are discarded.
 let filterOk: t<result<'a, 'b>> => t<'a>
 
 /**
-`takeAtMost(n)` is the sequence of the first `n` items in the source; remaining
-items are discarded.
+`take(source, count)` is the sequence of the first `count` items of `source`, or
+fewer if `source` ends sooner. Remaining items are discarded.
 */
-let takeAtMost: (t<'a>, int) => t<'a>
+let take: (t<'a>, int) => t<'a>
 
 /**
 `takeWhile(source, predicate)` is the sequence that includes all items from the

@@ -32,7 +32,7 @@ let nums =
   ->Seq.map(n => mod(n * 3, 7))
   ->Seq.pairwise
   ->Seq.filterMap(((a, b)) => a < b ? Some(a + b) : None)
-  ->Seq.takeAtMost(623)
+  ->Seq.take(623)
   ->Seq.tap(n => {
     if mod(n, 100) == 0 {
       Js.log(`Saw ${n->intToString}. Interesting!`)
@@ -48,7 +48,7 @@ items in an array.
 let fibonacci = count =>
   Seq.unfold((0, 1), ((a, b)) => a + b <= 100 ? Some(a + b, (b, a + b)) : None)
   ->Seq.prepend([0, 1]->Seq.fromArray)
-  ->Seq.takeAtMost(count)
+  ->Seq.take(count)
   ->Seq.toArray
 
 /**

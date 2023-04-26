@@ -240,12 +240,12 @@ let fromOption = opt =>
 
 let mapi = (xx, f) => xx->indexed->map(((x, inx)) => f(x, inx))
 
-let takeAtMost = (xx, count) => {
+let take = (xx, count) => {
   switch count {
   | 0 => empty
   | n if n < 0 =>
     InvalidArgument(
-      `takeAtMost requires a count of 0 or more. You requested ${count->Belt.Int.toString}`,
+      `take requires a count of 0 or more. You requested ${count->Belt.Int.toString}`,
     )->raise
   | count =>
     let rec go = (xx, count) =>
