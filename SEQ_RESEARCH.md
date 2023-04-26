@@ -16,7 +16,6 @@
 - Consider refactoring string functions; many ways to split a string and many ways to join
 - Consider naming of `startWith` versus `prependItem` or `endWith` and `appendItem` for more discoverability. Also other packages have a `startsWith` to check if the beginning matches. Note rxjs has a `startWith` which is where I got mine.
 - `uniqueBy` could be very useful; requires scan which is advanced to implement
-- Combinations might be cool. Probably always want to iterate through all combinations due to how they are generated; otherwise weird clustering. Limits - if 100 and choose 10 that gets big really fast. Also the combinations of length 10 are combinations of length 9 plus something else - can't regenerate on every attempt or too slow. Is it faster to work from an array so you can jump into getting items by index? Could increment a number that has the bits to include and each bit points to an index.
 - TakeN from end? Is this a window behind, take last, and then option convert to empty?
 - Remove some functions from array since in seq now
 
