@@ -44,6 +44,34 @@ let callCount = () => {
 }
 
 /**
+`throwIfInvoked` is a test helper function that throw if it is ever called.
+*/
+let throwIfInvoked = () =>
+  Js.Exn.raiseError("Tried to invoke a testing function that always fails.")
+
+/**
+`countdown(start)` is a function that returns `start` the first time it is
+called, and returns `1` less each subsequent time. If the function is called
+after the countdown has completed - meaning the value has reached `0` - an exception is thrown. This is useful for testing to ensure a callback is
+  never called more than necessary.
+*/
+let countdown = n => {
+  if n < 0 {
+    S.InvalidArgument("The countdown must begin at 0 or more.")->raise
+  }
+  let count = ref(n)
+  () => {
+    if count.contents == 0 {
+      Js.Exn.raiseError(
+        "Attempted to consume a value from the countdown after it had been exhausted.",
+      )
+    }
+    count := count.contents - 1
+    count.contents + 1
+  }
+}
+
+/**
 Create a test that compares two sequences for equality. Converts both sequences
 to arrays and then uses the ReScript recursive equality test.
 */
@@ -111,8 +139,37 @@ let makeValueEqualTests = (~title, tests) =>
 // file.
 // =============================================================================
 
+let onceTests = [
+  seqEqual(~title="once", ~expectation="string", ~a=() => S.once("x"), ~b=["x"]),
+  seqEqual(~title="once", ~expectation="bool", ~a=() => S.once(true), ~b=[true]),
+  seqEqual(~title="once", ~expectation="int", ~a=() => S.once(1), ~b=[1]),
+  seqEqual(~title="once", ~expectation="object", ~a=() => S.once({"a": 1}), ~b=[{"a": 1}]),
+  seqEqual(~title="once", ~expectation="array", ~a=() => S.once([1, 2, 3]), ~b=[[1, 2, 3]]),
+]
+
+let onceWithTests = [
+  seqEqual(~title="onceWith", ~expectation="string", ~a=() => S.onceWith(() => "x"), ~b=["x"]),
+  seqEqual(~title="onceWith", ~expectation="bool", ~a=() => S.onceWith(() => true), ~b=[true]),
+  seqEqual(~title="onceWith", ~expectation="object", ~a=() => S.once({"a": 1}), ~b=[{"a": 1}]),
+  seqEqual(~title="onceWith", ~expectation="array", ~a=() => S.onceWith(() => [1, 2]), ~b=[[1, 2]]),
+  valueEqual(
+    ~title="onceWith",
+    ~expectation="generator function only called when enumerated",
+    ~a=() => {
+      S.onceWith(throwIfInvoked)->ignore
+      1
+    },
+    ~b=1,
+  ),
+  seqEqual(
+    ~title="onceWith",
+    ~expectation="generator function called one time at most",
+    ~a=() => S.onceWith(countdown(1)),
+    ~b=[1],
+  ),
+]
+
 let basicConstructorTests = [
-  seqEqual(~title="once", ~expectation="has one item in it", ~a=() => S.once(3), ~b=[3]),
   seqEqual(~title="empty", ~expectation="has no items", ~a=() => S.empty, ~b=[]),
   seqEqual(~title="cons", ~expectation="when a + empty => a", ~a=() => S.cons(1, S.empty), ~b=[1]),
   seqEqual(
@@ -1787,6 +1844,8 @@ let tests =
     memoizeTests,
     minByMaxByTests,
     orElseTests,
+    onceTests,
+    onceWithTests,
     pairwiseTests,
     permutationTests,
     prependTests,

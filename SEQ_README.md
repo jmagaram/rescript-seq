@@ -48,6 +48,7 @@ let fromOption: option<'a> => t<'a>
 let init: (int, int => 'a) => t<'a>
 let iterate: ('a, 'a => 'a) => t<'a>
 let once: 'a => t<'a>
+let onceWith: (unit => 'a) => t<'a>
 let permutations: (t<'a>, int) => t<(int, t<'a>)>
 let range: (int, int) => t<int>
 let rangeMap: (int, int, int => 'a) => t<'a>

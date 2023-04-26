@@ -39,11 +39,11 @@ from (iterator)
 
 ### Supported
 
-isEmpty, uncons, length, iter, fold_left, iteri, fold_lefti, for_all, exists, find, find_map, compare, empty, return, cons, init, unfold, equal, repeat, forever, iterate, cycle, map, mapi, filter, filter_map, take, drop, take_while, drop_while, memoize, append, concat, flat_map, zip, sorted_merge, scan, product, concat_map, interleave, map2, once
+isEmpty, uncons, length, iter, fold_left, iteri, fold_lefti, for_all, exists, find, find_map, compare, empty, return, cons, init, unfold, equal, repeat, forever, iterate, cycle, map, mapi, filter, filter_map, take, drop, take_while, drop_while, memoize, append, concat, flat_map, zip, sorted_merge, scan, product, concat_map, interleave, map2, once, onceWith
 
 ### Not supported
 
-iter2, fold_left2, for_all2, exists2, group, map_product, unzip, partition_map, partition, ints, onceWith
+iter2, fold_left2, for_all2, exists2, group, map_product, unzip, partition_map, partition, ints
 
 ## F#
 

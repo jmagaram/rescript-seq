@@ -38,6 +38,8 @@ let empty = (. ()) => Node.end
 
 let once = x => (. ()) => Next(x, empty)
 
+let onceWith = f => (. ()) => Next(f(), empty)
+
 let cons = (x, xx) => (. ()) => Next(x, xx)
 let startWith = (xx, x) => (. ()) => Next(x, xx)
 
