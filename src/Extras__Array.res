@@ -11,7 +11,7 @@ let fromOption = opt =>
 let isEmpty = xs => xs->Array.length == 0
 let isNotEmpty = xs => xs->Array.length > 0
 
-let exactlyOneValue = xs =>
+let exactlyOne = xs =>
   switch xs->Array.length {
   | 1 => xs->Js.Array2.unsafe_get(0)->Some
   | _ => None

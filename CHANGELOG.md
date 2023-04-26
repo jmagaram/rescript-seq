@@ -4,6 +4,7 @@
 - Remove `Array.pairs`; use Seq module instead
 - Remove `Array.filterSomeWith`
 - Rename exception from the spelled-wrong `ArgumentOfOfRange` to `InvalidArgument`
+- Rename `Array.exactlyOneValue` to `Array.exactlyOne` like `Seq.exactlyOne`
 
 ## Version 1.1.1
 

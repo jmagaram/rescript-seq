@@ -59,19 +59,19 @@ let others = {
     test(
       ~title="exactlyOneValue",
       ~expect="when empty => None",
-      ~a=() => []->A.exactlyOneValue,
+      ~a=() => []->A.exactlyOne,
       ~b=None,
     ),
     test(
       ~title="exactlyOneValue",
       ~expect="when one value => Some",
-      ~a=() => [3]->A.exactlyOneValue,
+      ~a=() => [3]->A.exactlyOne,
       ~b=Some(3),
     ),
     test(
       ~title="exactlyOneValue",
       ~expect="when empty => None",
-      ~a=() => [1, 2]->A.exactlyOneValue,
+      ~a=() => [1, 2]->A.exactlyOne,
       ~b=None,
     ),
     test(
