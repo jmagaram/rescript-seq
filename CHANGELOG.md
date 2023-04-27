@@ -12,6 +12,8 @@
 - Rename `Seq.joinString` to `Seq.join` like `Array.join`. Require a separator character.
 - Rename `Seq.takeAtMost` to `Seq.take` since that is the TC39 proposal name and other packages use the same name. The name is slightly inaccurate, but then so is `drop`.
 - Add `Seq.toList`
+- Replace `Array.fromOneValue` with `Array.of1`
+- Replace `NonEmptyArray.fromOneValue` with `of1`, `of2`, `of3` and `ofMany`, all zero-cost bindings to `Array.of`.
 
 ## Version 1.1.1
 

@@ -19,14 +19,11 @@ let concatSort = (xxs: array<array<'a>>, stringify: 'a => string) =>
   ->Js.Array2.map(xs => xs->Js.Array2.map(stringify)->Js.Array2.joinWith(""))
   ->Js.Array2.sortInPlace
 
-let others = {
+let tests = {
   [
-    test(
-      ~title="fromOneValue",
-      ~expect="wrap item in an array",
-      ~a=() => [1, 2, 3]->A.fromOneValue,
-      ~b=[[1, 2, 3]],
-    ),
+    test(~title="of1", ~expect="wrap item in an array", ~a=() => 1->A.of1, ~b=[1]),
+    test(~title="of1", ~expect="wrap array in array", ~a=() => [1, 2, 3]->A.of1, ~b=[[1, 2, 3]]),
+    test(~title="of1", ~expect="wrap None in array", ~a=() => None->A.of1, ~b=[None]),
     test(~title="fromOption", ~expect="if None => empty", ~a=() => None->A.fromOption, ~b=[]),
     test(
       ~title="fromOption",
@@ -96,5 +93,3 @@ let others = {
     ),
   ]
 }
-
-let tests = [others]->Belt.Array.concatMany

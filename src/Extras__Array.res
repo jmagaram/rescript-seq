@@ -1,11 +1,11 @@
 module Array = Belt.Array
 
-@val external fromOneValue: 'a => array<'a> = "Array.of"
+@val external of1: 'a => array<'a> = "Array.of"
 
 let fromOption = opt =>
   switch opt {
   | None => []
-  | Some(i) => fromOneValue(i)
+  | Some(i) => of1(i)
   }
 
 let isEmpty = xs => xs->Array.length == 0

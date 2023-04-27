@@ -4,9 +4,6 @@ module O = Belt.Option
 let expectEq = (~title, ~expectation, ~a, ~b) =>
   Extras__Test.make(~category="NonEmptyArray", ~title, ~expectation, ~predicate=() => a() == b)
 
-let one = [1]->NEA.fromArrayExn
-let oneTwo = [1, 2]->NEA.fromArrayExn
-let oneTwoThree = [1, 2, 3]->NEA.fromArrayExn
 let add = (x, y) => x + y
 
 let tests = [
@@ -31,51 +28,64 @@ let tests = [
   expectEq(
     ~title="map",
     ~expectation="",
-    ~a=() => oneTwoThree->NEA.map(i => i * 2)->NEA.toArray,
+    ~a=() => NEA.of3(1, 2, 3)->NEA.map(i => i * 2)->NEA.toArray,
     ~b=[2, 4, 6],
   ),
-  expectEq(~title="head", ~expectation="returns first item", ~a=() => oneTwoThree->NEA.head, ~b=1),
-  expectEq(~title="last", ~expectation="returns last item", ~a=() => oneTwoThree->NEA.last, ~b=3),
+  expectEq(
+    ~title="head",
+    ~expectation="returns first item",
+    ~a=() => NEA.of3(1, 2, 3)->NEA.head,
+    ~b=1,
+  ),
+  expectEq(
+    ~title="last",
+    ~expectation="returns last item",
+    ~a=() => NEA.of3(1, 2, 3)->NEA.last,
+    ~b=3,
+  ),
   expectEq(
     ~title="reduce",
     ~expectation="when one item, return it",
-    ~a=() => one->NEA.reduce(add),
+    ~a=() => NEA.of1(1)->NEA.reduce(add),
     ~b=1,
   ),
   expectEq(
     ~title="reduce",
     ~expectation="when two items, return sum",
-    ~a=() => oneTwo->NEA.reduce(add),
+    ~a=() => NEA.of2(1, 2)->NEA.reduce(add),
     ~b=3,
   ),
   expectEq(
     ~title="reduce",
     ~expectation="when many items, return sum",
-    ~a=() => oneTwoThree->NEA.reduce(add),
+    ~a=() => NEA.of3(1, 2, 3)->NEA.reduce(add),
     ~b=6,
   ),
   expectEq(
     ~title="maxBy",
     ~expectation="return max",
-    ~a=() => oneTwoThree->NEA.maxBy((i, j) => i < j ? -1 : i > j ? 1 : 0),
+    ~a=() => NEA.of3(1, 2, 3)->NEA.maxBy((i, j) => i < j ? -1 : i > j ? 1 : 0),
     ~b=3,
   ),
   expectEq(
     ~title="minBy",
     ~expectation="return min",
-    ~a=() => oneTwoThree->NEA.minBy((i, j) => i < j ? -1 : i > j ? 1 : 0),
+    ~a=() => NEA.of3(1, 2, 3)->NEA.minBy((i, j) => i < j ? -1 : i > j ? 1 : 0),
     ~b=1,
   ),
   expectEq(
     ~title="concat",
     ~expectation="",
-    ~a=() => oneTwoThree->NEA.concat(oneTwoThree)->NEA.toArray,
+    ~a=() => NEA.of3(1, 2, 3)->NEA.concat(NEA.of3(1, 2, 3))->NEA.toArray,
     ~b=[1, 2, 3, 1, 2, 3],
   ),
+  expectEq(~title="of1", ~expectation="", ~a=() => 4->NEA.of1->NEA.toArray, ~b=[4]),
+  expectEq(~title="of2", ~expectation="", ~a=() => NEA.of2(1, 2)->NEA.toArray, ~b=[1, 2]),
+  expectEq(~title="of3", ~expectation="", ~a=() => NEA.of3(1, 2, 3)->NEA.toArray, ~b=[1, 2, 3]),
   expectEq(
-    ~title="fromOneValue",
+    ~title="ofMany",
     ~expectation="",
-    ~a=() => 4->NEA.fromOneValue->NEA.toArray,
-    ~b=[4],
+    ~a=() => NEA.ofMany(1, [2, 3, 4, 5])->NEA.toArray,
+    ~b=[1, 2, 3, 4, 5],
   ),
 ]

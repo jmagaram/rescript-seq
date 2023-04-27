@@ -1,5 +1,5 @@
 let fromOption: option<'a> => array<'a>
-@val external fromOneValue: 'a => array<'a> = "Array.of"
+@val external of1: 'a => array<'a> = "Array.of"
 let isEmpty: array<'a> => bool
 let isNotEmpty: array<'a> => bool
 let exactlyOne: array<'a> => option<'a>
