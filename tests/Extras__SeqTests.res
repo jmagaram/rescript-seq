@@ -125,10 +125,8 @@ let valueEqual = (~title, ~expectation, ~a, ~b) =>
 Creates a test that passes if the provided function throws any kind of
 exception.
 */
-let willThrow = (~title, ~expectation, ~f) =>
-  T.fromPredicate(~category="Seq", ~title, ~expectation, () =>
-    Ex.Result.fromTryCatch(f)->Result.isError
-  )
+let willThrow = (~title, ~expectation=?, ~f) =>
+  T.expectThrow(~category="Seq", ~title, ~expectation?, f)
 
 /**
 Creates a test that passes if the provided function does NOT throw an exception.

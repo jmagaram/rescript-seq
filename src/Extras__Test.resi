@@ -10,6 +10,10 @@ let fromResult: (
 
 let fromPredicate: (~category: string, ~title: string, ~expectation: string=?, unit => bool) => t
 
+let expectThrow: (~category: string, ~title: string, ~expectation: string=?, unit => 'a) => t
+
+let expectNotThrow: (~category: string, ~title: string, ~expectation: string=?, unit => 'a) => t
+
 let fromPredicateAsync: (
   ~category: string,
   ~title: string,

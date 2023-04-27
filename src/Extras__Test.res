@@ -57,6 +57,26 @@ let fromPredicate = (~category, ~title, ~expectation=?, predicate) =>
     }
   )
 
+let expectThrow = (~category, ~title, ~expectation=?, f) =>
+  fromPredicate(~category, ~title, ~expectation?, () => {
+    try {
+      f()->ignore
+      false
+    } catch {
+    | _ => true
+    }
+  })
+
+let expectNotThrow = (~category, ~title, ~expectation=?, f) =>
+  fromPredicate(~category, ~title, ~expectation?, () => {
+    try {
+      f()->ignore
+      true
+    } catch {
+    | _ => false
+    }
+  })
+
 let fromResultAsync = (~category, ~title, ~expectation=?, predicate) => {
   category,
   title,
