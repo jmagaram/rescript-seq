@@ -1496,14 +1496,7 @@ let sortByTests = makeSeqEqualsTests(
     ([1, 5, 2, 9, 7, 3]->S.fromArray->S.sortBy(intCmp), [1, 2, 3, 5, 7, 9], ""),
   ],
 )->Js.Array2.concat([
-  T.make(~category="Seq", ~title="sortBy", ~expectation="completely lazy", ~predicate=() => {
-    S.repeatWith(3, () => {Js.Exn.raiseError("boom!")})
-    ->S.sortBy(intCmp)
-    ->S.take(0)
-    ->S.consume
-    ->ignore
-    true
-  }),
+  willNotThrow(~title="sortBy", ~expectation="lazy", ~f=() => death()->S.sortBy(intCmp)),
   T.make(~category="Seq", ~title="sortBy", ~expectation="stable", ~predicate=() => {
     let sortByFirst = (a, b) => {
       let (afst, _) = a
