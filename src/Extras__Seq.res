@@ -660,7 +660,7 @@ let everySome = xx => {
 let toOption = xx =>
   switch xx->nextNode {
   | End => None
-  | Next(x, xx) => Some(xx->startWith(x))
+  | Next(x, xx) => Some(cons(x, xx))
   }
 
 let consume = xx => xx->forEach(_ => ())
