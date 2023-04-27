@@ -588,13 +588,14 @@ item in it, or `None` if the sequence is empty.
 let last: t<'a> => option<'a>
 
 /**
-`toArray` eagerly consumes the entire sequence and converts it to an array.
+`toArray` eagerly consumes the entire sequence and converts it to an array with
+items in the same order.
 */
 let toArray: t<'a> => array<'a>
 
 /**
-`toList(source)` eagerly consumes the entire sequence and converts it to a list
-with items in the same order as in `source`.
+`toList` eagerly consumes the entire sequence and converts it to a list with
+items in the same order.
 */
 let toList: t<'a> => list<'a>
 
