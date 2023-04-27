@@ -93,19 +93,14 @@ let head = xx =>
   | Next(x, _) => Some(x)
   }
 
-let forEach = (xx, f) => {
-  let curr = ref(xx->nextNode)
-  let break = ref(false)
-  while !break.contents {
-    switch curr.contents {
-    | End => break := true
-    | Next(x, xx) => {
-        f(x)
-        curr := xx->nextNode
-      }
+let rec forEach = (xx, f) =>
+  switch xx->headTail {
+  | None => ()
+  | Some(x, xx) => {
+      f(x)
+      forEach(xx, f)
     }
   }
-}
 
 let indexed = xx => {
   let rec go = (xx, index) =>

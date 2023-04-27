@@ -999,13 +999,33 @@ let dropUntilTests =
 let forEachTests = [
   valueEqual(
     ~title="forEach",
-    ~expectation="",
+    ~expectation="every value is enumerated",
     ~a=() => {
       let result = []
       S.range(1, 5)->S.forEach(i => result->Js.Array2.push(i)->ignore)
       result
     },
     ~b=[1, 2, 3, 4, 5],
+  ),
+  valueEqual(
+    ~title="forEach",
+    ~expectation="millions",
+    ~a=() => {
+      let lastSeen = ref(None)
+      S.range(1, 999_999)->S.forEach(i => lastSeen := Some(i))
+      lastSeen.contents
+    },
+    ~b=Some(999_999),
+  ),
+  valueEqual(
+    ~title="forEach",
+    ~expectation="empty",
+    ~a=() => {
+      let lastSeen = ref(None)
+      S.empty->S.forEach(i => lastSeen := Some(i))
+      lastSeen.contents
+    },
+    ~b=None,
   ),
   valueEqual(
     ~title="forEachi",
