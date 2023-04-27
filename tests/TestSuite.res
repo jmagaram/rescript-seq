@@ -1,5 +1,6 @@
 open Belt
 module Test = Extras__Test
+module Task = Extras__Task
 module Ex = Extras
 module Promise = Js.Promise2
 
@@ -12,10 +13,9 @@ let isLocalDevelopment = () => {
   }
 }
 
-let keywords = []
-let onlyShowFailures = true
-let filter = test => keywords->Js.Array2.every(word => test->Test.hasKeyword(word))
-let throwIfAnyTestFails = !isLocalDevelopment()
+let onlyShowFailures = false
+let filter = test => []->Js.Array2.every(word => test->Test.hasKeyword(word))
+let throwOnFailure = !isLocalDevelopment()
 
 let tests =
   [
@@ -33,18 +33,16 @@ let tests =
     Extras__TrampolineTests.tests,
   ]->Array.concatMany
 
-Ex.Task.Result.make(
+Task.Result.make(
   ~promise=() => Ex.Test.runSuite(tests, ~filter, ~onlyShowFailures),
   ~onError=e => e,
 )
-->Ex.Task.map(i =>
-  switch i {
-  | Ok(s) if s.fail == 0 => None
-  | Ok(s) if s.fail > 0 => Some(`Tests failed: ${s.fail->Int.toString}`)
-  | _ => Some("Could not run the test suite, or an unexpected failure.")
+->Task.forEach(s =>
+  switch (s, throwOnFailure) {
+  | (Ok(s), true) if s.fail > 0 => Js.Exn.raiseError(`Tests failed: ${s.fail->Int.toString}`)
+  | (Error(_), true) => Js.Exn.raiseError("Could not complete the test suite.")
+  | _ => ()
   }
 )
-->Ex.Task.map(i => throwIfAnyTestFails ? i : None)
-->Ex.Task.forEach(Option.forEach(_, msg => Js.Exn.raiseError(msg)))
-->Ex.Task.toPromise
+->Task.toPromise
 ->ignore
