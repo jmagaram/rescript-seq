@@ -15,7 +15,7 @@ module Yes = L.MakeString({
 })
 
 let tests = [
-  T.make(~category="Literal", ~title="True", ~expectation="all", ~predicate=() => {
+  T.fromPredicate(~category="Literal", ~title="True", ~expectation="all", () => {
     L.True.value->L.True.unwrap == true &&
     L.True.parse(35)->Option.isNone &&
     L.True.parse("abc")->Option.isNone &&
@@ -26,7 +26,7 @@ let tests = [
     L.True.isTypeOf(false->Unknown.make) == false &&
     L.True.isTypeOf(34->Unknown.make) == false
   }),
-  T.make(~category="Literal", ~title="Seven", ~expectation="all", ~predicate=() => {
+  T.fromPredicate(~category="Literal", ~title="Seven", ~expectation="all", () => {
     Seven.value->Seven.unwrap == 7 &&
     Seven.parse(35)->Option.isNone &&
     Seven.parse("abc")->Option.isNone &&
@@ -37,7 +37,7 @@ let tests = [
     Seven.isTypeOf(34->Unknown.make) == false &&
     Seven.isTypeOf(false->Unknown.make) == false
   }),
-  T.make(~category="Literal", ~title="Yes", ~expectation="all", ~predicate=() => {
+  T.fromPredicate(~category="Literal", ~title="Yes", ~expectation="all", () => {
     Yes.value->Yes.unwrap == "yes" &&
     Yes.parse(35)->Option.isNone &&
     Yes.parse("abc")->Option.isNone &&

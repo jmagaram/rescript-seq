@@ -9,7 +9,7 @@ let isEqual = (cmp, a, b) => cmp(a, b) == 0 && cmp(b, a) == 0
 
 let lessThanTests = (~small, ~big, ~cmp) => {
   let make = (~title, ~isTrue) =>
-    T.make(~category="Cmp", ~title, ~expectation="when different", ~predicate=() => isTrue)
+    T.fromPredicate(~category="Cmp", ~title, ~expectation="when different", () => isTrue)
   [
     make(~title="lt", ~isTrue=C.lt(cmp, small, big)),
     make(~title="lte", ~isTrue=C.lte(cmp, small, big)),
@@ -24,7 +24,7 @@ let lessThanTests = (~small, ~big, ~cmp) => {
 
 let areSameTests = (~a, ~b, ~cmp) => {
   let make = (~title, ~isTrue) =>
-    T.make(~category="Cmp", ~title, ~expectation="when same", ~predicate=() => isTrue)
+    T.fromPredicate(~category="Cmp", ~title, ~expectation="when same", () => isTrue)
   [
     make(~title="lt", ~isTrue=false == C.lt(cmp, a, b)),
     make(~title="lte", ~isTrue=C.lte(cmp, a, b)),
@@ -38,24 +38,24 @@ let areSameTests = (~a, ~b, ~cmp) => {
 }
 
 let otherTests = [
-  T.make(~category="Cmp", ~title="fromMap", ~expectation="", ~predicate=() => {
+  T.fromPredicate(~category="Cmp", ~title="fromMap", ~expectation="", () => {
     let target = C.fromMap(i => i.age, C.int)
     let bob = {name: "bob", age: 3}
     let sue = {name: "sue", age: 8}
     inOrder(target, bob, sue)
   }),
-  T.make(~category="Cmp", ~title="fromFloatResult", ~expectation="", ~predicate=() => {
+  T.fromPredicate(~category="Cmp", ~title="fromFloatResult", ~expectation="", () => {
     let f = (x: int, y: int) => x < y ? -1.0 : x > y ? 1.0 : 0.0
     let target = C.fromFloatResult(f)
     inOrder(target, 3, 9) && isEqual(target, 3, 3)
   }),
-  T.make(~category="Cmp", ~title="int instance", ~expectation="", ~predicate=() => {
+  T.fromPredicate(~category="Cmp", ~title="int instance", ~expectation="", () => {
     inOrder(C.int, 1, 2) && isEqual(C.int, 1, 1)
   }),
-  T.make(~category="Cmp", ~title="float instance", ~expectation="", ~predicate=() => {
+  T.fromPredicate(~category="Cmp", ~title="float instance", ~expectation="", () => {
     inOrder(C.float, 1.0, 2.0) && isEqual(C.float, 1.0, 1.0)
   }),
-  T.make(~category="Cmp", ~title="bool instance", ~expectation="", ~predicate=() => {
+  T.fromPredicate(~category="Cmp", ~title="bool instance", ~expectation="", () => {
     inOrder(C.bool, false, true) && isEqual(C.bool, false, false)
   }),
 ]

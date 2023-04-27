@@ -14,6 +14,7 @@
 - Add `Seq.toList`
 - Replace `Array.fromOneValue` with `Array.of1`
 - Replace `NonEmptyArray.fromOneValue` with `of1`, `of2`, `of3` and `ofMany`, all zero-cost bindings to `Array.of`.
+- `Test.fromResult` and `Test.fromPredicate` and async flavors; enable displaying message when test fails. Also show detailed of test failures.
 
 ## Version 1.1.1
 

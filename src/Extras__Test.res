@@ -1,11 +1,12 @@
 open Belt
+module Promise = Js.Promise2
 module String = Js.String2
 
 type t = {
   category: string,
   title: string,
   expectation: string,
-  predicate: unit => promise<bool>,
+  predicate: unit => promise<result<unit, string>>,
 }
 
 let category = i => i.category
@@ -32,35 +33,57 @@ type summary = {
 let stringCmp = (x: string, y: string) => x < y ? -1 : x > y ? 1 : 0
 let cmp = (a, b) => stringCmp(a.category ++ a.title, b.category ++ b.title)
 
-let make = (~category, ~title, ~expectation, ~predicate as p) => {
+let fromResult = (~category, ~title, ~expectation, predicate) => {
   category,
   title,
   expectation,
   predicate: () =>
     try {
-      p()->Js.Promise2.resolve
+      predicate()
     } catch {
-    | _ => false->Js.Promise2.resolve
-    },
+    | _ => Error("An exception was raised and not caught by the test itself.")
+    }->Promise.resolve,
 }
 
-let makeAsync = (~category, ~title, ~expectation, ~predicate) => {
+let fromPredicate = (~category, ~title, ~expectation, predicate) =>
+  fromResult(~category, ~title, ~expectation, () =>
+    try {
+      switch predicate() {
+      | true => Ok()
+      | false => Error("")
+      }
+    } catch {
+    | _ => Error("An exception was raised and not caught by the test itself.")
+    }
+  )
+
+let fromResultAsync = (~category, ~title, ~expectation, predicate) => {
   category,
   title,
   expectation,
   predicate,
 }
 
+let fromPredicateAsync = (~category, ~title, ~expectation, predicate) =>
+  fromResultAsync(~category, ~title, ~expectation, () =>
+    predicate()->Promise.then(success => Promise.resolve(success ? Ok() : Error("")))
+  )
+
 let run = async i => {
   try {
     let succeed = await i.predicate()
     (succeed, i)
   } catch {
-  | _ => (false, i)
+  | _ => (Error("An exception was raised and not caught by the test itself."), i)
   }
 }
 
-let toString = i => `${i.category} | ${i.title} | ${i.expectation}`
+let toSummaryString = i => `${i.category} | ${i.title} | ${i.expectation}`
+
+let toDetailString = (i, message) => {
+  let message = message == "" ? "" : `\n${message}`
+  `\n==== FAIL ${i.category} | ${i.title} | ${i.expectation} ====${message}`
+}
 
 let runSuite = async (~filter=_ => true, ~onlyShowFailures=false, tests) => {
   let log = Js.Console.log
@@ -73,15 +96,27 @@ let runSuite = async (~filter=_ => true, ~onlyShowFailures=false, tests) => {
     ->Array.keep(filter)
     ->SortArray.stableSortBy(cmp)
     ->Array.map(i => i->run)
-    ->Js.Promise2.all
-  let (succeeded, failed) = results->Array.partition(((r, _)) => r)
+    ->Promise.all
+  let succeeded = results->Array.keepMap(((r, t)) =>
+    switch r {
+    | Ok(_) => Some(t)
+    | Error(_) => None
+    }
+  )
+  let failed = results->Array.keepMap(((r, t)) =>
+    switch r {
+    | Ok(_) => None
+    | Error(message) => Some(t, message)
+    }
+  )
   if succeeded->Array.length > 0 && !onlyShowFailures {
     logSection("SUCCEEDED")
-    succeeded->Array.forEach(((_, t)) => `PASS ${t->toString}`->log)
+    succeeded->Array.forEach(t => `PASS ${t->toSummaryString}`->log)
   }
   if failed->Array.length > 0 {
-    logSection("FAILED")
-    failed->Array.forEach(((_, t)) => `FAIL  ${t->toString}`->log)
+    failed->Array.forEach(((t, message)) => toDetailString(t, message)->log)
+    logSection("FAILURE SUMMARY")
+    failed->Array.forEach(((t, _)) => `FAIL  ${t->toSummaryString}`->log)
   }
   logSection("SUMMARY")
   let summary = {

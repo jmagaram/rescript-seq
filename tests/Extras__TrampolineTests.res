@@ -14,11 +14,11 @@ let factorial = n => {
 
 let factorialTests =
   [(1, 1), (2, 2), (3, 6), (4, 24), (12, 479001600)]->Array.map(((n, total)) =>
-    T.make(
+    T.fromPredicate(
       ~category="Functions",
       ~title="Trampoline (factorial)",
       ~expectation=`${n->Belt.Int.toString}! == ${total->Belt.Int.toString}`,
-      ~predicate=() => factorial(n) == total,
+      () => factorial(n) == total,
     )
   )
 
@@ -34,11 +34,11 @@ let decrement = n => {
 
 let decrementTests =
   [10, 100, 999999]->Array.map(n =>
-    T.make(
+    T.fromPredicate(
       ~category="Functions",
       ~title="Trampoline (decrement)",
       ~expectation=`Can decrement from ${n->Belt.Int.toString}`,
-      ~predicate=() => decrement(n) == 0,
+      () => decrement(n) == 0,
     )
   )
 

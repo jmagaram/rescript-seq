@@ -18,7 +18,7 @@ let taskTests = {
     Task.make(~promise=() => Promise.resolve(success), ~onError=_ => onError)
 
   let makeTest = (~title, ~expectation, ~a, ~b) =>
-    T.makeAsync(~category="Task", ~title, ~expectation, ~predicate=async () =>
+    T.fromPredicateAsync(~category="Task", ~title, ~expectation, async () =>
       await a()->Task.toPromise == b
     )
 
@@ -67,11 +67,11 @@ let taskTests = {
         ->Task.map(i => `It is ${i->Belt.Int.toString}`),
       ~b="It is 12",
     ),
-    T.makeAsync(
+    T.fromPredicateAsync(
       ~category="Task",
       ~title="spy",
       ~expectation="spy function is executed",
-      ~predicate=async () => {
+      async () => {
         let saw = ref(-1)
         let t =
           succeedsTask(~success=99, ~onError=-1)->Task.spy(v => saw := v)->Task.map(i => i * 2)
@@ -87,7 +87,7 @@ let taskResultTests = {
     Task.Result.make(~promise=() => Promise.resolve(success), ~onError=_ => onError)
 
   let makeTest = (~title, ~expectation, ~a, ~b) =>
-    T.makeAsync(~category="Task.Result", ~title, ~expectation, ~predicate=async () =>
+    T.fromPredicateAsync(~category="Task.Result", ~title, ~expectation, async () =>
       await a()->Task.toPromise == b
     )
 

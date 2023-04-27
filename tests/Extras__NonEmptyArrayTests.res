@@ -2,7 +2,7 @@ module NEA = Extras__NonEmptyArray
 module O = Belt.Option
 
 let expectEq = (~title, ~expectation, ~a, ~b) =>
-  Extras__Test.make(~category="NonEmptyArray", ~title, ~expectation, ~predicate=() => a() == b)
+  Extras__Test.fromPredicate(~category="NonEmptyArray", ~title, ~expectation, () => a() == b)
 
 let add = (x, y) => x + y
 

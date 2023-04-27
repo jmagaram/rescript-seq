@@ -97,14 +97,15 @@ Create a test that compares two sequences for equality. Converts both sequences
 to arrays and then uses the ReScript recursive equality test.
 */
 let seqEqual = (~title, ~expectation, ~a, ~b) =>
-  T.make(~category="Seq", ~title, ~expectation, ~predicate=() => {
+  T.fromResult(~category="Seq", ~title, ~expectation, () => {
     let a = a()->S.toArray
-    if a != b {
-      Js.Console.log(`===== NOT EQUAL : ${title} : ${expectation} =====`)
-      Js.Console.log(`A: ${a->Js.Array2.toString->shorten}`)
-      Js.Console.log(`B: ${b->Js.Array2.toString->shorten}`)
+    switch a == b {
+    | true => Ok()
+    | false =>
+      Error(
+        `Actual:   ${a->Js.Array2.toString->shorten}\nExpected: ${b->Js.Array2.toString->shorten}`,
+      )
     }
-    a == b
   })
 
 /**
@@ -112,15 +113,12 @@ Creates a test that compares two values for equality. Uses the ReScript
 recursive equality test.
 */
 let valueEqual = (~title, ~expectation, ~a, ~b) =>
-  T.make(~category="Seq", ~title, ~expectation, ~predicate=() => {
+  T.fromResult(~category="Seq", ~title, ~expectation, () => {
     let aValue = a()
-    let pass = aValue == b
-    if !pass {
-      Js.Console.log(`===== NOT EQUAL : ${title} : ${expectation} =====`)
-      Js.Console.log(`A: ${aValue->Obj.magic}`)
-      Js.Console.log(`B: ${b->Obj.magic}`)
+    switch aValue == b {
+    | true => Ok()
+    | false => Error(`Actual:   ${aValue->Obj.magic}\nExpected: ${b->Obj.magic}`)
     }
-    pass
   })
 
 /**
@@ -128,7 +126,7 @@ Creates a test that passes if the provided function throws any kind of
 exception.
 */
 let willThrow = (~title, ~expectation, ~f) =>
-  T.make(~category="Seq", ~title, ~expectation, ~predicate=() =>
+  T.fromPredicate(~category="Seq", ~title, ~expectation, () =>
     Ex.Result.fromTryCatch(f)->Result.isError
   )
 
@@ -136,7 +134,7 @@ let willThrow = (~title, ~expectation, ~f) =>
 Creates a test that passes if the provided function does NOT throw an exception.
 */
 let willNotThrow = (~title, ~expectation, ~f) =>
-  T.make(~category="Seq", ~title, ~expectation, ~predicate=() =>
+  T.fromPredicate(~category="Seq", ~title, ~expectation, () =>
     Ex.Result.fromTryCatch(f)->Result.isOk
   )
 
@@ -464,10 +462,10 @@ let windowTests =
       (S.range(1, 5)->S.take(0)->S.window(1)->S.map(joinInts), [], ""),
     ],
   )->Js.Array2.concat([
-    T.make(~category="Seq", ~title="window", ~expectation="when size = 0 => throw", ~predicate=() =>
+    T.fromPredicate(~category="Seq", ~title="window", ~expectation="when size = 0 => throw", () =>
       R.fromTryCatch(() => [1, 2, 3]->S.fromArray->S.window(0))->Result.isError
     ),
-    T.make(~category="Seq", ~title="window", ~expectation="when size < 0 => throw", ~predicate=() =>
+    T.fromPredicate(~category="Seq", ~title="window", ~expectation="when size < 0 => throw", () =>
       R.fromTryCatch(() => [1, 2, 3]->S.fromArray->S.window(-1))->Result.isError
     ),
   ])
@@ -1365,11 +1363,11 @@ let (everyOkTests, everySomeTests) = {
 }
 
 let memoizeTests = [
-  T.make(
+  T.fromPredicate(
     ~category="Seq",
     ~title="cache",
     ~expectation="calculations only done once",
-    ~predicate=() => {
+    () => {
       let randoms = S.foreverWith(() => Js.Math.random())->S.take(4)->S.cache
       let nums1 = randoms->S.toArray
       let nums2 = randoms->S.toArray
@@ -1377,11 +1375,11 @@ let memoizeTests = [
       nums1 == nums2 && nums2 == nums3
     },
   ),
-  T.make(
+  T.fromPredicate(
     ~category="Seq",
     ~title="cache",
     ~expectation="all lazy; can cache foreverWith",
-    ~predicate=() => {
+    () => {
       let randoms = S.foreverWith(() => Js.Math.random())->S.cache->S.take(4)
       let nums1 = randoms->S.toArray
       let nums2 = randoms->S.toArray
@@ -1403,11 +1401,11 @@ let findTests = [
   (() => S.range(1, 999_999), i => i == 999_999, Some(999_999), "when million"),
   (() => S.range(1, 999_999), _ => false, None, "when million"),
 ]->Js.Array2.mapi(((source, predicate, result, note), index) =>
-  T.make(
+  T.fromPredicate(
     ~category="Seq",
     ~title="find",
     ~expectation=`${index->intToString} ${note}`,
-    ~predicate=() => {
+    () => {
       source()->S.find(predicate) == result
     },
   )
@@ -1415,11 +1413,11 @@ let findTests = [
 
 let map2Tests = {
   let test = (xs, ys, expected) => {
-    T.make(
+    T.fromPredicate(
       ~category="Seq",
       ~title="map2",
       ~expectation=`${xs},${ys} => ${expected}`,
-      ~predicate=() => {
+      () => {
         let xs = xs->characters
         let ys = ys->characters
         let expected = expected == "" ? S.empty : expected->Js.String2.split(",")->S.fromArray
@@ -1443,11 +1441,11 @@ let map2Tests = {
 
 let map3Tests = {
   let test = (xs, ys, zs, expected) => {
-    T.make(
+    T.fromPredicate(
       ~category="Seq",
       ~title="map3",
       ~expectation=`${xs},${ys},${zs} => ${expected}`,
-      ~predicate=() => {
+      () => {
         let xs = xs->characters
         let ys = ys->characters
         let zs = zs->characters
@@ -1472,11 +1470,11 @@ let map3Tests = {
 }
 
 let consumeTests = [
-  T.make(
+  T.fromPredicate(
     ~category="Seq",
     ~title="consume",
     ~expectation="enumerates sequence for side effects",
-    ~predicate=() => {
+    () => {
       let lastSeen = ref(0)
       S.range(0, 999_999)->S.tap(i => lastSeen := i)->S.consume
       lastSeen.contents == 999_999
@@ -1517,7 +1515,7 @@ let sortByTests = makeSeqEqualsTests(
   ],
 )->Js.Array2.concat([
   willNotThrow(~title="sortBy", ~expectation="lazy", ~f=() => death()->S.sortBy(intCmp)),
-  T.make(~category="Seq", ~title="sortBy", ~expectation="stable", ~predicate=() => {
+  T.fromPredicate(~category="Seq", ~title="sortBy", ~expectation="stable", () => {
     let sortByFirst = (a, b) => {
       let (afst, _) = a
       let (bfst, _) = b

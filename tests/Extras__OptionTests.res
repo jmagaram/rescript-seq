@@ -1,5 +1,5 @@
 let expectEq = (~title, ~expectation, ~a, ~b) =>
-  Extras__Test.make(~category="Option", ~title, ~expectation, ~predicate=() => a() == b)
+  Extras__Test.fromPredicate(~category="Option", ~title, ~expectation, () => a() == b)
 
 module T = Extras__Test
 module O = Extras__Option
@@ -119,20 +119,20 @@ let tests = [
     ~a=() => Ok(5)->O.fromError,
     ~b=None,
   ),
-  T.make(
+  T.fromPredicate(
     ~category="Option",
     ~title="fromTryCatch",
     ~expectation="when throw, return as None",
-    ~predicate=() => {
+    () => {
       let r = O.fromTryCatch(() => Js.Exn.raiseError("banana"))
       r->Belt.Option.isNone
     },
   ),
-  T.make(
+  T.fromPredicate(
     ~category="Option",
     ~title="fromTryCatch",
     ~expectation="when not throw, return result as Some",
-    ~predicate=() => O.fromTryCatch(() => 3) == Some(3),
+    () => O.fromTryCatch(() => 3) == Some(3),
   ),
   expectEq(
     ~title="map2",

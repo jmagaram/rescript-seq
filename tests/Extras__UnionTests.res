@@ -40,51 +40,51 @@ module StringOrFalseTests = {
 
   let tests = {
     module SF = StringOrFalse
-    let test = (~expectation, ~predicate) =>
-      Test.make(~category="Union", ~title="StringOrFalse", ~expectation, ~predicate)
+    let test = (~expectation, predicate) =>
+      Test.fromPredicate(~category="Union", ~title="StringOrFalse", ~expectation, predicate)
     [
-      test(~expectation="fromString (safe assignment)", ~predicate=() =>
+      test(~expectation="fromString (safe assignment)", () =>
         "abc"->SF.fromString->SF.equals("abc"->Obj.magic)
       ),
-      test(~expectation="fromFalse (safe assignment)", ~predicate=() =>
+      test(~expectation="fromFalse (safe assignment)", () =>
         Literal.False.value->SF.fromFalse->SF.equals(false->Obj.magic)
       ),
-      test(~expectation="make from false => Some", ~predicate=() =>
+      test(~expectation="make from false => Some", () =>
         false->SF.make->OptionEx.isSomeAnd(v => v->Obj.magic == false)
       ),
-      test(~expectation="make from true => None", ~predicate=() => true->SF.make->Option.isNone),
-      test(~expectation="make from string => Some", ~predicate=() =>
+      test(~expectation="make from true => None", () => true->SF.make->Option.isNone),
+      test(~expectation="make from string => Some", () =>
         "abc"->SF.make->OptionEx.isSomeAnd(v => v->Obj.magic == "abc")
       ),
-      test(~expectation="make from int => None", ~predicate=() => 34->SF.make->Option.isNone),
-      test(~expectation="match on string", ~predicate=() =>
+      test(~expectation="make from int => None", () => 34->SF.make->Option.isNone),
+      test(~expectation="match on string", () =>
         "abc"->SF.fromString->SF.match(~onString=i => i == "abc", ~onFalse=_ => false)
       ),
-      test(~expectation="equals when both false => true", ~predicate=() =>
+      test(~expectation="equals when both false => true", () =>
         SF.equals(Literal.False.value->SF.fromFalse, Literal.False.value->SF.fromFalse)
       ),
-      test(~expectation="equals when both string and same string => true", ~predicate=() =>
+      test(~expectation="equals when both string and same string => true", () =>
         SF.equals("abc"->SF.fromString, "abc"->SF.fromString)
       ),
-      test(~expectation="equals when both string but different => false", ~predicate=() =>
+      test(~expectation="equals when both string but different => false", () =>
         false == SF.equals("abc"->SF.fromString, "xyz"->SF.fromString)
       ),
-      test(~expectation="equals when one string and one false => false", ~predicate=() =>
+      test(~expectation="equals when one string and one false => false", () =>
         false == SF.equals("abc"->SF.fromString, Literal.False.value->SF.fromFalse)
       ),
-      test(~expectation="equals when one string and one false => false", ~predicate=() =>
+      test(~expectation="equals when one string and one false => false", () =>
         false == SF.equals("abc"->SF.fromString, Literal.False.value->SF.fromFalse)
       ),
-      test(~expectation="toString when string => Some", ~predicate=() =>
+      test(~expectation="toString when string => Some", () =>
         "abc"->SF.fromString->SF.toString == Some("abc")
       ),
-      test(~expectation="toString when not string => None", ~predicate=() =>
+      test(~expectation="toString when not string => None", () =>
         Literal.False.value->SF.fromFalse->SF.toString->Option.isNone
       ),
-      test(~expectation="toFalse when false => Some", ~predicate=() =>
+      test(~expectation="toFalse when false => Some", () =>
         Literal.False.value->SF.fromFalse->SF.toFalse == Some(Literal.False.value)
       ),
-      test(~expectation="toFalse when not false => None", ~predicate=() =>
+      test(~expectation="toFalse when not false => None", () =>
         "abc"->SF.fromString->SF.toFalse->Option.isNone
       ),
     ]
@@ -157,26 +157,26 @@ module FancyUnionTest = {
   }
 
   let tests = {
-    let test = (~expectation, ~predicate) =>
-      Test.make(~category="Union", ~title="Fancy", ~expectation, ~predicate)
+    let test = (~expectation, predicate) =>
+      Test.fromPredicate(~category="Union", ~title="Fancy", ~expectation, predicate)
     [
-      test(~expectation="fromNegativeOne", ~predicate=() =>
+      test(~expectation="fromNegativeOne", () =>
         NegativeOne.value->Target.fromNegativeOne->Obj.magic == -1
       ),
-      test(~expectation="fromNull", ~predicate=() =>
+      test(~expectation="fromNull", () =>
         Literal.Null.value->Target.fromNull->Obj.magic == Js.null
       ),
-      test(~expectation="fromSuccess", ~predicate=() => {
+      test(~expectation="fromSuccess", () => {
         let value = {"success": Literal.True.value, "count": 5}
         value->Target.fromSuccess->Obj.magic == value
       }),
-      test(~expectation="make from NegativeOne => Some", ~predicate=() =>
+      test(~expectation="make from NegativeOne => Some", () =>
         NegativeOne.value->Target.make->Obj.magic == Some(-1)
       ),
-      test(~expectation="make from invalid value like 34 => None", ~predicate=() =>
+      test(~expectation="make from invalid value like 34 => None", () =>
         34->Target.make->Option.isNone
       ),
-      test(~expectation="match on Success", ~predicate=() =>
+      test(~expectation="match on Success", () =>
         {"success": Literal.True.value, "count": 5}
         ->Target.make
         ->Option.getExn
@@ -187,7 +187,7 @@ module FancyUnionTest = {
           ~onNull=_ => false,
         )
       ),
-      test(~expectation="match on NegativeOne", ~predicate=() =>
+      test(~expectation="match on NegativeOne", () =>
         -1
         ->Target.make
         ->Option.getExn
@@ -198,13 +198,13 @@ module FancyUnionTest = {
           ~onNull=_ => false,
         )
       ),
-      test(~expectation="toNull when null => Some", ~predicate=() =>
+      test(~expectation="toNull when null => Some", () =>
         Literal.Null.value->Target.fromNull->Target.toNull->Option.isSome
       ),
-      test(~expectation="toNull when something else => None", ~predicate=() =>
+      test(~expectation="toNull when something else => None", () =>
         NegativeOne.value->Target.fromNegativeOne->Target.toNull->Option.isNone
       ),
-      test(~expectation="match on Null", ~predicate=() =>
+      test(~expectation="match on Null", () =>
         Literal.Null.value
         ->Target.fromNull
         ->Target.match(
@@ -245,32 +245,26 @@ module PointTests = {
     module B = Point3D
   })
 
-  let test = (~expectation, ~predicate) =>
-    Test.make(~category="Union", ~title="Point", ~expectation, ~predicate)
+  let test = (~expectation, predicate) =>
+    Test.fromPredicate(~category="Union", ~title="Point", ~expectation, predicate)
 
   let tests = [
-    test(~expectation="make from 2d => Some", ~predicate=() =>
-      [1.0, 1.0]->Point.make->Option.isSome
-    ),
-    test(~expectation="make from 3d => Some", ~predicate=() =>
-      [1.0, 1.0, 1.0]->Point.make->Option.isSome
-    ),
-    test(~expectation="make from 4d => None", ~predicate=() =>
+    test(~expectation="make from 2d => Some", () => [1.0, 1.0]->Point.make->Option.isSome),
+    test(~expectation="make from 3d => Some", () => [1.0, 1.0, 1.0]->Point.make->Option.isSome),
+    test(~expectation="make from 4d => None", () =>
       [1.0, 1.0, 1.0, 1.0]->Point.make->Option.isNone
     ),
-    test(~expectation="make from empty => None", ~predicate=() => []->Point.make->Option.isNone),
-    test(~expectation="make from string => None", ~predicate=() =>
-      "abc"->Point.make->Option.isNone
-    ),
-    test(~expectation="match on 2d", ~predicate=() => {
+    test(~expectation="make from empty => None", () => []->Point.make->Option.isNone),
+    test(~expectation="make from string => None", () => "abc"->Point.make->Option.isNone),
+    test(~expectation="match on 2d", () => {
       let p = (1.0, 1.0)
       p->Point.fromA->Point.matchAB(~onA=i => i === p, ~onB=_ => false)
     }),
-    test(~expectation="match on 3d", ~predicate=() => {
+    test(~expectation="match on 3d", () => {
       let p = (1.0, 1.0, 1.0)
       p->Point.fromB->Point.matchAB(~onA=_ => false, ~onB=i => i === p)
     }),
-    test(~expectation="match on 3d", ~predicate=() => {
+    test(~expectation="match on 3d", () => {
       (2.0, 3.0, 4.0)
       ->Point.fromB
       ->Point.matchAB(~onA=_ => false, ~onB=((x, y, z)) => x === 2.0 && y === 3.0 && z === 4.0)
@@ -384,71 +378,74 @@ module OnlyRescriptStructTests = {
     }
   }
 
-  let test = (~expectation, ~predicate) =>
-    Test.make(~category="Union", ~title="Use RescriptStruct exclusively", ~expectation, ~predicate)
+  let test = (~expectation, predicate) =>
+    Test.fromPredicate(
+      ~category="Union",
+      ~title="Use RescriptStruct exclusively",
+      ~expectation,
+      predicate,
+    )
 
   let tests = [
-    test(~expectation="make from short string => Some", ~predicate=() =>
+    test(~expectation="make from short string => Some", () =>
       "abc"->Target.make->OptionEx.isSomeAnd(v => Obj.magic(v) == "abc")
     ),
-    test(~expectation="make from long string => None", ~predicate=() =>
+    test(~expectation="make from long string => None", () =>
       "abcdefghijklmnopqrstuv"->Target.make->Option.isNone
     ),
-    test(~expectation="make from positive int => Some", ~predicate=() =>
+    test(~expectation="make from positive int => Some", () =>
       34
       ->NonNegativeInt.make
       ->Option.getExn
       ->Target.make
       ->OptionEx.isSomeAnd(i => Obj.magic(i) == 34)
     ),
-    test(~expectation="make from negative number => None", ~predicate=() =>
-      -99->Target.make->Option.isNone
-    ),
-    test(~expectation="make from point => Some", ~predicate=() =>
+    test(~expectation="make from negative number => None", () => -99->Target.make->Option.isNone),
+    test(~expectation="make from point => Some", () =>
       Point.make(2, 3)
       ->Target.make
       ->OptionEx.isSomeAnd(v => Point.equals(Obj.magic(v), Point.make(2, 3)))
     ),
-    test(~expectation="make from point => Some with exact same instance", ~predicate=() => {
+    test(~expectation="make from point => Some with exact same instance", () => {
       let p = Point.make(2, 3)
       Obj.magic(p->Target.fromPoint) === p
     }),
-    test(~expectation="match on point", ~predicate=() => {
+    test(~expectation="match on point", () => {
       Point.make(2, 3)
       ->Target.make
       ->Option.getExn
       ->Target.match(~onString=_ => false, ~onInt=_ => false, ~onPoint=p => p.x == 2 && p.y == 3)
     }),
-    test(~expectation="match on positive int", ~predicate=() => {
+    test(~expectation="match on positive int", () => {
       16
       ->Target.make
       ->Option.getExn
       ->Target.match(~onString=_ => false, ~onInt=i => i == NonNegative(16), ~onPoint=_ => false)
     }),
-    test(~expectation="equality of int", ~predicate=() =>
+    test(~expectation="equality of int", () =>
       Target.equals(
         NonNegativeInt.make(1)->Option.getExn->Target.fromNonNegativeInt,
         NonNegativeInt.make(1)->Option.getExn->Target.fromNonNegativeInt,
       )
     ),
-    test(~expectation="equality of int", ~predicate=() =>
+    test(~expectation="equality of int", () =>
       false ==
         Target.equals(
           NonNegativeInt.make(1)->Option.getExn->Target.fromNonNegativeInt,
           NonNegativeInt.make(2)->Option.getExn->Target.fromNonNegativeInt,
         )
     ),
-    test(~expectation="equality of int and string", ~predicate=() =>
+    test(~expectation="equality of int and string", () =>
       false ==
         Target.equals(
           NonNegativeInt.make(1)->Option.getExn->Target.fromNonNegativeInt,
           ShortString.make("abcde")->Option.getExn->Target.fromShortString,
         )
     ),
-    test(~expectation="equality of point", ~predicate=() =>
+    test(~expectation="equality of point", () =>
       Target.equals(Point.make(1, 2)->Target.fromPoint, Point.make(1, 2)->Target.fromPoint)
     ),
-    test(~expectation="equality of point", ~predicate=() =>
+    test(~expectation="equality of point", () =>
       false == Target.equals(Point.make(1, 2)->Target.fromPoint, Point.make(9, 9)->Target.fromPoint)
     ),
   ]
@@ -547,39 +544,39 @@ module LazinessTests = {
     module B = StringThrows
   })
 
-  let test = (~expectation, ~predicate) =>
-    Test.make(~category="Union", ~title="Lazy evaluation", ~expectation, ~predicate)
+  let test = (~expectation, predicate) =>
+    Test.fromPredicate(~category="Union", ~title="Lazy evaluation", ~expectation, predicate)
 
   let tests = [
-    test(~expectation="4 make from int => Some", ~predicate=() =>
+    test(~expectation="4 make from int => Some", () =>
       1->IntOrBoolOrFloatOrString.make->OptionEx.isSomeAnd(v => Obj.magic(v) == 1)
     ),
-    test(~expectation="4 make from bool => Some", ~predicate=() =>
+    test(~expectation="4 make from bool => Some", () =>
       true->IntOrBoolOrFloatOrString.make->OptionEx.isSomeAnd(v => Obj.magic(v) == true)
     ),
-    test(~expectation="4 make from float => Some", ~predicate=() =>
+    test(~expectation="4 make from float => Some", () =>
       3.5->IntOrBoolOrFloatOrString.make->OptionEx.isSomeAnd(v => Obj.magic(v) == 3.5)
     ),
-    test(~expectation="3 make from int => Some", ~predicate=() =>
+    test(~expectation="3 make from int => Some", () =>
       1->IntOrBoolOrString.make->OptionEx.isSomeAnd(v => Obj.magic(v) == 1)
     ),
-    test(~expectation="3 make from bool => Some", ~predicate=() =>
+    test(~expectation="3 make from bool => Some", () =>
       true->IntOrBoolOrString.make->OptionEx.isSomeAnd(v => Obj.magic(v) == true)
     ),
-    test(~expectation="3 match from int", ~predicate=() =>
+    test(~expectation="3 match from int", () =>
       1
       ->IntOrBoolOrString.fromA
       ->IntOrBoolOrString.matchABC(~onA=i => i == 1, ~onB=_ => false, ~onC=_ => false)
     ),
-    test(~expectation="3 match from bool", ~predicate=() =>
+    test(~expectation="3 match from bool", () =>
       true
       ->IntOrBoolOrString.fromB
       ->IntOrBoolOrString.matchABC(~onA=_ => false, ~onB=b => b == true, ~onC=_ => false)
     ),
-    test(~expectation="2 make from int => Some", ~predicate=() =>
+    test(~expectation="2 make from int => Some", () =>
       1->IntOrString.make->OptionEx.isSomeAnd(v => Obj.magic(v) == 1)
     ),
-    test(~expectation="2 match from int", ~predicate=() =>
+    test(~expectation="2 match from int", () =>
       1->IntOrString.fromA->IntOrString.matchAB(~onA=i => i == 1, ~onB=_ => false)
     ),
   ]

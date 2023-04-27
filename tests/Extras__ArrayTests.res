@@ -2,7 +2,7 @@ module T = Extras__Test
 module A = Extras__Array
 
 let test = (~title, ~expect, ~a, ~b) =>
-  T.make(~category="Array", ~title, ~expectation=expect, ~predicate=() => {
+  T.fromPredicate(~category="Array", ~title, ~expectation=expect, () => {
     let m = a()
     let n = b
     if m != n {

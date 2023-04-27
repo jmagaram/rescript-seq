@@ -4,7 +4,7 @@ module T = Extras__Test
 module R = Extras__Result
 
 let expectEqual = (~title, ~expectation, ~a, ~b) =>
-  T.make(~category="Result", ~title, ~expectation, ~predicate=() => a() == b)
+  T.fromPredicate(~category="Result", ~title, ~expectation, () => a() == b)
 
 let fromArray =
   [
@@ -51,11 +51,11 @@ let mapError =
   )
 
 let fromTryCatch = [
-  T.make(
+  T.fromPredicate(
     ~category="Result",
     ~title="fromTryCatch",
     ~expectation="when throw, return as Error",
-    ~predicate=() => {
+    () => {
       let r = R.fromTryCatch(() => Js.Exn.raiseError("banana"))
       switch r {
       | Ok(_) => false
@@ -67,11 +67,11 @@ let fromTryCatch = [
       }
     },
   ),
-  T.make(
+  T.fromPredicate(
     ~category="Result",
     ~title="fromTryCatch",
     ~expectation="when not throw, return result as Ok",
-    ~predicate=() => R.fromTryCatch(() => 3) == Ok(3),
+    () => R.fromTryCatch(() => 3) == Ok(3),
   ),
 ]
 
