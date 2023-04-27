@@ -83,6 +83,7 @@ let sortBy: (t<'a>, ('a, 'a) => int) => t<'a>
 let take: (t<'a>, int) => t<'a>
 let takeUntil: (t<'a>, 'a => bool) => t<'a>
 let takeWhile: (t<'a>, 'a => bool) => t<'a>
+let tail: t<'a> => t<'a>
 let tap: (t<'a>, 'a => unit) => t<'a>
 let window: (t<'a>, int) => t<array<'a>>
 let windowAhead: (t<'a>, int) => t<array<'a>>
@@ -131,7 +132,6 @@ let orElse: (t<'a>, t<'a>) => t<'a>
 let reduce: (t<'a>, 'b, ('b, 'a) => 'b) => 'b
 let reducei: (t<'a>, ~zero: 'b, (~sum: 'b, ~val: 'a, ~inx: int) => 'b) => 'b
 let some: (t<'a>, 'a => bool) => bool
-let tail: t<'a> => t<'a>
 let toArray: t<'a> => array<'a>
 let toOption: t<'a> => option<t<'a>>
 ```
