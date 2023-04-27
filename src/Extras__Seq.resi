@@ -593,6 +593,12 @@ let last: t<'a> => option<'a>
 let toArray: t<'a> => array<'a>
 
 /**
+`toList(source)` eagerly consumes the entire sequence and converts it to a list
+with items in the same order as in `source`.
+*/
+let toList: t<'a> => list<'a>
+
+/**
 `join(parts, separator)` concatenates every string in `parts`, separated
 by `separator`. If `parts` is empty, returns an empty string. If `parts` has
 only one string, that string is returned without using the `separator`.

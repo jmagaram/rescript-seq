@@ -744,3 +744,5 @@ let (combinations, permutations) = {
   let combinations = (xx, maxSize) => helper(xx, maxSize, (x, xx) => once(cons(x, xx)))
   (combinations, permutations)
 }
+
+let toList = xx => xx->reverse->reduce(list{}, Belt.List.add)

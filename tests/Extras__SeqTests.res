@@ -1677,6 +1677,17 @@ let (combinationTests, permutationTests) = {
   (combinationTests, permutationTests)
 }
 
+let toListTests = makeValueEqualTests(
+  ~title="toList",
+  [
+    (() => S.empty->S.toList, list{}, ""),
+    (() => S.once(1)->S.toList, list{1}, ""),
+    (() => [1, 2]->S.fromArray->S.toList, list{1, 2}, ""),
+    (() => [1, 2, 3]->S.fromArray->S.toList, list{1, 2, 3}, ""),
+    (() => S.range(1, 9_999)->S.toList->Belt.List.drop(9_998)->Option.getExn, list{9_999}, ""),
+  ],
+)
+
 let sampleFibonacci = {
   let fib = Extras__SeqSamples.fibonacci
   makeSeqEqualsTests(
@@ -1842,6 +1853,7 @@ let tests =
     takeWhileTests,
     tapTests,
     toArrayTests,
+    toListTests,
     toOptionTests,
     unfoldTests,
     windowAheadTests,
