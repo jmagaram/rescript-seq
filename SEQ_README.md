@@ -35,7 +35,7 @@ type t<'a> // A lazy sequence of `a`
 let combinations: (t<'a>, int) => t<(int, t<'a>)>
 let cons: ('a, t<'a>) => t<'a>
 let cycle: t<'a> => t<'a>
-let delay:()=>t<'a>=>t<'a>
+let delay: (unit => t<'a>) => t<'a>
 let empty: t<'a>
 let endWith: (t<'a>, 'a) => t<'a>
 let forever: 'a => t<'a>
