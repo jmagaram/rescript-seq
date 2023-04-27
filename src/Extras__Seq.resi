@@ -131,25 +131,6 @@ cons(1, [2, 3, 4]) // [1, 2, 3, 4]
 let cons: ('a, t<'a>) => t<'a>
 
 /**
-`startsWith(xx, x)` constructs the sequence that begins with the element `x`
-followed by the sequence `xx`. This is the same as `cons` but with the arguments
-reversed.
-
-## Examples
-
-```rescript
-cons(1, [2, 3, 4]) // [1, 2, 3, 4]
-```
-*/
-let startWith: (t<'a>, 'a) => t<'a>
-
-/**
-`endWith(xx, x)` is the sequence that begins with `xx` and appends `x` onto the
-end.
-*/
-let endWith: (t<'a>, 'a) => t<'a>
-
-/**
 `prepend(xx, yy)` is all items in `yy` followed by all items in `xx`. See
 `concat` for the same functionality but the arguments reversed.
 */

@@ -37,7 +37,6 @@ let cons: ('a, t<'a>) => t<'a>
 let cycle: t<'a> => t<'a>
 let delay: (unit => t<'a>) => t<'a>
 let empty: t<'a>
-let endWith: (t<'a>, 'a) => t<'a>
 let forever: 'a => t<'a>
 let foreverWith: (unit => 'a) => t<'a>
 let fromArray: (~start: int=?, ~end: int=?, array<'a>) => t<'a>
@@ -52,7 +51,6 @@ let range: (int, int) => t<int>
 let rangeMap: (int, int, int => 'a) => t<'a>
 let repeat: (int, 'a) => t<'a>
 let repeatWith: (int, unit => 'a) => t<'a>
-let startWith: (t<'a>, 'a) => t<'a>
 let unfold: ('a, 'a => option<('b, 'a)>) => t<'b>
 
 // Transform

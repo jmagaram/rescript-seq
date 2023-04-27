@@ -17,7 +17,6 @@ let once = x => (. ()) => Next(x, empty)
 let onceWith = f => (. ()) => Next(f(), empty)
 
 let cons = (x, xx) => (. ()) => Next(x, xx)
-let startWith = (xx, x) => (. ()) => Next(x, xx)
 
 let nextNode = (xx: t<'a>) => xx(.)
 
@@ -67,7 +66,6 @@ let rec concat = (xx, yy) =>
     }
   }
 
-let endWith = (xx, x) => concat(xx, once(x))
 let prepend = (xx, yy) => concat(yy, xx)
 
 let rec flatMap = (xx, f) =>
@@ -521,8 +519,8 @@ let zip4 = (xx, yy, zz, qq) => map4(xx, yy, zz, qq, (x, y, z, q) => (x, y, z, q)
 let zip5 = (xx, yy, zz, qq, mm) => map5(xx, yy, zz, qq, mm, (x, y, z, q, m) => (x, y, z, q, m))
 
 let equals = (xx, yy, eq) => {
-  let xx = xx->map(x => Some(x))->endWith(None)
-  let yy = yy->map(y => Some(y))->endWith(None)
+  let xx = xx->map(x => Some(x))->concat(None->once)
+  let yy = yy->map(y => Some(y))->concat(None->once)
   map2(xx, yy, (x, y) =>
     switch (x, y) {
     | (None, None) => true
@@ -533,8 +531,8 @@ let equals = (xx, yy, eq) => {
 }
 
 let compare = (xx, yy, cmp) => {
-  let xx = xx->map(x => Some(x))->endWith(None)
-  let yy = yy->map(y => Some(y))->endWith(None)
+  let xx = xx->map(x => Some(x))->concat(None->once)
+  let yy = yy->map(y => Some(y))->concat(None->once)
   map2(xx, yy, (x, y) =>
     switch (x, y) {
     | (Some(x), Some(y)) => cmp(x, y)
@@ -702,13 +700,13 @@ let distribute = (xx, item) => {
       switch suf->headTail {
       | None => None
       | Some(x, xx) => {
-          let yield = pre->endWith(x)->endWith(item)->concat(xx)
-          let next = (pre->endWith(x), xx)
+          let yield = pre->concat(x->once)->concat(item->once)->concat(xx)
+          let next = (pre->concat(x->once), xx)
           Some(yield, next)
         }
       }
     )
-  go(empty, xx)->startWith(cons(item, xx))
+  go(empty, xx)->concat(cons(item, xx)->once)
 }
 
 let (combinations, permutations) = {

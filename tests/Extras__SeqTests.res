@@ -222,15 +222,6 @@ let fromOptionTests =
     ),
   ])
 
-let startWithTests = makeSeqEqualsTests(
-  ~title="startWith",
-  [
-    (S.empty->S.startWith(1), [1], "when start with empty"),
-    (S.once(2)->S.startWith(1), [1, 2], "when start with one item"),
-    ([2, 3, 4]->S.fromArray->S.startWith(1), [1, 2, 3, 4], "when start with many items"),
-  ],
-)
-
 let fromListTests = makeSeqEqualsTests(
   ~title="fromList",
   [
@@ -404,7 +395,7 @@ let dropTests = makeSeqEqualsTests(
   valueEqual(
     ~title="drop",
     ~expectation="while drop a million, no overflow",
-    ~a=() => S.range(1, 999_999)->S.endWith(1_000_000)->S.drop(999_999)->S.last,
+    ~a=() => S.range(1, 999_999)->S.concat(1_000_000->S.once)->S.drop(999_999)->S.last,
     ~b=Some(1_000_000),
   ),
 ])
@@ -1863,7 +1854,6 @@ let tests =
     someTests,
     sortByTests,
     sortedMergeTests,
-    startWithTests,
     takeTests,
     takeUntilTests,
     takeWhileTests,
