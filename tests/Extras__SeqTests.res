@@ -1522,15 +1522,18 @@ let sortByTests = makeSeqEqualsTests(
   }),
 ])
 
-let delayTests = makeSeqEqualsTests(
-  ~title="delay",
-  [
-    (S.delay(() => S.empty), [], ""),
-    (S.delay(() => S.once(1)), [1], ""),
-    (S.delay(() => S.range(1, 5)), [1, 2, 3, 4, 5], ""),
-    (S.delay(() => Js.Exn.raiseError("boom!"))->S.take(0), [], ""),
-  ],
-)
+let delayTests =
+  makeSeqEqualsTests(
+    ~title="delay",
+    [
+      (S.delay(() => S.empty), [], ""),
+      (S.delay(() => S.once(1)), [1], ""),
+      (S.delay(() => S.range(1, 5)), [1, 2, 3, 4, 5], ""),
+      (S.delay(() => Js.Exn.raiseError("boom!"))->S.take(0), [], ""),
+    ],
+  )->Js.Array2.concat([
+    willNotThrow(~title="delay", ~expectation="lazy", ~f=() => S.delay(throwIfInvoked)),
+  ])
 
 let (combinationTests, permutationTests) = {
   let sortLetters = w =>
@@ -1662,7 +1665,7 @@ let (combinationTests, permutationTests) = {
     ),
     valueEqual(
       ~title,
-      ~a=() => S.repeatWith(3, () => {Js.Exn.raiseError("oops!")})->f(1000)->S.take(0)->S.last,
+      ~a=() => S.repeatWith(3, throwIfInvoked)->f(1000)->S.take(0)->S.last,
       ~b=None,
       ~expectation="totally lazy",
     ),
@@ -1760,15 +1763,13 @@ let sampleRunningTotal = {
 
 let tests =
   [
-    everyOkTests,
     allPairsTests,
-    everySomeTests,
     chunkBySizeTests,
     combinationTests,
     compareTests,
     concatTests,
-    consumeTests,
     consTests,
+    consumeTests,
     cycleTests,
     delayTests,
     dropTests,
@@ -1776,6 +1777,8 @@ let tests =
     dropWhileTests,
     emptyTests,
     equalsTests,
+    everyOkTests,
+    everySomeTests,
     everyTests,
     exactlyOneTests,
     filterMapiTests,
@@ -1811,9 +1814,9 @@ let tests =
     mapTests,
     memoizeTests,
     minByMaxByTests,
-    orElseTests,
     onceTests,
     onceWithTests,
+    orElseTests,
     pairwiseTests,
     permutationTests,
     prependTests,
