@@ -51,11 +51,11 @@ iter2, fold_left2, for_all2, exists2, group, map_product, unzip, partition_map, 
 
 ### Supported
 
-allPairs, append, cache, choose, chunkBySize, collect, compareWith, concat, delay, empty, exists, filter, fold, forAll, head, indexed, init, initInfinite, isEmpty, iter, iteri, last, length, map, map2, map3, mapFold, mapi, maxBy, minBy, ofArray, ofList, pairwise, pick, replicate, rev, scan, singleton, skip, skipWhile, sortWith, tail, takeWhile, toArray, truncate, tryExactlyOne, tryFind, tryHead, tryLast, tryPick, unfold, where, windowed, zip, zip3
+allPairs, append, cache, choose, chunkBySize, collect, compareWith, concat, delay, empty, exists, filter, fold, forAll, head, indexed, init, initInfinite, isEmpty, iter, iteri, last, length, map, map2, map3, mapFold, mapi, maxBy, minBy, ofArray, ofList, pairwise, pick, replicate, rev, scan, singleton, skip, skipWhile, sortWith, tail, takeWhile, toArray, toList, truncate, tryExactlyOne, tryFind, tryHead, tryLast, tryPick, unfold, where, windowed, zip, zip3
 
 ### Not supported
 
-average, averageBy, cast, contains, countBy, distinctBy, exactlyOne, except, exists2, findBack, findIndex, fold2, foldBack, foldBack2, forAll2, groupBy, insertAt, insertManyAt, item (nth), iter2, iteri2, mapFoldBack, mapi2, max, min, permute, readonly, **reduce** (simplified fold throw if empty), reduceBack, removeAt, removeManyAt, scanBack, sort, sortBy, sortByDescending, sortDescending, sortWith, splitInto, sum, sumBy, toList, transpose, take (throws like takeExactly), tryFindBack, tryFindIndex, tryFindIndexBack, tryItem, updateAt
+average, averageBy, cast, contains, countBy, distinctBy, exactlyOne, except, exists2, findBack, findIndex, fold2, foldBack, foldBack2, forAll2, groupBy, insertAt, insertManyAt, item (nth), iter2, iteri2, mapFoldBack, mapi2, max, min, permute, readonly, **reduce** (simplified fold throw if empty), reduceBack, removeAt, removeManyAt, scanBack, sort, sortBy, sortByDescending, sortDescending, sortWith, splitInto, sum, sumBy, transpose, take (throws like takeExactly), tryFindBack, tryFindIndex, tryFindIndexBack, tryItem, updateAt
 
 ## Rust
 
