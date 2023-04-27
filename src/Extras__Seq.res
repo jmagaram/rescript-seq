@@ -28,29 +28,19 @@ let headTail = xx =>
   }
 
 /**
-This is a foundation method for many of the functions in this library. It must
-not be recursive to prevent stack overflows. This consumes at least 1 item in
-`xx`.
+`findNode(source, predicate)` is a foundation method for many of the functions
+in this library. This must not compile to recursive JavaScript or stack
+overflows can result. This function consumes at least one item from the source.
 */
-let findNode = (xx, f) => {
-  let found = ref(None)
-  let current = ref(xx)
-  let break = ref(false)
-  while !break.contents {
-    switch current.contents->nextNode {
-    | End => break := true
-    | Next(x, xx) as node =>
-      switch f(x) {
-      | true =>
-        found := Some(node)
-        break := true
-      | false => ()
-      }
-      current := xx
+let rec findNode = (xx, f) =>
+  switch xx->nextNode {
+  | End => End
+  | Next(x, xx) as nxt =>
+    switch f(x) {
+    | true => nxt
+    | false => findNode(xx, f)
     }
   }
-  found.contents->Option.getWithDefault(End)
-}
 
 let find = (xx, f) =>
   switch xx->findNode(f) {
