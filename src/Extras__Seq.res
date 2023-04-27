@@ -107,20 +107,12 @@ let forEach = (xx, f) => {
   }
 }
 
-module Indexed = {
-  type t<'a> = ('a, int)
-  @inline let make = (~value, ~index) => (value, index)
-  @inline let value = ((value, _): t<'a>) => value
-  @inline let index = ((_, index): t<'a>) => index
-  @inline let indexEquals = (i, other) => i->index == other
-}
-
 let indexed = xx => {
   let rec go = (xx, index) =>
     (. ()) =>
       switch xx->nextNode {
       | End => End
-      | Next(x, xx) => Next(Indexed.make(~value=x, ~index), go(xx, index + 1))
+      | Next(x, xx) => Next((x, index), go(xx, index + 1))
       }
   go(xx, 0)
 }
@@ -240,21 +232,22 @@ let take = (xx, count) => {
 let headTails = xx =>
   unfold(xx, xx => xx->headTail->Option.flatMap(((_, xx) as ht) => Some(ht, xx)))
 
-let snd = ((_, b)) => b
+@inline let snd = ((_, b)) => b
+@inline let fst = ((a, _)) => a
 
 let drop = (xx, count) =>
   switch count {
   | 0 => xx
   | n if n < 0 =>
     InvalidArgument(
-      `'drop' requires a count of zero or more but youu asked for ${count->Belt.Int.toString}`,
+      `'drop' requires a count of zero or more but you asked for ${count->Belt.Int.toString}`,
     )->raise
   | count =>
     xx
     ->headTails
     ->indexed
-    ->find(Indexed.indexEquals(_, count - 1))
-    ->Option.map(Indexed.value)
+    ->find(((_, inx)) => inx == count - 1)
+    ->Option.map(fst)
     ->Option.map(snd)
     ->Option.getWithDefault(empty)
   }
