@@ -4,29 +4,29 @@ type t
 let fromResult: (
   ~category: string,
   ~title: string,
-  ~expectation: string,
+  ~expectation: string=?,
   unit => result<unit, string>,
 ) => t
 
-let fromPredicate: (~category: string, ~title: string, ~expectation: string, unit => bool) => t
+let fromPredicate: (~category: string, ~title: string, ~expectation: string=?, unit => bool) => t
 
 let fromPredicateAsync: (
   ~category: string,
   ~title: string,
-  ~expectation: string,
+  ~expectation: string=?,
   unit => promise<bool>,
 ) => t
 
 let fromResultAsync: (
   ~category: string,
   ~title: string,
-  ~expectation: string,
+  ~expectation: string=?,
   unit => promise<result<unit, string>>,
 ) => t
 
 let category: t => string
 let title: t => string
-let expectation: t => string
+let expectation: t => option<string>
 let hasKeyword: (t, string) => bool
 
 type summary = {

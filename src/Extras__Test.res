@@ -5,7 +5,7 @@ module String = Js.String2
 type t = {
   category: string,
   title: string,
-  expectation: string,
+  expectation: option<string>,
   predicate: unit => promise<result<unit, string>>,
 }
 
@@ -21,7 +21,7 @@ let hasKeyword = (i, word) => {
   }
   match(~text=i->category, ~word) ||
   match(~text=i->title, ~word) ||
-  match(~text=i->expectation, ~word)
+  i->expectation->Option.mapWithDefault(false, expectation => match(~text=expectation, ~word))
 }
 
 type summary = {
@@ -33,7 +33,7 @@ type summary = {
 let stringCmp = (x: string, y: string) => x < y ? -1 : x > y ? 1 : 0
 let cmp = (a, b) => stringCmp(a.category ++ a.title, b.category ++ b.title)
 
-let fromResult = (~category, ~title, ~expectation, predicate) => {
+let fromResult = (~category, ~title, ~expectation=?, predicate) => {
   category,
   title,
   expectation,
@@ -45,8 +45,8 @@ let fromResult = (~category, ~title, ~expectation, predicate) => {
     }->Promise.resolve,
 }
 
-let fromPredicate = (~category, ~title, ~expectation, predicate) =>
-  fromResult(~category, ~title, ~expectation, () =>
+let fromPredicate = (~category, ~title, ~expectation=?, predicate) =>
+  fromResult(~category, ~title, ~expectation?, () =>
     try {
       switch predicate() {
       | true => Ok()
@@ -57,15 +57,15 @@ let fromPredicate = (~category, ~title, ~expectation, predicate) =>
     }
   )
 
-let fromResultAsync = (~category, ~title, ~expectation, predicate) => {
+let fromResultAsync = (~category, ~title, ~expectation=?, predicate) => {
   category,
   title,
   expectation,
   predicate,
 }
 
-let fromPredicateAsync = (~category, ~title, ~expectation, predicate) =>
-  fromResultAsync(~category, ~title, ~expectation, () =>
+let fromPredicateAsync = (~category, ~title, ~expectation=?, predicate) =>
+  fromResultAsync(~category, ~title, ~expectation?, () =>
     predicate()->Promise.then(success => Promise.resolve(success ? Ok() : Error("")))
   )
 
@@ -78,11 +78,21 @@ let run = async i => {
   }
 }
 
-let toSummaryString = i => `${i.category} | ${i.title} | ${i.expectation}`
+let toSummaryString = i => {
+  let expectation = switch i->expectation {
+  | None => ""
+  | Some(expectation) => `| ${expectation}`
+  }
+  `${i.category} | ${i.title} ${expectation}`
+}
 
 let toDetailString = (i, message) => {
   let message = message == "" ? "" : `\n${message}`
-  `\n==== FAIL ${i.category} | ${i.title} | ${i.expectation} ====${message}`
+  let expectation = switch i->expectation {
+  | None => ""
+  | Some(expectation) => `| ${expectation}`
+  }
+  `\n==== FAIL ${i.category} | ${i.title} ${expectation} ====${message}`
 }
 
 let runSuite = async (~filter=_ => true, ~onlyShowFailures=false, tests) => {
