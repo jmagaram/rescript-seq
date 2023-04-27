@@ -48,6 +48,10 @@ let find = (xx, f) =>
   | Next(x, _) => Some(x)
   }
 
+/**
+`mapNext(source, mapper)` is a convenience function that helps create sequence
+functions where `End` maps to `End` but `Next` maps to something else.
+*/
 let mapNext = (xx, f) =>
   (. ()) =>
     switch xx->nextNode {
