@@ -350,7 +350,7 @@ let intersperseWith = (xx, separator) => {
 
 let intersperse = (xx, separator) => xx->intersperseWith(() => separator)
 
-module UncurriedDeferred = {
+module Cache = {
   type t<'a> = (. unit) => 'a
 
   type toLazy<'a> = t<'a> => Lazy.t<'a>
@@ -362,12 +362,12 @@ module UncurriedDeferred = {
   type fromLazy<'a> = Lazy.t<'a> => t<'a>
   let fromLazy: fromLazy<'a> = f => (. ()) => Lazy.force(f)
 
-  type memoize<'a> = t<'a> => t<'a>
-  let memoize: memoize<'a> = f => f->toLazy->fromLazy
+  type make<'a> = t<'a> => t<'a>
+  let make: make<'a> = f => f->toLazy->fromLazy
 }
 
 let rec cache = seq =>
-  UncurriedDeferred.memoize((. ()) =>
+  Cache.make((. ()) =>
     switch seq->nextNode {
     | End => End
     | Next(value, seq) => Next(value, cache(seq))
