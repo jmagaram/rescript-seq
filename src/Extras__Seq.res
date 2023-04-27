@@ -21,6 +21,17 @@ let startWith = (xx, x) => (. ()) => Next(x, xx)
 
 let nextNode = (xx: t<'a>) => xx(.)
 
+/**
+`mapNext(source, mapper)` is a convenience function that helps create sequence
+functions where `End` maps to `End` but `Next` maps to something else.
+*/
+let mapNext = (xx, f) =>
+  (. ()) =>
+    switch xx->nextNode {
+    | End => End
+    | Next(x, xx) => f(x, xx)
+    }
+
 let headTail = xx =>
   switch xx->nextNode {
   | End => None
@@ -47,17 +58,6 @@ let find = (xx, f) =>
   | End => None
   | Next(x, _) => Some(x)
   }
-
-/**
-`mapNext(source, mapper)` is a convenience function that helps create sequence
-functions where `End` maps to `End` but `Next` maps to something else.
-*/
-let mapNext = (xx, f) =>
-  (. ()) =>
-    switch xx->nextNode {
-    | End => End
-    | Next(x, xx) => f(x, xx)
-    }
 
 let rec concat = (xx, yy) =>
   (. ()) => {
