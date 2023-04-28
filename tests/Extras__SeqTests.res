@@ -664,6 +664,7 @@ let takeTests = makeSeqEqualsTests(
     ~a=() => S.range(1, 999_999)->S.last,
     ~b=Some(999_999),
   ),
+  willNotThrow(~title="take", ~expectation="lazy", () => death()->S.take(99)),
   willNotThrow(~title="take", ~expectation="if zero, do not iterate anything", () =>
     death()->S.take(0)->S.consume
   ),
