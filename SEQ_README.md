@@ -13,7 +13,7 @@ Highlights:
 - Comprehensive test suite
 - Written 100% in ReScript. Look at the tests and code to gain deeper understanding of how it works.
 - Full [suite of > 90 functions](#functions) based on researching other libraries and languages
-- **Build sequences** using `fromArray`, `range`, `unfold`, `cycle`, `repeat` and others. This enables functionality similar to [JavaScript generators](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Generator).
+- **Build sequences** using `fromArray`, `range`, `unfold`, `cycle`, `replicate` and others. This enables functionality similar to [JavaScript generators](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Generator).
 - **Transform** sequences with `map`, `filter`, `take`, `dropWhile`, `scan`, `tap`, `window`, and others.
 - **Combine** multiple sequences with `zip`, `zip3`, `map2`, `map3`, `sortedMerge`, `interleave` and others.
 - **Calculate** values with `reduce`, `some`, `findMap`, `isSortedBy`, `minBy`, `toArray` and others.
@@ -49,8 +49,8 @@ let onceWith: (unit => 'a) => t<'a>
 let permutations: (t<'a>, int) => t<(int, t<'a>)>
 let range: (int, int) => t<int>
 let rangeMap: (int, int, int => 'a) => t<'a>
-let repeat: (int, 'a) => t<'a>
-let repeatWith: (int, unit => 'a) => t<'a>
+let replicate: (int, 'a) => t<'a>
+let replicateWith: (int, unit => 'a) => t<'a>
 let unfold: ('a, 'a => option<('b, 'a)>) => t<'b>
 
 // Transform

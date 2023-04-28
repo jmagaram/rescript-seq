@@ -290,7 +290,7 @@ let allPairsTests = makeSeqEqualsTests(
       "",
     ),
     (
-      S.allPairs(S.repeatWith(2, countdown(2)), S.repeatWith(2, countdown(2))),
+      S.allPairs(S.replicateWith(2, countdown(2)), S.replicateWith(2, countdown(2))),
       [(2, 2), (2, 1), (1, 2), (1, 1)],
       "cached!",
     ),
@@ -343,10 +343,10 @@ let flatMapTests =
   makeSeqEqualsTests(
     ~title="flatMap",
     [
-      (S.empty->S.flatMap(i => S.repeat(i, i)), [], ""),
-      (S.once(2)->S.flatMap(i => S.repeat(i, 6)), [6, 6], ""),
+      (S.empty->S.flatMap(i => S.replicate(i, i)), [], ""),
+      (S.once(2)->S.flatMap(i => S.replicate(i, 6)), [6, 6], ""),
       (S.once(2)->S.flatMap(_ => S.empty), [], ""),
-      (S.range(1, 3)->S.flatMap(i => S.repeat(i, i)), [1, 2, 2, 3, 3, 3], ""),
+      (S.range(1, 3)->S.flatMap(i => S.replicate(i, i)), [1, 2, 2, 3, 3, 3], ""),
       (S.range(1, 3)->S.flatMap(_ => S.empty), [], ""),
       (S.range(1, 3)->S.flatMap(i => S.once(i)), [1, 2, 3], ""),
     ],
@@ -354,7 +354,8 @@ let flatMapTests =
     valueEqual(
       ~title="flatMap",
       ~expectation="million won't overflow",
-      ~a=() => S.repeat(1000, 1)->S.flatMap(_ => S.repeat(1000, 1))->S.concat(S.once(999))->S.last,
+      ~a=() =>
+        S.replicate(1000, 1)->S.flatMap(_ => S.replicate(1000, 1))->S.concat(S.once(999))->S.last,
       ~b=Some(999),
     ),
   ])
@@ -425,7 +426,7 @@ let flattenTests = makeSeqEqualsTests(
   ~title="flatten",
   [
     (S.once(S.empty)->S.flatten, [], ""),
-    (S.range(1, 3)->S.map(i => S.repeat(i, i))->S.flatten, [1, 2, 2, 3, 3, 3], ""),
+    (S.range(1, 3)->S.map(i => S.replicate(i, i))->S.flatten, [1, 2, 2, 3, 3, 3], ""),
     (S.empty->S.flatten, [], ""),
   ],
 )
@@ -619,29 +620,29 @@ let fromArrayTests = {
   Js.Array2.concat(basicTests, throwsTests)
 }
 
-let repeatTests = makeSeqEqualsTests(
-  ~title="repeat",
+let replicateTests = makeSeqEqualsTests(
+  ~title="replicate",
   [
-    (S.repeat(0, "x"), [], ""),
-    (S.repeat(1, "x"), ["x"], "x"),
-    (S.repeat(2, "x"), ["x", "x"], ""),
-    (S.repeat(3, "x"), ["x", "x", "x"], ""),
+    (S.replicate(0, "x"), [], ""),
+    (S.replicate(1, "x"), ["x"], "x"),
+    (S.replicate(2, "x"), ["x", "x"], ""),
+    (S.replicate(3, "x"), ["x", "x", "x"], ""),
   ],
 )
 
-let repeatWithTests = makeSeqEqualsTests(
-  ~title="repeatWith",
+let replicateWithTests = makeSeqEqualsTests(
+  ~title="replicateWith",
   [
-    (S.repeatWith(0, () => "x"), [], ""),
-    (S.repeatWith(1, () => "x"), ["x"], "x"),
-    (S.repeatWith(2, () => "x"), ["x", "x"], ""),
-    (S.repeatWith(3, () => "x"), ["x", "x", "x"], ""),
+    (S.replicateWith(0, () => "x"), [], ""),
+    (S.replicateWith(1, () => "x"), ["x"], "x"),
+    (S.replicateWith(2, () => "x"), ["x", "x"], ""),
+    (S.replicateWith(3, () => "x"), ["x", "x", "x"], ""),
   ],
 )
 
 let foreverTests = [
   valueEqual(
-    ~title="repeatInfinite",
+    ~title="forever",
     ~expectation="millions",
     ~a=() => S.forever("x")->S.indexed->S.takeUntil(((_, inx)) => inx == 999_999)->S.last,
     ~b=Some(("x", 999_999)),
@@ -1014,7 +1015,7 @@ let filterTests =
     seqEqual(
       ~title="filteri",
       ~expectation="when skipping millions => no stack problem",
-      ~a=() => S.repeat(999_999, 1)->S.concat(2->S.once)->S.filteri((value, _) => value != 1),
+      ~a=() => S.replicate(999_999, 1)->S.concat(2->S.once)->S.filteri((value, _) => value != 1),
       ~b=[2],
     ),
   ])
@@ -1185,7 +1186,7 @@ let lengthTests = [
   valueEqual(
     ~title="length",
     ~expectation="millions",
-    ~a=() => S.repeat(999_999, 1)->S.length,
+    ~a=() => S.replicate(999_999, 1)->S.length,
     ~b=999_999,
   ),
 ]
@@ -1769,7 +1770,7 @@ let (combinationTests, permutationTests) = {
     ),
     valueEqual(
       ~title,
-      ~a=() => S.repeatWith(3, throwIfInvoked)->f(1000)->S.take(0)->S.last,
+      ~a=() => S.replicateWith(3, throwIfInvoked)->f(1000)->S.take(0)->S.last,
       ~b=None,
       ~expectation="totally lazy",
     ),
@@ -1938,8 +1939,8 @@ let tests =
     rangeMapTests,
     rangeTests,
     reduceTests,
-    repeatTests,
-    repeatWithTests,
+    replicateTests,
+    replicateWithTests,
     reverseTests,
     sampleBinaryDigits,
     sampleChunkBySize,

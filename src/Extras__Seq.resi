@@ -48,15 +48,15 @@ Seq.init(3, inx => inx * 2) // [0, 2, 4]
 let init: (int, int => 'a) => t<'a>
 
 /**
-`repeat(count, item)` is the sequence of `item` repeated exacly `count` times.
+`replicate(count, item)` is the sequence of `item` repeated exacly `count` times.
 */
-let repeat: (int, 'a) => t<'a>
+let replicate: (int, 'a) => t<'a>
 
 /**
-`repeatWith(count, f)` is the sequence of length `count` where `f()` is called
-to generate every item.
+`replicateWith(count, f)` is the sequence of length `count` where `f()` is called
+to generate each item.
 */
-let repeatWith: (int, unit => 'a) => t<'a>
+let replicateWith: (int, unit => 'a) => t<'a>
 
 /**
 `forever(item)` is the sequence of `item` repeated forever.

@@ -4,6 +4,7 @@
 - Fix bug in `Seq.tail`; was not completely lazy
 - Fix bug in `Seq.drop`; was not completely lazy
 - Fix bug in `Seq.findMap` for nested options
+- Rename `repeat` to `replicate`; more common usage in other Seq libraries
 - Remove `Array.fromSeed`; use Seq module instead
 - Remove `Array.pairs`; use Seq module instead
 - Remove `Array.filterSomeWith`

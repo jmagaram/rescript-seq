@@ -19,7 +19,7 @@ let aa = Seq.range(1, 100)
 let bb = Seq.iterate(2, i => i * 2)->Seq.takeWhile(i => i < 1000)
 let cc = Seq.foreverWith(() => Js.Math.random())
 let dd = [1, 3, 7, 2]->Seq.fromArray->Seq.cycle
-let ee = Seq.repeat(100, "x")->Seq.toArray
+let ee = Seq.replicate(100, "x")->Seq.toArray
 let ff = Seq.rangeMap(99, 1, i => i * 3)
 let gg = Seq.once("Hello!")
 

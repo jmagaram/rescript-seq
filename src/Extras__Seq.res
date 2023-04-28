@@ -137,13 +137,13 @@ let rec unfold = (seed, f) =>
 
 let init = (count, f) => unfold(0, i => i < count ? Some(f(i), i + 1) : None)
 
-let repeat = (count, value) => unfold(0, i => i < count ? Some(value, i + 1) : None)
+let replicate = (count, value) => unfold(0, i => i < count ? Some(value, i + 1) : None)
 
 let rec forever = value => (. ()) => Next(value, forever(value))
 
 let rec foreverWith = f => (. ()) => Next(f(), foreverWith(f))
 
-let repeatWith = (count, value) => unfold(1, i => i <= count ? Some(value(), i + 1) : None)
+let replicateWith = (count, value) => unfold(1, i => i <= count ? Some(value(), i + 1) : None)
 
 let iterate = (seed, f) => unfold(seed, i => Some(i, f(i)))
 
@@ -452,7 +452,7 @@ let chunkBySize = (xx, length) => {
   }
   xx
   ->map(i => Some(i))
-  ->concat(repeat(length - 1, None))
+  ->concat(replicate(length - 1, None))
   ->scani(~zero=[], (~sum, ~val, ~inx) => {
     switch val {
     | None => sum
@@ -536,7 +536,7 @@ let rec map2 = (xx, yy, f) =>
   (. ()) => {
     let xx = xx->headTail
     let yy = yy->headTail
-    Extras__Option.map2(xx, yy, ((x, xx), (y, yy)) => Next(
+    OptionEx.map2(xx, yy, ((x, xx), (y, yy)) => Next(
       f(x, y),
       map2(xx, yy, f),
     ))->Option.getWithDefault(End)
@@ -683,7 +683,7 @@ let windowAhead = (xx, size) => {
   }
   xx
   ->map(i => Some(i))
-  ->concat(repeat(size - 1, None))
+  ->concat(replicate(size - 1, None))
   ->scani(~zero=[], (~sum, ~val as i, ~inx) => {
     if inx >= size {
       sum->Js.Array2.shift->ignore
