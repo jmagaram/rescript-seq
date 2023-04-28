@@ -1,6 +1,8 @@
 ## Version 2.0.0
 
 - Fix bug in `Seq.filterMap` for nested options
+- Fix bug in `Seq.tail`; was not completely lazy
+- Fix bug in `Seq.drop`; was not completely lazy
 - Remove `Array.fromSeed`; use Seq module instead
 - Remove `Array.pairs`; use Seq module instead
 - Remove `Array.filterSomeWith`

@@ -395,6 +395,7 @@ let dropTests = makeSeqEqualsTests(
     (S.once(4)->S.drop(1), [], ""),
   ],
 )->Js.Array2.concat([
+  willNotThrow(~title="drop", ~expectation="lazy", ~f=() => death()->S.drop(1)),
   valueEqual(
     ~title="drop",
     ~expectation="if drop 0, return same seq instance",
@@ -1214,6 +1215,18 @@ let headTailTests = [
   ),
 ]
 
+let tailTests = [
+  willNotThrow(~title="tail", ~expectation="lazy", ~f=() => death()->S.tail),
+  seqEqual(~title="tail", ~expectation="if empty => empty", ~a=() => S.empty->S.tail, ~b=[]),
+  seqEqual(~title="tail", ~expectation="if singleton => empty", ~a=() => S.once(1)->S.tail, ~b=[]),
+  seqEqual(
+    ~title="tail",
+    ~expectation="if many => get tail",
+    ~a=() => S.range(1, 5)->S.tail,
+    ~b=[2, 3, 4, 5],
+  ),
+]
+
 let headTests = [
   valueEqual(~title="head", ~expectation="when empty", ~a=() => S.empty->S.head, ~b=None),
   valueEqual(
@@ -1901,6 +1914,7 @@ let tests =
     takeTests,
     takeUntilTests,
     takeWhileTests,
+    tailTests,
     tapTests,
     toArrayTests,
     toListTests,

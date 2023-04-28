@@ -107,15 +107,6 @@ let head = xx =>
   | Next(x, _) => Some(x)
   }
 
-let rec forEach = (xx, f) =>
-  switch xx->headTail {
-  | None => ()
-  | Some(x, xx) => {
-      f(x)
-      forEach(xx, f)
-    }
-  }
-
 let indexed = xx => {
   let rec go = (xx, index) =>
     (. ()) =>
@@ -125,6 +116,17 @@ let indexed = xx => {
       }
   go(xx, 0)
 }
+
+let rec forEach = (xx, f) =>
+  switch xx->headTail {
+  | None => ()
+  | Some(x, xx) => {
+      f(x)
+      forEach(xx, f)
+    }
+  }
+
+let forEachi = (xx, f) => xx->indexed->forEach(((x, inx)) => f(x, inx))
 
 let rec unfold = (seed, f) =>
   (. ()) =>
@@ -239,24 +241,24 @@ let take = (xx, count) => {
 let headTails = xx =>
   unfold(xx, xx => xx->headTail->Option.flatMap(((_, xx) as ht) => Some(ht, xx)))
 
-@inline let snd = ((_, b)) => b
-@inline let fst = ((a, _)) => a
+let rec dropEager = (xx, count) =>
+  switch count {
+  | 0 => xx
+  | count =>
+    switch xx->headTail {
+    | None => empty
+    | Some(_, xx) => dropEager(xx, count - 1)
+    }
+  }
 
 let drop = (xx, count) =>
   switch count {
   | 0 => xx
-  | n if n < 0 =>
+  | count if count < 0 =>
     InvalidArgument(
       `'drop' requires a count of zero or more but you asked for ${count->Belt.Int.toString}`,
     )->raise
-  | count =>
-    xx
-    ->headTails
-    ->indexed
-    ->find(((_, inx)) => inx == count - 1)
-    ->Option.map(fst)
-    ->Option.map(snd)
-    ->Option.getWithDefault(empty)
+  | count => delay(() => dropEager(xx, count))
   }
 
 let rec filter = (xx, f) =>
@@ -499,8 +501,6 @@ let toArray = xx =>
     xx
   })
 
-let forEachi = (xx, f) => xx->indexed->forEach(((x, inx)) => f(x, inx))
-
 let some = (xx, f) => xx->find(f)->Option.isSome
 
 let every = (xx, f) => xx->find(i => !f(i))->Option.isNone
@@ -596,7 +596,12 @@ let isEmpty = xx =>
   | _ => false
   }
 
-let tail = xx => xx->drop(1)
+let tail = xx =>
+  (. ()) =>
+    switch xx->headTail {
+    | None => End
+    | Some(_, xx) => xx->nextNode
+    }
 
 let minBy = (xx, cmp) =>
   xx->reduce(None, (sum, x) => {
