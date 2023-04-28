@@ -1,27 +1,31 @@
 ## Version 2.0.0
 
-- Fix bug in `Seq.filterMap` for nested options
-- Fix bug in `Seq.tail`; was not completely lazy
-- Fix bug in `Seq.drop`; was not completely lazy
-- Fix bug in `Seq.findMap` for nested options
-- Rename `repeat` to `replicate`; more common usage in other Seq libraries
-- Remove `Array.fromSeed`; use Seq module instead
-- Remove `Array.pairs`; use Seq module instead
-- Remove `Array.filterSomeWith`
-- Rename exception from the spelled-wrong `ArgumentOfOfRange` to `InvalidArgument`
-- Rename `Array.exactlyOneValue` to `Array.exactlyOne` like `Seq.exactlyOne`
-- Rename `Seq.singleton` to `Seq.once` and add `Seq.onceWith`; like Rust does it
-- Rename `Seq.everyOrEmpty` to `Seq.every` to be more like array; less cumbersome
-- Rename `Seq.allSome` and `Seq.allOk` to `Seq.everySome` and `Seq.everyOk`
-- Remove `Seq.characters`; many ways to split a string and with Core it will feel better since you can do `String.split` not `Js.String2.split`.
-- Rename `Seq.joinString` to `Seq.join` like `Array.join`. Require a separator character.
-- Rename `Seq.takeAtMost` to `Seq.take` since that is the TC39 proposal name and other packages use the same name. The name is slightly inaccurate, but then so is `drop`.
-- Add `Seq.toList`
-- Replace `Array.fromOneValue` with `Array.of1`
-- Replace `NonEmptyArray.fromOneValue` with `of1`, `of2`, `of3` and `ofMany`, all zero-cost bindings to `Array.of`.
-- `Test.fromResult` and `Test.fromPredicate` and async flavors; enable displaying message when test fails. Also show detailed of test failures.
-- Test expectation is optional
-- Remove `Seq.startWith` and `Seq.endWith`; can use `concat` and `prepend` with `Seq.once`.
+- Fixed bugs
+  - `Seq.filterMap` didn't work with nested options
+  - `Seq.tail` was not completely lazy
+  - `Seq.drop` was not completely lazy
+  - `Seq.findMap` didn't work with nested options
+- Rename
+  - `Seq.take` not `Seq.takeAtMost` since that is the TC39 proposal name and other packages use the same name. The name (and `drop`) is slightly inaccurate.
+  - `repeat` to `replicate`; more common usage in other Seq libraries
+  - `InvalidArgument` exception not `ArgumentOfOfRange` (spelled wrong)
+  - `Seq.every` not `Seq.everyOrEmpty` to be less cumbersome and more like array
+  - `Seq.join` like `Array.join` rather than `Seq.joinString`. Also require a separator character.
+  - `Seq.everyOk` not `Seq.allSome`
+  - `Seq.everySome` not `Seq.allSome`
+  - `Seq.once` not `Seq.singleton`; do it like Rust. Also provide `Seq.onceWith`
+  - `Array.exactlyOne` not `Array.exactlyOneValue` like `Seq.exactlyOne`
+  - `Array.of1` not `Array.fromOneValue`
+- Remove
+  - `Array.fromSeed`; use Seq module instead
+  - `Array.pairs`; use Seq module instead
+  - `Array.filterSomeWith`; use Seq module instead
+  - `Seq.characters`; many ways to split a string and with Core it will feel better since you can do `String.split` not `Js.String2.split`.
+  - `Seq.startWith` and `Seq.endWith`; use `concat` and `prepend` with `Seq.once`.
+- Add
+  - `Seq.toList`
+  - `NonEmptyArray.of1`, `of2`, `of3` and `ofMany`, all zero-cost bindings to `Array.of`.
+  - In the test framework, enable displaying detailed messages when a test fails. Provide `Test.fromResult` and `Test.fromPredicate`. Also `expectThrow` and `expectsNotThrow`. The expectation text is optional.
 
 ## Version 1.1.1
 
