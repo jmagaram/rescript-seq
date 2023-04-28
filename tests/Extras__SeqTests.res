@@ -33,7 +33,7 @@ invoked more than 3 times. Also this is useful when testing sequences that rely
 on persistent values. For example, the `allPairs` function should cache the
 returned values before creating the pairs.
 */
-let callCount = () => {
+let callCountForever = () => {
   let count = ref(0)
   S.foreverWith(() => {
     count := count.contents + 1
@@ -1638,7 +1638,7 @@ let (combinationTests, permutationTests) = {
       ),
       (
         () =>
-          callCount()
+          callCountForever()
           ->S.map(i => i == 1 ? "a" : i == 2 ? "b" : i == 3 ? "c" : "x")
           ->S.take(3)
           ->S.combinations(3)
@@ -1682,7 +1682,7 @@ let (combinationTests, permutationTests) = {
       ),
       (
         () =>
-          callCount()
+          callCountForever()
           ->S.map(i => i == 1 ? "a" : i == 2 ? "b" : i == 3 ? "c" : "x")
           ->S.take(3)
           ->S.permutations(3)
