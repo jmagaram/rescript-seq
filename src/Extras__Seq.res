@@ -34,6 +34,7 @@ sometimes simpler to use this in pipeline mode because if you put a `(.)` at the
 end it latches on to the very last item in the sequence rather than the result
 of everything that came before.
 */
+@inline
 let nextNode = (xx: t<'a>) => xx(.)
 
 /**
@@ -76,7 +77,7 @@ let rec concat = (xx, yy) =>
     }
   }
 
-let prepend = (xx, yy) => concat(yy, xx)
+@inline let prepend = (xx, yy) => concat(yy, xx)
 
 let rec flatMap = (xx, f) =>
   (. ()) =>
