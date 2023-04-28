@@ -36,10 +36,15 @@ of everything that came before.
 */
 let nextNode = (xx: t<'a>) => xx(.)
 
+/**
+This tries to consume the first item in the sequence and returns `None` if the
+sequence is empty or a `Some` with the head and tail. This is the same as
+`uncons` but with a different name. It could be named `match` perhaps.
+*/
 let headTail = xx =>
   switch xx->nextNode {
   | End => None
-  | Next(xx, x) => Some(xx, x)
+  | Next(x, xx) => Some(x, xx)
   }
 
 /**
