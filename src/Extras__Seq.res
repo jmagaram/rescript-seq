@@ -147,17 +147,15 @@ let rec tap = (xx, f) =>
       }
     }
 
-let cycleNonEmpty = xx => {
-  let rec go = yy =>
+let cycle = xx =>
     (. ()) =>
-      switch yy->nextNode {
-      | End => go(xx)(.)
-      | Next(y, yy) => Next(y, go(yy))
+    switch xx->headTail {
+    | None => End
+    | Some(x, xx') => {
+        let rec cycleNonEmpty = xx => (. ()) => concat(xx, cycleNonEmpty(xx))->nextNode
+        cons(x, xx')->concat(cycleNonEmpty(xx))->nextNode
       }
-  go(xx)
 }
-
-let cycle = xx => xx->mapNext((x, xx') => cons(x, xx')->concat(xx->cycleNonEmpty)->nextNode)
 
 let fromArray = (~start=?, ~end=?, xx: array<'a>) => {
   switch xx->Extras__Array.isEmpty {

@@ -239,8 +239,8 @@ let cycleTests = makeSeqEqualsTests(
     ([1, 2, 3]->S.fromArray->S.cycle->S.take(9), [1, 2, 3, 1, 2, 3, 1, 2, 3], ""),
     (S.forever(1)->S.cycle->S.take(4), [1, 1, 1, 1], "when infinite can still cycle"),
     (
-      callCountForever()->S.take(3)->S.cycle->S.take(6),
-      [1, 2, 3, 4, 5, 6],
+      callCountForever()->S.take(3)->S.cycle->S.take(9),
+      [1, 2, 3, 4, 5, 6, 7, 8, 9],
       "the process to generate items is cycled, not the items themselves.",
     ),
     (
@@ -258,6 +258,12 @@ let cycleTests = makeSeqEqualsTests(
       1
     },
     ~b=1,
+  ),
+  valueEqual(
+    ~title="cycle",
+    ~expectation="millions",
+    ~a=() => S.range(1, 1000)->S.cycle->S.take(1000 * 1000)->S.last,
+    ~b=Some(1000),
   ),
 ])
 
