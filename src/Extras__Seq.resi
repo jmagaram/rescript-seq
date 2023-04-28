@@ -666,5 +666,3 @@ of items in `source` based on their indexed position (not value), from 1 to
 tuple. 
 */
 let permutations: (t<'a>, int) => t<(int, t<'a>)>
-
-let distinctBy: (t<'a>, ('a, 'a) => int) => t<'a>
