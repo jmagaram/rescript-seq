@@ -4,6 +4,15 @@ module OptionEx = Extras__Option
 
 exception InvalidArgument(string)
 
+/**
+This is the type definition of a sequence. It is basically a function that
+returns either `End`, meaning there is nothing left in the sequence, or `Next`,
+indicating the next item. It uses uncurried mode since the resultant JavaScript
+looked a bit simpler to me. This is an abstract type in case we want to change
+the implementation later to use an `option` perhaps. Or maybe generate more
+performant code for sequences that wrap arrays. Note that the `unfold` function
+is nearly identical to this implementation, so not much flexibility is lost.
+*/
 type rec t<'a> = (. unit) => node<'a>
 and node<'a> =
   | End
@@ -14,22 +23,18 @@ let delay = generator => (. ()) => generator()(.)
 let empty = (. ()) => End
 
 let once = x => (. ()) => Next(x, empty)
+
 let onceWith = f => (. ()) => Next(f(), empty)
 
 let cons = (x, xx) => (. ()) => Next(x, xx)
 
-let nextNode = (xx: t<'a>) => xx(.)
-
 /**
-`mapNext(source, mapper)` is a convenience function that helps create sequence
-functions where `End` maps to `End` but `Next` maps to something else.
+Internal helper function to generate the next node in a sequence. It is
+sometimes simpler to use this in pipeline mode because if you put a `(.)` at the
+end it latches on to the very last item in the sequence rather than the result
+of everything that came before.
 */
-let mapNext = (xx, f) =>
-  (. ()) =>
-    switch xx->nextNode {
-    | End => End
-    | Next(x, xx) => f(x, xx)
-    }
+let nextNode = (xx: t<'a>) => xx(.)
 
 let headTail = xx =>
   switch xx->nextNode {
@@ -148,14 +153,14 @@ let rec tap = (xx, f) =>
     }
 
 let cycle = xx =>
-    (. ()) =>
+  (. ()) =>
     switch xx->headTail {
     | None => End
     | Some(x, xx') => {
         let rec cycleNonEmpty = xx => (. ()) => concat(xx, cycleNonEmpty(xx))->nextNode
         cons(x, xx')->concat(cycleNonEmpty(xx))->nextNode
       }
-}
+    }
 
 let fromArray = (~start=?, ~end=?, xx: array<'a>) => {
   switch xx->Extras__Array.isEmpty {
@@ -262,20 +267,28 @@ let rec filter = (xx, f) =>
 let filteri = (xx, f) => xx->indexed->filter(((x, inx)) => f(x, inx))->map(((v, _)) => v)
 
 let rec takeWhile = (xx, predicate) =>
-  xx->mapNext((x, xx) =>
-    switch predicate(x) {
-    | false => End
-    | true => Next(x, takeWhile(xx, predicate))
+  (. ()) => {
+    switch xx->nextNode {
+    | End => End
+    | Next(x, xx) =>
+      switch predicate(x) {
+      | true => Next(x, takeWhile(xx, predicate))
+      | false => End
+      }
     }
-  )
+  }
 
-let rec takeUntil = (xx, f) =>
-  xx->mapNext((x, xx) => {
-    switch f(x) {
-    | false => Next(x, takeUntil(xx, f))
-    | true => Next(x, empty)
+let rec takeUntil = (xx, predicate) =>
+  (. ()) => {
+    switch xx->nextNode {
+    | End => End
+    | Next(x, xx) =>
+      switch predicate(x) {
+      | true => Next(x, empty)
+      | false => Next(x, takeUntil(xx, predicate))
+      }
     }
-  })
+  }
 
 let filterMapi = (xx, f) => {
   let rec go = xx =>
