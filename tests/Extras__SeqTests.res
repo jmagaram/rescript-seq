@@ -13,6 +13,7 @@ module String = Js.String2
 let intToString = Belt.Int.toString
 
 let intCmp = Ex.Cmp.int
+let intOptionCmp = (a, b) => Belt.Option.cmp(a, b, intCmp)
 let stringCmp = (a: string, b: string) => a < b ? -1 : a > b ? 1 : 0
 
 let characters = s => s->Js.String2.split("")->S.fromArray
