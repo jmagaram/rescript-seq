@@ -473,11 +473,12 @@ let windowTests =
       (S.range(1, 5)->S.take(0)->S.window(1)->S.map(joinInts), [], ""),
     ],
   )->Js.Array2.concat([
-    T.fromPredicate(~category="Seq", ~title="window", ~expectation="when size = 0 => throw", () =>
-      R.fromTryCatch(() => [1, 2, 3]->S.fromArray->S.window(0))->Result.isError
+    willNotThrow(~title="window", ~expectation="lazy", () => death()->S.window(5)),
+    willThrow(~title="window", ~expectation="when size = 0 => throw", () =>
+      S.range(1, 5)->S.window(0)->S.consume
     ),
-    T.fromPredicate(~category="Seq", ~title="window", ~expectation="when size < 0 => throw", () =>
-      R.fromTryCatch(() => [1, 2, 3]->S.fromArray->S.window(-1))->Result.isError
+    willThrow(~title="window", ~expectation="when size < 0 => throw", () =>
+      S.range(1, 5)->S.window(-1)->S.consume
     ),
   ])
 
@@ -504,6 +505,7 @@ let windowAheadBehindTests = (~title, ~function, ~data) =>
   }->Js.Array2.concat([
     willThrow(~title, ~expectation="when size == 0 => throw", () => "abc"->characters->function(0)),
     willThrow(~title, ~expectation="when size < 0 => throw", () => "abc"->characters->function(-1)),
+    willNotThrow(~title, ~expectation="lazy", () => death()->function(1)),
   ])
 
 let windowAheadTests = windowAheadBehindTests(
