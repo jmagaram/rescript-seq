@@ -77,7 +77,14 @@ let iterate: ('a, 'a => 'a) => t<'a>
 
 /**
 `cycle` is the sequence that consists of an infinite number of repetitions of
-the input sequence.
+the input sequence. If the original sequence is empty, the resulting sequence
+will also be empty.
+
+**Note:** The process for generating items is cycled, rather than cycling the
+values produced. For example, if the original sequence is based on a function
+that generates random numbers, then when the sequence repeats entirely new
+random numbers will be produced. If this is not the desired behavior consider
+using `cache` before calling `cycle`.
 */
 let cycle: t<'a> => t<'a>
 
@@ -659,3 +666,5 @@ of items in `source` based on their indexed position (not value), from 1 to
 tuple. 
 */
 let permutations: (t<'a>, int) => t<(int, t<'a>)>
+
+let distinctBy: (t<'a>, ('a, 'a) => int) => t<'a>

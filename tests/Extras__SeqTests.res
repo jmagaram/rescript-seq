@@ -239,9 +239,14 @@ let cycleTests = makeSeqEqualsTests(
     ([1, 2, 3]->S.fromArray->S.cycle->S.take(9), [1, 2, 3, 1, 2, 3, 1, 2, 3], ""),
     (S.forever(1)->S.cycle->S.take(4), [1, 1, 1, 1], "when infinite can still cycle"),
     (
-      callCount()->S.take(3)->S.cycle->S.take(6),
+      callCountForever()->S.take(3)->S.cycle->S.take(6),
       [1, 2, 3, 4, 5, 6],
-      "first value, if generated on demand, if cached and used",
+      "the process to generate items is cycled, not the items themselves.",
+    ),
+    (
+      callCountForever()->S.take(3)->S.cache->S.cycle->S.take(6),
+      [1, 2, 3, 1, 2, 3],
+      "can use cache to cycle values, not the process.",
     ),
   ],
 )->Js.Array2.concat([
