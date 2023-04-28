@@ -419,7 +419,7 @@ let rec cache = xx =>
   Cache.make((. ()) =>
     switch xx->nextNode {
     | End => End
-    | Next(value, seq) => Next(value, cache(seq))
+    | Next(x, xx) => Next(x, cache(xx))
     }
   )
 
