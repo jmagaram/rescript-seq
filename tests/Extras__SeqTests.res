@@ -1106,17 +1106,50 @@ let everyTests = makeValueEqualTests(
   ],
 )
 
-let findMapTests = [
+let findMapTests = makeValueEqualTests(
+  ~title="findMap",
+  [
+    (() => S.range(1, 5)->S.findMap(i => i == 2 ? Some("x") : None), Some("x"), "if found, some"),
+    (() => S.range(1, 5)->S.findMap(_ => None), None, "if not found, none"),
+    (() => S.range(1, 99_999)->S.findMap(i => i == 99_999 ? Some("x") : None), Some("x"), "big"),
+  ],
+)->Js.Array2.concat([
   valueEqual(
     ~title="findMap",
-    ~expectation="if found => Some",
-    ~a=() => S.range(1, 5)->S.findMap(i => i == 2 ? Some("x") : None),
-    ~b=Some("x"),
+    ~expectation="nested options - find Some(Some(_))",
+    ~a=() => [None, Some(Some(1)), Some(None)]->S.fromArray->S.findMap(i => i)->Option.getExn,
+    ~b=Some(1),
   ),
   valueEqual(
     ~title="findMap",
-    ~expectation="if not found => None",
-    ~a=() => S.range(1, 5)->S.findMap(i => i == 99 ? Some("x") : None),
+    ~expectation="nested options - find Some(None)",
+    ~a=() =>
+      [Some(None), None, Some(Some(1)), Some(None)]->S.fromArray->S.findMap(i => i)->Option.getExn,
+    ~b=None,
+  ),
+  valueEqual(
+    ~title="findMap",
+    ~expectation="nested options - find Some(None) (must return as Some(Some(None)))",
+    ~a=() =>
+      [Some(Some(1)), None, Some(None)]
+      ->S.fromArray
+      ->S.findMap(i =>
+        switch i {
+        | Some(None) => Some(Some(None))
+        | _ => None
+        }
+      )
+      ->Option.getExn,
+    ~b=Some(None),
+  ),
+  valueEqual(
+    ~title="findMap",
+    ~expectation="nested options - find None",
+    ~a=() =>
+      [Some(Some(1)), None, Some(None)]
+      ->S.fromArray
+      ->S.findMap(i => i->Option.isNone ? Some(None) : None)
+      ->Option.getExn,
     ~b=None,
   ),
   valueEqual(
@@ -1125,13 +1158,7 @@ let findMapTests = [
     ~a=() => S.range(1, 5)->S.findMapi((n, inx) => n == 3 && inx == 2 ? Some("x") : None),
     ~b=Some("x"),
   ),
-  valueEqual(
-    ~title="findMap",
-    ~expectation="millions",
-    ~a=() => S.range(1, 999_999)->S.findMap(i => i == 999_999 ? Some("x") : None),
-    ~b=Some("x"),
-  ),
-]
+])
 
 let toArrayTests = [
   valueEqual(

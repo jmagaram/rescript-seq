@@ -516,10 +516,21 @@ let some = (xx, f) => xx->find(f)->Option.isSome
 
 let every = (xx, f) => xx->find(i => !f(i))->Option.isNone
 
-let findMapi = (xx, f) =>
-  xx->mapi((x, inx) => f(x, inx))->find(Option.isSome(_))->Option.map(Option.getUnsafe)
+let findMapi = (xx, f) => {
+  let found = xx->indexed->map(((x, inx)) => f(x, inx))->find(Option.isSome)
+  switch found {
+  | None => None
+  | Some(x) => x
+  }
+}
 
-let findMap = (xx, f) => findMapi(xx, (x, _) => f(x))
+let findMap = (xx, f) => {
+  let found = xx->map(f)->find(Option.isSome)
+  switch found {
+  | None => None
+  | Some(x) => x
+  }
+}
 
 let rec map2 = (xx, yy, f) =>
   (. ()) => {
