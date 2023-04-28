@@ -86,7 +86,12 @@ let rec flatMap = (xx, f) =>
     | Next(x, xx) => concat(f(x), flatMap(xx, f))(.)
     }
 
-let flatten = xxx => xxx->flatMap(i => i)
+let rec flatten = xxx =>
+  (. ()) =>
+    switch xxx->nextNode {
+    | End => End
+    | Next(xx, xxx) => concat(xx, flatten(xxx))->nextNode
+    }
 
 let rec map = (xx, f) =>
   (. ()) => {
