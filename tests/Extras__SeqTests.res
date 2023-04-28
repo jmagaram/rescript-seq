@@ -459,6 +459,7 @@ let tapTests = [
     },
     ~b=[1, 2, 3, 4, 5],
   ),
+  willNotThrow(~title="tap", ~expectation="lazy", () => death()->S.tap(_ => Js.log("Boom!"))),
 ]
 
 let windowTests =
