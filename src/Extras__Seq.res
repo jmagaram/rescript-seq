@@ -415,9 +415,9 @@ module Cache = {
   let make: make<'a> = f => f->toLazy->fromLazy
 }
 
-let rec cache = seq =>
+let rec cache = xx =>
   Cache.make((. ()) =>
-    switch seq->nextNode {
+    switch xx->nextNode {
     | End => End
     | Next(value, seq) => Next(value, cache(seq))
     }
