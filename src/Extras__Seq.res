@@ -141,7 +141,7 @@ let repeat = (count, value) => unfold(0, i => i < count ? Some(value, i + 1) : N
 
 let rec forever = value => (. ()) => Next(value, forever(value))
 
-let rec foreverWith = f => (. ()) => Next(f(), delay(() => foreverWith(f)))
+let rec foreverWith = f => (. ()) => Next(f(), foreverWith(f))
 
 let repeatWith = (count, value) => unfold(1, i => i <= count ? Some(value(), i + 1) : None)
 

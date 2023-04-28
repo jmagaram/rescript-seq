@@ -26,6 +26,17 @@ let trueAlways = _ => true
 let falseAlways = _ => false
 
 /**
+Generates a function that when called returns the number of times it has been invoked.
+*/
+let callCount = () => {
+  let count = ref(0)
+  () => {
+    count := count.contents + 1
+    count.contents
+  }
+}
+
+/**
 Constructs an infinite sequence that returns the number of times it has been
 invoked. Useful for tracking that various sequences are completely lazy. For
 example, if you use this sequence and do a `take(3)` then it shouldn't be
@@ -34,11 +45,8 @@ on persistent values. For example, the `allPairs` function should cache the
 returned values before creating the pairs.
 */
 let callCountForever = () => {
-  let count = ref(0)
-  S.foreverWith(() => {
-    count := count.contents + 1
-    count.contents
-  })
+  let f = callCount()
+  S.foreverWith(f)
 }
 
 /**
@@ -672,22 +680,15 @@ let takeTests = makeSeqEqualsTests(
   ),
 ])
 
-let foreverWithTests = {
-  let callCount = () => {
-    let count = ref(0)
-    () => {
-      count := count.contents + 1
-      count.contents
-    }
-  }
+let foreverWithTests =
   makeSeqEqualsTests(
     ~title="foreverWith",
     [
-      (S.foreverWith(callCount())->S.take(0), [], ""),
-      (S.foreverWith(callCount())->S.take(1), [1], ""),
-      (S.foreverWith(callCount())->S.take(5), [1, 2, 3, 4, 5], ""),
+      (callCountForever()->S.take(0), [], ""),
+      (callCountForever()->S.take(1), [1], ""),
+      (callCountForever()->S.take(5), [1, 2, 3, 4, 5], ""),
       (
-        S.foreverWith(callCount())
+        callCountForever()
         ->S.take(999_999)
         ->S.last
         ->Option.map(S.once)
@@ -696,8 +697,9 @@ let foreverWithTests = {
         "",
       ),
     ],
-  )
-}
+  )->Js.Array2.concat([
+    willNotThrow(~title="foreverWith", ~expectation="lazy", ~f=() => S.foreverWith(throwIfInvoked)),
+  ])
 
 let unfoldTests =
   makeSeqEqualsTests(
