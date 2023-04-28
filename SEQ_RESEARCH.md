@@ -1,6 +1,6 @@
 # Research and notes
 
-- [Notes](#notes)
+- [Notes, ideas, etc.](#notes)
 - [TC39 Proposal](#tc39-proposal)
 - [OCaml](#ocaml)
 - [F#](#f)
@@ -15,12 +15,46 @@
 
 ## Notes
 
-- Remove `intersperseWith`; rarely will be used
-- Consider refactoring string functions; many ways to split a string and many ways to join
-- Consider naming of `startWith` versus `prependItem` or `endWith` and `appendItem` for more discoverability. Also other packages have a `startsWith` to check if the beginning matches. Note rxjs has a `startWith` which is where I got mine.
+- Haskell uses `replicate` to replicate a specific number of times and `repeat` for repeating forever
+- `groupBy`, `split`, etc.
 - `uniqueBy` could be very useful; requires scan which is advanced to implement
-- TakeN from end? Is this a window behind, take last, and then option convert to empty?
 - Remove some functions from array since in seq now
+- Look at API breaking functions in other parts of the extras package
+- Look at all code for problems
+- Separate project?
+
+### Proposed feature: distinctBy
+
+It is generally useful to filter out duplicate elements on demand. I got this working where the user provides a comparison function `('a,'a)=>int` which is really easy to do. The code relies on `Belt.Set` under-the-hood. `Belt.Set` relies on a hardcoded module for each type you want to put in the set, so I made it a type `unknown` and did some `Obj.magic` to make it work. There are some things to think about.
+
+My implementation was hardcoded to a specific equality test. Better performance might be possible using hash equality or the built-in JavaScript `Set`. But adding this level of customization is messy. We'd need separate functions for each kind of test, like `distinctByHash`, `distinctByComparison`, etc. Or one `distinctBy` that takes an `equality<'a>` to determine what path to take.
+
+It only works with `Belt.Set` because that is an immutable set. I generated unique items on demand, which is pretty cool. If a mutable set it used, the sequence can't be iterated more than once and it is probably better to generate all unique items at once.
+
+The user can write their own `distinctBy` and use whatever kind of equality and set they want. They can use a mutable set for example. Not too difficult. It's just a `reduce`.
+
+This function should never be called on infinite sequences, unless every item is unique, because once it gets past the last unique item it will search forever for another unique item and will fail.
+
+`F#` has this feature. They eagerly consume all the items and use a mutable set.
+
+```rescript
+let distinctBy = (xx: t<'a>, compare: ('a, 'a) => int) => {
+  module Set = Belt.Set
+  module Comparator = Belt.Id.MakeComparable({
+    type t = unknown
+    let cmp = (a: unknown, b: unknown) => compare((a->Obj.magic: 'a), (b->Obj.magic: 'a))
+  })
+  xx
+  ->scan((None, Set.make(~id=module(Comparator))), ((_, set), x) => {
+    switch set->Set.has((x->Obj.magic: unknown)) {
+    | true => (None, set)
+    | false => (Some(x), set->Set.add((x->Obj.magic: unknown)))
+    }
+  })
+  ->filterMap(((x, _set)) => x)
+}
+
+```
 
 ## TC39 Proposal
 
@@ -127,6 +161,9 @@ https://immutable-js.com/docs/v4.3.0/Seq/
 
 https://hackage.haskell.org/package/base-4.8.1.0/docs/Data-List.html
 
+`prefix` and `drop` do not throw.
+
 ## Racket
 
 https://docs.racket-lang.org/seq/index.html
+`deduplicate` generates a list not a sequence
