@@ -279,26 +279,26 @@ let rec filter = (xx, f) =>
 
 let filteri = (xx, f) => xx->indexed->filter(((x, inx)) => f(x, inx))->map(((v, _)) => v)
 
-let rec takeWhile = (xx, predicate) =>
+let rec takeWhile = (xx, f) =>
   (. ()) => {
     switch xx->nextNode {
     | End => End
     | Next(x, xx) =>
-      switch predicate(x) {
-      | true => Next(x, takeWhile(xx, predicate))
+      switch f(x) {
+      | true => Next(x, takeWhile(xx, f))
       | false => End
       }
     }
   }
 
-let rec takeUntil = (xx, predicate) =>
+let rec takeUntil = (xx, f) =>
   (. ()) => {
     switch xx->nextNode {
     | End => End
     | Next(x, xx) =>
-      switch predicate(x) {
+      switch f(x) {
       | true => Next(x, empty)
-      | false => Next(x, takeUntil(xx, predicate))
+      | false => Next(x, takeUntil(xx, f))
       }
     }
   }
@@ -417,19 +417,19 @@ let allPairs = (xx, yy) => {
   xx->flatMap(x => yy->map(y => (x, y)))
 }
 
-let dropUntil = (xx, predicate) =>
+let dropUntil = (xx, f) =>
   (. ()) =>
     xx
     ->headTails
-    ->find(((x, _)) => predicate(x))
+    ->find(((x, _)) => f(x))
     ->Option.map(((x, xx)) => Next(x, xx))
     ->Option.getWithDefault(End)
 
-let dropWhile = (xx, predicate) =>
+let dropWhile = (xx, f) =>
   (. ()) =>
     xx
     ->headTails
-    ->find(((x, _)) => false == predicate(x))
+    ->find(((x, _)) => false == f(x))
     ->Option.map(((x, xx)) => Next(x, xx))
     ->Option.getWithDefault(End)
 
