@@ -279,10 +279,31 @@ let rec takeUntil = (xx, f) =>
     }
   })
 
-let filterMapi = (xx, f) =>
-  xx->indexed->map(((x, inx)) => f(x, inx))->filter(Option.isSome)->map(Option.getUnsafe)
+let filterMapi = (xx, f) => {
+  let rec go = xx =>
+    switch xx->headTail {
+    | None => None
+    | Some((x, index), xx) =>
+      switch f(x, index) {
+      | None => go(xx)
+      | Some(x) => Some(x, xx)
+      }
+    }
+  unfold(xx->indexed, go)
+}
 
-let filterMap = (xx, f) => xx->map(f)->filter(Option.isSome)->map(Option.getUnsafe)
+let filterMap = (xx, f) => {
+  let rec go = xx =>
+    switch xx->headTail {
+    | None => None
+    | Some(x, xx) =>
+      switch f(x) {
+      | None => go(xx)
+      | Some(x) => Some(x, xx)
+      }
+    }
+  unfold(xx, go)
+}
 
 let filterSome = xx => xx->filterMap(x => x)
 

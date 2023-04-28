@@ -901,7 +901,8 @@ let filterMapTests =
     (S.range(1, 5), i => i == 5 ? Some(99) : None, [99], ""),
     (S.range(1, 5), i => i == 1 || i == 3 ? Some(i * 2) : None, [2, 6], ""),
     (S.range(1, 999_999), i => i == 999_999 ? Some(-i) : None, [-999_999], "millions"),
-  ]->Js.Array2.mapi(((source, f, result, note), inx) =>
+  ]
+  ->Js.Array2.mapi(((source, f, result, note), inx) =>
     seqEqual(
       ~title="filterMap",
       ~expectation=`index ${inx->intToString} ${note}`,
@@ -909,6 +910,23 @@ let filterMapTests =
       ~b=result,
     )
   )
+  ->Js.Array2.concat({
+    let items = [Some(Some(1)), None, Some(None), Some(Some(2)), None, Some(None)]
+    [
+      valueEqual(
+        ~title="filterMap",
+        ~expectation="option of options yields correct values",
+        ~a=() =>
+          items
+          ->S.fromArray
+          ->S.filterMap(i => i)
+          ->S.equals([Some(1), None, Some(2), None]->S.fromArray, (a, b) =>
+            intOptionCmp(a, b) == 0
+          ),
+        ~b=true,
+      ),
+    ]
+  })
 
 let filterMapiTests = makeSeqEqualsTests(
   ~title="filterMapi",
@@ -922,7 +940,21 @@ let filterMapiTests = makeSeqEqualsTests(
       "",
     ),
   ],
-)
+)->Js.Array2.concat({
+  let items = [Some(Some(1)), None, Some(None), Some(Some(2)), None, Some(None)]
+  [
+    valueEqual(
+      ~title="filterMapi",
+      ~expectation="option of options yields correct values",
+      ~a=() =>
+        items
+        ->S.fromArray
+        ->S.filterMapi((value, _inx) => value)
+        ->S.equals([Some(1), None, Some(2), None]->S.fromArray, (a, b) => intOptionCmp(a, b) == 0),
+      ~b=true,
+    ),
+  ]
+})
 
 let filterTests =
   [
