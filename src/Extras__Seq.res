@@ -329,7 +329,18 @@ let filterMap = (xx, f) => {
   unfold(xx, go)
 }
 
-let filterSome = xx => xx->filterMap(x => x)
+let filterSome = xx => {
+  let rec go = xx =>
+    switch xx->headTail {
+    | None => None
+    | Some(x, xx) =>
+      switch x {
+      | None => go(xx)
+      | Some(x) => Some(x, xx)
+      }
+    }
+  unfold(xx, go)
+}
 
 let filterOk = xx =>
   xx->filterMap(x =>
