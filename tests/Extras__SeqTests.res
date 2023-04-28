@@ -785,6 +785,7 @@ let chunkBySizeTests = {
     willThrow(~title="chunkBySize", ~expectation="when size == -1", () =>
       S.range(1, 5)->S.chunkBySize(0)
     ),
+    willNotThrow(~title="chunkBySize", ~expectation="lazy", () => death()->S.chunkBySize(5)),
   ])
 }
 
