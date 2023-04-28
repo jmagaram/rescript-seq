@@ -546,15 +546,18 @@ let windowBehindTests = windowAheadBehindTests(
   ],
 )
 
-let pairwiseTests = makeSeqEqualsTests(
-  ~title="pairwise",
-  [
-    (S.empty->S.pairwise, [], ""),
-    (S.once(1)->S.pairwise, [], ""),
-    (S.range(1, 2)->S.pairwise, [(1, 2)], ""),
-    (S.range(1, 5)->S.pairwise, [(1, 2), (2, 3), (3, 4), (4, 5)], ""),
-  ],
-)
+let pairwiseTests =
+  makeSeqEqualsTests(
+    ~title="pairwise",
+    [
+      (S.empty->S.pairwise, [], ""),
+      (S.once(1)->S.pairwise, [], ""),
+      (S.range(1, 2)->S.pairwise, [(1, 2)], ""),
+      (S.range(1, 5)->S.pairwise, [(1, 2), (2, 3), (3, 4), (4, 5)], ""),
+    ],
+  )->Js.Array2.concat([
+    willNotThrow(~title="pairwise", ~expectation="lazy", () => death()->S.pairwise),
+  ])
 
 let interleaveTests = makeSeqEqualsTests(
   ~title="interleave",
