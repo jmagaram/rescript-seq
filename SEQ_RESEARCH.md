@@ -10,6 +10,8 @@
 - [Itertools for Javascript](#itertools-javascript)
 - [More LINQ](#morelinq)
 - [Immutable.js Seq](#immutablejs-seq)
+- [Haskell List](#haskell)
+- [Racket](#racket)
 
 ## Notes
 
@@ -120,3 +122,11 @@ endsWith, flatten (recursive), tagFirstLast, toMap, toObject
 
 Not investigated everything yet
 https://immutable-js.com/docs/v4.3.0/Seq/
+
+## Haskell
+
+https://hackage.haskell.org/package/base-4.8.1.0/docs/Data-List.html
+
+## Racket
+
+https://docs.racket-lang.org/seq/index.html
