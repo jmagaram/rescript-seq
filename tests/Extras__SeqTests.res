@@ -580,7 +580,14 @@ let iterateTests = makeSeqEqualsTests(
       "millions",
     ),
   ],
-)
+)->Js.Array2.concat([
+  willNotThrow(~title="iterate", ~expectation="lazy", ~f=() =>
+    S.iterate(0, i => {
+      Js.Exn.raiseError("Boom!")->raise->ignore
+      i
+    })
+  ),
+])
 
 let fromArrayTests = {
   let basicTests = makeSeqEqualsTests(
