@@ -82,9 +82,9 @@ will also be empty.
 
 **Note:** The process for generating items is cycled, rather than cycling the
 values produced. For example, if the original sequence is based on a function
-that generates random numbers, then when the sequence repeats entirely new
-random numbers will be produced. If this is not the desired behavior consider
-using `cache` before calling `cycle`.
+that generates random numbers, then when the sequence repeats new random numbers
+will be produced. If this is not the desired behavior consider using `cache`
+before calling `cycle`.
 */
 let cycle: t<'a> => t<'a>
 
