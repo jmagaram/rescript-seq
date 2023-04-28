@@ -134,13 +134,13 @@ let valueEqual = (~title, ~expectation, ~a, ~b) =>
 Creates a test that passes if the provided function throws any kind of
 exception.
 */
-let willThrow = (~title, ~expectation=?, ~f) =>
+let willThrow = (~title, ~expectation=?, f) =>
   T.expectThrow(~category="Seq", ~title, ~expectation?, f)
 
 /**
 Creates a test that passes if the provided function does NOT throw an exception.
 */
-let willNotThrow = (~title, ~expectation, ~f) =>
+let willNotThrow = (~title, ~expectation, f) =>
   T.fromPredicate(~category="Seq", ~title, ~expectation, () =>
     Ex.Result.fromTryCatch(f)->Result.isOk
   )
@@ -403,7 +403,7 @@ let dropTests = makeSeqEqualsTests(
     (S.once(4)->S.drop(1), [], ""),
   ],
 )->Js.Array2.concat([
-  willNotThrow(~title="drop", ~expectation="lazy", ~f=() => death()->S.drop(1)),
+  willNotThrow(~title="drop", ~expectation="lazy", () => death()->S.drop(1)),
   valueEqual(
     ~title="drop",
     ~expectation="if drop 0, return same seq instance",
@@ -501,12 +501,8 @@ let windowAheadBehindTests = (~title, ~function, ~data) =>
     }
     data->Js.Array2.map(((input, size, expected)) => oneTest(input, size, expected))
   }->Js.Array2.concat([
-    willThrow(~title, ~expectation="when size == 0 => throw", ~f=() =>
-      "abc"->characters->function(0)
-    ),
-    willThrow(~title, ~expectation="when size < 0 => throw", ~f=() =>
-      "abc"->characters->function(-1)
-    ),
+    willThrow(~title, ~expectation="when size == 0 => throw", () => "abc"->characters->function(0)),
+    willThrow(~title, ~expectation="when size < 0 => throw", () => "abc"->characters->function(-1)),
   ])
 
 let windowAheadTests = windowAheadBehindTests(
@@ -581,7 +577,7 @@ let iterateTests = makeSeqEqualsTests(
     ),
   ],
 )->Js.Array2.concat([
-  willNotThrow(~title="iterate", ~expectation="lazy", ~f=() =>
+  willNotThrow(~title="iterate", ~expectation="lazy", () =>
     S.iterate(0, i => {
       Js.Exn.raiseError("Boom!")->raise->ignore
       i
@@ -604,7 +600,7 @@ let fromArrayTests = {
       ([0, 1, 2, 3]->S.fromArray(~start=2, ~end=1), [2, 1], ""),
     ],
   )
-  let throws = f => willThrow(~title="fromArray", ~expectation="throws", ~f)
+  let throws = f => willThrow(~title="fromArray", ~expectation="throws", f)
   let throwsTests = [
     throws(() => [1, 2, 3]->S.fromArray(~start=-1)),
     throws(() => [1, 2, 3]->S.fromArray(~start=3)),
@@ -667,7 +663,7 @@ let takeTests = makeSeqEqualsTests(
     ~a=() => S.range(1, 999_999)->S.last,
     ~b=Some(999_999),
   ),
-  willNotThrow(~title="take", ~expectation="if zero, do not iterate anything", ~f=() =>
+  willNotThrow(~title="take", ~expectation="if zero, do not iterate anything", () =>
     death()->S.take(0)->S.consume
   ),
   valueEqual(
@@ -705,7 +701,7 @@ let foreverWithTests =
       ),
     ],
   )->Js.Array2.concat([
-    willNotThrow(~title="foreverWith", ~expectation="lazy", ~f=() => S.foreverWith(throwIfInvoked)),
+    willNotThrow(~title="foreverWith", ~expectation="lazy", () => S.foreverWith(throwIfInvoked)),
   ])
 
 let unfoldTests =
@@ -781,10 +777,10 @@ let chunkBySizeTests = {
       ),
     ],
   )->Js.Array2.concat([
-    willThrow(~title="chunkBySize", ~expectation="when size == 0", ~f=() =>
+    willThrow(~title="chunkBySize", ~expectation="when size == 0", () =>
       S.range(1, 5)->S.chunkBySize(0)
     ),
-    willThrow(~title="chunkBySize", ~expectation="when size == -1", ~f=() =>
+    willThrow(~title="chunkBySize", ~expectation="when size == -1", () =>
       S.range(1, 5)->S.chunkBySize(0)
     ),
   ])
@@ -1225,7 +1221,7 @@ let headTailTests = [
 ]
 
 let tailTests = [
-  willNotThrow(~title="tail", ~expectation="lazy", ~f=() => death()->S.tail),
+  willNotThrow(~title="tail", ~expectation="lazy", () => death()->S.tail),
   seqEqual(~title="tail", ~expectation="if empty => empty", ~a=() => S.empty->S.tail, ~b=[]),
   seqEqual(~title="tail", ~expectation="if singleton => empty", ~a=() => S.once(1)->S.tail, ~b=[]),
   seqEqual(
@@ -1546,7 +1542,7 @@ let reverseTests =
       (S.range(1, 5)->S.reverse, [5, 4, 3, 2, 1], ""),
     ],
   )->Js.Array2.concat([
-    willNotThrow(~title="reverse", ~expectation="lazy; not reversed until iterated", ~f=() =>
+    willNotThrow(~title="reverse", ~expectation="lazy; not reversed until iterated", () =>
       death()->S.reverse
     ),
   ])
@@ -1569,7 +1565,7 @@ let sortByTests = makeSeqEqualsTests(
     ([1, 5, 2, 9, 7, 3]->S.fromArray->S.sortBy(intCmp), [1, 2, 3, 5, 7, 9], ""),
   ],
 )->Js.Array2.concat([
-  willNotThrow(~title="sortBy", ~expectation="lazy", ~f=() => death()->S.sortBy(intCmp)),
+  willNotThrow(~title="sortBy", ~expectation="lazy", () => death()->S.sortBy(intCmp)),
   T.fromPredicate(~category="Seq", ~title="sortBy", ~expectation="stable", () => {
     let sortByFirst = (a, b) => {
       let (afst, _) = a
@@ -1605,7 +1601,7 @@ let delayTests =
       (S.delay(() => Js.Exn.raiseError("boom!"))->S.take(0), [], ""),
     ],
   )->Js.Array2.concat([
-    willNotThrow(~title="delay", ~expectation="lazy", ~f=() => S.delay(throwIfInvoked)),
+    willNotThrow(~title="delay", ~expectation="lazy", () => S.delay(throwIfInvoked)),
   ])
 
 let (combinationTests, permutationTests) = {
@@ -1716,8 +1712,8 @@ let (combinationTests, permutationTests) = {
     ],
   )
   let miscellaneous = (title, f) => [
-    willThrow(~title, ~expectation="if size < 0 throw", ~f=() => S.range(1, 9)->f(-1)),
-    willThrow(~title, ~expectation="if size = 0 throw", ~f=() => S.range(1, 9)->f(0)),
+    willThrow(~title, ~expectation="if size < 0 throw", () => S.range(1, 9)->f(-1)),
+    willThrow(~title, ~expectation="if size = 0 throw", () => S.range(1, 9)->f(0)),
     valueEqual(
       ~title,
       ~expectation="millions - take 10",
