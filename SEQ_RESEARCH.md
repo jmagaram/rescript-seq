@@ -4,6 +4,7 @@
 - [TC39 Proposal](#tc39-proposal)
 - [OCaml](#ocaml)
 - [F#](#f)
+- [.net Enumerable](#net-enumerable)
 - [Rust](#rust)
 - [Python Itertools](#itertools-python)
 - [Itertools for Javascript](#itertools-javascript)
@@ -56,6 +57,12 @@ allPairs, append, cache, choose, chunkBySize, collect, compareWith, concat, dela
 ### Not supported
 
 average, averageBy, cast, contains, countBy, distinctBy, exactlyOne, except, exists2, findBack, findIndex, fold2, foldBack, foldBack2, forAll2, groupBy, insertAt, insertManyAt, item (nth), iter2, iteri2, mapFoldBack, mapi2, max, min, permute, readonly, **reduce** (simplified fold throw if empty), reduceBack, removeAt, removeManyAt, scanBack, sort, sortBy, sortByDescending, sortDescending, sortWith, splitInto, sum, sumBy, transpose, take (throws like takeExactly), tryFindBack, tryFindIndex, tryFindIndexBack, tryItem, updateAt
+
+## .net Enumerable
+
+[.net Enumerable](https://learn.microsoft.com/en-us/dotnet/api/system.linq.enumerable?view=net-7.0)
+
+Interesting that `take` is really `takeAtMost` and `skip` is really `skipAtMost` while for F# these throw exceptions if there aren't enough elements.
 
 ## Rust
 
