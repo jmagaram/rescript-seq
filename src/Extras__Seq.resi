@@ -261,14 +261,14 @@ beginning of `source` and **starts** at the first item where predicate is
 let dropUntil: (t<'a>, 'a => bool) => t<'a>
 
 /**
-`scan(source, zero, accumulator)` is conceptually related to `reduce`. However
+`scan(source, zero, accumulator)` is conceptually related to `fold`. However
 instead of performing an eager evaluation and returning the final accumulator,
 it returns a sequence of accumulators (partial sums).
 */
 let scan: (t<'a>, 'b, ('b, 'a) => 'b) => t<'b>
 
 /**
-`scan(source, zero, accumulator)` is conceptually related to `reduce`. However
+`scan(source, zero, accumulator)` is conceptually related to `fold`. However
 instead of performing an eager evaluation and returning the final accumulator,
 it returns a sequence of accumulators (partial sums). The callback receives the
 zero-based index of each item.
@@ -442,21 +442,21 @@ other sequence are included.
 let interleave: (t<'a>, t<'a>) => t<'a>
 
 /**
-`reduce(source, zero, accumulator)` invokes `accomulator` successively for every
+`fold(source, zero, accumulator)` invokes `accumulator` successively for every
 item in `source`. The calculation is initialized with the provided `zero` value.
 The function only terminates if the sequence is finite. Analogous to
-`Array.reduce` in JavaScript.
+`Array.reduce` in JavaScript when an initial value is provided.
 */
-let reduce: (t<'a>, 'b, ('b, 'a) => 'b) => 'b
+let fold: (t<'a>, 'b, ('b, 'a) => 'b) => 'b
 
 /**
-`reducei(source, zero, accumulator)` invokes `accomulator` successively for
+`foldi(source, zero, accumulator)` invokes `accumulator` successively for
 every item in `source`. The calculation is initialized with the provided `zero`
 value. The function only terminates if the sequence is finite. The accumulator
 receives the zero-based index of each item. Analogous to `Array.reduce` in
-JavaScript.
+JavaScript when an initial value is provided.
 */
-let reducei: (t<'a>, ~zero: 'b, (~sum: 'b, ~val: 'a, ~inx: int) => 'b) => 'b
+let foldi: (t<'a>, ~zero: 'b, (~sum: 'b, ~val: 'a, ~inx: int) => 'b) => 'b
 
 /**
 `forEach(source, f)` eagerly applies `f` to each item in the sequence. This does

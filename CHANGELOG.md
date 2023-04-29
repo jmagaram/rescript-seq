@@ -14,6 +14,7 @@
   - `Seq.everyOk` not `Seq.allSome`
   - `Seq.everySome` not `Seq.allSome`
   - `Seq.once` not `Seq.singleton`; do it like Rust. Also provide `Seq.onceWith`
+  - `Seq.reduce` to `Seq.fold`; more accurate and also want a separate `reduce` function
   - `Array.exactlyOne` not `Array.exactlyOneValue` like `Seq.exactlyOne`
   - `Array.of1` not `Array.fromOneValue`
 - Remove

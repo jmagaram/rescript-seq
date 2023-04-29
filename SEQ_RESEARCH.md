@@ -31,7 +31,7 @@ My implementation was hardcoded to a specific equality test. Better performance 
 
 It only works with `Belt.Set` because that is an immutable set. I generated unique items on demand, which is pretty cool. If a mutable set it used, the sequence can't be iterated more than once and it is probably better to generate all unique items at once.
 
-The user can write their own `distinctBy` and use whatever kind of equality and set they want. They can use a mutable set for example. Not too difficult. It's just a `reduce`.
+The user can write their own `distinctBy` and use whatever kind of equality and set they want. They can use a mutable set for example. Not too difficult. It's just a `fold`.
 
 This function should never be called on infinite sequences, unless every item is unique, because once it gets past the last unique item it will search forever for another unique item and will fail.
 
@@ -92,7 +92,7 @@ allPairs, append, cache, choose, chunkBySize, collect, compareWith, concat, dela
 
 ### Not supported
 
-average, averageBy, cast, contains, countBy, distinctBy, exactlyOne, except, exists2, findBack, findIndex, fold2, foldBack, foldBack2, forAll2, groupBy, insertAt, insertManyAt, item (nth), iter2, iteri2, mapFoldBack, mapi2, max, min, permute, readonly, **reduce** (simplified fold throw if empty), reduceBack, removeAt, removeManyAt, scanBack, sort, sortBy, sortByDescending, sortDescending, sortWith, splitInto, sum, sumBy, transpose, take (throws like takeExactly), tryFindBack, tryFindIndex, tryFindIndexBack, tryItem, updateAt
+average, averageBy, cast, contains, countBy, distinctBy, exactlyOne, except, exists2, findBack, findIndex, fold2, foldBack, foldBack2, forAll2, groupBy, insertAt, insertManyAt, item (nth), iter2, iteri2, mapFoldBack, mapi2, max, min, permute, readonly, reduce, reduceBack, removeAt, removeManyAt, scanBack, sort, sortBy, sortByDescending, sortDescending, sortWith, splitInto, sum, sumBy, transpose, take (throws like takeExactly), tryFindBack, tryFindIndex, tryFindIndexBack, tryItem, updateAt
 
 ## .net Enumerable
 
@@ -112,7 +112,7 @@ all, any, array_chunks, chain, cmp_by, count, cycle, enumerate, eq_by, filter, f
 
 ### Not supported
 
-advance_by, cloned, cmp, collect, collect_into, copied, eq, fuse, ge, gt, partitioned, try_fold, is_sorted, is_sorted_by_key, le, lt, map_while, max, min, ne, next_chunk, nth, partial_cmp, partition, partition_in_place, peekable, position, **reduce** ( to option), rPosition, size_hint, step_by, sum, try_collect, try_find, try_fold, try_for_each, try_reduce, unzip, some kind of **remainder** ability
+advance_by, cloned, cmp, collect, collect_into, copied, eq, fuse, ge, gt, partitioned, try_fold, is_sorted, is_sorted_by_key, le, lt, map_while, max, min, ne, next_chunk, nth, partial_cmp, partition, partition_in_place, peekable, position, reduce, rPosition, size_hint, step_by, sum, try_collect, try_find, try_fold, try_for_each, try_reduce, unzip, some kind of remainder ability
 
 ## Itertools (Python)
 

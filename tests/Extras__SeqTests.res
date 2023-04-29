@@ -1374,19 +1374,19 @@ let toOptionTests = [
   ),
 ]
 
-let reduceTests = {
+let foldTests = {
   let add = (total, x) => total + x
   let lastSeen = (_: option<'a>, x: 'a) => Some(x)
   let oneUpTo = n => S.range(1, n)
   [
-    (() => S.empty->S.reduce(-1, add), -1),
-    (() => S.once(99)->S.reduce(1, add), 100),
-    (() => S.range(1, 3)->S.reduce(1, add), 7),
-    (() => oneUpTo(99)->S.reduce(None, lastSeen)->Option.getWithDefault(-1), 99),
-    (() => oneUpTo(9999)->S.reduce(None, lastSeen)->Option.getWithDefault(-1), 9999),
-    (() => oneUpTo(999_999)->S.reduce(None, lastSeen)->Option.getWithDefault(-1), 999_999),
+    (() => S.empty->S.fold(-1, add), -1),
+    (() => S.once(99)->S.fold(1, add), 100),
+    (() => S.range(1, 3)->S.fold(1, add), 7),
+    (() => oneUpTo(99)->S.fold(None, lastSeen)->Option.getWithDefault(-1), 99),
+    (() => oneUpTo(9999)->S.fold(None, lastSeen)->Option.getWithDefault(-1), 9999),
+    (() => oneUpTo(999_999)->S.fold(None, lastSeen)->Option.getWithDefault(-1), 999_999),
   ]->Js.Array2.mapi(((a, b), index) =>
-    valueEqual(~title="reduce", ~expectation=`index ${index->intToString}`, ~a, ~b)
+    valueEqual(~title="fold", ~expectation=`index ${index->intToString}`, ~a, ~b)
   )
 }
 
@@ -1645,7 +1645,7 @@ let (combinationTests, permutationTests) = {
     w->String.split("")->Belt.SortArray.stableSortBy(stringCmp)->Js.Array2.joinWith("")
   let sortOutput = combos =>
     combos
-    ->S.map(combo => combo->S.reduce("", (sum, i) => sum ++ i)->sortLetters)
+    ->S.map(combo => combo->S.fold("", (sum, i) => sum ++ i)->sortLetters)
     ->S.sortBy(stringCmp)
     ->S.toArray
     ->Js.Array2.joinWith(",")
@@ -1877,8 +1877,8 @@ let sampleRunningTotal = {
   )
 }
 
-let tests =
-  [
+let tests = [
+  // chunkByKindTests,
     allPairsTests,
     chunkBySizeTests,
     combinationTests,
@@ -1906,6 +1906,7 @@ let tests =
     findTests,
     flatMapTests,
     flattenTests,
+  foldTests,
     forEachTests,
     foreverTests,
     foreverWithTests,
@@ -1938,7 +1939,6 @@ let tests =
     prependTests,
     rangeMapTests,
     rangeTests,
-    reduceTests,
     replicateTests,
     replicateWithTests,
     reverseTests,
@@ -1952,10 +1952,10 @@ let tests =
     someTests,
     sortByTests,
     sortedMergeTests,
+  tailTests,
     takeTests,
     takeUntilTests,
     takeWhileTests,
-    tailTests,
     tapTests,
     toArrayTests,
     toListTests,

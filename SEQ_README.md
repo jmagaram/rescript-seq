@@ -115,6 +115,8 @@ let exactlyOne: t<'a> => option<'a>
 let find: (t<'a>, 'a => bool) => option<'a>
 let findMap: (t<'a>, 'a => option<'b>) => option<'b>
 let findMapi: (t<'a>, ('a, int) => option<'b>) => option<'b>
+let fold: (t<'a>, 'b, ('b, 'a) => 'b) => 'b
+let foldi: (t<'a>, ~zero: 'b, (~sum: 'b, ~val: 'a, ~inx: int) => 'b) => 'b
 let forEach: (t<'a>, 'a => unit) => unit
 let forEachi: (t<'a>, ('a, int) => unit) => unit
 let head: t<'a> => option<'a>
@@ -127,8 +129,6 @@ let length: t<'a> => int
 let maxBy: (t<'a>, ('a, 'a) => int) => option<'a>
 let minBy: (t<'a>, ('a, 'a) => int) => option<'a>
 let orElse: (t<'a>, t<'a>) => t<'a>
-let reduce: (t<'a>, 'b, ('b, 'a) => 'b) => 'b
-let reducei: (t<'a>, ~zero: 'b, (~sum: 'b, ~val: 'a, ~inx: int) => 'b) => 'b
 let some: (t<'a>, 'a => bool) => bool
 let toArray: t<'a> => array<'a>
 let toList: t<'a> => list<'a>

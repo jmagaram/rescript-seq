@@ -489,25 +489,25 @@ let window = (xx, length) => {
 let pairwise = xx =>
   xx->window(2)->map(i => (i->Js.Array2.unsafe_get(0), i->Js.Array2.unsafe_get(1)))
 
-let reduce = (xx, zero, concat) => {
+let fold = (xx, zero, concat) => {
   let sum = ref(zero)
   xx->forEach(x => sum := concat(sum.contents, x))
   sum.contents
 }
 
-let reducei = (xx, ~zero, concat) =>
-  xx->indexed->reduce(zero, (sum, (val, inx)) => concat(~sum, ~val, ~inx))
+let foldi = (xx, ~zero, concat) =>
+  xx->indexed->fold(zero, (sum, (val, inx)) => concat(~sum, ~val, ~inx))
 
 let join = (xx, separator) =>
   switch separator->Js.String2.length {
   | 0 => xx
   | _ => xx->intersperse(separator)
-  }->reduce("", (total, i) => total ++ i)
+  }->fold("", (total, i) => total ++ i)
 
-let last = xx => xx->reduce(None, (_, x) => Some(x))
+let last = xx => xx->fold(None, (_, x) => Some(x))
 
 let toArray = xx =>
-  xx->reduce([], (xx, i) => {
+  xx->fold([], (xx, i) => {
     xx->Js.Array2.push(i)->ignore
     xx
   })
@@ -610,7 +610,7 @@ let compare = (xx, yy, cmp) => {
   ->Option.getWithDefault(0)
 }
 
-let length = xx => xx->reduce(0, (sum, _) => sum + 1)
+let length = xx => xx->fold(0, (sum, _) => sum + 1)
 
 let isEmpty = xx =>
   switch xx->nextNode {
@@ -808,4 +808,6 @@ let (combinations, permutations) = {
   (combinations, permutations)
 }
 
-let toList = xx => xx->reverse->reduce(list{}, Belt.List.add)
+let toList = xx => xx->reverse->fold(list{}, Belt.List.add)
+
+// aaaabbbbbccccc taking LAST of each group

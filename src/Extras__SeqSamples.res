@@ -126,7 +126,7 @@ let validate = (docs, isValidEmail) =>
 
 /**
 Computes the running total of integers in an array. `scan` is conceptually
-similar to `reduce` but returns intermediate results. For example, the running
+similar to `fold` but returns intermediate results. For example, the running
 total of [1, 2, 3, 4] is [0, 1, 3, 6, 10] 
 */
 let runningTotal = nums => nums->Seq.fromArray->Seq.scan(0, (sum, i) => sum + i)
