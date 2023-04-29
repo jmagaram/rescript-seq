@@ -459,6 +459,21 @@ JavaScript when an initial value is provided.
 let foldi: (t<'a>, ~zero: 'b, (~sum: 'b, ~val: 'a, ~inx: int) => 'b) => 'b
 
 /**
+`reduce(source, accumulator)` applies a function to each element of the
+sequence, threading an accumulator argument through the computation. Begin by
+applying the function to the first two elements. Then feed this result into the
+function along with the third element and so on. Return the final result. If
+`source` has a single item, that is the result. If `source` is empty, returns
+`None`.
+
+See `fold` for a version of this function that succeeds with an empty input
+sequence. This function is analogous to `Array.reduce` in JavaScript when no
+initial value is provided. This function only terminates if the sequence is
+finite.
+*/
+let reduce: (t<'a>, ('a, 'a) => 'a) => option<'a>
+
+/**
 `forEach(source, f)` eagerly applies `f` to each item in the sequence. This does
 not return any value. It is useful for performing side-effects like logging
 values to the console.

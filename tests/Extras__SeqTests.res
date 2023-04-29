@@ -1377,16 +1377,31 @@ let toOptionTests = [
 let foldTests = {
   let add = (total, x) => total + x
   let lastSeen = (_: option<'a>, x: 'a) => Some(x)
-  let oneUpTo = n => S.range(1, n)
   [
     (() => S.empty->S.fold(-1, add), -1),
     (() => S.once(99)->S.fold(1, add), 100),
     (() => S.range(1, 3)->S.fold(1, add), 7),
-    (() => oneUpTo(99)->S.fold(None, lastSeen)->Option.getWithDefault(-1), 99),
-    (() => oneUpTo(9999)->S.fold(None, lastSeen)->Option.getWithDefault(-1), 9999),
-    (() => oneUpTo(999_999)->S.fold(None, lastSeen)->Option.getWithDefault(-1), 999_999),
+    (() => S.range(1, 99)->S.fold(None, lastSeen)->Option.getWithDefault(-1), 99),
+    (() => S.range(1, 9999)->S.fold(None, lastSeen)->Option.getWithDefault(-1), 9999),
+    (() => S.range(1, 999_999)->S.fold(None, lastSeen)->Option.getWithDefault(-1), 999_999),
   ]->Js.Array2.mapi(((a, b), index) =>
     valueEqual(~title="fold", ~expectation=`index ${index->intToString}`, ~a, ~b)
+  )
+}
+
+let reduceTests = {
+  let add = (sum, x) => sum + x
+  let lastSeen = (_, x) => x
+  makeValueEqualTests(
+    ~title="reduce",
+    [
+      (() => S.empty->S.reduce(add), None, ""),
+      (() => S.once(99)->S.reduce(add), Some(99), ""),
+      (() => S.range(1, 2)->S.reduce(add), Some(1 + 2), ""),
+      (() => S.range(1, 4)->S.reduce(add), Some(1 + 2 + 3 + 4), ""),
+      (() => S.range(1, 9999)->S.reduce(lastSeen), Some(9999), ""),
+      (() => S.range(1, 999_999)->S.reduce(lastSeen), Some(999_999), ""),
+    ],
   )
 }
 
@@ -1941,6 +1956,7 @@ let tests = [
     rangeTests,
     replicateTests,
     replicateWithTests,
+  reduceTests,
     reverseTests,
     sampleBinaryDigits,
     sampleChunkBySize,

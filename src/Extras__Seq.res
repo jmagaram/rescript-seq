@@ -498,6 +498,16 @@ let fold = (xx, zero, concat) => {
 let foldi = (xx, ~zero, concat) =>
   xx->indexed->fold(zero, (sum, (val, inx)) => concat(~sum, ~val, ~inx))
 
+let reduce = (xx, concat) =>
+  switch xx->headTail {
+  | None => None
+  | Some(x, xx) => {
+      let sum = ref(x)
+      xx->forEach(x => sum := concat(sum.contents, x))
+      Some(sum.contents)
+    }
+  }
+
 let join = (xx, separator) =>
   switch separator->Js.String2.length {
   | 0 => xx
@@ -625,21 +635,9 @@ let tail = xx =>
     | Some(_, xx) => xx->nextNode
     }
 
-let minBy = (xx, cmp) =>
-  xx->reduce(None, (sum, x) => {
-    switch sum {
-    | None => Some(x)
-    | Some(sum) => Some(cmp(x, sum) < 0 ? x : sum)
-    }
-  })
+let minBy = (xx, cmp) => xx->reduce((sum, i) => cmp(i, sum) < 0 ? i : sum)
 
-let maxBy = (xx, cmp) =>
-  xx->reduce(None, (sum, x) => {
-    switch sum {
-    | None => Some(x)
-    | Some(sum) => Some(cmp(x, sum) > 0 ? x : sum)
-    }
-  })
+let maxBy = (xx, cmp) => xx->reduce((sum, i) => cmp(i, sum) > 0 ? i : sum)
 
 let rec interleave = (xx, yy) => {
   (. ()) => {

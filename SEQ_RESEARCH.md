@@ -108,11 +108,11 @@ Interesting that `take` is really `takeAtMost` and `skip` is really `skipAtMost`
 
 ### Supported
 
-all, any, array_chunks, chain, cmp_by, count, cycle, enumerate, eq_by, filter, filter_map, find, find_map, flat_map, flatten, fold, for_each, inspect, intersperse, intersperseWith, is_sorted_by, last, map, max_by, min_by, partial_cmp_by, product, rev, scan, skip, skip_while, take, take_while, zip
+all, any, array_chunks, chain, cmp_by, count, cycle, enumerate, eq_by, filter, filter_map, find, find_map, flat_map, flatten, fold, for_each, inspect, intersperse, intersperseWith, is_sorted_by, last, map, max_by, min_by, partial_cmp_by, product, reduce, rev, scan, skip, skip_while, take, take_while, zip
 
 ### Not supported
 
-advance_by, cloned, cmp, collect, collect_into, copied, eq, fuse, ge, gt, partitioned, try_fold, is_sorted, is_sorted_by_key, le, lt, map_while, max, min, ne, next_chunk, nth, partial_cmp, partition, partition_in_place, peekable, position, reduce, rPosition, size_hint, step_by, sum, try_collect, try_find, try_fold, try_for_each, try_reduce, unzip, some kind of remainder ability
+advance_by, cloned, cmp, collect, collect_into, copied, eq, fuse, ge, gt, partitioned, try_fold, is_sorted, is_sorted_by_key, le, lt, map_while, max, min, ne, next_chunk, nth, partial_cmp, partition, partition_in_place, peekable, position, rPosition, size_hint, step_by, sum, try_collect, try_find, try_fold, try_for_each, try_reduce, unzip, some kind of remainder ability
 
 ## Itertools (Python)
 
