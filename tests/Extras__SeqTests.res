@@ -1389,6 +1389,48 @@ let foldTests = {
   )
 }
 
+let foldUntilTests = {
+  let add = (total, x) => total + x
+  let throwIfTryToAdd = (total, x) => {
+    throwIfInvoked()->ignore
+    total + x
+  }
+  makeValueEqualTests(
+    ~title="foldUntil",
+    [
+      // zero items
+      (() => S.empty->S.foldUntil(100, add, _ => false), 100, "if empty => zero"),
+      (() => S.empty->S.foldUntil(100, add, _ => true), 100, "if empty => zero"),
+      (
+        () => S.empty->S.foldUntil(100, throwIfTryToAdd, i => i == 100),
+        100,
+        "if zero satisfies, do not call accumulator",
+      ),
+      (
+        () => death()->S.foldUntil(100, throwIfTryToAdd, i => i == 100),
+        100,
+        "if zero satisfies, do not iterate sequence",
+      ),
+      // one item
+      (() => S.once(1)->S.foldUntil(100, add, i => i == 100), 100, ""),
+      (() => S.once(1)->S.foldUntil(100, add, _ => false), 101, ""),
+      // two items
+      (() => S.range(1, 2)->S.foldUntil(100, add, i => i == 100), 100, ""),
+      (() => S.range(1, 2)->S.foldUntil(100, add, i => i >= 101), 101, ""),
+      (() => S.range(1, 2)->S.foldUntil(100, add, i => i >= 103), 103, ""),
+      (() => S.range(1, 2)->S.foldUntil(100, add, _ => false), 103, ""),
+      // three items
+      (() => S.range(1, 3)->S.foldUntil(100, add, i => i == 100), 100, ""),
+      (() => S.range(1, 3)->S.foldUntil(100, add, i => i >= 101), 101, ""),
+      (() => S.range(1, 3)->S.foldUntil(100, add, i => i >= 103), 103, ""),
+      (() => S.range(1, 3)->S.foldUntil(100, add, i => i >= 106), 106, ""),
+      (() => S.range(1, 3)->S.foldUntil(100, add, _ => false), 106, ""),
+      // millions
+      (() => S.range(1, 999_999)->S.foldUntil(0, (_, i) => i, _ => false), 999_999, "millions"),
+    ],
+  )
+}
+
 let reduceTests = {
   let add = (sum, x) => sum + x
   let lastSeen = (_, x) => x
@@ -1922,6 +1964,7 @@ let tests = [
     flatMapTests,
     flattenTests,
   foldTests,
+  foldUntilTests,
     forEachTests,
     foreverTests,
     foreverWithTests,

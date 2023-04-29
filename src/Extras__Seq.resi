@@ -459,6 +459,18 @@ JavaScript when an initial value is provided.
 let foldi: (t<'a>, ~zero: 'b, (~sum: 'b, ~val: 'a, ~inx: int) => 'b) => 'b
 
 /**
+`foldUntil(source, zero, accumulator, predicate)` starts a calculation with the
+provided `zero` value. It feeds successive items from `source` through the
+`accumulator`. The calculation stops either when `source` is exhausted, or when
+the `predicate` applied to the accumulated value is satisfied. The accumulated
+value is then returned.
+
+**Note:** If you want the last value before the predicate is satisfied, see
+`foldWhile`.
+*/
+let foldUntil: (t<'a>, 'b, ('b, 'a) => 'b, 'b => bool) => 'b
+
+/**
 `reduce(source, accumulator)` applies a function to each element of the
 sequence, threading an accumulator argument through the computation. Begin by
 applying the function to the first two elements. Then feed this result into the
