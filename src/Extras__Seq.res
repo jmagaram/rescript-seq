@@ -514,7 +514,7 @@ let join = (xx, separator) =>
   | _ => xx->intersperse(separator)
   }->fold("", (total, i) => total ++ i)
 
-let last = xx => xx->fold(None, (_, x) => Some(x))
+let last = xx => xx->reduce((_, i) => i)
 
 let toArray = xx =>
   xx->fold([], (xx, i) => {
