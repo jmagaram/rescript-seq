@@ -462,11 +462,7 @@ let foldi: (t<'a>, ~zero: 'b, (~sum: 'b, ~val: 'a, ~inx: int) => 'b) => 'b
 `foldUntil(source, zero, accumulator, predicate)` starts a calculation with the
 provided `zero` value. It feeds successive items from `source` through the
 `accumulator`. The calculation stops either when `source` is exhausted, or when
-the `predicate` applied to the accumulated value is satisfied. The accumulated
-value is then returned.
-
-**Note:** If you want the last value before the predicate is satisfied, see
-`foldWhile`.
+the `predicate` applied to `zero` or the accumulated value is satisfied.
 */
 let foldUntil: (t<'a>, 'b, ('b, 'a) => 'b, 'b => bool) => 'b
 
