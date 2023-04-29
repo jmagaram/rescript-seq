@@ -25,6 +25,7 @@
   - `Seq.startWith` and `Seq.endWith`; use `concat` and `prepend` with `Seq.once`.
 - Add
   - `Seq.foldUntil`
+  - `Seq.reduceUntil`
   - `Seq.reduce` (like `Seq.fold` but no initial parameter)
   - `Seq.toList`
   - `NonEmptyArray.of1`, `of2`, `of3` and `ofMany`, all zero-cost bindings to `Array.of`.

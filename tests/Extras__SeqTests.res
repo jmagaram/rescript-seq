@@ -1447,6 +1447,25 @@ let reduceTests = {
   )
 }
 
+let reduceUntilTests = {
+  let add = (sum, x) => sum + x
+  let lastSeen = (_, x) => x
+  makeValueEqualTests(
+    ~title="reduceUntil",
+    [
+      (() => S.empty->S.reduceUntil(add, trueAlways), None, ""),
+      (() => S.empty->S.reduceUntil(add, falseAlways), None, ""),
+      (() => S.once(100)->S.reduceUntil(add, i => i == 100), Some(100), ""),
+      (() => S.once(100)->S.reduceUntil(add, i => i !== 100), Some(100), ""),
+      (() => S.range(3, 5)->S.reduceUntil(add, i => i >= 3), Some(3), ""),
+      (() => S.range(3, 5)->S.reduceUntil(add, i => i >= 7), Some(7), ""),
+      (() => S.range(3, 5)->S.reduceUntil(add, i => i >= 12), Some(12), ""),
+      (() => S.range(3, 5)->S.reduceUntil(add, falseAlways), Some(12), ""),
+      (() => S.range(1, 999_999)->S.reduceUntil(lastSeen, i => i == 999_998), Some(999_998), ""),
+    ],
+  )
+}
+
 let lastTests = {
   [
     (S.empty, None),
@@ -1997,6 +2016,7 @@ let tests = [
     prependTests,
     rangeMapTests,
     rangeTests,
+  reduceUntilTests,
     replicateTests,
     replicateWithTests,
   reduceTests,
