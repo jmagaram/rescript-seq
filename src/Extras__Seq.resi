@@ -479,30 +479,29 @@ an empty sequence.
 let reduce: (t<'a>, ('a, 'a) => 'a) => option<'a>
 
 /**
-`reduceUntil(source, accumulator, predicate)` applies a function to each element
-of the sequence, threading `accumulator` through the computation. Begin by
-applying `accumulator` to the first two elements. Then feed this result into
-`accumulator` along with the third element and so on. The computation ends when
-`source` is exhausted, or when the `predicate` applied to the accumulated value
-is `true`. If `source` has a single item, that is the result regardless of
-whether it satisfies the predicate. If `source` is empty, return `None`.
+`reduceUntil(source, accumulator, predicate)` calculates a single value from all
+the items in `source`. If `source` has more than one item, begin by applying
+`accumulator` to the first two items. Then feed that result into `accumulator`
+with the third element and so on until. If `source` is empty, returns `None`.
+The computation stops when `source` is exhausted or `predicate` returns `true`.
+The result is the first reduced value where `predicate` is `true`, or the result
+of reducing all items when `predicate` always is `false`.
 
-**Note:** If you want the last value that satisfies the predicate, see `reduceWhile`.
+**Note:** See `reduceWhile` if you want the last value, if any, where
+`predicate` is `true`.
 */
 let reduceUntil: (t<'a>, ('a, 'a) => 'a, 'a => bool) => option<'a>
 
 /**
-`reduceWhile(source, accumulator, predicate)` applies a function to each element
-of the sequence, threading `accumulator` through the computation. Begin by
-applying `accumulator` to the first two elements. Then feed this result into
-`accumulator` along with the third element and so on. The computation stops when
-`source` is exhausted, or when the `predicate` applied to the accumulated value
-is `false`. If `source` has a single item and it satisfies the predicate, that
-is the result. If `source` has a single item and it does not satisfy the
-predicate, or is `source` is empty, return `None`.
+`reduceWhile(source, accumulator, predicate)` calculates a single value from all
+the items in `source`. If `source` has more than one item, begin by applying
+`accumulator` to the first two items. Then feed that result into `accumulator`
+with the third element and so on until. If `source` is empty, returns `None`.
+The computation stops when `source` is exhausted or `predicate` returns `false`.
+The result is the last value, if any, where `predicate` is `true`.
 
-**Note:** The result, if any, always satisfies the predicate. See `reduceUntil`
-if you want the last accumulated value that causes the predicate to return `false`.
+**Note:** See `reduceUntil` if you want the first reduced value where
+`predicate` returns `false`.
 */
 let reduceWhile: (t<'a>, ('a, 'a) => 'a, 'a => bool) => option<'a>
 
