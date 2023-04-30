@@ -487,14 +487,27 @@ of the sequence, threading `accumulator` through the computation. Begin by
 applying `accumulator` to the first two elements. Then feed this result into
 `accumulator` along with the third element and so on. The computation ends when
 `source` is exhausted, or when the `predicate` applied to the accumulated value
-is satisfied. If `source` has a single item and it satisfies the predicate, that
+is `true`. If `source` has a single item, that is the result regardless of
+whether it satisfies the predicate. If `source` is empty, return `None`.
+
+**Note:** If you want the last value that satisfies the predicate, see `reduceWhile`.
+*/
+let reduceUntil: (t<'a>, ('a, 'a) => 'a, 'a => bool) => option<'a>
+
+/**
+`reduceWhile(source, accumulator, predicate)` applies a function to each element
+of the sequence, threading `accumulator` through the computation. Begin by
+applying `accumulator` to the first two elements. Then feed this result into
+`accumulator` along with the third element and so on. The computation stops when
+`source` is exhausted, or when the `predicate` applied to the accumulated value
+is `false`. If `source` has a single item and it satisfies the predicate, that
 is the result. If `source` has a single item and it does not satisfy the
 predicate, or is `source` is empty, return `None`.
 
-**Note:** If you want the last value before a predicate is satisfied, see
-`reduceWhile`.
+**Note:** The result, if any, always satisfies the predicate. See `reduceUntil`
+if you want the last accumulated value that causes the predicate to return `false`.
 */
-let reduceUntil: (t<'a>, ('a, 'a) => 'a, 'a => bool) => option<'a>
+let reduceWhile: (t<'a>, ('a, 'a) => 'a, 'a => bool) => option<'a>
 
 /**
 `forEach(source, f)` eagerly applies `f` to each item in the sequence. This does

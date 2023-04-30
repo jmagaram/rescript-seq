@@ -26,6 +26,7 @@
 - Add
   - `Seq.foldUntil`
   - `Seq.reduceUntil`
+  - `Seq.reduceWhile`
   - `Seq.reduce` (like `Seq.fold` but no initial parameter)
   - `Seq.toList`
   - `NonEmptyArray.of1`, `of2`, `of3` and `ofMany`, all zero-cost bindings to `Array.of`.

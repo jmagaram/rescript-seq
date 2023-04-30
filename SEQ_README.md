@@ -132,6 +132,7 @@ let minBy: (t<'a>, ('a, 'a) => int) => option<'a>
 let orElse: (t<'a>, t<'a>) => t<'a>
 let reduce: (t<'a>, ('a, 'a) => 'a) => option<'a>
 let reduceUntil: (t<'a>, ('a, 'a) => 'a, 'a => bool) => option<'a>
+let reduceWhile: (t<'a>, ('a, 'a) => 'a, 'a => bool) => option<'a>
 let some: (t<'a>, 'a => bool) => bool
 let toArray: t<'a> => array<'a>
 let toList: t<'a> => list<'a>

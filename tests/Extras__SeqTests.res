@@ -1447,6 +1447,9 @@ let reduceTests = {
   )
 }
 
+// keep reducing until some predicate returns true or until the end of the sequence
+// untilExhaustedOr
+// then return that value
 let reduceUntilTests = {
   let add = (sum, x) => sum + x
   let lastSeen = (_, x) => x
@@ -1456,12 +1459,36 @@ let reduceUntilTests = {
       (() => S.empty->S.reduceUntil(add, trueAlways), None, ""),
       (() => S.empty->S.reduceUntil(add, falseAlways), None, ""),
       (() => S.once(100)->S.reduceUntil(add, i => i == 100), Some(100), ""),
-      (() => S.once(100)->S.reduceUntil(add, i => i !== 100), Some(100), ""),
+      (() => S.once(100)->S.reduceUntil(add, i => i != 100), Some(100), ""),
       (() => S.range(3, 5)->S.reduceUntil(add, i => i >= 3), Some(3), ""),
       (() => S.range(3, 5)->S.reduceUntil(add, i => i >= 7), Some(7), ""),
       (() => S.range(3, 5)->S.reduceUntil(add, i => i >= 12), Some(12), ""),
       (() => S.range(3, 5)->S.reduceUntil(add, falseAlways), Some(12), ""),
-      (() => S.range(1, 999_999)->S.reduceUntil(lastSeen, i => i == 999_998), Some(999_998), ""),
+      (() => S.range(1, 999_999)->S.reduceUntil(lastSeen, i => i > 999_995), Some(999_996), ""),
+    ],
+  )
+}
+
+// keep reducing while some condition is true
+// like keep incrementing something while it is < 1 million
+// the moment it is >= 1 million, return previous value
+// reduceLastWhere
+
+let reduceWhileTests = {
+  let add = (sum, x) => sum + x
+  let lastSeen = (_, x) => x
+  makeValueEqualTests(
+    ~title="reduceWhileTests",
+    [
+      (() => S.empty->S.reduceWhile(add, trueAlways), None, ""),
+      (() => S.empty->S.reduceWhile(add, falseAlways), None, ""),
+      (() => S.once(100)->S.reduceWhile(add, i => i == 100), Some(100), ""),
+      (() => S.once(100)->S.reduceWhile(add, i => i != 100), None, ""),
+      (() => S.range(3, 5)->S.reduceWhile(add, i => i <= 3), Some(3), ""),
+      (() => S.range(3, 5)->S.reduceWhile(add, i => i <= 7), Some(7), ""),
+      (() => S.range(3, 5)->S.reduceWhile(add, i => i <= 12), Some(12), ""),
+      (() => S.range(3, 5)->S.reduceWhile(add, falseAlways), None, ""),
+      (() => S.range(1, 999_999)->S.reduceWhile(lastSeen, i => i < 999_995), Some(999_994), ""),
     ],
   )
 }
@@ -2016,10 +2043,11 @@ let tests = [
     prependTests,
     rangeMapTests,
     rangeTests,
-  reduceUntilTests,
     replicateTests,
     replicateWithTests,
   reduceTests,
+  reduceUntilTests,
+  reduceWhileTests,
     reverseTests,
     sampleBinaryDigits,
     sampleChunkBySize,

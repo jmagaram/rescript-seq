@@ -538,6 +538,29 @@ let reduceUntil = (xx, concat, predicate) => {
   }
 }
 
+let reduceWhile = (xx, concat, predicate) => {
+  let rec go = (sum, xx) => {
+    switch xx->headTail {
+    | None => Some(sum)
+    | Some(x, xx) => {
+        let sum' = concat(sum, x)
+        switch predicate(sum') {
+        | true => go(sum', xx)
+        | false => Some(sum)
+        }
+      }
+    }
+  }
+  switch xx->headTail {
+  | None => None
+  | Some(x, xx) =>
+    switch predicate(x) {
+    | true => go(x, xx)
+    | false => None
+    }
+  }
+}
+
 let join = (xx, separator) =>
   switch separator->Js.String2.length {
   | 0 => xx
