@@ -367,15 +367,14 @@ let orElse: (t<'a>, t<'a>) => t<'a>
 /**
 `map2(seq1, seq2, mapper)` is the sequence formed by applying the `mapper`
 function to corresponding items from the source sequences. If one sequence ends
-before any of the others, the remaining elements in the longer sequences are
-ignored.
+before the other, the remaining items in the longer sequence are ignored.
 */
 let map2: (t<'a>, t<'b>, ('a, 'b) => 'c) => t<'c>
 
 /**
 `map3(seq1, seq2, seq3, mapper)` is the sequence formed by applying the `mapper`
 function to corresponding items from the source sequences. If one sequence ends
-before any of the others, the remaining elements in the longer sequences are
+before any of the others, the remaining items in the longer sequences are
 ignored.
 */
 let map3: (t<'a>, t<'b>, t<'c>, ('a, 'b, 'c) => 'd) => t<'d>
@@ -383,7 +382,7 @@ let map3: (t<'a>, t<'b>, t<'c>, ('a, 'b, 'c) => 'd) => t<'d>
 /**
 `map4(seq1, seq2, seq3, seq4, mapper)` is the sequence formed by applying the
 `mapper` function to corresponding items from the source sequences. If one
-sequence ends before any of the others, the remaining elements in the longer
+sequence ends before any of the others, the remaining items in the longer
 sequences are ignored.
 */
 let map4: (t<'a>, t<'b>, t<'c>, t<'d>, ('a, 'b, 'c, 'd) => 'e) => t<'e>
@@ -391,29 +390,29 @@ let map4: (t<'a>, t<'b>, t<'c>, t<'d>, ('a, 'b, 'c, 'd) => 'e) => t<'e>
 /**
 `map5(seq1, seq2, seq3, seq4, seq5, mapper)` is the sequence formed by applying
 the `mapper` function to corresponding items from the source sequences. If one
-sequence ends before any of the others, the remaining elements in the longer
+sequence ends before any of the others, the remaining items in the longer
 sequences are ignored.
 */
 let map5: (t<'a>, t<'b>, t<'c>, t<'d>, t<'e>, ('a, 'b, 'c, 'd, 'e) => 'f) => t<'f>
 
 /**
 `zip(seq1, seq2, mapper)` is the sequence formed by combining corresponding
-items from the source sequences into a tuple. If one sequence ends before any of
-the others, the remaining elements in the longer sequences are ignored.
+items from the source sequences into a tuple. If one sequence ends before the
+other, the remaining items in the longer sequence are ignored.
 */
 let zip: (t<'a>, t<'b>) => t<('a, 'b)>
 
 /**
 `zip3(seq1, seq2, seq3, mapper)` is the sequence formed by combining corresponding
 items from the source sequences into a tuple. If one sequence ends before any of
-the others, the remaining elements in the longer sequences are ignored.
+the others, the remaining items in the longer sequences are ignored.
 */
 let zip3: (t<'a>, t<'b>, t<'c>) => t<('a, 'b, 'c)>
 
 /**
 `zip4(seq1, seq2, seq3, seq4, mapper)` is the sequence formed by combining
 corresponding items from the source sequences into a tuple. If one sequence ends
-before any of the others, the remaining elements in the longer sequences are
+before any of the others, the remaining items in the longer sequences are
 ignored.
 */
 let zip4: (t<'a>, t<'b>, t<'c>, t<'d>) => t<('a, 'b, 'c, 'd)>
@@ -421,7 +420,7 @@ let zip4: (t<'a>, t<'b>, t<'c>, t<'d>) => t<('a, 'b, 'c, 'd)>
 /**
 `zip5(seq1, seq2, seq3, seq4, seq5, mapper)` is the sequence formed by combining
 corresponding items from the source sequences into a tuple. If one sequence ends
-before any of the others, the remaining elements in the longer sequences are
+before any of the others, the remaining items in the longer sequences are
 ignored.
 */
 let zip5: (t<'a>, t<'b>, t<'c>, t<'d>, t<'e>) => t<('a, 'b, 'c, 'd, 'e)>
