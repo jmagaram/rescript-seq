@@ -896,7 +896,7 @@ let (combinations, permutations) = {
 
 let toList = xx => xx->reverse->fold(list{}, Belt.List.add)
 
-let foldAdjacent = (xx: t<'a>, init: 'a => 'b, acc: ('b, 'a) => option<'b>) =>
+let foldAdjacent = (xx, init, acc) =>
   xx
   ->scan((0, None), ((group, sum), x) =>
     switch sum {
