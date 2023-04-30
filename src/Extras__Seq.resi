@@ -443,9 +443,12 @@ let interleave: (t<'a>, t<'a>) => t<'a>
 
 /**
 `fold(source, zero, accumulator)` invokes `accumulator` successively for every
-item in `source`. The calculation is initialized with the provided `zero` value.
-The function only terminates if the sequence is finite. Analogous to
-`Array.reduce` in JavaScript when an initial value is provided.
+item in `source`, starting with the provided `zero` value, and returns the final
+result.
+
+Folding is useful when you have a collection of something and want to produce a
+single value from it. This function is analogous to `Array.reduce` in JavaScript
+when an initial value is provided.
 */
 let fold: (t<'a>, 'b, ('b, 'a) => 'b) => 'b
 
@@ -459,10 +462,12 @@ JavaScript when an initial value is provided.
 let foldi: (t<'a>, ~zero: 'b, (~sum: 'b, ~val: 'a, ~inx: int) => 'b) => 'b
 
 /**
-`foldUntil(source, zero, accumulator, predicate)` starts a calculation with the
-provided `zero` value. It feeds successive items from `source` through the
-`accumulator`. The calculation stops either when `source` is exhausted, or when
-the `predicate` applied to `zero` or the accumulated value is satisfied.
+`foldUntil(source, zero, accumulator, predicate)` invokes `accumulator`
+successively for items in `source`, starting with the provided `zero` value. The
+computation stops after `source` is exhausted, or after `predicate` applied to
+`zero` or the current accumulated result is `true`. Returns the first result
+where `predicate` is `true` or the final computed value if `predicate` is always
+`false`.
 */
 let foldUntil: (t<'a>, 'b, ('b, 'a) => 'b, 'b => bool) => 'b
 
