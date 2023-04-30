@@ -115,7 +115,6 @@ let find: (t<'a>, 'a => bool) => option<'a>
 let findMap: (t<'a>, 'a => option<'b>) => option<'b>
 let findMapi: (t<'a>, ('a, int) => option<'b>) => option<'b>
 let fold: (t<'a>, 'b, ('b, 'a) => 'b) => 'b
-let foldi: (t<'a>, ~zero: 'b, (~sum: 'b, ~val: 'a, ~inx: int) => 'b) => 'b
 let foldUntil: (t<'a>, 'b, ('b, 'a) => 'b, 'b => bool) => 'b
 let foldWhile: (t<'a>, 'b, ('b, 'a) => 'b, 'b => bool) => option<'b>
 let forEach: (t<'a>, 'a => unit) => unit

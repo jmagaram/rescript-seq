@@ -444,15 +444,6 @@ when an initial value is provided.
 let fold: (t<'a>, 'b, ('b, 'a) => 'b) => 'b
 
 /**
-`foldi(source, zero, accumulator)` invokes `accumulator` successively for
-every item in `source`. The calculation is initialized with the provided `zero`
-value. The function only terminates if the sequence is finite. The accumulator
-receives the zero-based index of each item. Analogous to `Array.reduce` in
-JavaScript when an initial value is provided.
-*/
-let foldi: (t<'a>, ~zero: 'b, (~sum: 'b, ~val: 'a, ~inx: int) => 'b) => 'b
-
-/**
 `foldUntil(source, zero, accumulator, predicate)` invokes `accumulator`
 successively for items in `source`, starting with the provided `zero` value. The
 computation stops after `source` is exhausted, or after `predicate` applied to

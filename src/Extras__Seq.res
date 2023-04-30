@@ -525,9 +525,6 @@ let foldWhile = (xx, zero, concat, predicate) => {
   }
 }
 
-let foldi = (xx, ~zero, concat) =>
-  xx->indexed->fold(zero, (sum, (val, inx)) => concat(~sum, ~val, ~inx))
-
 let reduce = (xx, concat) =>
   switch xx->headTail {
   | None => None
