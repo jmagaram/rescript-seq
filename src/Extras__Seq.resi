@@ -467,17 +467,14 @@ the `predicate` applied to `zero` or the accumulated value is satisfied.
 let foldUntil: (t<'a>, 'b, ('b, 'a) => 'b, 'b => bool) => 'b
 
 /**
-`reduce(source, accumulator)` applies a function to each element of the
-sequence, threading `accumulator` through the computation. Begin by applying the
-`accumulator` to the first two elements. Then feed this result into
-`accumulator` with the third element and so on. Return the final result. If
-`source` has a single item, that is the result. If `source` is empty, returns
-`None`.
+`reduce(source, accumulator)` calculates a single value from all the items in
+`source`. If `source` has a single item, no "reduction" occurs; that item is the
+result. Otherwise begin by applying `accumulator` to the first two items. Then
+feed that result into `accumulator` with the third element and so on until. If
+`source` is empty, returns `None`.
 
-See `fold` for a version of this function that succeeds with an empty input
-sequence. This function is analogous to `Array.reduce` in JavaScript when no
-initial value is provided. This function only terminates if the sequence is
-finite.
+See `fold` for a related function that takes an initial value and succeeds with
+an empty sequence.
 */
 let reduce: (t<'a>, ('a, 'a) => 'a) => option<'a>
 
