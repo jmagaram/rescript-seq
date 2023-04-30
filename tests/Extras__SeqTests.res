@@ -1463,18 +1463,18 @@ let foldWhileTests = {
   )
 }
 
-let reduceTests = {
+let sumTests = {
   let add = (sum, x) => sum + x
   let lastSeen = (_, x) => x
   makeValueEqualTests(
-    ~title="reduce",
+    ~title="sum",
     [
-      (() => S.empty->S.reduce(add), None, ""),
-      (() => S.once(99)->S.reduce(add), Some(99), ""),
-      (() => S.range(1, 2)->S.reduce(add), Some(1 + 2), ""),
-      (() => S.range(1, 4)->S.reduce(add), Some(1 + 2 + 3 + 4), ""),
-      (() => S.range(1, 9999)->S.reduce(lastSeen), Some(9999), ""),
-      (() => S.range(1, 999_999)->S.reduce(lastSeen), Some(999_999), ""),
+      (() => S.empty->S.sum(add), None, ""),
+      (() => S.once(99)->S.sum(add), Some(99), ""),
+      (() => S.range(1, 2)->S.sum(add), Some(1 + 2), ""),
+      (() => S.range(1, 4)->S.sum(add), Some(1 + 2 + 3 + 4), ""),
+      (() => S.range(1, 9999)->S.sum(lastSeen), Some(9999), ""),
+      (() => S.range(1, 999_999)->S.sum(lastSeen), Some(999_999), ""),
     ],
   )
 }
@@ -1482,7 +1482,7 @@ let reduceTests = {
 let cumulativeSumTests = {
   let add = (sum, x) => sum + x
   makeSeqEqualsTests(
-    ~title="prefixSums",
+    ~title="cumulativeSum",
     [
       ([]->S.fromArray->S.cumulativeSum(add), [], ""),
       ([1]->S.fromArray->S.cumulativeSum(add), [1], ""),
@@ -1503,21 +1503,21 @@ let cumulativeSumTests = {
 // keep reducing until some predicate returns true or until the end of the sequence
 // untilExhaustedOr
 // then return that value
-let reduceUntilTests = {
+let sumUntilTests = {
   let add = (sum, x) => sum + x
   let lastSeen = (_, x) => x
   makeValueEqualTests(
-    ~title="reduceUntil",
+    ~title="sumUntil",
     [
-      (() => S.empty->S.reduceUntil(add, trueAlways), None, ""),
-      (() => S.empty->S.reduceUntil(add, falseAlways), None, ""),
-      (() => S.once(100)->S.reduceUntil(add, i => i == 100), Some(100), ""),
-      (() => S.once(100)->S.reduceUntil(add, i => i != 100), Some(100), ""),
-      (() => S.range(3, 5)->S.reduceUntil(add, i => i >= 3), Some(3), ""),
-      (() => S.range(3, 5)->S.reduceUntil(add, i => i >= 7), Some(7), ""),
-      (() => S.range(3, 5)->S.reduceUntil(add, i => i >= 12), Some(12), ""),
-      (() => S.range(3, 5)->S.reduceUntil(add, falseAlways), Some(12), ""),
-      (() => S.range(1, 999_999)->S.reduceUntil(lastSeen, i => i > 999_995), Some(999_996), ""),
+      (() => S.empty->S.sumUntil(add, trueAlways), None, ""),
+      (() => S.empty->S.sumUntil(add, falseAlways), None, ""),
+      (() => S.once(100)->S.sumUntil(add, i => i == 100), Some(100), ""),
+      (() => S.once(100)->S.sumUntil(add, i => i != 100), Some(100), ""),
+      (() => S.range(3, 5)->S.sumUntil(add, i => i >= 3), Some(3), ""),
+      (() => S.range(3, 5)->S.sumUntil(add, i => i >= 7), Some(7), ""),
+      (() => S.range(3, 5)->S.sumUntil(add, i => i >= 12), Some(12), ""),
+      (() => S.range(3, 5)->S.sumUntil(add, falseAlways), Some(12), ""),
+      (() => S.range(1, 999_999)->S.sumUntil(lastSeen, i => i > 999_995), Some(999_996), ""),
     ],
   )
 }
@@ -1527,21 +1527,21 @@ let reduceUntilTests = {
 // the moment it is >= 1 million, return previous value
 // reduceLastWhere
 
-let reduceWhileTests = {
+let sumWhileTests = {
   let add = (sum, x) => sum + x
   let lastSeen = (_, x) => x
   makeValueEqualTests(
-    ~title="reduceWhileTests",
+    ~title="sumWhileTests",
     [
-      (() => S.empty->S.reduceWhile(add, trueAlways), None, ""),
-      (() => S.empty->S.reduceWhile(add, falseAlways), None, ""),
-      (() => S.once(100)->S.reduceWhile(add, i => i == 100), Some(100), ""),
-      (() => S.once(100)->S.reduceWhile(add, i => i != 100), None, ""),
-      (() => S.range(3, 5)->S.reduceWhile(add, i => i <= 3), Some(3), ""),
-      (() => S.range(3, 5)->S.reduceWhile(add, i => i <= 7), Some(7), ""),
-      (() => S.range(3, 5)->S.reduceWhile(add, i => i <= 12), Some(12), ""),
-      (() => S.range(3, 5)->S.reduceWhile(add, falseAlways), None, ""),
-      (() => S.range(1, 999_999)->S.reduceWhile(lastSeen, i => i < 999_995), Some(999_994), ""),
+      (() => S.empty->S.sumWhile(add, trueAlways), None, ""),
+      (() => S.empty->S.sumWhile(add, falseAlways), None, ""),
+      (() => S.once(100)->S.sumWhile(add, i => i == 100), Some(100), ""),
+      (() => S.once(100)->S.sumWhile(add, i => i != 100), None, ""),
+      (() => S.range(3, 5)->S.sumWhile(add, i => i <= 3), Some(3), ""),
+      (() => S.range(3, 5)->S.sumWhile(add, i => i <= 7), Some(7), ""),
+      (() => S.range(3, 5)->S.sumWhile(add, i => i <= 12), Some(12), ""),
+      (() => S.range(3, 5)->S.sumWhile(add, falseAlways), None, ""),
+      (() => S.range(1, 999_999)->S.sumWhile(lastSeen, i => i < 999_995), Some(999_994), ""),
     ],
   )
 }
@@ -2100,9 +2100,6 @@ let tests = [
   rangeTests,
   replicateTests,
   replicateWithTests,
-  reduceTests,
-  reduceUntilTests,
-  reduceWhileTests,
   reverseTests,
   sampleBinaryDigits,
   sampleChunkBySize,
@@ -2114,6 +2111,9 @@ let tests = [
   someTests,
   sortByTests,
   sortedMergeTests,
+  sumTests,
+  sumUntilTests,
+  sumWhileTests,
   tailTests,
   takeTests,
   takeUntilTests,

@@ -463,43 +463,60 @@ if any, where `predicate` is `true`.
 let foldWhile: (t<'a>, 'b, ('b, 'a) => 'b, 'b => bool) => option<'b>
 
 /**
-`reduce(source, accumulator)` calculates a single value from all the items in
-`source`. If `source` has a single item, no "reduction" occurs; that item is the
-result. Otherwise begin by applying `accumulator` to the first two items. Then
-feed that result into `accumulator` with the third element and so on. If
-`source` is empty, returns `None`.
+`sum(source, accumulator)` calculates a single value from all the items in
+`source`. If `source` has a single item, that item is the result. Otherwise
+begin by applying `accumulator` to the first two items. Then feed that result
+into `accumulator` with the third item and so on. If `source` is empty, returns
+`None`.
 
-See `fold` for a related function that takes an initial value and succeeds with
-an empty sequence.
+See `fold` for a related function that takes an initial value and can compute a
+value of a different type than the source.
+
+**Note:** Although the term `sum` is used, this function is not limited to
+adding numbers. The `accumulator` can concatenate strings, concatenate arrays,
+determine the minimum value of two, etc. This function is similar to
+`Array.reduce` in JavaScript when no initial value is provided.
 */
-let reduce: (t<'a>, ('a, 'a) => 'a) => option<'a>
+let sum: (t<'a>, ('a, 'a) => 'a) => option<'a>
 
 /**
-`reduceUntil(source, accumulator, predicate)` calculates a single value from all
-the items in `source`. If `source` has more than one item, begin by applying
+`sumUntil(source, accumulator, predicate)` calculates a single value from the
+items in `source`. If `source` has more than one item, begin by applying
 `accumulator` to the first two items. Then feed that result into `accumulator`
-with the third element and so on until. If `source` is empty, returns `None`.
-The computation stops when `source` is exhausted or `predicate` returns `true`.
-The result is the first reduced value where `predicate` is `true`, or the final
-computed value if `predicate` is always false.
+with the third item and so on until. If `source` is empty, returns `None`. The
+computation stops when `source` is exhausted or `predicate` returns `true`. The
+result is the first sum where `predicate` is `true`, or the final sum if
+`predicate` is always false.
 
-**Note:** See `reduceWhile` if you want the last value, if any, where
-`predicate` is `true`.
+See `sumWhile` if you want the last value, if any, where `predicate` is `true`.
+See `foldWhile` for a related function that takes an initial value and can
+compute a value of a different type than the source.
+
+**Note:** Although the term `sum` is used, this function is not limited to
+adding numbers. The `accumulator` can concatenate strings, concatenate arrays,
+determine the minimum value of two, etc. This function is similar to
+`Array.reduce` in JavaScript when no initial value is provided.
 */
-let reduceUntil: (t<'a>, ('a, 'a) => 'a, 'a => bool) => option<'a>
+let sumUntil: (t<'a>, ('a, 'a) => 'a, 'a => bool) => option<'a>
 
 /**
-`reduceWhile(source, accumulator, predicate)` calculates a single value from all
-the items in `source`. If `source` has more than one item, begin by applying
+`sumWhile(source, accumulator, predicate)` calculates a single value from the
+items in `source`. If `source` has more than one item, begin by applying
 `accumulator` to the first two items. Then feed that result into `accumulator`
-with the third element and so on until. If `source` is empty, returns `None`.
-The computation stops when `source` is exhausted or `predicate` returns `false`.
-The result is the last value, if any, where `predicate` is `true`.
+with the third item and so on until. If `source` is empty, returns `None`. The
+computation stops when `source` is exhausted or `predicate` returns `false`. The
+result is the last sum, if any, where `predicate` is `true`.
 
-**Note:** See `reduceUntil` if you want the first reduced value where
-`predicate` returns `false`.
+See `sumUntil` if you want the first sum where `predicate` returns `false`. See
+`foldUntil` for a related function that takes an initial value and can computer
+a value of a different type than the source.
+
+**Note: **Although the term `sum` is used, this function is not limited to
+adding numbers. The `accumulator` can concatenate strings, concatenate arrays,
+determine the minimum value of two, etc. This function is similar to
+`Array.reduce` in JavaScript when no initial value is provided.
 */
-let reduceWhile: (t<'a>, ('a, 'a) => 'a, 'a => bool) => option<'a>
+let sumWhile: (t<'a>, ('a, 'a) => 'a, 'a => bool) => option<'a>
 
 /**
 `cumulativeSum(source, accumulator)` calculates the running totals for each item

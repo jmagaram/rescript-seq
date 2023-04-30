@@ -525,7 +525,7 @@ let foldWhile = (xx, zero, concat, predicate) => {
   }
 }
 
-let reduce = (xx, concat) =>
+let sum = (xx, concat) =>
   switch xx->headTail {
   | None => None
   | Some(x, xx) => {
@@ -535,7 +535,7 @@ let reduce = (xx, concat) =>
     }
   }
 
-let reduceUntil = (xx, concat, predicate) => {
+let sumUntil = (xx, concat, predicate) => {
   let rec go = (sum, xx) => {
     switch predicate(sum) {
     | true => Some(sum)
@@ -552,7 +552,7 @@ let reduceUntil = (xx, concat, predicate) => {
   }
 }
 
-let reduceWhile = (xx, concat, predicate) => {
+let sumWhile = (xx, concat, predicate) => {
   let rec go = (sum, xx) => {
     switch xx->headTail {
     | None => Some(sum)
@@ -601,7 +601,7 @@ let join = (xx, separator) =>
   | _ => xx->intersperse(separator)
   }->fold("", (total, i) => total ++ i)
 
-let last = xx => xx->reduce((_, i) => i)
+let last = xx => xx->sum((_, i) => i)
 
 let toArray = xx =>
   xx->fold([], (xx, i) => {
@@ -722,9 +722,9 @@ let tail = xx =>
     | Some(_, xx) => xx->nextNode
     }
 
-let minBy = (xx, cmp) => xx->reduce((sum, i) => cmp(i, sum) < 0 ? i : sum)
+let minBy = (xx, cmp) => xx->sum((sum, i) => cmp(i, sum) < 0 ? i : sum)
 
-let maxBy = (xx, cmp) => xx->reduce((sum, i) => cmp(i, sum) > 0 ? i : sum)
+let maxBy = (xx, cmp) => xx->sum((sum, i) => cmp(i, sum) > 0 ? i : sum)
 
 let rec interleave = (xx, yy) => {
   (. ()) => {

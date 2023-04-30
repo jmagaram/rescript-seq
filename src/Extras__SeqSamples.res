@@ -3,7 +3,7 @@ module Option = Belt.Option
 let intToString = Belt.Int.toString
 
 // Wrap any array in a sequence and then use all the Seq functions to filter,
-// map, reduce, and analyze it. This process does NOT copy the array; it just
+// map, fold, and analyze it. This process does NOT copy the array; it just
 // creates a lightweight function to iterate through its elements. When you're
 // done, call `toArray`.
 
