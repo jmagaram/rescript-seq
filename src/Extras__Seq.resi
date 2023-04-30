@@ -484,8 +484,8 @@ the items in `source`. If `source` has more than one item, begin by applying
 `accumulator` to the first two items. Then feed that result into `accumulator`
 with the third element and so on until. If `source` is empty, returns `None`.
 The computation stops when `source` is exhausted or `predicate` returns `true`.
-The result is the first reduced value where `predicate` is `true`, or the result
-of reducing all items when `predicate` always is `false`.
+The result is the first reduced value where `predicate` is `true`, or the final
+computed value if `predicate` is always false.
 
 **Note:** See `reduceWhile` if you want the last value, if any, where
 `predicate` is `true`.
