@@ -470,7 +470,7 @@ let foldUntil: (t<'a>, 'b, ('b, 'a) => 'b, 'b => bool) => 'b
 `reduce(source, accumulator)` calculates a single value from all the items in
 `source`. If `source` has a single item, no "reduction" occurs; that item is the
 result. Otherwise begin by applying `accumulator` to the first two items. Then
-feed that result into `accumulator` with the third element and so on until. If
+feed that result into `accumulator` with the third element and so on. If
 `source` is empty, returns `None`.
 
 See `fold` for a related function that takes an initial value and succeeds with
@@ -713,3 +713,20 @@ of items in `source` based on their indexed position (not value), from 1 to
 tuple. 
 */
 let permutations: (t<'a>, int) => t<(int, t<'a>)>
+
+// /**
+// `reduceAdjacent(source, kind, kindEquals)` divides the input sequence into non-overlapping
+// arrays based on their kind, as defined by the `kind`. Data must be sorted. Does adjacent.
+// */
+// let reduceAdjacent: (
+//   t<'a>,
+//   ~key: 'a => 'key=?,
+//   ~val: 'a => 'val=?,
+//   ~eq: ('key, 'key) => bool=?,
+//   ~init: 'val => 'sum,
+//   ~add: ('sum, 'val) => 'sum,
+// ) => t<('key, 'sum)>
+// key value pairs? chunkValuesByKey
+// chunkByKey
+// collectAdjacent?
+// groupAdjacent?
