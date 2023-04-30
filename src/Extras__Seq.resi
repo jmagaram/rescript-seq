@@ -746,20 +746,3 @@ of items in `source` based on their indexed position (not value), from 1 to
 tuple. 
 */
 let permutations: (t<'a>, int) => t<(int, t<'a>)>
-
-// /**
-// `reduceAdjacent(source, kind, kindEquals)` divides the input sequence into non-overlapping
-// arrays based on their kind, as defined by the `kind`. Data must be sorted. Does adjacent.
-// */
-// let reduceAdjacent: (
-//   t<'a>,
-//   ~key: 'a => 'key=?,
-//   ~val: 'a => 'val=?,
-//   ~eq: ('key, 'key) => bool=?,
-//   ~init: 'val => 'sum,
-//   ~add: ('sum, 'val) => 'sum,
-// ) => t<('key, 'sum)>
-// key value pairs? chunkValuesByKey
-// chunkByKey
-// collectAdjacent?
-// groupAdjacent?
