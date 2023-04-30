@@ -468,9 +468,9 @@ let foldUntil: (t<'a>, 'b, ('b, 'a) => 'b, 'b => bool) => 'b
 
 /**
 `reduce(source, accumulator)` applies a function to each element of the
-sequence, threading an accumulator argument through the computation. Begin by
-applying the function to the first two elements. Then feed this result into the
-function along with the third element and so on. Return the final result. If
+sequence, threading `accumulator` through the computation. Begin by applying the
+`accumulator` to the first two elements. Then feed this result into
+`accumulator` with the third element and so on. Return the final result. If
 `source` has a single item, that is the result. If `source` is empty, returns
 `None`.
 
@@ -480,6 +480,21 @@ initial value is provided. This function only terminates if the sequence is
 finite.
 */
 let reduce: (t<'a>, ('a, 'a) => 'a) => option<'a>
+
+/**
+`reduceUntil(source, accumulator, predicate)` applies a function to each element
+of the sequence, threading `accumulator` through the computation. Begin by
+applying `accumulator` to the first two elements. Then feed this result into
+`accumulator` along with the third element and so on. The computation ends when
+`source` is exhausted, or when the `predicate` applied to the accumulated value
+is satisfied. If `source` has a single item and it satisfies the predicate, that
+is the result. If `source` has a single item and it does not satisfy the
+predicate, or is `source` is empty, return `None`.
+
+**Note:** If you want the last value before a predicate is satisfied, see
+`reduceWhile`.
+*/
+let reduceUntil: (t<'a>, ('a, 'a) => 'a, 'a => bool) => option<'a>
 
 /**
 `forEach(source, f)` eagerly applies `f` to each item in the sequence. This does
