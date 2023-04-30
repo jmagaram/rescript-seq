@@ -15,13 +15,31 @@
 
 ## Notes
 
-- Haskell uses `replicate` to replicate a specific number of times and `repeat` for repeating forever
-- `groupBy`, `split`, etc.
+- `groupBy`, `split`, etc. Think through naming again.
+- Which functions should return a result rather than option?
+- When sequence has an implicit sort order, lots of useful things ot do like `distinctAdjacent` or `chunkBy` (date, increasing sequences, etc.)
 - `uniqueBy` could be very useful; requires scan which is advanced to implement
 - Remove some functions from array since in seq now
 - Look at API breaking functions in other parts of the extras package
 - Look at all code for problems
 - Separate project?
+
+### Proposed feature: chunking, splitting
+
+Use cases for sorted sequences:
+
+- Find sequences of increasing numbers
+- Group sales into weekday and weekend
+- Find distinct values (distinct adjacent does the job since it is all sorted)
+
+Implementation ideas:
+
+- `chunkAdjacent` with a key definer; new group happens when the key changes; sometimes useful to get previous and current at the same time when doing this
+- `while` and `until` might be useful terms
+- maximum number of splits might be useful
+- `resultSelector` given a sequence of items in a chunk, make something from it; not necessarily an array
+- a comparator might be needed to know if a new chunk is being created
+- `chunkWhile` (separator )
 
 ### Proposed feature: distinctBy
 
@@ -88,11 +106,11 @@ iter2, fold_left2, for_all2, exists2, group, map_product, unzip, partition_map, 
 
 ### Supported
 
-allPairs, append, cache, choose, chunkBySize, collect, compareWith, concat, delay, empty, exists, filter, fold, forAll, head, indexed, init, initInfinite, isEmpty, iter, iteri, last, length, map, map2, map3, mapFold, mapi, maxBy, minBy, ofArray, ofList, pairwise, pick, replicate, rev, scan, singleton, skip, skipWhile, sortWith, tail, takeWhile, toArray, toList, truncate, tryExactlyOne, tryFind, tryHead, tryLast, tryPick, unfold, where, windowed, zip, zip3
+allPairs, append, cache, choose, chunkBySize, collect, compareWith, concat, delay, empty, exists, filter, fold, forAll, head, indexed, init, initInfinite, isEmpty, iter, iteri, last, length, map, map2, map3, mapFold, mapi, maxBy, minBy, ofArray, ofList, pairwise, pick, replicate, reduce, rev, scan, singleton, skip, skipWhile, sortWith, tail, takeWhile, toArray, toList, truncate, tryExactlyOne, tryFind, tryHead, tryLast, tryPick, unfold, where, windowed, zip, zip3
 
 ### Not supported
 
-average, averageBy, cast, contains, countBy, distinctBy, exactlyOne, except, exists2, findBack, findIndex, fold2, foldBack, foldBack2, forAll2, groupBy, insertAt, insertManyAt, item (nth), iter2, iteri2, mapFoldBack, mapi2, max, min, permute, readonly, reduce, reduceBack, removeAt, removeManyAt, scanBack, sort, sortBy, sortByDescending, sortDescending, sortWith, splitInto, sum, sumBy, transpose, take (throws like takeExactly), tryFindBack, tryFindIndex, tryFindIndexBack, tryItem, updateAt
+average, averageBy, cast, contains, countBy, distinctBy, exactlyOne, except, exists2, findBack, findIndex, fold2, foldBack, foldBack2, forAll2, groupBy, insertAt, insertManyAt, item (nth), iter2, iteri2, mapFoldBack, mapi2, max, min, permute, readonly, reduceBack, removeAt, removeManyAt, scanBack, sort, sortBy, sortByDescending, sortDescending, sortWith, splitInto, sum, sumBy, transpose, take (throws like takeExactly), tryFindBack, tryFindIndex, tryFindIndexBack, tryItem, updateAt
 
 ## .net Enumerable
 
@@ -142,6 +160,7 @@ range (with step), objectEntries, objectKeys, objectValues, append (one value), 
 
 [MoreLINQ on Github](https://github.com/morelinq/MoreLINQ)
 
+[Video series on many of these](https://markheath.net/category/MoreLINQ)
 Not investigated everything yet
 
 ### Supported
