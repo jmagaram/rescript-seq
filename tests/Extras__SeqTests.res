@@ -1491,12 +1491,12 @@ let cumulativeSumTests = {
     ],
   )->Js.Array2.concat([
     valueEqual(
-      ~title="prefixSums",
+      ~title="cumulativeSum",
       ~expectation="millions",
       ~a=() => S.range(1, 999_999)->S.cumulativeSum((_, n) => n)->S.last,
       ~b=Some(999_999),
     ),
-    willNotThrow(~title="prefixSums", ~expectation="lazy", () => death()->S.cumulativeSum(add)),
+    willNotThrow(~title="cumulativeSum", ~expectation="lazy", () => death()->S.cumulativeSum(add)),
   ])
 }
 
@@ -2098,6 +2098,7 @@ let tests = [
   prependTests,
   rangeMapTests,
   rangeTests,
+  sumTests,
   replicateTests,
   replicateWithTests,
   reverseTests,
@@ -2111,7 +2112,6 @@ let tests = [
   someTests,
   sortByTests,
   sortedMergeTests,
-  sumTests,
   sumUntilTests,
   sumWhileTests,
   tailTests,
