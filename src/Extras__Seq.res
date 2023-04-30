@@ -350,20 +350,18 @@ let filterOk = xx =>
     }
   )
 
-let scani = (xx, ~zero, f) => {
+let scan = (xx, zero, f) => {
   let rec go = (xx, sum) =>
     (. ()) =>
       switch xx->nextNode {
       | End => End
-      | Next((x, inx), xx) => {
-          let sum = f(~sum, ~val=x, ~inx)
+      | Next(x, xx) => {
+          let sum = f(sum, x)
           Next(sum, go(xx, sum))
         }
       }
-  concat(once(zero), go(xx->indexed, zero))
+  concat(once(zero), go(xx, zero))
 }
-
-let scan = (xx, zero, f) => scani(xx, ~zero, (~sum, ~val, ~inx as _) => f(sum, val))
 
 let rec sortedMerge = (xx, yy, cmp) => {
   (. ()) =>
@@ -453,7 +451,8 @@ let chunkBySize = (xx, length) => {
   xx
   ->map(i => Some(i))
   ->concat(replicate(length - 1, None))
-  ->scani(~zero=[], (~sum, ~val, ~inx) => {
+  ->indexed
+  ->scan([], (sum, (val, inx)) => {
     switch val {
     | None => sum
     | Some(value) =>
@@ -476,7 +475,7 @@ let window = (xx, length) => {
     )->raise
   }
   xx
-  ->scani(~zero=[], (~sum, ~val, ~inx as _) => {
+  ->scan([], (sum, val) => {
     if Js.Array2.length(sum) >= length {
       sum->Js.Array2.shift->ignore
     }
@@ -753,7 +752,8 @@ let windowAhead = (xx, size) => {
   xx
   ->map(i => Some(i))
   ->concat(replicate(size - 1, None))
-  ->scani(~zero=[], (~sum, ~val as i, ~inx) => {
+  ->indexed
+  ->scan([], (sum, (i, inx)) => {
     if inx >= size {
       sum->Js.Array2.shift->ignore
     }

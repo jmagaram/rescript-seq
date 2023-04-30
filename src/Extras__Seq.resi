@@ -268,14 +268,6 @@ it returns a sequence of accumulators (partial sums).
 let scan: (t<'a>, 'b, ('b, 'a) => 'b) => t<'b>
 
 /**
-`scan(source, zero, accumulator)` is conceptually related to `fold`. However
-instead of performing an eager evaluation and returning the final accumulator,
-it returns a sequence of accumulators (partial sums). The callback receives the
-zero-based index of each item.
-*/
-let scani: (t<'a>, ~zero: 'b, (~sum: 'b, ~val: 'a, ~inx: int) => 'b) => t<'b>
-
-/**
 `cache` memoizes the values in a sequence. This is typically useful when
 repeatedly evaluating items in the original sequence is computationally
 expensive or if iterating the sequence causes side-effects that the user does

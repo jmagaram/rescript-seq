@@ -23,6 +23,7 @@
   - `Array.filterSomeWith`; use Seq module instead
   - `Seq.characters`; many ways to split a string and with Core it will feel better since you can do `String.split` not `Js.String2.split`.
   - `Seq.startWith` and `Seq.endWith`; use `concat` and `prepend` with `Seq.once`.
+  - `Seq.scani`; just call `indexed` beforehand if index is needed. The mapping within scan removes the index if it isn't desired, unlike `filteri`.
 - Add
   - `Seq.foldUntil`
   - `Seq.foldWhile`
