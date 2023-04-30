@@ -473,9 +473,10 @@ See `fold` for a related function that takes an initial value and can compute a
 value of a different type than the source.
 
 **Note:** Although the term `sum` is used, this function is not limited to
-adding numbers. The `accumulator` can concatenate strings, concatenate arrays,
-determine the minimum value of two, etc. This function is similar to
-`Array.reduce` in JavaScript when no initial value is provided.
+adding numbers. The `accumulator` can concatenate strings and arrays, determine
+the smaller of two numbers, perform logical operations on booleans, etc. This
+function is similar to `Array.reduce` in JavaScript when no initial value is
+provided.
 */
 let sum: (t<'a>, ('a, 'a) => 'a) => option<'a>
 
@@ -493,9 +494,10 @@ See `foldWhile` for a related function that takes an initial value and can
 compute a value of a different type than the source.
 
 **Note:** Although the term `sum` is used, this function is not limited to
-adding numbers. The `accumulator` can concatenate strings, concatenate arrays,
-determine the minimum value of two, etc. This function is similar to
-`Array.reduce` in JavaScript when no initial value is provided.
+adding numbers. The `accumulator` can concatenate strings and arrays, determine
+the smaller of two numbers, perform logical operations on booleans, etc. This
+function is similar to `Array.reduce` in JavaScript when no initial value is
+provided.
 */
 let sumUntil: (t<'a>, ('a, 'a) => 'a, 'a => bool) => option<'a>
 
@@ -511,10 +513,11 @@ See `sumUntil` if you want the first sum where `predicate` returns `false`. See
 `foldUntil` for a related function that takes an initial value and can computer
 a value of a different type than the source.
 
-**Note: **Although the term `sum` is used, this function is not limited to
-adding numbers. The `accumulator` can concatenate strings, concatenate arrays,
-determine the minimum value of two, etc. This function is similar to
-`Array.reduce` in JavaScript when no initial value is provided.
+**Note:** Although the term `sum` is used, this function is not limited to
+adding numbers. The `accumulator` can concatenate strings and arrays, determine
+the smaller of two numbers, perform logical operations on booleans, etc. This
+function is similar to `Array.reduce` in JavaScript when no initial value is
+provided.
 */
 let sumWhile: (t<'a>, ('a, 'a) => 'a, 'a => bool) => option<'a>
 
@@ -526,6 +529,12 @@ result is the first item in `source`. Subsequent results are computed using
 
 See `scan` for a related function that takes an initial value and can generate
 values of a different type than the source.
+
+**Note:** Although the term `sum` is used, this function is not limited to
+adding numbers. The `accumulator` can concatenate strings and arrays, determine
+the smaller of two numbers, perform logical operations on booleans, etc. This
+function is similar to `Array.reduce` in JavaScript when no initial value is
+provided.
 */
 let cumulativeSum: (t<'a>, ('a, 'a) => 'a) => t<'a>
 
