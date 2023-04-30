@@ -575,6 +575,26 @@ let reduceWhile = (xx, concat, predicate) => {
   }
 }
 
+let cumulativeSum = (xx, accumulator) =>
+  (. ()) => {
+    switch xx->headTail {
+    | None => End
+    | Some(x, xx) =>
+      cons(
+        x,
+        unfold((x, xx), ((sum, xx)) =>
+          switch xx->headTail {
+          | None => None
+          | Some(x, xx) => {
+              let sum' = accumulator(sum, x)
+              Some(sum', (sum', xx))
+            }
+          }
+        ),
+      )->nextNode
+    }
+  }
+
 let join = (xx, separator) =>
   switch separator->Js.String2.length {
   | 0 => xx

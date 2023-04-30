@@ -1479,6 +1479,27 @@ let reduceTests = {
   )
 }
 
+let cumulativeSumTests = {
+  let add = (sum, x) => sum + x
+  makeSeqEqualsTests(
+    ~title="prefixSums",
+    [
+      ([]->S.fromArray->S.cumulativeSum(add), [], ""),
+      ([1]->S.fromArray->S.cumulativeSum(add), [1], ""),
+      ([1, 2]->S.fromArray->S.cumulativeSum(add), [1, 3], ""),
+      ([1, 2, 3, 4, 5]->S.fromArray->S.cumulativeSum(add), [1, 3, 6, 10, 15], ""),
+    ],
+  )->Js.Array2.concat([
+    valueEqual(
+      ~title="prefixSums",
+      ~expectation="millions",
+      ~a=() => S.range(1, 999_999)->S.cumulativeSum((_, n) => n)->S.last,
+      ~b=Some(999_999),
+    ),
+    willNotThrow(~title="prefixSums", ~expectation="lazy", () => death()->S.cumulativeSum(add)),
+  ])
+}
+
 // keep reducing until some predicate returns true or until the end of the sequence
 // untilExhaustedOr
 // then return that value
@@ -2021,6 +2042,7 @@ let tests = [
   concatTests,
   consTests,
   consumeTests,
+  cumulativeSumTests,
   cycleTests,
   delayTests,
   dropTests,

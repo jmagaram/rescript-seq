@@ -502,6 +502,17 @@ The result is the last value, if any, where `predicate` is `true`.
 let reduceWhile: (t<'a>, ('a, 'a) => 'a, 'a => bool) => option<'a>
 
 /**
+`cumulativeSum(source, accumulator)` calculates the running totals for each item
+in `source`. This is also known as an `inclusive scan`. The first item in the
+result is the first item in `source`. Subsequent results are computed using
+`accumulator(previousSum, nextItem)`. If `source` is empty, the result is empty.
+
+See `scan` for a related function that takes an initial value and can generate
+values of a different type than the source.
+*/
+let cumulativeSum: (t<'a>, ('a, 'a) => 'a) => t<'a>
+
+/**
 `forEach(source, f)` eagerly applies `f` to each item in the sequence. This does
 not return any value. It is useful for performing side-effects like logging
 values to the console.

@@ -57,6 +57,7 @@ let unfold: ('a, 'a => option<('b, 'a)>) => t<'b>
 
 let cache: t<'a> => t<'a>
 let chunkBySize: (t<'a>, int) => t<array<'a>>
+let cumulativeSum: (t<'a>, ('a, 'a) => 'a) => t<'a>
 let drop: (t<'a>, int) => t<'a>
 let dropUntil: (t<'a>, 'a => bool) => t<'a>
 let dropWhile: (t<'a>, 'a => bool) => t<'a>
