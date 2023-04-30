@@ -472,6 +472,15 @@ where `predicate` is `true` or the final computed value if `predicate` is always
 let foldUntil: (t<'a>, 'b, ('b, 'a) => 'b, 'b => bool) => 'b
 
 /**
+`foldWhile(source, zero, accumulator, predicate)` invokes `accumulator`
+successively for items in `source`, starting with the provided `zero` value. The
+computation stops after `source` is exhausted, or after `predicate` applied to
+`zero` or the current accumulated result is `false`. Returns the last result,
+if any, where `predicate` is `true`.
+*/
+let foldWhile: (t<'a>, 'b, ('b, 'a) => 'b, 'b => bool) => option<'b>
+
+/**
 `reduce(source, accumulator)` calculates a single value from all the items in
 `source`. If `source` has a single item, no "reduction" occurs; that item is the
 result. Otherwise begin by applying `accumulator` to the first two items. Then

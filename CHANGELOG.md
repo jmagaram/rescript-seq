@@ -25,6 +25,7 @@
   - `Seq.startWith` and `Seq.endWith`; use `concat` and `prepend` with `Seq.once`.
 - Add
   - `Seq.foldUntil`
+  - `Seq.foldWhile`
   - `Seq.reduceUntil`
   - `Seq.reduceWhile`
   - `Seq.reduce` (like `Seq.fold` but no initial parameter)

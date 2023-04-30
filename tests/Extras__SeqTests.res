@@ -1399,18 +1399,10 @@ let foldUntilTests = {
     ~title="foldUntil",
     [
       // zero items
-      (() => S.empty->S.foldUntil(100, add, _ => false), 100, "if empty => zero"),
-      (() => S.empty->S.foldUntil(100, add, _ => true), 100, "if empty => zero"),
-      (
-        () => S.empty->S.foldUntil(100, throwIfTryToAdd, i => i == 100),
-        100,
-        "if zero satisfies, do not call accumulator",
-      ),
-      (
-        () => death()->S.foldUntil(100, throwIfTryToAdd, i => i == 100),
-        100,
-        "if zero satisfies, do not iterate sequence",
-      ),
+      (() => S.empty->S.foldUntil(100, add, _ => false), 100, ""),
+      (() => S.empty->S.foldUntil(100, add, _ => true), 100, ""),
+      (() => S.empty->S.foldUntil(100, throwIfTryToAdd, i => i == 100), 100, ""),
+      (() => death()->S.foldUntil(100, add, i => i == 100), 100, ""),
       // one item
       (() => S.once(1)->S.foldUntil(100, add, i => i == 100), 100, ""),
       (() => S.once(1)->S.foldUntil(100, add, _ => false), 101, ""),
@@ -1427,6 +1419,46 @@ let foldUntilTests = {
       (() => S.range(1, 3)->S.foldUntil(100, add, _ => false), 106, ""),
       // millions
       (() => S.range(1, 999_999)->S.foldUntil(0, (_, i) => i, _ => false), 999_999, "millions"),
+    ],
+  )
+}
+
+let foldWhileTests = {
+  let add = (total, x) => total + x
+  let throwIfTryToAdd = (total, x) => {
+    throwIfInvoked()->ignore
+    total + x
+  }
+  makeValueEqualTests(
+    ~title="foldWhile",
+    [
+      // if predicate always false, return None
+      (() => S.empty->S.foldWhile(100, add, _ => false), None, ""),
+      (() => S.once(1)->S.foldWhile(100, add, _ => false), None, ""),
+      (() => S.range(1, 2)->S.foldWhile(100, add, _ => false), None, ""),
+      (() => S.range(1, 3)->S.foldWhile(100, add, _ => false), None, ""),
+      (() => death()->S.foldWhile(100, add, _ => false), None, ""),
+      // zero items
+      (() => S.empty->S.foldWhile(100, add, _ => true), Some(100), ""),
+      (() => S.empty->S.foldWhile(100, throwIfTryToAdd, _ => true), Some(100), ""),
+      // one item
+      (() => S.once(1)->S.foldWhile(100, add, i => i == 100), Some(100), ""),
+      (() => S.once(1)->S.foldWhile(100, add, i => i <= 101), Some(101), ""),
+      // two items
+      (() => S.range(1, 2)->S.foldWhile(100, add, i => i == 100), Some(100), ""),
+      (() => S.range(1, 2)->S.foldWhile(100, add, i => i <= 101), Some(101), ""),
+      (() => S.range(1, 2)->S.foldWhile(100, add, i => i <= 103), Some(103), ""),
+      // three items
+      (() => S.range(1, 3)->S.foldWhile(100, add, i => i == 100), Some(100), ""),
+      (() => S.range(1, 3)->S.foldWhile(100, add, i => i <= 101), Some(101), ""),
+      (() => S.range(1, 3)->S.foldWhile(100, add, i => i <= 103), Some(103), ""),
+      (() => S.range(1, 3)->S.foldWhile(100, add, i => i <= 106), Some(106), ""),
+      // millions
+      (
+        () => S.range(1, 999_999)->S.foldWhile(0, (_, i) => i, i => i <= 999_998),
+        Some(999_998),
+        "millions",
+      ),
     ],
   )
 }
@@ -2011,6 +2043,7 @@ let tests = [
     flattenTests,
   foldTests,
   foldUntilTests,
+  foldWhileTests,
     forEachTests,
     foreverTests,
     foreverWithTests,

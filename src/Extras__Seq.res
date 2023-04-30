@@ -508,6 +508,24 @@ let foldUntil = (xx, zero, concat, predicate) => {
   go(xx, zero)
 }
 
+let foldWhile = (xx, zero, concat, predicate) => {
+  let rec go = (xx, sum) =>
+    switch xx->headTail {
+    | None => Some(sum)
+    | Some(x, xx) => {
+        let sum' = concat(sum, x)
+        switch predicate(sum') {
+        | true => go(xx, sum')
+        | false => Some(sum)
+        }
+      }
+    }
+  switch predicate(zero) {
+  | false => None
+  | true => go(xx, zero)
+  }
+}
+
 let foldi = (xx, ~zero, concat) =>
   xx->indexed->fold(zero, (sum, (val, inx)) => concat(~sum, ~val, ~inx))
 
