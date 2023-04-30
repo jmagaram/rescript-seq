@@ -764,29 +764,29 @@ let windowAhead = (xx, size) => {
 }
 
 let everyOk = xx => {
-  xx
-  ->scan(Ok(empty), (sum, x) =>
-    switch x {
-    | Ok(ok) => sum->Result.map(oks => concat(oks, once(ok)))
-    | Error(_) as err => err
+  let concat = (sum, i) =>
+    switch sum {
+    | Error(_) as error => error
+    | Ok(oks) =>
+      switch i {
+      | Error(_) as error => error
+      | Ok(ok) => Ok(oks->concat(ok->once))
     }
-  )
-  ->takeUntil(Result.isError(_))
-  ->last
-  ->Option.getUnsafe
+    }
+  xx->foldUntil(Ok(empty), concat, Result.isError)
 }
 
 let everySome = xx => {
-  xx
-  ->scan(Some(empty), (sum, x) =>
-    switch x {
-    | Some(ok) => sum->Option.map(oks => concat(oks, once(ok)))
+  let concat = (sum, i) =>
+    switch sum {
     | None => None
+    | Some(somes) =>
+      switch i {
+      | None => None
+      | Some(some) => Some(somes->concat(some->once))
     }
-  )
-  ->takeUntil(Option.isNone(_))
-  ->last
-  ->Option.flatMap(i => i)
+    }
+  xx->foldUntil(Some(empty), concat, Option.isNone)
 }
 
 let toOption = xx =>
