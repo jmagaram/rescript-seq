@@ -541,8 +541,8 @@ let reduce = (xx, concat) =>
 
 let reduceUntil = (xx, concat, predicate) => {
   let rec go = (sum, xx) => {
-        switch predicate(sum) {
-        | true => Some(sum)
+    switch predicate(sum) {
+    | true => Some(sum)
     | false =>
       switch xx->headTail {
       | None => Some(sum)
@@ -771,7 +771,7 @@ let everyOk = xx => {
       switch i {
       | Error(_) as error => error
       | Ok(ok) => Ok(oks->concat(ok->once))
-    }
+      }
     }
   xx->foldUntil(Ok(empty), concat, Result.isError)
 }
@@ -784,7 +784,7 @@ let everySome = xx => {
       switch i {
       | None => None
       | Some(some) => Some(somes->concat(some->once))
-    }
+      }
     }
   xx->foldUntil(Some(empty), concat, Option.isNone)
 }
@@ -878,5 +878,3 @@ let (combinations, permutations) = {
 }
 
 let toList = xx => xx->reverse->fold(list{}, Belt.List.add)
-
-// aaaabbbbbccccc taking LAST of each group
