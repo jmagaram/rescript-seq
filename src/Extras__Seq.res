@@ -523,24 +523,18 @@ let reduce = (xx, concat) =>
 
 let reduceUntil = (xx, concat, predicate) => {
   let rec go = (sum, xx) => {
-    switch xx->headTail {
-    | None => Some(sum)
-    | Some(x, xx) => {
-        let sum = concat(sum, x)
         switch predicate(sum) {
         | true => Some(sum)
-        | false => go(sum, xx)
-        }
+    | false =>
+      switch xx->headTail {
+      | None => Some(sum)
+      | Some(x, xx) => go(concat(sum, x), xx)
       }
     }
   }
   switch xx->headTail {
   | None => None
-  | Some(x, xx) =>
-    switch predicate(x) {
-    | true => Some(x)
-    | false => go(x, xx)
-    }
+  | Some(x, xx) => go(x, xx)
   }
 }
 
