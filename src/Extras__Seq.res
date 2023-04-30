@@ -895,3 +895,24 @@ let (combinations, permutations) = {
 }
 
 let toList = xx => xx->reverse->fold(list{}, Belt.List.add)
+
+let foldAdjacent = (xx: t<'a>, init: 'a => 'b, acc: ('b, 'a) => option<'b>) =>
+  xx
+  ->scan((0, None), ((group, sum), x) =>
+    switch sum {
+    | None => (1, Some(init(x)))
+    | Some(sum) =>
+      switch acc(sum, x) {
+      | None => (group + 1, Some(init(x)))
+      | Some(sum') => (group, Some(sum'))
+      }
+    }
+  )
+  ->concat((-1, None)->once)
+  ->pairwise
+  ->filterMap(((a, b)) =>
+    switch (a, b) {
+    | ((aGroup, aSum), (bGroup, _)) if aGroup !== bGroup => aSum
+    | _ => None
+    }
+  )

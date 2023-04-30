@@ -16,7 +16,7 @@ Highlights:
 - **Build sequences** using `fromArray`, `range`, `unfold`, `cycle`, `replicate` and others. This enables functionality similar to [JavaScript generators](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Generator).
 - **Transform** sequences with `map`, `filter`, `take`, `dropWhile`, `scan`, `tap`, `window`, and others.
 - **Combine** multiple sequences with `zip`, `zip3`, `map2`, `map3`, `sortedMerge`, `interleave` and others.
-- **Calculate** values with `reduce`, `some`, `findMap`, `isSortedBy`, `minBy`, `toArray` and others.
+- **Calculate** values with `fold`, `some`, `findMap`, `isSortedBy`, `minBy`, `toArray` and others.
 - Ready for your contributions! :two_men_holding_hands: There are many other useful functions, and it would be great to have `async` versions.
 
 See code [examples](src/Extras__SeqSamples.res) to get a sense for how `Seq` is used and what is possible.
@@ -69,6 +69,7 @@ let filterOk: t<result<'a, 'b>> => t<'a>
 let filterSome: t<option<'a>> => t<'a>
 let flatMap: (t<'a>, 'a => t<'b>) => t<'b>
 let flatten: t<t<'a>> => t<'a>
+let foldAdjacent: (t<'a>, 'a => 'b, ('b, 'a) => option<'b>) => t<'b>
 let indexed: t<'a> => t<('a, int)>
 let intersperse: (t<'a>, 'a) => t<'a>
 let intersperseWith: (t<'a>, unit => 'a) => t<'a>
@@ -131,8 +132,8 @@ let maxBy: (t<'a>, ('a, 'a) => int) => option<'a>
 let minBy: (t<'a>, ('a, 'a) => int) => option<'a>
 let orElse: (t<'a>, t<'a>) => t<'a>
 let reduce: (t<'a>, ('a, 'a) => 'a) => option<'a>
-let reduceUntil: (t<'a>, ('a, 'a) => 'a, 'a => bool) => option<'a>
-let reduceWhile: (t<'a>, ('a, 'a) => 'a, 'a => bool) => option<'a>
+let sumUntil: (t<'a>, ('a, 'a) => 'a, 'a => bool) => option<'a>
+let sumWhile: (t<'a>, ('a, 'a) => 'a, 'a => bool) => option<'a>
 let some: (t<'a>, 'a => bool) => bool
 let toArray: t<'a> => array<'a>
 let toList: t<'a> => list<'a>

@@ -746,3 +746,21 @@ of items in `source` based on their indexed position (not value), from 1 to
 tuple. 
 */
 let permutations: (t<'a>, int) => t<(int, t<'a>)>
+
+/**
+`foldAdjacent(source, init, accumulator)` divides `source` into  non-overlapping
+groups of adjacent items, create a total of some kind for each group, and then
+returns a sequence of group totals. The first group is created by passing the
+first item to `init`; this group consists of a single item. The `accumulator` is
+then called with subsequent items. If `accumulator` returns `Some`, the current
+group is updated to incorporate the new item. If `accumulator` returns `None`,
+that signifies that the current group is "full" and a new group is then created
+using the `init` function.
+
+This function is particularly useful if `source` is sorted. For example, a
+sequence of sales could be grouped by month. Each month summary could be a tuple
+like `(month, salesTotal)` or `(month, salesArray)`. The grouping criteria and
+summarization approach is completely customizable based on the `init` and
+`accumulator` functions you provide.
+*/
+let foldAdjacent: (t<'a>, 'a => 'b, ('b, 'a) => option<'b>) => t<'b>

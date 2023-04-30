@@ -28,6 +28,7 @@
 - Add
   - `Seq.foldUntil`
   - `Seq.foldWhile`
+  - `Seq.foldAdjacent`
   - `Seq.sumUntil`
   - `Seq.sumWhile`
   - `Seq.cumulativeSum` (like `scan` but does not take an initial parameter)

@@ -1796,6 +1796,29 @@ let delayTests =
     willNotThrow(~title="delay", ~expectation="lazy", () => S.delay(throwIfInvoked)),
   ])
 
+let foldAdjacentTests = {
+  let kind = n => mod(n, 2) == 0 ? "e" : "o"
+  let countAdjacentParity = xx =>
+    xx
+    ->S.fromArray
+    ->S.foldAdjacent(n => (kind(n), 1), ((k, count), n) => kind(n) == k ? Some(k, count + 1) : None)
+  makeSeqEqualsTests(
+    ~title="foldAdjacent",
+    [
+      ([]->countAdjacentParity, [], ""),
+      ([1]->countAdjacentParity, [("o", 1)], ""),
+      ([1, 1]->countAdjacentParity, [("o", 2)], ""),
+      ([1, 1, 1]->countAdjacentParity, [("o", 3)], ""),
+      ([1, 1, 1, 2]->countAdjacentParity, [("o", 3), ("e", 1)], ""),
+      (
+        [1, 2, 2, 2, 3, 2, 2, 1]->countAdjacentParity,
+        [("o", 1), ("e", 3), ("o", 1), ("e", 2), ("o", 1)],
+        "",
+      ),
+    ],
+  )
+}
+
 let (combinationTests, permutationTests) = {
   let sortLetters = w =>
     w->String.split("")->Belt.SortArray.stableSortBy(stringCmp)->Js.Array2.joinWith("")
@@ -2063,6 +2086,7 @@ let tests = [
   findTests,
   flatMapTests,
   flattenTests,
+  foldAdjacentTests,
   foldTests,
   foldUntilTests,
   foldWhileTests,
