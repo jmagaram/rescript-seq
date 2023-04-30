@@ -442,32 +442,6 @@ let dropWhile = (xx, f) =>
     ->Option.map(((x, xx)) => Next(x, xx))
     ->Option.getWithDefault(End)
 
-let chunkBySize = (xx, length) => {
-  if length <= 0 {
-    InvalidArgument(
-      `chunkByyize requires a length > 0. You asked for ${length->Belt.Int.toString}`,
-    )->raise
-  }
-  xx
-  ->map(i => Some(i))
-  ->concat(replicate(length - 1, None))
-  ->indexed
-  ->scan([], (sum, (val, inx)) => {
-    switch val {
-    | None => sum
-    | Some(value) =>
-      switch mod(inx, length) {
-      | 0 => [value]
-      | _ =>
-        sum->Js.Array2.push(value)->ignore
-        sum
-      }
-    }
-  })
-  ->filteri((_, inx) => mod(inx, length) == 0)
-  ->drop(1)
-}
-
 let window = (xx, length) => {
   if length <= 0 {
     InvalidArgument(
@@ -916,3 +890,22 @@ let foldAdjacent = (xx, init, acc) =>
     | _ => None
     }
   )
+
+let chunkBySize = (xx, length) => {
+  if length <= 0 {
+    InvalidArgument(
+      `chunkBySize requires a length > 0. You asked for ${length->Belt.Int.toString}`,
+    )->raise
+  }
+  xx->foldAdjacent(
+    i => [i],
+    (sum, i) =>
+      switch sum->Js.Array2.length == length {
+      | true => None
+      | false => {
+          sum->Js.Array2.push(i)->ignore
+          Some(sum)
+        }
+      },
+  )
+}
