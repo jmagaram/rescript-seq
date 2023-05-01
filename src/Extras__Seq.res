@@ -870,26 +870,31 @@ let (combinations, permutations) = {
 
 let toList = xx => xx->reverse->fold(list{}, Belt.List.add)
 
-let foldAdjacent = (xx, init, acc) =>
-  xx
-  ->scan((0, None), ((group, sum), x) =>
-    switch sum {
-    | None => (1, Some(init(x)))
-    | Some(sum) =>
+let foldAdjacent = (xx, init, acc) => {
+  let rec foldGroup = (sum, xx) => {
+    switch xx->headTail {
+    | None => (sum, None)
+    | Some(x, xx) =>
       switch acc(sum, x) {
-      | None => (group + 1, Some(init(x)))
-      | Some(sum') => (group, Some(sum'))
+      | None => (sum, Some(init(x), xx))
+      | Some(sum) => foldGroup(sum, xx)
       }
     }
-  )
-  ->concat((-1, None)->once)
-  ->pairwise
-  ->filterMap(((a, b)) =>
-    switch (a, b) {
-    | ((aGroup, aSum), (bGroup, _)) if aGroup !== bGroup => aSum
-    | _ => None
+  }
+  let rec generate = (sum, xx) =>
+    (. ()) => {
+      let (sum', next) = foldGroup(sum, xx)
+      switch next {
+      | None => Next(sum', empty)
+      | Some((sum, xx)) => Next(sum', generate(sum, xx))
+      }
     }
-  )
+  (. ()) =>
+    switch xx->headTail {
+    | None => End
+    | Some(x, xx) => generate(init(x), xx)->nextNode
+    }
+}
 
 let chunkBySize = (xx, length) => {
   if length <= 0 {
