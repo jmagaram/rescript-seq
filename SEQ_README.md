@@ -129,10 +129,10 @@ let maxBy: (t<'a>, ('a, 'a) => int) => option<'a>
 let minBy: (t<'a>, ('a, 'a) => int) => option<'a>
 let orElse: (t<'a>, t<'a>) => t<'a>
 let reduce: (t<'a>, 'b, ('b, 'a) => 'b) => 'b
-let reduce: (t<'a>, ('a, 'a) => 'a) => option<'a>
 let reduceUntil: (t<'a>, 'b, ('b, 'a) => 'b, 'b => bool) => 'b
 let reduceWhile: (t<'a>, 'b, ('b, 'a) => 'b, 'b => bool) => option<'b>
 let some: (t<'a>, 'a => bool) => bool
+let sum: (t<'a>, ('a, 'a) => 'a) => option<'a>
 let toArray: t<'a> => array<'a>
 let toList: t<'a> => list<'a>
 let toOption: t<'a> => option<t<'a>>
