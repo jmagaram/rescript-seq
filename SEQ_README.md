@@ -55,6 +55,7 @@ let unfold: ('a, 'a => option<('b, 'a)>) => t<'b>
 
 // Transform
 
+let arrayChunksByKey: (t<'a>, 'a => 'k, ('k, 'k) => bool) => t<('k, array<'a>)>
 let cache: t<'a> => t<'a>
 let chunkBySize: (t<'a>, int) => t<array<'a>>
 let chunkByKey: (

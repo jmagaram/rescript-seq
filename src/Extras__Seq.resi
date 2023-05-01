@@ -290,6 +290,11 @@ might have fewer than `size` items.
 let chunkBySize: (t<'a>, int) => t<array<'a>>
 
 /**
+`arrayChunksByKey(source, key, equals)` divides `source` into non-overlapping arrays of adjacent items based on the `key`. The first item in `source` starts the first chunk. Items from `source` are pushed onto that chunk until the `key` changes (based on `equals`), which triggers the creation of the next chunk.
+*/
+let arrayChunksByKey: (t<'a>, 'a => 'k, ('k, 'k) => bool) => t<('k, array<'a>)>
+
+/**
 `pairwise` is the sequence of each element and its predecessor, with the
 exception of the first element that is only returned as the predecessor of the
 second. Returns the empty sequence if the source only has a single item.

@@ -881,3 +881,14 @@ let chunkByKey = (xx, ~equals, ~key, ~init, ~accumulator) => {
   xx->reduceAdjacent(initGroup, concat)
 }
 
+let arrayChunksByKey = (xx, key, equals) =>
+  chunkByKey(
+    xx,
+    ~key,
+    ~init=i => [i],
+    ~accumulator=(arr, item) => {
+      arr->Js.Array2.push(item)->ignore
+      arr
+    },
+    ~equals,
+  )

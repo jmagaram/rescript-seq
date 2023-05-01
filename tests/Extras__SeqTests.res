@@ -1862,6 +1862,39 @@ let chunkByKeyTests = {
   ])
 }
 
+let arrayChunksByKey = {
+  let parity = n => mod(n, 2) == 0 ? "e" : "o"
+  let concatSeqByParity = xx => xx->S.arrayChunksByKey(parity, (a, b) => a === b)
+  let concatByParity = xx =>
+    xx->S.fromArray->concatSeqByParity->S.map(((k, v)) => (k, v->Js.Array2.joinWith(",")))
+  makeSeqEqualsTests(
+    ~title="arrayChunksByKey",
+    [
+      ([]->concatByParity, [], ""),
+      ([1]->concatByParity, [("o", "1")], ""),
+      ([1, 1]->concatByParity, [("o", "1,1")], ""),
+      ([1, 2]->concatByParity, [("o", "1"), ("e", "2")], ""),
+      ([1, 2, 2]->concatByParity, [("o", "1"), ("e", "2,2")], ""),
+      ([1, 2, 2, 1]->concatByParity, [("o", "1"), ("e", "2,2"), ("o", "1")], ""),
+      (
+        [1, 2, 2, 2, 3, 3, 2, 1]->concatByParity,
+        [("o", "1"), ("e", "2,2,2"), ("o", "3,3"), ("e", "2"), ("o", "1")],
+        "",
+      ),
+    ],
+  )->Js.Array2.concat([
+    willNotThrow(~title="arrayChunksByKey", ~expectation="lazy", () => [1, 2, 3]->concatByParity),
+    willNotThrow(~title="arrayChunksByKey", ~expectation="equals not called if one item", () =>
+      S.arrayChunksByKey(S.once(1), i => i, (_, _) => throwIfInvoked())
+    ),
+    seqEqual(
+      ~title="arrayChunksByKey",
+      ~expectation="equals compares keys",
+      ~a=() => S.range(1, 5)->S.arrayChunksByKey(i => i, (i, j) => Js.Math.abs_int(i - j) <= 2),
+      ~b=[(1, [1, 2, 3]), (4, [4, 5])],
+    ),
+  ])
+}
 let (combinationTests, permutationTests) = {
   let sortLetters = w =>
     w->String.split("")->Belt.SortArray.stableSortBy(stringCmp)->Js.Array2.joinWith("")
@@ -2102,6 +2135,7 @@ let sampleRunningTotal = {
 let tests = [
   // chunkByKindTests,
   allPairsTests,
+  arrayChunksByKey,
   chunkByKeyTests,
   chunkBySizeTests,
   combinationTests,

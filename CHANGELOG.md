@@ -29,6 +29,7 @@
   - `Seq.reduceWhile`
   - `Seq.reduceAdjacent`
   - `Seq.chunkByKey`
+  - `Seq.arrayChunksByKey`
   - `Seq.cumulativeSum` (like `scan` but does not take an initial parameter)
   - `Seq.sumBy` (like `Seq.reduce` but no initial parameter)
   - `Seq.toList`
