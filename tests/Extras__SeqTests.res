@@ -1788,6 +1788,80 @@ let reduceAdjacentTests = {
   ])
 }
 
+let chunkByKeyTests = {
+  let parity = n => mod(n, 2) == 0 ? "e" : "o"
+  let concatSeqByParity = xx =>
+    xx->S.chunkByKey(
+      ~key=parity,
+      ~equals=(a, b) => a === b,
+      ~init=i => i->Belt.Int.toString,
+      ~accumulator=(sum, i) => `${sum},${i->Belt.Int.toString}`,
+    )
+  let concatByParity = xx => xx->S.fromArray->concatSeqByParity
+  makeSeqEqualsTests(
+    ~title="chunkByKey",
+    [
+      ([]->concatByParity, [], ""),
+      ([1]->concatByParity, [("o", "1")], ""),
+      ([1, 1]->concatByParity, [("o", "1,1")], ""),
+      ([1, 2]->concatByParity, [("o", "1"), ("e", "2")], ""),
+      ([1, 2, 2]->concatByParity, [("o", "1"), ("e", "2,2")], ""),
+      ([1, 2, 2, 1]->concatByParity, [("o", "1"), ("e", "2,2"), ("o", "1")], ""),
+      (
+        [1, 2, 2, 2, 3, 3, 2, 1]->concatByParity,
+        [("o", "1"), ("e", "2,2,2"), ("o", "3,3"), ("e", "2"), ("o", "1")],
+        "",
+      ),
+    ],
+  )->Js.Array2.concat([
+    willNotThrow(~title="chunkByKey", ~expectation="lazy", () => [1, 2, 3]->concatByParity),
+    willNotThrow(~title="chunkByKey", ~expectation="accumulator not called if one item", () =>
+      S.chunkByKey(
+        S.once(1),
+        ~equals=(a, b) => a == b,
+        ~init=i => i,
+        ~key=i => i,
+        ~accumulator=(_, _) => throwIfInvoked(),
+      )
+    ),
+    willNotThrow(~title="chunkByKey", ~expectation="equals not called if one item", () =>
+      S.chunkByKey(
+        S.once(1),
+        ~equals=(_, _) => throwIfInvoked(),
+        ~init=i => i,
+        ~key=i => i,
+        ~accumulator=(_, i) => i,
+      )
+    ),
+    seqEqual(
+      ~title="chunkByKey",
+      ~expectation="equals compares keys",
+      ~a=() =>
+        S.range(1, 5)->S.chunkByKey(
+          ~equals=(i, j) => Js.Math.abs_int(i - j) <= 2,
+          ~init=i => i,
+          ~accumulator=(sum, i) => sum + i,
+          ~key=i => i,
+        ),
+      ~b=[(1, 1 + 2 + 3), (4, 4 + 5)],
+    ),
+    valueEqual(
+      ~title="chunkByKey",
+      ~expectation="millions",
+      ~a=() =>
+        S.replicate(999_999, "x")
+        ->S.chunkByKey(
+          ~init=_ => 1,
+          ~accumulator=(sum, i) => sum + (i === "x" ? 1 : 0),
+          ~equals=(a, b) => a == b,
+          ~key=i => i,
+        )
+        ->S.toArray,
+      ~b=[("x", 999_999)],
+    ),
+  ])
+}
+
 let (combinationTests, permutationTests) = {
   let sortLetters = w =>
     w->String.split("")->Belt.SortArray.stableSortBy(stringCmp)->Js.Array2.joinWith("")
@@ -2028,6 +2102,7 @@ let sampleRunningTotal = {
 let tests = [
   // chunkByKindTests,
   allPairsTests,
+  chunkByKeyTests,
   chunkBySizeTests,
   combinationTests,
   compareTests,

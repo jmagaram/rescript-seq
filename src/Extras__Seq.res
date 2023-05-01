@@ -870,3 +870,14 @@ let chunkBySize = (xx, length) => {
       },
   )
 }
+
+let chunkByKey = (xx, ~equals, ~key, ~init, ~accumulator) => {
+  let initGroup = i => (key(i), init(i))
+  let concat = ((k, sum), i) =>
+    switch equals(k, key(i)) {
+    | true => Some(k, accumulator(sum, i))
+    | _ => None
+    }
+  xx->reduceAdjacent(initGroup, concat)
+}
+
