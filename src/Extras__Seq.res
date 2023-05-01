@@ -871,26 +871,25 @@ let (combinations, permutations) = {
 let toList = xx => xx->reverse->fold(list{}, Belt.List.add)
 
 let foldAdjacent = (xx, init, acc) => {
-  let rec foldGroup = (sum, xx) => {
-    switch xx->headTail {
-    | None => (sum, None)
-    | Some(x, xx) =>
-      switch acc(sum, x) {
-      | None => (sum, Some(init(x), xx))
-      | Some(sum) => foldGroup(sum, xx)
+  let rec unfolder = state =>
+    switch state {
+    | None => None
+    | Some((sum, xx)) =>
+      switch xx->headTail {
+      | None => Some(sum, None)
+      | Some(x, xx) =>
+        switch acc(sum, x) {
+        | None => Some(sum, Some(init(x), xx))
+        | Some(sum) => unfolder(Some(sum, xx))
+        }
       }
     }
-  }
-  let rec go = ((sum, xx)) =>
-    (. ()) => {
-      let (sum, next) = foldGroup(sum, xx)
-      Next(sum, next->Option.mapWithDefault(empty, go))
-    }
-  (. ()) =>
+  (. ()) => {
     switch xx->headTail {
     | None => End
-    | Some(x, xx) => go((init(x), xx))->nextNode
+    | Some(x, xx) => unfold(Some(init(x), xx), unfolder)->nextNode
     }
+  }
 }
 
 let chunkBySize = (xx, length) => {
