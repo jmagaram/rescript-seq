@@ -290,7 +290,10 @@ might have fewer than `size` items.
 let chunkBySize: (t<'a>, int) => t<array<'a>>
 
 /**
-`arrayChunksByKey(source, key, equals)` divides `source` into non-overlapping arrays of adjacent items based on the `key`. The first item in `source` starts the first chunk. Items from `source` are pushed onto that chunk until the `key` changes (based on `equals`), which triggers the creation of the next chunk.
+`arrayChunksByKey(source, key, equals)` divides `source` into non-overlapping
+arrays of adjacent items based on the `key`. The first item in `source` starts
+the first chunk. Items from `source` are pushed onto that chunk until the `key`
+changes (based on `equals`), which triggers the creation of the next chunk.
 */
 let arrayChunksByKey: (t<'a>, 'a => 'k, ('k, 'k) => bool) => t<('k, array<'a>)>
 
