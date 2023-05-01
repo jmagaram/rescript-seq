@@ -437,9 +437,9 @@ let interleave: (t<'a>, t<'a>) => t<'a>
 item in `source`, starting with the provided `zero` value, and returns the final
 result.
 
-Folding is useful when you have a collection of something and want to produce a
-single value from it. This function is analogous to `Array.reduce` in JavaScript
-when an initial value is provided.
+Reducing (also known as folding) is useful when you have a collection of
+something and want to produce a single value from it. This function is analogous
+to `Array.reduce` in JavaScript when an initial value is provided.
 */
 let reduce: (t<'a>, 'b, ('b, 'a) => 'b) => 'b
 
@@ -463,37 +463,30 @@ if any, where `predicate` is `true`.
 let reduceWhile: (t<'a>, 'b, ('b, 'a) => 'b, 'b => bool) => option<'b>
 
 /**
-`sum(source, accumulator)` calculates a single value from all the items in
-`source`. If `source` has a single item, that item is the result. Otherwise
-begin by applying `accumulator` to the first two items. Then feed that result
-into `accumulator` with the third item and so on. If `source` is empty, returns
-`None`.
+`sumBy(source, accumulator)` invokes `accumulator(sum, item)` successively for
+every item in `source`, starting with the first pair of items, and returns the
+final result. If `source` has a single item, that value becomes the final result
+and `accumulator` is not used. If `source` is empty, returns `None.`
 
-See `reduce` for a related function that takes an initial value and can compute a
-value of a different type than the source.
+This function is not limited to adding numbers; the `accumulator` can
+concatenate strings, append arrays, perform logical operations on booleans, etc.
 
-**Note:** Although the term `sum` is used, this function is not limited to
-adding numbers. The `accumulator` can concatenate strings and arrays, determine
-the smaller of two numbers, perform logical operations on booleans, etc. This
-function is similar to `Array.reduce` in JavaScript when no initial value is
-provided.
+See `reduce` for a function that takes an initial value and can compute a value
+of a different type than items in `source`.
 */
-let sum: (t<'a>, ('a, 'a) => 'a) => option<'a>
+let sumBy: (t<'a>, ('a, 'a) => 'a) => option<'a>
 
 /**
 `cumulativeSum(source, accumulator)` calculates the running totals for each item
-in `source`. This is also known as an `inclusive scan`. The first item in the
-result is the first item in `source`. Subsequent results are computed using
-`accumulator(previousSum, nextItem)`. If `source` is empty, the result is empty.
+in `source`. The first item in `source` becomes the first sum in the result.
+Subsequent results are computed by `accumulator(sum, item)`. If `source` is
+empty, the result is empty.
 
-See `scan` for a related function that takes an initial value and can generate
-values of a different type than the source.
+This function is not limited to adding numbers; the `accumulator` can
+concatenate strings, append arrays, perform logical operations on booleans, etc.
 
-**Note:** Although the term `sum` is used, this function is not limited to
-adding numbers. The `accumulator` can concatenate strings and arrays, determine
-the smaller of two numbers, perform logical operations on booleans, etc. This
-function is similar to `Array.reduce` in JavaScript when no initial value is
-provided.
+See `scan` for a function that takes an initial value and can generate values of
+a different type than the source.
 */
 let cumulativeSum: (t<'a>, ('a, 'a) => 'a) => t<'a>
 

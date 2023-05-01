@@ -499,7 +499,7 @@ let reduceWhile = (xx, zero, concat, predicate) => {
   }
 }
 
-let sum = (xx, concat) =>
+let sumBy = (xx, concat) =>
   switch xx->headTail {
   | None => None
   | Some(x, xx) => {
@@ -535,7 +535,7 @@ let join = (xx, separator) =>
   | _ => xx->intersperse(separator)
   }->reduce("", (total, i) => total ++ i)
 
-let last = xx => xx->sum((_, i) => i)
+let last = xx => xx->sumBy((_, i) => i)
 
 let toArray = xx =>
   xx->reduce([], (xx, i) => {
@@ -656,9 +656,9 @@ let tail = xx =>
     | Some(_, xx) => xx->nextNode
     }
 
-let minBy = (xx, cmp) => xx->sum((sum, i) => cmp(i, sum) < 0 ? i : sum)
+let minBy = (xx, cmp) => xx->sumBy((sum, i) => cmp(i, sum) < 0 ? i : sum)
 
-let maxBy = (xx, cmp) => xx->sum((sum, i) => cmp(i, sum) > 0 ? i : sum)
+let maxBy = (xx, cmp) => xx->sumBy((sum, i) => cmp(i, sum) > 0 ? i : sum)
 
 let rec interleave = (xx, yy) => {
   (. ()) => {

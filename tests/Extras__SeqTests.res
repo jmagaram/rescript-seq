@@ -1469,12 +1469,12 @@ let sumTests = {
   makeValueEqualTests(
     ~title="sum",
     [
-      (() => S.empty->S.sum(add), None, ""),
-      (() => S.once(99)->S.sum(add), Some(99), ""),
-      (() => S.range(1, 2)->S.sum(add), Some(1 + 2), ""),
-      (() => S.range(1, 4)->S.sum(add), Some(1 + 2 + 3 + 4), ""),
-      (() => S.range(1, 9999)->S.sum(lastSeen), Some(9999), ""),
-      (() => S.range(1, 999_999)->S.sum(lastSeen), Some(999_999), ""),
+      (() => S.empty->S.sumBy(add), None, ""),
+      (() => S.once(99)->S.sumBy(add), Some(99), ""),
+      (() => S.range(1, 2)->S.sumBy(add), Some(1 + 2), ""),
+      (() => S.range(1, 4)->S.sumBy(add), Some(1 + 2 + 3 + 4), ""),
+      (() => S.range(1, 9999)->S.sumBy(lastSeen), Some(9999), ""),
+      (() => S.range(1, 999_999)->S.sumBy(lastSeen), Some(999_999), ""),
     ],
   )
 }

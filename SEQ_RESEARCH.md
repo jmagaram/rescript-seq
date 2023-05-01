@@ -78,24 +78,21 @@ let distinctBy = (xx: t<'a>, compare: ('a, 'a) => int) => {
 
 ```
 
-### Naming of "reduce" and "runningTotal"
+### Naming for "sumBy" and "prefixSum"
 
-`fold` is powerful since you can supply a default `zero` value and compute a type that is different than what you start with. But a simpler version, where the initial value is the first value, is useful too. F# has this. They call it `reduce` vs. `fold`. However in JavaScript `Array.reduce` does both, depending on whether an initial parameter is provided.
+`fold` is powerful since you can supply a default `zero` value and compute a type that is different than what you start with. But a simpler version, where the initial value is the first value, is useful too. F# has this. They call it `reduce` vs. `fold`. In JavaScript `Array.reduce` you can omit the initial parameter. Haskell and other packages have this simplified flavor of fold. Also, just like `fold` is related to `scan`, it is useful to have a function that returns running sums, an inclusive scan.
 
-Just like `fold` and related to `scan`, I want simplified forms like `total` and `runningTotal`. A common name in various programming languages is `cumsum` for cumulative sum. Other possible names `prefixSum`, `runningSum`, `partialSums`, `exclusiveScan`, etc. Haskell has this as something like `scanll`.
+Don't want the term to be too number-focused, since you can accumulate strings, arrays, etc.
 
-I have version of `fold` and `reduce` that stop when a condition occurs, like `foldUntil` and `reduceUntil`. `totalUntil` or `totalWhile`?
+`minBy` and `maxBy` already exist. The result type is the same as the source type.
+
+Possible names for complete sum: `reduceFromFirst`, `sumBy`, `totalBy`.
+
+Possible names for running sum: `prefixSum`, `cumulativeSum`, `runningTotal`, `partialSums`, `cumsum` (used in MATLAB, R, and Julia), `accumulate`.
+
+In F#, `sumBy` allows you to turn each item into a number, and then adds them up using the default zero. Sometimes `By` suffix means a projection, but in this case you'd want to use `reduce`.
 
 See [prefix sum](https://en.wikipedia.org/wiki/Prefix_sum)
-
-Don't want the term to be number-focused, since you can accumulate strings, arrays, etc.
-
-Proposals:
-
-- `reduce`, `foldUntil`, `reduceWhile`, and for all intermediate results, `scan`
-- `sum` and `prefixSums`.
-- `sum` and `runningSum`.
-- `total` and `runningTotals`
 
 ## TC39 Proposal
 
