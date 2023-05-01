@@ -700,7 +700,7 @@ tuple.
 let permutations: (t<'a>, int) => t<(int, t<'a>)>
 
 /**
-`reduceAdjacent(source, init, accumulator)` divides `source` into  non-overlapping
+`chunkBy(source, init, accumulator)` divides `source` into  non-overlapping
 groups of adjacent items, create a total of some kind for each group, and then
 returns a sequence of group totals. The first group is created by passing the
 first item to `init`; this group consists of a single item. The `accumulator` is
@@ -715,7 +715,7 @@ like `(month, salesTotal)` or `(month, salesArray)`. The grouping criteria and
 summarization approach is completely customizable based on the `init` and
 `accumulator` functions you provide.
 */
-let reduceAdjacent: (t<'a>, 'a => 'b, ('b, 'a) => option<'b>) => t<'b>
+let chunkBy: (t<'a>, 'a => 'b, ('b, 'a) => option<'b>) => t<'b>
 
 /**
 `chunkByKey(source, key, equals, init, accumulator)` divides `source` into
@@ -730,8 +730,8 @@ of the next group.
 */
 let chunkByKey: (
   t<'a>,
-  ~equals: ('k, 'k) => bool,
-  ~key: 'a => 'k,
+  ~key: 'a => 'key,
+  ~equals: ('key, 'key) => bool,
   ~init: 'a => 'b,
   ~accumulator: ('b, 'a) => 'b,
-) => t<('k, 'b)>
+) => t<('key, 'b)>

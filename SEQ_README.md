@@ -56,14 +56,15 @@ let unfold: ('a, 'a => option<('b, 'a)>) => t<'b>
 // Transform
 
 let cache: t<'a> => t<'a>
+let chunkBy: (t<'a>, 'a => 'b, ('b, 'a) => option<'b>) => t<'b>
 let chunkBySize: (t<'a>, int) => t<array<'a>>
 let chunkByKey: (
   t<'a>,
-  ~equals: ('k, 'k) => bool,
-  ~key: 'a => 'k,
+  ~key: 'a => 'key,
+  ~equals: ('key, 'key) => bool,
   ~init: 'a => 'b,
   ~accumulator: ('b, 'a) => 'b,
-) => t<('k, 'b)>
+) => t<('key, 'b)>
 let cumulativeSum: (t<'a>, ('a, 'a) => 'a) => t<'a>
 let drop: (t<'a>, int) => t<'a>
 let dropUntil: (t<'a>, 'a => bool) => t<'a>
@@ -82,7 +83,6 @@ let intersperseWith: (t<'a>, unit => 'a) => t<'a>
 let map: (t<'a>, 'a => 'b) => t<'b>
 let mapi: (t<'a>, ('a, int) => 'b) => t<'b>
 let pairwise: t<'a> => t<('a, 'a)>
-let reduceAdjacent: (t<'a>, 'a => 'b, ('b, 'a) => option<'b>) => t<'b>
 let reverse: t<'a> => t<'a>
 let scan: (t<'a>, 'b, ('b, 'a) => 'b) => t<'b>
 let sortBy: (t<'a>, ('a, 'a) => int) => t<'a>

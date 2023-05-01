@@ -830,7 +830,7 @@ let (combinations, permutations) = {
 
 let toList = xx => xx->reverse->reduce(list{}, Belt.List.add)
 
-let reduceAdjacent = (xx, init, acc) => {
+let chunkBy = (xx, init, acc) => {
   let rec unfolder = state =>
     switch state {
     | None => None
@@ -858,7 +858,7 @@ let chunkBySize = (xx, length) => {
       `chunkBySize requires a length > 0. You asked for ${length->Belt.Int.toString}`,
     )->raise
   }
-  xx->reduceAdjacent(
+  xx->chunkBy(
     i => [i],
     (sum, i) =>
       switch sum->Js.Array2.length == length {
@@ -871,12 +871,12 @@ let chunkBySize = (xx, length) => {
   )
 }
 
-let chunkByKey = (xx, ~equals, ~key, ~init, ~accumulator) => {
+let chunkByKey = (xx, ~key, ~equals, ~init, ~accumulator) => {
   let initGroup = i => (key(i), init(i))
   let concat = ((k, sum), i) =>
     switch equals(k, key(i)) {
     | true => Some(k, accumulator(sum, i))
     | _ => None
     }
-  xx->reduceAdjacent(initGroup, concat)
+  xx->chunkBy(initGroup, concat)
 }
