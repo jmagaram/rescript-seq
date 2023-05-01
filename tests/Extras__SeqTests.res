@@ -1798,25 +1798,40 @@ let delayTests =
 
 let foldAdjacentTests = {
   let kind = n => mod(n, 2) == 0 ? "e" : "o"
-  let countAdjacentParity = xx =>
-    xx
-    ->S.fromArray
-    ->S.foldAdjacent(n => (kind(n), 1), ((k, count), n) => kind(n) == k ? Some(k, count + 1) : None)
+  let parityCount = xx =>
+    xx->S.foldAdjacent(
+      n => (kind(n), 1),
+      ((k, count), n) => kind(n) == k ? Some(k, count + 1) : None,
+    )
   makeSeqEqualsTests(
     ~title="foldAdjacent",
     [
-      ([]->countAdjacentParity, [], ""),
-      ([1]->countAdjacentParity, [("o", 1)], ""),
-      ([1, 1]->countAdjacentParity, [("o", 2)], ""),
-      ([1, 1, 1]->countAdjacentParity, [("o", 3)], ""),
-      ([1, 1, 1, 2]->countAdjacentParity, [("o", 3), ("e", 1)], ""),
+      ([]->S.fromArray->parityCount, [], ""),
+      ([1]->S.fromArray->parityCount, [("o", 1)], ""),
+      ([1, 1]->S.fromArray->parityCount, [("o", 2)], ""),
+      ([1, 1, 1]->S.fromArray->parityCount, [("o", 3)], ""),
+      ([1, 1, 1, 2]->S.fromArray->parityCount, [("o", 3), ("e", 1)], ""),
       (
-        [1, 2, 2, 2, 3, 2, 2, 1]->countAdjacentParity,
+        [1, 2, 2, 2, 3, 2, 2, 1]->S.fromArray->parityCount,
         [("o", 1), ("e", 3), ("o", 1), ("e", 2), ("o", 1)],
         "",
       ),
     ],
-  )
+  )->Js.Array2.concat([
+    seqEqual(
+      ~title="foldAdjacent",
+      ~expectation="millions in an output group",
+      ~a=() => S.concat(S.replicate(500_000, 1), S.replicate(500_000, 0))->parityCount,
+      ~b=[("o", 500_000), ("e", 500_000)],
+    ),
+    seqEqual(
+      ~title="foldAdjacent",
+      ~expectation="millions of source items",
+      ~a=() => [1, 2]->S.fromArray->S.cycle->S.take(1_000_000)->parityCount->S.drop(999_998),
+      ~b=[("o", 1), ("e", 1)],
+    ),
+    willNotThrow(~title="foldAdjacent", ~expectation="lazy", () => death()->parityCount),
+  ])
 }
 
 let (combinationTests, permutationTests) = {
