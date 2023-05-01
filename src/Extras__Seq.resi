@@ -284,8 +284,8 @@ let tap: (t<'a>, 'a => unit) => t<'a>
 
 /**
 `chunkBySize(source, size)` divides the input sequence into non-overlapping
-arrays with at most `size` items in each. The final chunk might have fewer than
-`size` items.
+arrays of adjacent items with at most `size` items in each. The final chunk
+might have fewer than `size` items.
 */
 let chunkBySize: (t<'a>, int) => t<array<'a>>
 
