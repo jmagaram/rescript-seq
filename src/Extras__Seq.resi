@@ -261,7 +261,7 @@ beginning of `source` and **starts** at the first item where predicate is
 let dropUntil: (t<'a>, 'a => bool) => t<'a>
 
 /**
-`scan(source, zero, accumulator)` is conceptually related to `fold`. However
+`scan(source, zero, accumulator)` is conceptually related to `reduce`. However
 instead of performing an eager evaluation and returning the final accumulator,
 it returns a sequence of accumulators (partial sums).
 */
@@ -433,7 +433,7 @@ other sequence are included.
 let interleave: (t<'a>, t<'a>) => t<'a>
 
 /**
-`fold(source, zero, accumulator)` invokes `accumulator` successively for every
+`reduce(source, zero, accumulator)` invokes `accumulator` successively for every
 item in `source`, starting with the provided `zero` value, and returns the final
 result.
 
@@ -441,26 +441,26 @@ Folding is useful when you have a collection of something and want to produce a
 single value from it. This function is analogous to `Array.reduce` in JavaScript
 when an initial value is provided.
 */
-let fold: (t<'a>, 'b, ('b, 'a) => 'b) => 'b
+let reduce: (t<'a>, 'b, ('b, 'a) => 'b) => 'b
 
 /**
-`foldUntil(source, zero, accumulator, predicate)` invokes `accumulator`
+`reduceUntil(source, zero, accumulator, predicate)` invokes `accumulator`
 successively for items in `source`, starting with the provided `zero` value. The
 computation stops after `source` is exhausted, or after `predicate` applied to
 `zero` or the current accumulated result is `true`. Returns the first result
 where `predicate` is `true` or the final computed value if `predicate` is always
 `false`.
 */
-let foldUntil: (t<'a>, 'b, ('b, 'a) => 'b, 'b => bool) => 'b
+let reduceUntil: (t<'a>, 'b, ('b, 'a) => 'b, 'b => bool) => 'b
 
 /**
-`foldWhile(source, zero, accumulator, predicate)` invokes `accumulator`
+`reduceWhile(source, zero, accumulator, predicate)` invokes `accumulator`
 successively for items in `source`, starting with the provided `zero` value. The
 computation stops after `source` is exhausted, or after `predicate` applied to
 `zero` or the current accumulated result is `false`. Returns the last result,
 if any, where `predicate` is `true`.
 */
-let foldWhile: (t<'a>, 'b, ('b, 'a) => 'b, 'b => bool) => option<'b>
+let reduceWhile: (t<'a>, 'b, ('b, 'a) => 'b, 'b => bool) => option<'b>
 
 /**
 `sum(source, accumulator)` calculates a single value from all the items in
@@ -469,7 +469,7 @@ begin by applying `accumulator` to the first two items. Then feed that result
 into `accumulator` with the third item and so on. If `source` is empty, returns
 `None`.
 
-See `fold` for a related function that takes an initial value and can compute a
+See `reduce` for a related function that takes an initial value and can compute a
 value of a different type than the source.
 
 **Note:** Although the term `sum` is used, this function is not limited to
@@ -490,7 +490,7 @@ result is the first sum where `predicate` is `true`, or the final sum if
 `predicate` is always false.
 
 See `sumWhile` if you want the last value, if any, where `predicate` is `true`.
-See `foldWhile` for a related function that takes an initial value and can
+See `reduceWhile` for a related function that takes an initial value and can
 compute a value of a different type than the source.
 
 **Note:** Although the term `sum` is used, this function is not limited to
@@ -510,7 +510,7 @@ computation stops when `source` is exhausted or `predicate` returns `false`. The
 result is the last sum, if any, where `predicate` is `true`.
 
 See `sumUntil` if you want the first sum where `predicate` returns `false`. See
-`foldUntil` for a related function that takes an initial value and can computer
+`reduceUntil` for a related function that takes an initial value and can computer
 a value of a different type than the source.
 
 **Note:** Although the term `sum` is used, this function is not limited to
@@ -748,7 +748,7 @@ tuple.
 let permutations: (t<'a>, int) => t<(int, t<'a>)>
 
 /**
-`foldAdjacent(source, init, accumulator)` divides `source` into  non-overlapping
+`reduceAdjacent(source, init, accumulator)` divides `source` into  non-overlapping
 groups of adjacent items, create a total of some kind for each group, and then
 returns a sequence of group totals. The first group is created by passing the
 first item to `init`; this group consists of a single item. The `accumulator` is
@@ -763,4 +763,4 @@ like `(month, salesTotal)` or `(month, salesArray)`. The grouping criteria and
 summarization approach is completely customizable based on the `init` and
 `accumulator` functions you provide.
 */
-let foldAdjacent: (t<'a>, 'a => 'b, ('b, 'a) => option<'b>) => t<'b>
+let reduceAdjacent: (t<'a>, 'a => 'b, ('b, 'a) => option<'b>) => t<'b>

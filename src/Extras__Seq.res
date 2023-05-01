@@ -462,13 +462,13 @@ let window = (xx, length) => {
 let pairwise = xx =>
   xx->window(2)->map(i => (i->Js.Array2.unsafe_get(0), i->Js.Array2.unsafe_get(1)))
 
-let fold = (xx, zero, concat) => {
+let reduce = (xx, zero, concat) => {
   let sum = ref(zero)
   xx->forEach(x => sum := concat(sum.contents, x))
   sum.contents
 }
 
-let foldUntil = (xx, zero, concat, predicate) => {
+let reduceUntil = (xx, zero, concat, predicate) => {
   let rec go = (xx, sum) =>
     switch predicate(sum) {
     | true => sum
@@ -481,7 +481,7 @@ let foldUntil = (xx, zero, concat, predicate) => {
   go(xx, zero)
 }
 
-let foldWhile = (xx, zero, concat, predicate) => {
+let reduceWhile = (xx, zero, concat, predicate) => {
   let rec go = (xx, sum) =>
     switch xx->headTail {
     | None => Some(sum)
@@ -573,12 +573,12 @@ let join = (xx, separator) =>
   switch separator->Js.String2.length {
   | 0 => xx
   | _ => xx->intersperse(separator)
-  }->fold("", (total, i) => total ++ i)
+  }->reduce("", (total, i) => total ++ i)
 
 let last = xx => xx->sum((_, i) => i)
 
 let toArray = xx =>
-  xx->fold([], (xx, i) => {
+  xx->reduce([], (xx, i) => {
     xx->Js.Array2.push(i)->ignore
     xx
   })
@@ -681,7 +681,7 @@ let compare = (xx, yy, cmp) => {
   ->Option.getWithDefault(0)
 }
 
-let length = xx => xx->fold(0, (sum, _) => sum + 1)
+let length = xx => xx->reduce(0, (sum, _) => sum + 1)
 
 let isEmpty = xx =>
   switch xx->nextNode {
@@ -764,7 +764,7 @@ let everyOk = xx => {
       | Ok(ok) => Ok(oks->concat(ok->once))
       }
     }
-  xx->foldUntil(Ok(empty), concat, Result.isError)
+  xx->reduceUntil(Ok(empty), concat, Result.isError)
 }
 
 let everySome = xx => {
@@ -777,7 +777,7 @@ let everySome = xx => {
       | Some(some) => Some(somes->concat(some->once))
       }
     }
-  xx->foldUntil(Some(empty), concat, Option.isNone)
+  xx->reduceUntil(Some(empty), concat, Option.isNone)
 }
 
 let toOption = xx =>
@@ -868,9 +868,9 @@ let (combinations, permutations) = {
   (combinations, permutations)
 }
 
-let toList = xx => xx->reverse->fold(list{}, Belt.List.add)
+let toList = xx => xx->reverse->reduce(list{}, Belt.List.add)
 
-let foldAdjacent = (xx, init, acc) => {
+let reduceAdjacent = (xx, init, acc) => {
   let rec unfolder = state =>
     switch state {
     | None => None
@@ -898,7 +898,7 @@ let chunkBySize = (xx, length) => {
       `chunkBySize requires a length > 0. You asked for ${length->Belt.Int.toString}`,
     )->raise
   }
-  xx->foldAdjacent(
+  xx->reduceAdjacent(
     i => [i],
     (sum, i) =>
       switch sum->Js.Array2.length == length {

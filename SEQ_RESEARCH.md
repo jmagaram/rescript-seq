@@ -20,6 +20,7 @@
 - When sequence has an implicit sort order, lots of useful things ot do like `distinctAdjacent` or `chunkBy` (date, increasing sequences, etc.)
 - `uniqueBy` could be very useful; requires scan which is advanced to implement
 - Remove some functions from array since in seq now
+- Should it be called `reduceAdjacent` or `windowFold` or `chunkFold` or `partitionFold` etc.
 - Look at API breaking functions in other parts of the extras package
 - Look at all code for problems
 - Separate project?
@@ -28,9 +29,9 @@
 
 Use cases for sorted sequences:
 
+- Chunk by key and then in each chunk, calculate minimum, length, or just an array of each. Could group by month, even/odd, status, etc.
 - Find sequences of increasing numbers
-- Group sales into weekday and weekend
-- Find distinct values (distinct adjacent does the job since it is all sorted)
+- Find distinct adjacent values
 
 Implementation ideas:
 
@@ -40,6 +41,8 @@ Implementation ideas:
 - `resultSelector` given a sequence of items in a chunk, make something from it; not necessarily an array
 - a comparator might be needed to know if a new chunk is being created
 - `chunkWhile` (separator )
+- In general, having a `reduceUntil` that returns a remainder, or `takeUntil` with a remainder, might be useful. Then have a way to do this for all chunks.
+- Very often helpful to see previous value when making a split decision, and sometimes next value as well
 
 ### Proposed feature: distinctBy
 
@@ -49,7 +52,7 @@ My implementation was hardcoded to a specific equality test. Better performance 
 
 It only works with `Belt.Set` because that is an immutable set. I generated unique items on demand, which is pretty cool. If a mutable set it used, the sequence can't be iterated more than once and it is probably better to generate all unique items at once.
 
-The user can write their own `distinctBy` and use whatever kind of equality and set they want. They can use a mutable set for example. Not too difficult. It's just a `fold`.
+The user can write their own `distinctBy` and use whatever kind of equality and set they want. They can use a mutable set for example. Not too difficult. It's just a `reduce`.
 
 This function should never be called on infinite sequences, unless every item is unique, because once it gets past the last unique item it will search forever for another unique item and will fail.
 
@@ -73,6 +76,25 @@ let distinctBy = (xx: t<'a>, compare: ('a, 'a) => int) => {
 }
 
 ```
+
+### Naming of "reduce" and "runningTotal"
+
+`fold` is powerful since you can supply a default `zero` value and compute a type that is different than what you start with. But a simpler version, where the initial value is the first value, is useful too. F# has this. They call it `reduce` vs. `fold`. However in JavaScript `Array.reduce` does both, depending on whether an initial parameter is provided.
+
+Just like `fold` and related to `scan`, I want simplified forms like `total` and `runningTotal`. A common name in various programming languages is `cumsum` for cumulative sum. Other possible names `prefixSum`, `runningSum`, `partialSums`, `exclusiveScan`, etc. Haskell has this as something like `scanll`.
+
+I have version of `fold` and `reduce` that stop when a condition occurs, like `foldUntil` and `reduceUntil`. `totalUntil` or `totalWhile`?
+
+See [prefix sum](https://en.wikipedia.org/wiki/Prefix_sum)
+
+Don't want the term to be number-focused, since you can accumulate strings, arrays, etc.
+
+Proposals:
+
+- `reduce`, `foldUntil`, `reduceWhile`, and for all intermediate results, `scan`
+- `sum`, `sumUntil`, `sumWhile`, and `prefixSums`.
+- `sum`, `sumUntil`, `sumWhile`, and `runningSum`.
+- `total`, `totalUntil`, `totalWhile`, and `runningTotals`
 
 ## TC39 Proposal
 

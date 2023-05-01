@@ -16,7 +16,7 @@ Highlights:
 - **Build sequences** using `fromArray`, `range`, `unfold`, `cycle`, `replicate` and others. This enables functionality similar to [JavaScript generators](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Generator).
 - **Transform** sequences with `map`, `filter`, `take`, `dropWhile`, `scan`, `tap`, `window`, and others.
 - **Combine** multiple sequences with `zip`, `zip3`, `map2`, `map3`, `sortedMerge`, `interleave` and others.
-- **Calculate** values with `fold`, `some`, `findMap`, `isSortedBy`, `minBy`, `toArray` and others.
+- **Calculate** values with `reduce`, `some`, `findMap`, `isSortedBy`, `minBy`, `toArray` and others.
 - Ready for your contributions! :two_men_holding_hands: There are many other useful functions, and it would be great to have `async` versions.
 
 See code [examples](src/Extras__SeqSamples.res) to get a sense for how `Seq` is used and what is possible.
@@ -69,20 +69,20 @@ let filterOk: t<result<'a, 'b>> => t<'a>
 let filterSome: t<option<'a>> => t<'a>
 let flatMap: (t<'a>, 'a => t<'b>) => t<'b>
 let flatten: t<t<'a>> => t<'a>
-let foldAdjacent: (t<'a>, 'a => 'b, ('b, 'a) => option<'b>) => t<'b>
 let indexed: t<'a> => t<('a, int)>
 let intersperse: (t<'a>, 'a) => t<'a>
 let intersperseWith: (t<'a>, unit => 'a) => t<'a>
 let map: (t<'a>, 'a => 'b) => t<'b>
 let mapi: (t<'a>, ('a, int) => 'b) => t<'b>
 let pairwise: t<'a> => t<('a, 'a)>
+let reduceAdjacent: (t<'a>, 'a => 'b, ('b, 'a) => option<'b>) => t<'b>
 let reverse: t<'a> => t<'a>
 let scan: (t<'a>, 'b, ('b, 'a) => 'b) => t<'b>
 let sortBy: (t<'a>, ('a, 'a) => int) => t<'a>
+let tail: t<'a> => t<'a>
 let take: (t<'a>, int) => t<'a>
 let takeUntil: (t<'a>, 'a => bool) => t<'a>
 let takeWhile: (t<'a>, 'a => bool) => t<'a>
-let tail: t<'a> => t<'a>
 let tap: (t<'a>, 'a => unit) => t<'a>
 let window: (t<'a>, int) => t<array<'a>>
 let windowAhead: (t<'a>, int) => t<array<'a>>
@@ -116,9 +116,6 @@ let exactlyOne: t<'a> => option<'a>
 let find: (t<'a>, 'a => bool) => option<'a>
 let findMap: (t<'a>, 'a => option<'b>) => option<'b>
 let findMapi: (t<'a>, ('a, int) => option<'b>) => option<'b>
-let fold: (t<'a>, 'b, ('b, 'a) => 'b) => 'b
-let foldUntil: (t<'a>, 'b, ('b, 'a) => 'b, 'b => bool) => 'b
-let foldWhile: (t<'a>, 'b, ('b, 'a) => 'b, 'b => bool) => option<'b>
 let forEach: (t<'a>, 'a => unit) => unit
 let forEachi: (t<'a>, ('a, int) => unit) => unit
 let head: t<'a> => option<'a>
@@ -131,10 +128,13 @@ let length: t<'a> => int
 let maxBy: (t<'a>, ('a, 'a) => int) => option<'a>
 let minBy: (t<'a>, ('a, 'a) => int) => option<'a>
 let orElse: (t<'a>, t<'a>) => t<'a>
+let reduce: (t<'a>, 'b, ('b, 'a) => 'b) => 'b
 let reduce: (t<'a>, ('a, 'a) => 'a) => option<'a>
+let reduceUntil: (t<'a>, 'b, ('b, 'a) => 'b, 'b => bool) => 'b
+let reduceWhile: (t<'a>, 'b, ('b, 'a) => 'b, 'b => bool) => option<'b>
+let some: (t<'a>, 'a => bool) => bool
 let sumUntil: (t<'a>, ('a, 'a) => 'a, 'a => bool) => option<'a>
 let sumWhile: (t<'a>, ('a, 'a) => 'a, 'a => bool) => option<'a>
-let some: (t<'a>, 'a => bool) => bool
 let toArray: t<'a> => array<'a>
 let toList: t<'a> => list<'a>
 let toOption: t<'a> => option<t<'a>>
