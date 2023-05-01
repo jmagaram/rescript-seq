@@ -884,10 +884,7 @@ let foldAdjacent = (xx, init, acc) => {
   let rec go = (sum, xx) =>
     (. ()) => {
       let (sum', next) = foldGroup(sum, xx)
-      switch next {
-      | None => Next(sum', empty)
-      | Some((sum, xx)) => Next(sum', go(sum, xx))
-      }
+      Next(sum', next->Option.map(((sum, xx)) => go(sum, xx))->Option.getWithDefault(empty))
     }
   (. ()) =>
     switch xx->headTail {
