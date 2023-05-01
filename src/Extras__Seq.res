@@ -881,15 +881,15 @@ let foldAdjacent = (xx, init, acc) => {
       }
     }
   }
-  let rec go = (sum, xx) =>
+  let rec go = ((sum, xx)) =>
     (. ()) => {
-      let (sum', next) = foldGroup(sum, xx)
-      Next(sum', next->Option.map(((sum, xx)) => go(sum, xx))->Option.getWithDefault(empty))
+      let (sum, next) = foldGroup(sum, xx)
+      Next(sum, next->Option.mapWithDefault(empty, go))
     }
   (. ()) =>
     switch xx->headTail {
     | None => End
-    | Some(x, xx) => go(init(x), xx)->nextNode
+    | Some(x, xx) => go((init(x), xx))->nextNode
     }
 }
 
