@@ -509,46 +509,6 @@ let sum = (xx, concat) =>
     }
   }
 
-let sumUntil = (xx, concat, predicate) => {
-  let rec go = (sum, xx) => {
-    switch predicate(sum) {
-    | true => Some(sum)
-    | false =>
-      switch xx->headTail {
-      | None => Some(sum)
-      | Some(x, xx) => go(concat(sum, x), xx)
-      }
-    }
-  }
-  switch xx->headTail {
-  | None => None
-  | Some(x, xx) => go(x, xx)
-  }
-}
-
-let sumWhile = (xx, concat, predicate) => {
-  let rec go = (sum, xx) => {
-    switch xx->headTail {
-    | None => Some(sum)
-    | Some(x, xx) => {
-        let sum' = concat(sum, x)
-        switch predicate(sum') {
-        | true => go(sum', xx)
-        | false => Some(sum)
-        }
-      }
-    }
-  }
-  switch xx->headTail {
-  | None => None
-  | Some(x, xx) =>
-    switch predicate(x) {
-    | true => go(x, xx)
-    | false => None
-    }
-  }
-}
-
 let cumulativeSum = (xx, accumulator) =>
   (. ()) => {
     switch xx->headTail {

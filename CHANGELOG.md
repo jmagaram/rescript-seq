@@ -28,8 +28,6 @@
   - `Seq.reduceUntil`
   - `Seq.reduceWhile`
   - `Seq.reduceAdjacent`
-  - `Seq.sumUntil`
-  - `Seq.sumWhile`
   - `Seq.cumulativeSum` (like `scan` but does not take an initial parameter)
   - `Seq.sum` (like `Seq.reduce` but no initial parameter)
   - `Seq.toList`

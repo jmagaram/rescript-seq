@@ -133,8 +133,6 @@ let reduce: (t<'a>, ('a, 'a) => 'a) => option<'a>
 let reduceUntil: (t<'a>, 'b, ('b, 'a) => 'b, 'b => bool) => 'b
 let reduceWhile: (t<'a>, 'b, ('b, 'a) => 'b, 'b => bool) => option<'b>
 let some: (t<'a>, 'a => bool) => bool
-let sumUntil: (t<'a>, ('a, 'a) => 'a, 'a => bool) => option<'a>
-let sumWhile: (t<'a>, ('a, 'a) => 'a, 'a => bool) => option<'a>
 let toArray: t<'a> => array<'a>
 let toList: t<'a> => list<'a>
 let toOption: t<'a> => option<t<'a>>

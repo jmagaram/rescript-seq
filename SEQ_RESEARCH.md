@@ -24,6 +24,7 @@
 - Look at API breaking functions in other parts of the extras package
 - Look at all code for problems
 - Separate project?
+- Naming of `headTail` is really annoying to use. Prefer `match` or `uncons`.
 
 ### Proposed feature: chunking, splitting
 
@@ -92,9 +93,9 @@ Don't want the term to be number-focused, since you can accumulate strings, arra
 Proposals:
 
 - `reduce`, `foldUntil`, `reduceWhile`, and for all intermediate results, `scan`
-- `sum`, `sumUntil`, `sumWhile`, and `prefixSums`.
-- `sum`, `sumUntil`, `sumWhile`, and `runningSum`.
-- `total`, `totalUntil`, `totalWhile`, and `runningTotals`
+- `sum` and `prefixSums`.
+- `sum` and `runningSum`.
+- `total` and `runningTotals`
 
 ## TC39 Proposal
 

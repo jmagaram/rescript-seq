@@ -481,47 +481,6 @@ provided.
 let sum: (t<'a>, ('a, 'a) => 'a) => option<'a>
 
 /**
-`sumUntil(source, accumulator, predicate)` calculates a single value from the
-items in `source`. If `source` has more than one item, begin by applying
-`accumulator` to the first two items. Then feed that result into `accumulator`
-with the third item and so on until. If `source` is empty, returns `None`. The
-computation stops when `source` is exhausted or `predicate` returns `true`. The
-result is the first sum where `predicate` is `true`, or the final sum if
-`predicate` is always false.
-
-See `sumWhile` if you want the last value, if any, where `predicate` is `true`.
-See `reduceWhile` for a related function that takes an initial value and can
-compute a value of a different type than the source.
-
-**Note:** Although the term `sum` is used, this function is not limited to
-adding numbers. The `accumulator` can concatenate strings and arrays, determine
-the smaller of two numbers, perform logical operations on booleans, etc. This
-function is similar to `Array.reduce` in JavaScript when no initial value is
-provided.
-*/
-let sumUntil: (t<'a>, ('a, 'a) => 'a, 'a => bool) => option<'a>
-
-/**
-`sumWhile(source, accumulator, predicate)` calculates a single value from the
-items in `source`. If `source` has more than one item, begin by applying
-`accumulator` to the first two items. Then feed that result into `accumulator`
-with the third item and so on until. If `source` is empty, returns `None`. The
-computation stops when `source` is exhausted or `predicate` returns `false`. The
-result is the last sum, if any, where `predicate` is `true`.
-
-See `sumUntil` if you want the first sum where `predicate` returns `false`. See
-`reduceUntil` for a related function that takes an initial value and can computer
-a value of a different type than the source.
-
-**Note:** Although the term `sum` is used, this function is not limited to
-adding numbers. The `accumulator` can concatenate strings and arrays, determine
-the smaller of two numbers, perform logical operations on booleans, etc. This
-function is similar to `Array.reduce` in JavaScript when no initial value is
-provided.
-*/
-let sumWhile: (t<'a>, ('a, 'a) => 'a, 'a => bool) => option<'a>
-
-/**
 `cumulativeSum(source, accumulator)` calculates the running totals for each item
 in `source`. This is also known as an `inclusive scan`. The first item in the
 result is the first item in `source`. Subsequent results are computed using
