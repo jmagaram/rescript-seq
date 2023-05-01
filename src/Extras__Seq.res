@@ -881,18 +881,18 @@ let foldAdjacent = (xx, init, acc) => {
       }
     }
   }
-  let rec generate = (sum, xx) =>
+  let rec go = (sum, xx) =>
     (. ()) => {
       let (sum', next) = foldGroup(sum, xx)
       switch next {
       | None => Next(sum', empty)
-      | Some((sum, xx)) => Next(sum', generate(sum, xx))
+      | Some((sum, xx)) => Next(sum', go(sum, xx))
       }
     }
   (. ()) =>
     switch xx->headTail {
     | None => End
-    | Some(x, xx) => generate(init(x), xx)->nextNode
+    | Some(x, xx) => go(init(x), xx)->nextNode
     }
 }
 
