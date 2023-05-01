@@ -719,8 +719,9 @@ let reduceAdjacent: (t<'a>, 'a => 'b, ('b, 'a) => option<'b>) => t<'b>
 
 /**
 `chunkByKey(source, key, equals, init, accumulator)` divides `source` into
-non-overlapping groups of adjacent items, divided by `key`, create a "total" of
-some kind for each group, and returns a sequence of `(key, total)` tuples.
+non-overlapping groups of adjacent items based on `key`, create a reduction (a
+summary or total) for items each group, and returns a sequence of `(key, total)`
+tuples.
 
 The first item in `source` is used to create the first group using `init`. Items
 from `source` are "added" to the group using `accumulator`, until the key
