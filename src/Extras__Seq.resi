@@ -582,10 +582,11 @@ let head: t<'a> => option<'a>
 let tail: t<'a> => t<'a>
 
 /**
-`headTail` deconstructs the sequence into its head (first item) and the tail
-(the rest, possibly empty). If the sequence is empty returns `None`.
+`uncons` splits ("un-constructs") the the sequence into its head (first item)
+and the tail, which is possibly empty. If the sequence is empty, it returns
+`None`.
 */
-let headTail: t<'a> => option<('a, t<'a>)>
+let uncons: t<'a> => option<('a, t<'a>)>
 
 /**
 `minBy(seq, compare)` eagerly consumes the entire sequence and returns the

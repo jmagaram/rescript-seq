@@ -69,7 +69,7 @@ to consume a value once the sequence is complete, an exception is thrown.
 let toDispenser = xx => {
   let xx = ref(xx)
   () => {
-    switch xx.contents->S.headTail {
+    switch xx.contents->S.uncons {
     | None => Js.Exn.raiseError("You are attempting to consume a value past the end of a sequence.")
     | Some(x, xx') => {
         xx := xx'
@@ -1235,23 +1235,23 @@ let compareTests = [
   )
 )
 
-let headTailTests = [
+let unconsTests = [
   valueEqual(
-    ~title="headTail",
+    ~title="uncons",
     ~expectation="when empty => None",
-    ~a=() => S.empty->S.headTail,
+    ~a=() => S.empty->S.uncons,
     ~b=None,
   ),
   valueEqual(
-    ~title="headTail",
+    ~title="uncons",
     ~expectation="when once => Some(head,empty)",
-    ~a=() => S.once(4)->S.headTail->Option.map(((h, t)) => (h, t->S.toArray)),
+    ~a=() => S.once(4)->S.uncons->Option.map(((h, t)) => (h, t->S.toArray)),
     ~b=Some(4, []),
   ),
   valueEqual(
-    ~title="headTail",
+    ~title="uncons",
     ~expectation="when many items => Some(head,tail)",
-    ~a=() => [1, 2, 3]->S.fromArray->S.headTail->Option.map(((h, t)) => (h, t->S.toArray)),
+    ~a=() => [1, 2, 3]->S.fromArray->S.uncons->Option.map(((h, t)) => (h, t->S.toArray)),
     ~b=Some(1, [2, 3]),
   ),
 ]
@@ -2134,7 +2134,6 @@ let tests =
     fromArrayTests,
     fromListTests,
     fromOptionTests,
-    headTailTests,
     headTests,
     indexedTests,
     initTests,
@@ -2185,6 +2184,7 @@ let tests =
     toArrayTests,
     toListTests,
     toOptionTests,
+    unconsTests,
     unfoldTests,
     windowAheadTests,
     windowBehindTests,

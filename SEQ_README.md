@@ -126,7 +126,6 @@ let findMapi: (t<'a>, ('a, int) => option<'b>) => option<'b>
 let forEach: (t<'a>, 'a => unit) => unit
 let forEachi: (t<'a>, ('a, int) => unit) => unit
 let head: t<'a> => option<'a>
-let headTail: t<'a> => option<('a, t<'a>)>
 let isEmpty: t<'a> => bool
 let isSortedBy: (t<'a>, ('a, 'a) => int) => bool
 let join: t<string> => string
@@ -143,4 +142,5 @@ let sumBy: (t<'a>, ('a, 'a) => 'a) => option<'a>
 let toArray: t<'a> => array<'a>
 let toList: t<'a> => list<'a>
 let toOption: t<'a> => option<t<'a>>
+let uncons: t<'a> => option<('a, t<'a>)>
 ```

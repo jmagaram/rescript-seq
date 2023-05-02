@@ -13,6 +13,7 @@
   - `Seq.join` like `Array.join` rather than `Seq.joinString`. Also require a separator character.
   - `Seq.everyOk` not `Seq.allSome`
   - `Seq.everySome` not `Seq.allSome`
+  - `Seq.headTail` to `Seq.uncons`
   - `Seq.once` not `Seq.singleton`; do it like Rust. Also provide `Seq.onceWith`
   - `Array.exactlyOne` not `Array.exactlyOneValue` like `Seq.exactlyOne`
   - `Array.of1` not `Array.fromOneValue`

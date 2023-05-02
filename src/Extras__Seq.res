@@ -37,12 +37,7 @@ of everything that came before.
 @inline
 let nextNode = (xx: t<'a>) => xx(.)
 
-/**
-This tries to consume the first item in the sequence and returns `None` if the
-sequence is empty or a `Some` with the head and tail. This is the same as
-`uncons` but with a different name. It could be named `match` perhaps.
-*/
-let headTail = xx =>
+let uncons = xx =>
   switch xx->nextNode {
   | End => None
   | Next(x, xx) => Some(x, xx)
@@ -118,7 +113,7 @@ let indexed = xx => {
 }
 
 let rec forEach = (xx, f) =>
-  switch xx->headTail {
+  switch xx->uncons {
   | None => ()
   | Some(x, xx) => {
       f(x)
@@ -167,7 +162,7 @@ let rec tap = (xx, f) =>
 
 let cycle = xx =>
   (. ()) =>
-    switch xx->headTail {
+    switch xx->uncons {
     | None => End
     | Some(x, xx') => {
         let rec cycleNonEmpty = xx => (. ()) => concat(xx, cycleNonEmpty(xx))->nextNode
@@ -238,14 +233,13 @@ let take = (xx, count) => {
   go(xx, count)
 }
 
-let headTails = xx =>
-  unfold(xx, xx => xx->headTail->Option.flatMap(((_, xx) as ht) => Some(ht, xx)))
+let headTails = xx => unfold(xx, xx => xx->uncons->Option.flatMap(((_, xx) as ht) => Some(ht, xx)))
 
 let rec dropEager = (xx, count) =>
   switch count {
   | 0 => xx
   | count =>
-    switch xx->headTail {
+    switch xx->uncons {
     | None => empty
     | Some(_, xx) => dropEager(xx, count - 1)
     }
@@ -305,7 +299,7 @@ let rec takeUntil = (xx, f) =>
 
 let filterMapi = (xx, f) => {
   let rec go = xx =>
-    switch xx->headTail {
+    switch xx->uncons {
     | None => None
     | Some((x, index), xx) =>
       switch f(x, index) {
@@ -318,7 +312,7 @@ let filterMapi = (xx, f) => {
 
 let filterMap = (xx, f) => {
   let rec go = xx =>
-    switch xx->headTail {
+    switch xx->uncons {
     | None => None
     | Some(x, xx) =>
       switch f(x) {
@@ -331,7 +325,7 @@ let filterMap = (xx, f) => {
 
 let filterSome = xx => {
   let rec go = xx =>
-    switch xx->headTail {
+    switch xx->uncons {
     | None => None
     | Some(x, xx) =>
       switch x {
@@ -473,7 +467,7 @@ let reduceUntil = (xx, zero, concat, predicate) => {
     switch predicate(sum) {
     | true => sum
     | false =>
-      switch xx->headTail {
+      switch xx->uncons {
       | None => sum
       | Some(x, xx) => go(xx, concat(sum, x))
       }
@@ -483,7 +477,7 @@ let reduceUntil = (xx, zero, concat, predicate) => {
 
 let reduceWhile = (xx, zero, concat, predicate) => {
   let rec go = (xx, sum) =>
-    switch xx->headTail {
+    switch xx->uncons {
     | None => Some(sum)
     | Some(x, xx) => {
         let sum' = concat(sum, x)
@@ -500,7 +494,7 @@ let reduceWhile = (xx, zero, concat, predicate) => {
 }
 
 let sumBy = (xx, concat) =>
-  switch xx->headTail {
+  switch xx->uncons {
   | None => None
   | Some(x, xx) => {
       let sum = ref(x)
@@ -511,13 +505,13 @@ let sumBy = (xx, concat) =>
 
 let cumulativeSum = (xx, accumulator) =>
   (. ()) => {
-    switch xx->headTail {
+    switch xx->uncons {
     | None => End
     | Some(x, xx) =>
       cons(
         x,
         unfold((x, xx), ((sum, xx)) =>
-          switch xx->headTail {
+          switch xx->uncons {
           | None => None
           | Some(x, xx) => {
               let sum' = accumulator(sum, x)
@@ -565,8 +559,8 @@ let findMap = (xx, f) => {
 
 let rec map2 = (xx, yy, f) =>
   (. ()) => {
-    let xx = xx->headTail
-    let yy = yy->headTail
+    let xx = xx->uncons
+    let yy = yy->uncons
     OptionEx.map2(xx, yy, ((x, xx), (y, yy)) => Next(
       f(x, y),
       map2(xx, yy, f),
@@ -575,9 +569,9 @@ let rec map2 = (xx, yy, f) =>
 
 let rec map3 = (xx, yy, zz, f) =>
   (. ()) => {
-    let xx = xx->headTail
-    let yy = yy->headTail
-    let zz = zz->headTail
+    let xx = xx->uncons
+    let yy = yy->uncons
+    let zz = zz->uncons
     OptionEx.map3(xx, yy, zz, ((x, xx), (y, yy), (z, zz)) => Next(
       f(x, y, z),
       map3(xx, yy, zz, f),
@@ -586,10 +580,10 @@ let rec map3 = (xx, yy, zz, f) =>
 
 let rec map4 = (xx, yy, zz, qq, f) =>
   (. ()) => {
-    let xx = xx->headTail
-    let yy = yy->headTail
-    let zz = zz->headTail
-    let qq = qq->headTail
+    let xx = xx->uncons
+    let yy = yy->uncons
+    let zz = zz->uncons
+    let qq = qq->uncons
     OptionEx.map4(xx, yy, zz, qq, ((x, xx), (y, yy), (z, zz), (q, qq)) => Next(
       f(x, y, z, q),
       map4(xx, yy, zz, qq, f),
@@ -598,11 +592,11 @@ let rec map4 = (xx, yy, zz, qq, f) =>
 
 let rec map5 = (xx, yy, zz, qq, mm, f) =>
   (. ()) => {
-    let xx = xx->headTail
-    let yy = yy->headTail
-    let zz = zz->headTail
-    let qq = qq->headTail
-    let mm = mm->headTail
+    let xx = xx->uncons
+    let yy = yy->uncons
+    let zz = zz->uncons
+    let qq = qq->uncons
+    let mm = mm->uncons
     OptionEx.map5(xx, yy, zz, qq, mm, ((x, xx), (y, yy), (z, zz), (q, qq), (m, mm)) => Next(
       f(x, y, z, q, m),
       map5(xx, yy, zz, qq, mm, f),
@@ -651,7 +645,7 @@ let isEmpty = xx =>
 
 let tail = xx =>
   (. ()) =>
-    switch xx->headTail {
+    switch xx->uncons {
     | None => End
     | Some(_, xx) => xx->nextNode
     }
@@ -670,7 +664,7 @@ let rec interleave = (xx, yy) => {
 }
 
 let exactlyOne = xx =>
-  switch xx->headTail {
+  switch xx->uncons {
   | None => None
   | Some(x, xx) =>
     switch xx->isEmpty {
@@ -787,7 +781,7 @@ after the last item. If `source` is empty, returns a sequence consisting only of
 let distribute = (xx, item) => {
   let go = (pre, suf) =>
     unfold((pre, suf), ((pre, suf)) =>
-      switch suf->headTail {
+      switch suf->uncons {
       | None => None
       | Some(x, xx) => {
           let yield = pre->concat(x->once)->concat(item->once)->concat(xx)
@@ -805,7 +799,7 @@ let (combinations, permutations) = {
       InvalidArgument(`Size must be 1 or more. You asked for ${maxSize->Belt.Int.toString}.`)->raise
     }
     unfold((empty, xx), ((sum, xx)) =>
-      switch xx->headTail {
+      switch xx->uncons {
       | None => None
       | Some(x, xx) => {
           let next = {
@@ -835,7 +829,7 @@ let chunkBy = (xx, init, acc) => {
     switch state {
     | None => None
     | Some((sum, xx)) =>
-      switch xx->headTail {
+      switch xx->uncons {
       | None => Some(sum, None)
       | Some(x, xx) =>
         switch acc(sum, x) {
@@ -845,7 +839,7 @@ let chunkBy = (xx, init, acc) => {
       }
     }
   (. ()) => {
-    switch xx->headTail {
+    switch xx->uncons {
     | None => End
     | Some(x, xx) => unfold(Some(init(x), xx), unfolder)->nextNode
     }
