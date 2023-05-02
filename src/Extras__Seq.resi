@@ -6,7 +6,7 @@ type t<'a>
 exception InvalidArgument(string)
 
 /**
-`empty` is a sequence with nothing in it; analogous to an empty array.
+`empty` is a sequence with nothing in it.
 */
 let empty: t<'a>
 
@@ -126,8 +126,8 @@ None->Seq.fromOption // []
 let fromOption: option<'a> => t<'a>
 
 /**
-`cons(x, xx)` constructs the sequence that begins with the element `x` followed
-by the sequence `xx`. This is the same as `startsWith` but the arguments are reversed.
+`cons(head, tail)` constructs the sequence that begins with the element `head`
+followed by the sequence `tail`.
 
 ## Examples
 
@@ -139,13 +139,13 @@ let cons: ('a, t<'a>) => t<'a>
 
 /**
 `prepend(xx, yy)` is all items in `yy` followed by all items in `xx`. See
-`concat` for the same functionality but the arguments reversed.
+`concat` for the same behavior but the arguments reversed.
 */
 let prepend: (t<'a>, t<'a>) => t<'a>
 
 /**
 `concat(xx, yy)` is all items in `xx` followed by all items in `yy`. See
-`prepend` for the same functionality but the arguments reversed.
+`prepend` for the same behavior but the arguments reversed.
 */
 let concat: (t<'a>, t<'a>) => t<'a>
 
@@ -157,8 +157,8 @@ let flatten: t<t<'a>> => t<'a>
 
 /**
 `flatMap(source, mapper)` creates a sequence by calling the `mapper` callback on
-each item in the source sequence and then concatenating every item produced.
-Also known as `bind`. Analogous to `Array.flatMap` in JavaScript.
+each item in `source` and then concatenating every item produced. Also known as
+`bind`. Analogous to `Array.flatMap` in JavaScript.
 */
 let flatMap: (t<'a>, 'a => t<'b>) => t<'b>
 
@@ -176,34 +176,34 @@ each item.
 let mapi: (t<'a>, ('a, int) => 'b) => t<'b>
 
 /**
-`indexed` builds a new sequence whose elements are the corresponding elements of
-the input sequence paired with the integer index (from 0) of each element.
+`indexed` builds a new sequence whose elements are the corresponding items of
+the input sequence paired with the integer index (from 0) of each item.
 */
 let indexed: t<'a> => t<('a, int)>
 
 /**
-`filter` builds a new sequence containing only the elements of the source for
+`filter` builds a new sequence containing only the items of the source for
 which the given predicate returns "true". Similar to `Array.filter` in
 JavaScript.
 */
 let filter: (t<'a>, 'a => bool) => t<'a>
 
 /**
-`filteri` builds a new sequence containing only the elements of the source for
+`filteri` builds a new sequence containing only the items of the source for
 which the given predicate returns "true". The callback receives the zero-based
 index of each item.
 */
 let filteri: (t<'a>, ('a, int) => bool) => t<'a>
 
 /**
-`filterMap(source, mapper)` builds a new sequence containing only the elements of `source` for
-which the `mapper` callback returns `Some`.
+`filterMap(source, mapper)` builds a new sequence containing only the items
+in `source` for which the `mapper` callback returns `Some`.
 */
 let filterMap: (t<'a>, 'a => option<'b>) => t<'b>
 
 /**
-`filterMap(source, mapper)` builds a new sequence containing only the elements
-of `source` for which the `mapper` callback returns `Some`. The callback
+`filterMap(source, mapper)` builds a new sequence containing only the items
+in `source` for which the `mapper` callback returns `Some`. The callback
 receives the zero-based index of each item.
 */
 let filterMapi: (t<'a>, ('a, int) => option<'b>) => t<'b>
@@ -229,20 +229,21 @@ let take: (t<'a>, int) => t<'a>
 /**
 `takeWhile(source, predicate)` is the sequence that includes all items from the
 beginning of `source` up to **but not including** the item where `predicate` is
-`false`.
+`false`. See `takeUntil` to include that last item.
 */
 let takeWhile: (t<'a>, 'a => bool) => t<'a>
 
 /**
 `takeUntil(source, predicate)` is the sequence that includes all items from the
 beginning of `source` up to **and including** the first item where `predicate` is
-`false`.
+`false`. See `takeWhile` to exclude that last item.
 */
 let takeUntil: (t<'a>, 'a => bool) => t<'a>
 
 /**
 `drop(source, count)` is the sequence that begins after the first `count` items
-are discarded from `source`.
+are discarded from `source`. If the sequence has less than or equal to `count`
+items, the remaining sequence is empty. 
 */
 let drop: (t<'a>, int) => t<'a>
 
@@ -262,8 +263,8 @@ let dropUntil: (t<'a>, 'a => bool) => t<'a>
 
 /**
 `scan(source, zero, accumulator)` is conceptually related to `reduce`. However
-instead of performing an eager evaluation and returning the final accumulator,
-it returns a sequence of accumulators (partial sums).
+instead of performing an eager evaluation and returning the final accumulated
+value, it returns a sequence of accumulated values (partial sums).
 */
 let scan: (t<'a>, 'b, ('b, 'a) => 'b) => t<'b>
 
@@ -278,7 +279,7 @@ let cache: t<'a> => t<'a>
 /**
 `tap` inserts a listener into the middle of a sequence so side-effects, like
 logging and debugging, can be performed. It returns the original sequence
-without modification. This is equivalent to `map` with the identity function.
+without modification. 
 */
 let tap: (t<'a>, 'a => unit) => t<'a>
 
@@ -351,8 +352,8 @@ the separator is a constant value.
 let intersperseWith: (t<'a>, unit => 'a) => t<'a>
 
 /**
-`orElse(source, otherwise)` is the sequence `source` unless it is empty, in
-which case `otherwise` is substituted.
+`orElse(source, otherwise)` is the `source` unless it is empty, in which case
+`otherwise` is substituted as a fallback.
 */
 let orElse: (t<'a>, t<'a>) => t<'a>
 
@@ -434,8 +435,7 @@ let interleave: (t<'a>, t<'a>) => t<'a>
 
 /**
 `reduce(source, zero, accumulator)` invokes `accumulator` successively for every
-item in `source`, starting with the provided `zero` value, and returns the final
-result.
+item in `source`, starting with the `zero` value, and returns the final result.
 
 Reducing (also known as folding) is useful when you have a collection of
 something and want to produce a single value from it. This function is analogous
@@ -445,7 +445,7 @@ let reduce: (t<'a>, 'b, ('b, 'a) => 'b) => 'b
 
 /**
 `reduceUntil(source, zero, accumulator, predicate)` invokes `accumulator`
-successively for items in `source`, starting with the provided `zero` value. The
+successively for items in `source`, starting with the `zero` value. The
 computation stops after `source` is exhausted, or after `predicate` applied to
 `zero` or the current accumulated result is `true`. Returns the first result
 where `predicate` is `true` or the final computed value if `predicate` is always
@@ -539,7 +539,8 @@ for an empty sequence or if no such item can be found.
 let findMapi: (t<'a>, ('a, int) => option<'b>) => option<'b>
 
 /**
-`length` returns the number of items in the sequence.
+`length` returns the number of items in the sequence. **Note:** This requires
+eagerly iterating through every item.
 */
 let length: t<'a> => int
 
@@ -557,13 +558,13 @@ let isSortedBy: (t<'a>, ('a, 'a) => int) => bool
 /**
 `equals(seq1, seq2, areEqual)` determines if two sequences have exactly the same
 length and corresponding items in each sequence are equal according to the
-`compare` function.
+`areEqual` function.
 */
 let equals: (t<'a>, t<'a>, ('a, 'a) => bool) => bool
 
 /**
 `compare(seq1, seq2, compare)` compares two sequences using the given comparison
-function, element by element. Returns the first non-zero result. If the end of a
+function, item by item. Returns the first non-zero result. If the end of a
 sequence is reached it return -1 if the first sequence is shorter and 1 if the
 second sequence is shorter.
 */
@@ -576,8 +577,8 @@ empty.
 let head: t<'a> => option<'a>
 
 /**
-`tail` is the sequence that starts after the head (first item). Equivalent to
-`drop` with `1`.
+`tail` is the sequence (possibly empty) that starts after the head (first item).
+Equivalent to `drop` with `1`.
 */
 let tail: t<'a> => t<'a>
 
@@ -590,27 +591,26 @@ let uncons: t<'a> => option<('a, t<'a>)>
 
 /**
 `minBy(seq, compare)` eagerly consumes the entire sequence and returns the
-minimum item according to the comparator function. Returns `None` if the
+minimum item according to the `compare` function. Returns `None` if the
 sequence is empty.
 */
 let minBy: (t<'a>, ('a, 'a) => int) => option<'a>
 
 /**
 `maxBy(seq, compare)` eagerly consumes the entire sequence and returns the
-maximum item according to the comparator function. Returns `None` if the
+maximum item according to the `compare` function. Returns `None` if the
 sequence is empty.
 */
 let maxBy: (t<'a>, ('a, 'a) => int) => option<'a>
 
 /**
 `last` eagerly consumes the entire sequence and returns a `Some` for the last
-item in it, or `None` if the sequence is empty.
+item, or `None` if the sequence is empty.
 */
 let last: t<'a> => option<'a>
 
 /**
-`toArray` eagerly consumes the entire sequence and converts it to an array with
-items in the same order.
+`toArray` eagerly consumes the entire sequence and converts it to an array.
 */
 let toArray: t<'a> => array<'a>
 
@@ -621,9 +621,10 @@ items in the same order.
 let toList: t<'a> => list<'a>
 
 /**
-`join(parts, separator)` concatenates every string in `parts`, separated
-by `separator`. If `parts` is empty, returns an empty string. If `parts` has
-only one string, that string is returned without using the `separator`.
+`join(parts, separator)` concatenates every string in `parts`, separated by
+`separator`; use an empty string if no separator is desired. If `parts` is
+empty, returns an empty string. If `parts` has only one string, that string is
+returned without using the `separator`.
 */
 let join: (t<string>, string) => string
 
@@ -636,21 +637,18 @@ let exactlyOne: t<'a> => option<'a>
 /**
 `toOption` checks if the sequence is empty and if so returns `None`. Otherwise
 returns a `Some` non-empty sequence.
-
-**Note:** To check if the sequence is empty, this function eagerly consumes the
-first item and then "puts it back".
 */
 let toOption: t<'a> => option<t<'a>>
 
 /**
-`everyOk` returns an `Ok` sequence if all the input values are `Ok` or if the
+`everyOk` returns an `Ok` sequence if all the input items are `Ok` or if the
 input sequence is empty. Otherwise returns the first `Error`. This is useful for
 lazy validation because validation stops when the first `Error` is encountered.
 */
 let everyOk: t<result<'ok, 'err>> => result<t<'ok>, 'err>
 
 /**
-`everySome` returns a `Some` sequence if all input values are `Some` or if the
+`everySome` returns a `Some` sequence if all input items are `Some` or if the
 input sequence is empty. Otherwise returns `None.`
 */
 let everySome: t<option<'a>> => option<t<'a>>
@@ -703,12 +701,12 @@ let permutations: (t<'a>, int) => t<(int, t<'a>)>
 /**
 `chunkBy(source, init, accumulator)` divides `source` into non-overlapping
 groups of adjacent items, computes (via reduce) a "total" of some kind for each
-group, and then returns a sequence of group totals. The first group is created
-by passing the first item to `init`; this group consists of a single item. The
-`accumulator` is then called with subsequent items. If `accumulator` returns
-`Some`, the current group total is updated to incorporate the new item. If
-`accumulator` returns `None`, that signifies the group is "full" and a new group
-is then created using the `init` function.
+group, and then returns a sequence of group "totals". The first group is created
+by passing the first item to `init`. The `accumulator` is then called with
+subsequent items. If `accumulator` returns `Some`, the current group is
+updated to incorporate the new item. If `accumulator` returns `None`, that
+signifies the group is "full" and a new group is then created using the `init`
+function.
 
 This function is particularly useful if `source` is sorted. For example, a
 sequence of sales could be grouped by month. Each month summary could be a tuple
@@ -725,9 +723,9 @@ summary or total) for items each group, and returns a sequence of `(key, total)`
 tuples.
 
 The first item in `source` is used to create the first group using `init`. Items
-from `source` are "added" to the group using `accumulator`, until the key
-changes (based on the provided `equals` function), which triggers the creation
-of the next group. 
+from `source` are "added" to the group using `accumulator(sum, item)`, until the
+key changes (based on the provided `equals` function), which triggers the
+creation of the next group. 
 */
 let chunkByKey: (
   t<'a>,
