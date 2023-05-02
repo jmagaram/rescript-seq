@@ -28,7 +28,7 @@ This is part of the [rescript-extras package](README.md) right now; see install 
 ## Functions
 
 ```rescript
-type t<'a> // A lazy sequence of `a`
+type t<'a> // A lazy sequence of `'a`
 
 // Construct
 
@@ -104,6 +104,7 @@ let map2: (t<'a>, t<'b>, ('a, 'b) => 'c) => t<'c>
 let map3: (t<'a>, t<'b>, t<'c>, ('a, 'b, 'c) => 'd) => t<'d>
 let map4: (t<'a>, t<'b>, t<'c>, t<'d>, ('a, 'b, 'c, 'd) => 'e) => t<'e>
 let map5: (t<'a>, t<'b>, t<'c>, t<'d>, t<'e>, ('a, 'b, 'c, 'd, 'e) => 'f) => t<'f>
+let orElse: (t<'a>, t<'a>) => t<'a>
 let prepend: (t<'a>, t<'a>) => t<'a>
 let sortedMerge: (t<'a>, t<'a>, ('a, 'a) => int) => t<'a>
 let zip: (t<'a>, t<'b>) => t<('a, 'b)>
@@ -133,7 +134,6 @@ let last: t<'a> => option<'a>
 let length: t<'a> => int
 let maxBy: (t<'a>, ('a, 'a) => int) => option<'a>
 let minBy: (t<'a>, ('a, 'a) => int) => option<'a>
-let orElse: (t<'a>, t<'a>) => t<'a>
 let reduce: (t<'a>, 'b, ('b, 'a) => 'b) => 'b
 let reduceUntil: (t<'a>, 'b, ('b, 'a) => 'b, 'b => bool) => 'b
 let reduceWhile: (t<'a>, 'b, ('b, 'a) => 'b, 'b => bool) => option<'b>
