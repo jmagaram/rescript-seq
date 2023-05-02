@@ -1479,24 +1479,24 @@ let sumTests = {
   )
 }
 
-let cumulativeSumTests = {
+let prefixSumTests = {
   let add = (sum, x) => sum + x
   makeSeqEqualsTests(
-    ~title="cumulativeSum",
+    ~title="prefixSum",
     [
-      ([]->S.fromArray->S.cumulativeSum(add), [], ""),
-      ([1]->S.fromArray->S.cumulativeSum(add), [1], ""),
-      ([1, 2]->S.fromArray->S.cumulativeSum(add), [1, 3], ""),
-      ([1, 2, 3, 4, 5]->S.fromArray->S.cumulativeSum(add), [1, 3, 6, 10, 15], ""),
+      ([]->S.fromArray->S.prefixSum(add), [], ""),
+      ([1]->S.fromArray->S.prefixSum(add), [1], ""),
+      ([1, 2]->S.fromArray->S.prefixSum(add), [1, 3], ""),
+      ([1, 2, 3, 4, 5]->S.fromArray->S.prefixSum(add), [1, 3, 6, 10, 15], ""),
     ],
   )->Js.Array2.concat([
     valueEqual(
-      ~title="cumulativeSum",
+      ~title="prefixSum",
       ~expectation="millions",
-      ~a=() => S.range(1, 999_999)->S.cumulativeSum((_, n) => n)->S.last,
+      ~a=() => S.range(1, 999_999)->S.prefixSum((_, n) => n)->S.last,
       ~b=Some(999_999),
     ),
-    willNotThrow(~title="cumulativeSum", ~expectation="lazy", () => death()->S.cumulativeSum(add)),
+    willNotThrow(~title="prefixSum", ~expectation="lazy", () => death()->S.prefixSum(add)),
   ])
 }
 
@@ -2107,7 +2107,7 @@ let tests =
     concatTests,
     consTests,
     consumeTests,
-    cumulativeSumTests,
+    prefixSumTests,
     cycleTests,
     delayTests,
     dropTests,

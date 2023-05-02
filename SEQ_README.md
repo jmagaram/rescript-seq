@@ -65,7 +65,6 @@ let chunkByKey: (
   ~init: 'a => 'b,
   ~accumulator: ('b, 'a) => 'b,
 ) => t<('key, 'b)>
-let cumulativeSum: (t<'a>, ('a, 'a) => 'a) => t<'a>
 let drop: (t<'a>, int) => t<'a>
 let dropUntil: (t<'a>, 'a => bool) => t<'a>
 let dropWhile: (t<'a>, 'a => bool) => t<'a>
@@ -83,6 +82,7 @@ let intersperseWith: (t<'a>, unit => 'a) => t<'a>
 let map: (t<'a>, 'a => 'b) => t<'b>
 let mapi: (t<'a>, ('a, int) => 'b) => t<'b>
 let pairwise: t<'a> => t<('a, 'a)>
+let prefixSum: (t<'a>, ('a, 'a) => 'a) => t<'a>
 let reverse: t<'a> => t<'a>
 let scan: (t<'a>, 'b, ('b, 'a) => 'b) => t<'b>
 let sortBy: (t<'a>, ('a, 'a) => int) => t<'a>

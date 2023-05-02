@@ -477,7 +477,7 @@ of a different type than items in `source`.
 let sumBy: (t<'a>, ('a, 'a) => 'a) => option<'a>
 
 /**
-`cumulativeSum(source, accumulator)` calculates the running totals for each item
+`prefixSum(source, accumulator)` calculates the running totals for each item
 in `source`. The first item in `source` becomes the first sum in the result.
 Subsequent results are computed by `accumulator(sum, item)`. If `source` is
 empty, the result is empty.
@@ -488,7 +488,7 @@ concatenate strings, append arrays, perform logical operations on booleans, etc.
 See `scan` for a function that takes an initial value and can generate values of
 a different type than the source.
 */
-let cumulativeSum: (t<'a>, ('a, 'a) => 'a) => t<'a>
+let prefixSum: (t<'a>, ('a, 'a) => 'a) => t<'a>
 
 /**
 `forEach(source, f)` eagerly applies `f` to each item in the sequence. This does

@@ -30,7 +30,7 @@
   - `Seq.reduceWhile`
   - `Seq.chunkBy`
   - `Seq.chunkByKey`
-  - `Seq.cumulativeSum` (like `scan` but does not take an initial parameter)
+  - `Seq.prefixSum` (like `scan` but does not take an initial parameter)
   - `Seq.sumBy` (like `Seq.reduce` but no initial parameter)
   - `Seq.toList`
   - `NonEmptyArray.of1`, `of2`, `of3` and `ofMany`, all zero-cost bindings to `Array.of`.

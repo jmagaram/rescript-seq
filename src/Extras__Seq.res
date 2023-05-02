@@ -503,7 +503,7 @@ let sumBy = (xx, concat) =>
     }
   }
 
-let cumulativeSum = (xx, accumulator) =>
+let prefixSum = (xx, accumulator) =>
   (. ()) => {
     switch xx->uncons {
     | None => End
