@@ -2041,21 +2041,13 @@ let sampleBinaryDigits = {
   makeSeqEqualsTests(
     ~title="sampleBinaryDigits",
     [
-      (15->getDigits, [1, 1, 1, 1], ""),
-      (8->getDigits, [1, 0, 0, 0], ""),
-      (435_195->getDigits, [1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1], ""),
-    ],
-  )
-}
-
-let sampleChunkBySize = {
-  let getChunks = Extras__SeqSamples.chunk
-  makeSeqEqualsTests(
-    ~title="sampleChunkBySize",
-    [
-      ([1, 2, 3]->getChunks(2), [[1, 2], [3]], ""),
-      ([]->getChunks(8), [], ""),
-      ([1, 2, 3]->getChunks(1), [[1], [2], [3]], ""),
+      (15->getDigits->S.fromArray, [1, 1, 1, 1], ""),
+      (8->getDigits->S.fromArray, [1, 0, 0, 0], ""),
+      (
+        435_195->getDigits->S.fromArray,
+        [1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1],
+        "",
+      ),
     ],
   )
 }
@@ -2096,18 +2088,31 @@ let sampleRunningTotal = {
   )
 }
 
+let sampleMultiplicationTableTests = {
+  let tbl = Extras__SeqSamples.multiplicationTable
+  makeValueEqualTests(
+    ~title="sampleMultiplicationTable",
+    [
+      (() => tbl[1][4], 4, ""),
+      (() => tbl[8][9], 72, ""),
+      (() => tbl[8][9], 72, ""),
+      (() => tbl[2][5], 10, ""),
+      (() => tbl[9][2], 18, ""),
+    ],
+  )
+}
+
 let tests =
   [
     allPairsTests,
-    chunkByTests,
     chunkByKeyTests,
     chunkBySizeTests,
+    chunkByTests,
     combinationTests,
     compareTests,
     concatTests,
     consTests,
     consumeTests,
-    prefixSumTests,
     cycleTests,
     delayTests,
     dropTests,
@@ -2156,6 +2161,7 @@ let tests =
     orElseTests,
     pairwiseTests,
     permutationTests,
+    prefixSumTests,
     prependTests,
     rangeMapTests,
     rangeTests,
@@ -2166,9 +2172,9 @@ let tests =
     replicateWithTests,
     reverseTests,
     sampleBinaryDigits,
-    sampleChunkBySize,
     sampleFibonacci,
     sampleLocalMinimums,
+    sampleMultiplicationTableTests,
     sampleRunningTotal,
     sampleZipLongest,
     scanTests,
