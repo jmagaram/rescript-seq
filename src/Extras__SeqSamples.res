@@ -21,7 +21,9 @@ let dd = Seq.foreverWith(() => Js.Math.random())
 let ee = Seq.replicate(100, "x")
 
 /**
-Pointless number crunching just to see how it flows.
+Pointless number crunching to see how it flows. Unlike arrays, each
+transformation does NOT create and allocate memory for the entire thing. The
+only time work is done is with the final `forEach`.
 */
 let nums =
   Seq.range(1, 999_999)
