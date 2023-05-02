@@ -860,28 +860,11 @@ let chunkBySize = (xx, length) => {
   )
 }
 
-module KeyValue = {
-  type t<'key, 'val> = ('key, 'val)
-  let key = ((k, _)) => k
-  let value = ((_, v)) => v
-}
-
-let chunkByKey = (
-  xx: t<KeyValue.t<'key, 'val>>,
-  equals: ('key, 'key) => bool,
-  init: 'val => 'sum,
-  accumulator: ('sum, 'val) => 'sum,
-) => {
-  let init: KeyValue.t<'key, 'val> => KeyValue.t<'key, 'sum> = kv => (
-    kv->KeyValue.key,
-    init(kv->KeyValue.value),
-  )
-  let acc: (KeyValue.t<'key, 'sum>, KeyValue.t<'key, 'val>) => option<KeyValue.t<'key, 'sum>> = (
-    sum,
-    item,
-  ) =>
-    switch equals(sum->KeyValue.key, item->KeyValue.key) {
-    | true => Some((sum->KeyValue.key, accumulator(sum->KeyValue.value, item->KeyValue.value)))
+let chunkByKey = (xx, equals, init, accumulator) => {
+  let init = ((k, v)) => (k, init(v))
+  let acc = ((kSum, sum), (kItem, i)) =>
+    switch equals(kSum, kItem) {
+    | true => Some((kSum, accumulator(sum, i)))
     | false => None
     }
   chunkBy(xx, init, acc)
