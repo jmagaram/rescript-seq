@@ -15,18 +15,17 @@
 
 ## Notes
 
-- `groupBy`, `split`, etc. Think through naming again.
-- Which functions should return a result rather than option?
-- When sequence has an implicit sort order, lots of useful things ot do like `distinctAdjacent` or `chunkBy` (date, increasing sequences, etc.)
-- `uniqueBy` could be very useful; requires scan which is advanced to implement
-- Remove some functions from array since in seq now
-- Should it be called `reduceAdjacent` or `windowFold` or `chunkFold` or `partitionFold` etc.
-- Look at API breaking functions in other parts of the extras package
-- Look at all code for problems
-- Separate project?
-- Naming of `headTail` is really annoying to use. Prefer `match` or `uncons`.
+- Move Seq into a separate project?
+- Should any functions return a result rather than option?
+- Look again at `findMapi` and other indexers. Do we need them or just use `indexed` first?
+- `takeAtMost` and `dropAtMost`? Which name should be used?
+- `orElse` may not be best name though it is similar to `Option.orElse`. `orElseIfEmpty`, `ifEmptyThen`, `fallbackIfEmpty`.
 
-### Proposed feature: chunking, splitting
+### Naming of "uncons"
+
+`uncons` used in functional programming often and opposite of the `cons`. `headTail` is annoying to use. `match`? `splitAt`? Or how about `next` to indicate it is consuming one item?
+
+### Chunking and splitting
 
 Use cases for sorted sequences:
 
@@ -34,28 +33,35 @@ Use cases for sorted sequences:
 - Find sequences of increasing numbers
 - Find distinct adjacent values
 
-Implementation ideas:
+Implementation thoughts:
 
-- `chunkAdjacent` with a key definer; new group happens when the key changes; sometimes useful to get previous and current at the same time when doing this
-- `while` and `until` might be useful terms
-- maximum number of splits might be useful
-- `resultSelector` given a sequence of items in a chunk, make something from it; not necessarily an array
-- a comparator might be needed to know if a new chunk is being created
-- `chunkWhile` (separator )
-- In general, having a `reduceUntil` that returns a remainder, or `takeUntil` with a remainder, might be useful. Then have a way to do this for all chunks.
-- Very often helpful to see previous value when making a split decision, and sometimes next value as well
+- Naming needs to distinguish between something that summarizes across entire sequence and adjacent chunks. `groupBy` probably implies the whole thing. Also, `partition` is used in Belt and OCaml Seq for the whole thing.
+- Very often helpful to see previous value when making a split decision. This value can be stored in the previous chunk, though, as a key perhaps.
+- Maximum number of splits might be useful and is part of `MoreLINQ`
 
-### Proposed feature: distinctBy
+F# has a `chunkBySize`. In F# `groupBy` digests the entire sequence into unique keys.
+
+Haskell has a `group` function that creates lists of lists such that if you concatenate them all together you end up with the original.
+
+Naming ideas: `chunkAndReduce`, `chunkReduce`, `split`, `splitReduce`, `groupAdjacent`, `adjacentGroupBy`, `groupAdjacent`, `reduceAdjacent`, `groupWith`. `group` is a great word. `divide`, `segment`, `collect`. `summarizeAdjacent`. `cluster`. `chunkInto`. `split` focuses on the act of splitting, not on what is left over. Maybe name the array chunk one separate like `arrayChunksBySize` and then have `chunkBy` and `chunkByKey`.
+
+### DistinctBy, other set operations
+
+Many useful functions like `union`, `intersect`, `distinct`, `except`, `countBy` could be built if we had a...
+
+```rescript
+  type set<'a, 'b> = {
+    empty: unit => 'b,
+    has: ('b, 'a) => bool,
+    add: ('b, 'a) => 'b,
+  }
+```
 
 It is generally useful to filter out duplicate elements on demand. I got this working where the user provides a comparison function `('a,'a)=>int` which is really easy to do. The code relies on `Belt.Set` under-the-hood. `Belt.Set` relies on a hardcoded module for each type you want to put in the set, so I made it a type `unknown` and did some `Obj.magic` to make it work. There are some things to think about.
 
 My implementation was hardcoded to a specific equality test. Better performance might be possible using hash equality or the built-in JavaScript `Set`. But adding this level of customization is messy. We'd need separate functions for each kind of test, like `distinctByHash`, `distinctByComparison`, etc. Or one `distinctBy` that takes an `equality<'a>` to determine what path to take.
 
 It only works with `Belt.Set` because that is an immutable set. I generated unique items on demand, which is pretty cool. If a mutable set it used, the sequence can't be iterated more than once and it is probably better to generate all unique items at once.
-
-The user can write their own `distinctBy` and use whatever kind of equality and set they want. They can use a mutable set for example. Not too difficult. It's just a `reduce`.
-
-This function should never be called on infinite sequences, unless every item is unique, because once it gets past the last unique item it will search forever for another unique item and will fail.
 
 `F#` has this feature. They eagerly consume all the items and use a mutable set.
 
@@ -78,7 +84,7 @@ let distinctBy = (xx: t<'a>, compare: ('a, 'a) => int) => {
 
 ```
 
-### Naming for "sumBy" and "prefixSum"
+### "sumBy" and "prefixSum"
 
 `fold` is powerful since you can supply a default `zero` value and compute a type that is different than what you start with. But a simpler version, where the initial value is the first value, is useful too. F# has this. They call it `reduce` vs. `fold`. In JavaScript `Array.reduce` you can omit the initial parameter. Haskell and other packages have this simplified flavor of fold. Also, just like `fold` is related to `scan`, it is useful to have a function that returns running sums, an inclusive scan.
 
@@ -202,7 +208,11 @@ https://hackage.haskell.org/package/base-4.8.1.0/docs/Data-List.html
 
 `prefix` and `drop` do not throw.
 
+append, head, last, tail, init (all elements except for the last), uncons, length, map, reverse, intersperse, intercalate, transpose, subsequences (combinations), permutations, foldl, foldll (no initial value), foldr, foldrl, concat, concatMap, and, or, any, all, sum, product, maximum, minimum, scanl, scanr, **mapAccumL** (is this like the F# one?), iterate, repeat, replicate, cycle, unfold, take, drop, splitAt, takeWhile, dropWhile, dropWhileEnd, span, break, stripPrefix, group, inits, tails, isPrefixOf, isSuffixOf, isInfixOf, isSubsequenceOf, find, filter, partition, elemIndex, elemIndices, findIndex, findIndices, zip, zip3, etc. zipWith, zipWith3, etc. unzip, lines, union, intersect, sortOn, insertBy,
+
 ## Racket
 
 https://docs.racket-lang.org/seq/index.html
 `deduplicate` generates a list not a sequence
+
+by (every nth element), rest, init (all but the last)
