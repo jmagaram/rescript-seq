@@ -164,7 +164,7 @@ the ReScript recursive equality test.
 */
 let makeValueEqualTests = (~title, tests) =>
   tests->Js.Array2.mapi(((lazyA, b, note), index) =>
-    valueEqual(~title, ~a=lazyA, ~b, ~expectation=`Index ${index->Belt.Int.toString} ${note}`)
+    valueEqual(~title, ~a=lazyA, ~b, ~expectation=`Index ${index->intToString} ${note}`)
   )
 
 // =============================================================================
@@ -464,16 +464,37 @@ let tapTests = [
 ]
 
 let windowTests =
-  makeSeqEqualsTests(
-    ~title="window",
-    [
-      (S.range(1, 5)->S.window(3)->S.map(joinInts), ["123", "234", "345"], ""),
-      (S.range(1, 5)->S.window(2)->S.map(joinInts), ["12", "23", "34", "45"], ""),
-      (S.range(1, 5)->S.window(1)->S.map(joinInts), ["1", "2", "3", "4", "5"], ""),
-      (S.range(1, 5)->S.window(999_999)->S.map(joinInts), [], ""),
-      (S.range(1, 5)->S.takeAtMost(0)->S.window(1)->S.map(joinInts), [], ""),
-    ],
-  )->Js.Array2.concat([
+  S.rangeMap(0, 6, sourceLength =>
+    S.rangeMap(1, 8, windowSize => {
+      let source = sourceLength == 0 ? S.empty : S.range(1, sourceLength)
+      let result = source->S.window(windowSize)
+      switch windowSize > sourceLength || sourceLength == 0 {
+      | true =>
+        valueEqual(
+          ~title="window",
+          ~a=() => result->S.length,
+          ~b=0,
+          ~expectation="when windowSize == 0 or > source length => 0 results",
+        )
+      | false => {
+          let expected = S.rangeMap(
+            1,
+            sourceLength - windowSize + 1,
+            i => S.range(i, i + windowSize - 1)->S.toArray,
+          )
+          valueEqual(
+            ~title="window",
+            ~a=() => S.equals(result, expected, (a, b) => a == b),
+            ~b=true,
+            ~expectation=`source length ${sourceLength->intToString}, window size ${windowSize->intToString}`,
+          )
+        }
+      }
+    })
+  )
+  ->S.flatten
+  ->S.toArray
+  ->Js.Array2.concat([
     willNotThrow(~title="window", ~expectation="lazy", () => death()->S.window(5)),
     willThrow(~title="window", ~expectation="when size = 0 => throw", () =>
       S.range(1, 5)->S.window(0)->S.consume
@@ -1791,11 +1812,7 @@ let chunkByKeyTests = {
   let concatSeqByParity = xx =>
     xx
     ->S.map(x => (parity(x), x))
-    ->S.chunkByKey(
-      (a, b) => a === b,
-      Belt.Int.toString,
-      (sum, i) => `${sum},${i->Belt.Int.toString}`,
-    )
+    ->S.chunkByKey((a, b) => a === b, intToString, (sum, i) => `${sum},${i->intToString}`)
   let concatByParity = xx => xx->S.fromArray->concatSeqByParity
   makeSeqEqualsTests(
     ~title="chunkByKey",
