@@ -43,7 +43,7 @@ let nums =
 
 /**
 Given an array of sales, compute the sale count and total revenue per employee.
-The `chunkBy` function does a `reduce` on adjacent chunks of items. 
+The `chunkByKey` function reduces adjacent items that share the same key.
 */
 type summary = {empId: string, sales: int, revenue: int}
 type sale = {empId: string, amount: int}
@@ -54,15 +54,13 @@ let sortByEmployee = (a, b) => {
 }
 let salesSummary = sales => {
   sales
+  ->Js.Array2.sortInPlaceWith(sortByEmployee)
   ->Seq.fromArray
-  ->Seq.sortBy(sortByEmployee)
-  ->Seq.chunkBy(
+  ->Seq.map(i => (i.empId, i))
+  ->Seq.chunkByKey(
+    (id1, id2) => id1 === id2,
     i => {empId: i.empId, sales: 1, revenue: i.amount},
-    (sum, i) =>
-      switch i.empId == sum.empId {
-      | false => None
-      | true => Some({...sum, sales: sum.sales + 1, revenue: sum.revenue + i.amount})
-      },
+    (sum, i) => {...sum, sales: sum.sales + 1, revenue: sum.revenue + i.amount},
   )
 }
 

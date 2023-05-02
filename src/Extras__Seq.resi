@@ -701,36 +701,34 @@ let permutations: (t<'a>, int) => t<(int, t<'a>)>
 /**
 `chunkBy(source, init, accumulator)` divides `source` into non-overlapping
 groups of adjacent items, computes (via reduce) a "total" of some kind for each
-group, and then returns a sequence of group "totals". The first group is created
-by passing the first item to `init`. The `accumulator` is then called with
-subsequent items. If `accumulator` returns `Some`, the current group is
-updated to incorporate the new item. If `accumulator` returns `None`, that
-signifies the group is "full" and a new group is then created using the `init`
-function.
+group, and then returns a sequence of group "totals".
 
-This function is particularly useful if `source` is sorted. For example, a
-sequence of sales could be grouped by month. Each month summary could be a tuple
-like `(month, salesTotal)` or `(month, salesArray)`. The grouping criteria and
-summarization approach is completely customizable based on the `init` and
-`accumulator` functions you provide.
+The first group is created by passing the first item to `init`. The
+`accumulator` is then called with subsequent items. If `accumulator` returns
+`Some`, the current group is updated to incorporate the new item. If
+`accumulator` returns `None`, that signifies the group is complete, and a new
+group is then created using the `init` function.
+
+**Note:** This function lazily operates on adjacent items. It does not summarize
+data across the entire sequence. If you want to summarize all the data, consider
+first sorting the data. Or use `reduce` to convert the data to a dictionary.
 */
 let chunkBy: (t<'a>, 'a => 'b, ('b, 'a) => option<'b>) => t<'b>
 
 /**
-`chunkByKey(source, key, equals, init, accumulator)` divides `source` into
-non-overlapping groups of adjacent items based on `key`, create a reduction (a
-summary or total) for items each group, and returns a sequence of `(key, total)`
-tuples.
+`chunkByKey(source, equals, init, accumulator)` divides a sequence of  
+`(key, value)` into non-overlapping groups of adjacent items based on `key`,
+computes (via reduce) a "total" of some kind for each group, and then returns a
+sequence of `(key, total)`.
 
-The first item in `source` is used to create the first group using `init`. Items
-from `source` are "added" to the group using `accumulator(sum, item)`, until the
-key changes (based on the provided `equals` function), which triggers the
-creation of the next group. 
+The first group is created by passing the first `value` in `source` to `init`.
+The `accumulator` is then called with subsequent adjacent items that share the
+same `key`. When the key changes, based on the `equals` function, a new group is
+created with the `init` function.
+
+**Note:** This function lazily operates on adjacent items. It does not summarize
+data across the entire sequence. If you want to summarize all the data, consider
+first sorting the data by key. Or use `reduce` to convert the data to a
+dictionary.
 */
-let chunkByKey: (
-  t<'a>,
-  ~key: 'a => 'key,
-  ~equals: ('key, 'key) => bool,
-  ~init: 'a => 'b,
-  ~accumulator: ('b, 'a) => 'b,
-) => t<('key, 'b)>
+let chunkByKey: (t<('k, 'a)>, ('k, 'k) => bool, 'a => 'b, ('b, 'a) => 'b) => t<('k, 'b)>

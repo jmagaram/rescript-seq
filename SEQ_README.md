@@ -57,13 +57,7 @@ let unfold: ('a, 'a => option<('b, 'a)>) => t<'b>
 let cache: t<'a> => t<'a>
 let chunkBy: (t<'a>, 'a => 'b, ('b, 'a) => option<'b>) => t<'b>
 let chunkBySize: (t<'a>, int) => t<array<'a>>
-let chunkByKey: (
-  t<'a>,
-  ~key: 'a => 'key,
-  ~equals: ('key, 'key) => bool,
-  ~init: 'a => 'b,
-  ~accumulator: ('b, 'a) => 'b,
-) => t<('key, 'b)>
+let chunkByKey: (t<('k, 'a)>, ('k, 'k) => bool, 'a => 'b, ('b, 'a) => 'b) => t<('k, 'b)>
 let drop: (t<'a>, int) => t<'a>
 let dropUntil: (t<'a>, 'a => bool) => t<'a>
 let dropWhile: (t<'a>, 'a => bool) => t<'a>
