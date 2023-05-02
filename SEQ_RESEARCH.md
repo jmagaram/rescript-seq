@@ -15,11 +15,18 @@
 
 ## Notes
 
+- Look again at `findMapi` and other indexers. Do we need them or just use `indexed` first?
 - Move Seq into a separate project?
 - Should any functions return a result rather than option?
-- Look again at `findMapi` and other indexers. Do we need them or just use `indexed` first?
+- Skip last done lazily?
 - `takeAtMost` and `dropAtMost`? Which name should be used?
 - `orElse` may not be best name though it is similar to `Option.orElse`. `orElseIfEmpty`, `ifEmptyThen`, `fallbackIfEmpty`.
+
+### About indexed versions of functions like `mapi`
+
+Sometimes it is useful to have the index of an item when performing a computation. This can be accomplished by calling the `indexed` function before calling the function that needs the index. This is how it is done in `F#`. `Rust` has an `enumerate` function. So indexed versions aren't as important as they would be with non-lazy `array` functions where adding the index regenerates the entire array. Indexed versions are useful in a few cases: (1) where developers expect it from experience with JavaScript `array` functions, (2) when the user is likely going to NOT want the index after they have performed some kind of transformation, because then they have to fist call `indexed`, and then after the transformation, do a `map(snd)` to get rid of it. This is the case with `filter`.
+
+Indexed versions are especially uninteresting when the developer is going to discard the index quickly, like when a `map`. a For sequences then the indexer versions are mostly useful when the developer is going to discard the index
 
 ### Naming of "uncons"
 
