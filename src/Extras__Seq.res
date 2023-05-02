@@ -1,6 +1,6 @@
 module Option = Belt.Option
-module Result = Belt.Result
 module OptionEx = Extras__Option
+module Result = Belt.Result
 
 exception InvalidArgument(string)
 
@@ -11,7 +11,8 @@ indicating the next item. It uses uncurried mode since the resultant JavaScript
 looked a bit simpler to me. This is an abstract type in case we want to change
 the implementation later to use an `option` perhaps. Or maybe generate more
 performant code for sequences that wrap arrays. Note that the `unfold` function
-is nearly identical to this implementation, so not much flexibility is lost.
+is nearly identical to this implementation, so not much flexibility is lost by
+hiding the implementation.
 */
 type rec t<'a> = (. unit) => node<'a>
 and node<'a> =
@@ -43,11 +44,6 @@ let uncons = xx =>
   | Next(x, xx) => Some(x, xx)
   }
 
-/**
-`findNode(source, predicate)` is a foundation method for many of the functions
-in this library. This must not compile to recursive JavaScript or stack
-overflows can result. This function consumes at least one item from the source.
-*/
 let rec findNode = (xx, f) =>
   switch xx->nextNode {
   | End => End
@@ -134,11 +130,11 @@ let init = (count, f) => unfold(0, i => i < count ? Some(f(i), i + 1) : None)
 
 let replicate = (count, value) => unfold(0, i => i < count ? Some(value, i + 1) : None)
 
+let replicateWith = (count, value) => unfold(1, i => i <= count ? Some(value(), i + 1) : None)
+
 let rec forever = value => (. ()) => Next(value, forever(value))
 
 let rec foreverWith = f => (. ()) => Next(f(), foreverWith(f))
-
-let replicateWith = (count, value) => unfold(1, i => i <= count ? Some(value(), i + 1) : None)
 
 let iterate = (seed, f) => unfold(seed, i => Some(i, f(i)))
 
@@ -160,14 +156,13 @@ let rec tap = (xx, f) =>
       }
     }
 
+let rec cycleNonEmpty = xx => (. ()) => concat(xx, cycleNonEmpty(xx))->nextNode
+
 let cycle = xx =>
   (. ()) =>
     switch xx->uncons {
     | None => End
-    | Some(x, xx') => {
-        let rec cycleNonEmpty = xx => (. ()) => concat(xx, cycleNonEmpty(xx))->nextNode
-        cons(x, xx')->concat(cycleNonEmpty(xx))->nextNode
-      }
+    | Some(x, xx') => cons(x, xx')->concat(cycleNonEmpty(xx))->nextNode
     }
 
 let fromArray = (~start=?, ~end=?, xx: array<'a>) => {
