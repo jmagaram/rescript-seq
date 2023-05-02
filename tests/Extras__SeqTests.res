@@ -39,7 +39,7 @@ let callCount = () => {
 /**
 Constructs an infinite sequence that returns the number of times it has been
 invoked. Useful for tracking that various sequences are completely lazy. For
-example, if you use this sequence and do a `take(3)` then it shouldn't be
+example, if you use this sequence and do a `takeAtMost(3)` then it shouldn't be
 invoked more than 3 times. Also this is useful when testing sequences that rely
 on persistent values. For example, the `allPairs` function should cache the
 returned values before creating the pairs.
@@ -244,16 +244,16 @@ let cycleTests = makeSeqEqualsTests(
   ~title="cycle",
   [
     (S.empty->S.cycle, [], "when empty => empty"),
-    (S.once(1)->S.cycle->S.take(4), [1, 1, 1, 1], ""),
-    ([1, 2, 3]->S.fromArray->S.cycle->S.take(9), [1, 2, 3, 1, 2, 3, 1, 2, 3], ""),
-    (S.forever(1)->S.cycle->S.take(4), [1, 1, 1, 1], "when infinite can still cycle"),
+    (S.once(1)->S.cycle->S.takeAtMost(4), [1, 1, 1, 1], ""),
+    ([1, 2, 3]->S.fromArray->S.cycle->S.takeAtMost(9), [1, 2, 3, 1, 2, 3, 1, 2, 3], ""),
+    (S.forever(1)->S.cycle->S.takeAtMost(4), [1, 1, 1, 1], "when infinite can still cycle"),
     (
-      callCountForever()->S.take(3)->S.cycle->S.take(9),
+      callCountForever()->S.takeAtMost(3)->S.cycle->S.takeAtMost(9),
       [1, 2, 3, 4, 5, 6, 7, 8, 9],
       "the process to generate items is cycled, not the items themselves.",
     ),
     (
-      callCountForever()->S.take(3)->S.cache->S.cycle->S.take(6),
+      callCountForever()->S.takeAtMost(3)->S.cache->S.cycle->S.takeAtMost(6),
       [1, 2, 3, 1, 2, 3],
       "can use cache to cycle values, not the process.",
     ),
@@ -271,7 +271,7 @@ let cycleTests = makeSeqEqualsTests(
   valueEqual(
     ~title="cycle",
     ~expectation="millions",
-    ~a=() => S.range(1, 1000)->S.cycle->S.take(1000 * 1000)->S.last,
+    ~a=() => S.range(1, 1000)->S.cycle->S.takeAtMost(1000 * 1000)->S.last,
     ~b=Some(1000),
   ),
 ])
@@ -391,33 +391,33 @@ let takeWhileTests = makeSeqEqualsTests(
   ],
 )
 
-let dropTests = makeSeqEqualsTests(
-  ~title="drop",
+let dropAtMostTests = makeSeqEqualsTests(
+  ~title="dropAtMost",
   [
-    (S.range(1, 3)->S.drop(0), [1, 2, 3], ""),
-    (S.range(1, 3)->S.drop(1), [2, 3], ""),
-    (S.range(1, 3)->S.drop(3), [], ""),
-    (S.range(1, 3)->S.drop(4), [], ""),
-    (S.empty->S.drop(0), [], ""),
-    (S.empty->S.drop(1), [], ""),
-    (S.once(4)->S.drop(0), [4], ""),
-    (S.once(4)->S.drop(1), [], ""),
+    (S.range(1, 3)->S.dropAtMost(0), [1, 2, 3], ""),
+    (S.range(1, 3)->S.dropAtMost(1), [2, 3], ""),
+    (S.range(1, 3)->S.dropAtMost(3), [], ""),
+    (S.range(1, 3)->S.dropAtMost(4), [], ""),
+    (S.empty->S.dropAtMost(0), [], ""),
+    (S.empty->S.dropAtMost(1), [], ""),
+    (S.once(4)->S.dropAtMost(0), [4], ""),
+    (S.once(4)->S.dropAtMost(1), [], ""),
   ],
 )->Js.Array2.concat([
-  willNotThrow(~title="drop", ~expectation="lazy", () => death()->S.drop(1)),
+  willNotThrow(~title="dropAtMost", ~expectation="lazy", () => death()->S.dropAtMost(1)),
   valueEqual(
-    ~title="drop",
+    ~title="dropAtMost",
     ~expectation="if drop 0, return same seq instance",
     ~a=() => {
       let oneToFive = S.range(1, 5)
-      oneToFive->S.drop(0) === oneToFive
+      oneToFive->S.dropAtMost(0) === oneToFive
     },
     ~b=true,
   ),
   valueEqual(
-    ~title="drop",
+    ~title="dropAtMost",
     ~expectation="while drop a million, no overflow",
-    ~a=() => S.range(1, 999_999)->S.concat(1_000_000->S.once)->S.drop(999_999)->S.last,
+    ~a=() => S.range(1, 999_999)->S.concat(1_000_000->S.once)->S.dropAtMost(999_999)->S.last,
     ~b=Some(1_000_000),
   ),
 ])
@@ -471,7 +471,7 @@ let windowTests =
       (S.range(1, 5)->S.window(2)->S.map(joinInts), ["12", "23", "34", "45"], ""),
       (S.range(1, 5)->S.window(1)->S.map(joinInts), ["1", "2", "3", "4", "5"], ""),
       (S.range(1, 5)->S.window(999_999)->S.map(joinInts), [], ""),
-      (S.range(1, 5)->S.take(0)->S.window(1)->S.map(joinInts), [], ""),
+      (S.range(1, 5)->S.takeAtMost(0)->S.window(1)->S.map(joinInts), [], ""),
     ],
   )->Js.Array2.concat([
     willNotThrow(~title="window", ~expectation="lazy", () => death()->S.window(5)),
@@ -574,11 +574,11 @@ let interleaveTests = makeSeqEqualsTests(
 let iterateTests = makeSeqEqualsTests(
   ~title="iterate",
   [
-    (S.iterate(2, i => i * 2)->S.take(3), [2, 4, 8], ""),
-    (S.iterate(2, i => i * 2)->S.take(1), [2], ""),
-    (S.iterate(2, i => i * 2)->S.take(0), [], ""),
+    (S.iterate(2, i => i * 2)->S.takeAtMost(3), [2, 4, 8], ""),
+    (S.iterate(2, i => i * 2)->S.takeAtMost(1), [2], ""),
+    (S.iterate(2, i => i * 2)->S.takeAtMost(0), [], ""),
     (
-      S.iterate(1, i => i + 1)->S.take(999_999)->S.filter(i => i === 999_999),
+      S.iterate(1, i => i + 1)->S.takeAtMost(999_999)->S.filter(i => i === 999_999),
       [999_999],
       "millions",
     ),
@@ -649,33 +649,33 @@ let foreverTests = [
   ),
 ]
 
-let takeTests = makeSeqEqualsTests(
-  ~title="take",
+let takeAtMostTests = makeSeqEqualsTests(
+  ~title="takeAtMost",
   [
-    (S.empty->S.take(0), [], ""),
-    (S.empty->S.take(1), [], ""),
-    (S.once(1)->S.take(0), [], ""),
-    (S.once(1)->S.take(1), [1], ""),
-    (S.once(1)->S.take(2), [1], ""),
-    (S.range(1, 5)->S.take(0), [], ""),
-    (S.range(1, 5)->S.take(1), [1], ""),
-    (S.range(1, 5)->S.take(3), [1, 2, 3], ""),
-    (S.range(1, 5)->S.take(5), [1, 2, 3, 4, 5], ""),
-    (S.range(1, 5)->S.take(6), [1, 2, 3, 4, 5], ""),
+    (S.empty->S.takeAtMost(0), [], ""),
+    (S.empty->S.takeAtMost(1), [], ""),
+    (S.once(1)->S.takeAtMost(0), [], ""),
+    (S.once(1)->S.takeAtMost(1), [1], ""),
+    (S.once(1)->S.takeAtMost(2), [1], ""),
+    (S.range(1, 5)->S.takeAtMost(0), [], ""),
+    (S.range(1, 5)->S.takeAtMost(1), [1], ""),
+    (S.range(1, 5)->S.takeAtMost(3), [1, 2, 3], ""),
+    (S.range(1, 5)->S.takeAtMost(5), [1, 2, 3, 4, 5], ""),
+    (S.range(1, 5)->S.takeAtMost(6), [1, 2, 3, 4, 5], ""),
   ],
 )->Js.Array2.concat([
   valueEqual(
-    ~title="take",
+    ~title="takeAtMost",
     ~expectation="millions",
     ~a=() => S.range(1, 999_999)->S.last,
     ~b=Some(999_999),
   ),
-  willNotThrow(~title="take", ~expectation="lazy", () => death()->S.take(99)),
-  willNotThrow(~title="take", ~expectation="if zero, do not iterate anything", () =>
-    death()->S.take(0)->S.consume
+  willNotThrow(~title="takeAtMost", ~expectation="lazy", () => death()->S.takeAtMost(99)),
+  willNotThrow(~title="takeAtMost", ~expectation="if zero, do not iterate anything", () =>
+    death()->S.takeAtMost(0)->S.consume
   ),
   valueEqual(
-    ~title="take",
+    ~title="takeAtMost",
     ~expectation="if take 999_999, generator function called 999_999 times",
     ~a=() => {
       let callCount = ref(0)
@@ -683,7 +683,7 @@ let takeTests = makeSeqEqualsTests(
         callCount := callCount.contents + 1
         callCount.contents
       })
-      ->S.take(999_999)
+      ->S.takeAtMost(999_999)
       ->S.consume
       callCount.contents
     },
@@ -695,12 +695,12 @@ let foreverWithTests =
   makeSeqEqualsTests(
     ~title="foreverWith",
     [
-      (callCountForever()->S.take(0), [], ""),
-      (callCountForever()->S.take(1), [1], ""),
-      (callCountForever()->S.take(5), [1, 2, 3, 4, 5], ""),
+      (callCountForever()->S.takeAtMost(0), [], ""),
+      (callCountForever()->S.takeAtMost(1), [1], ""),
+      (callCountForever()->S.takeAtMost(5), [1, 2, 3, 4, 5], ""),
       (
         callCountForever()
-        ->S.take(999_999)
+        ->S.takeAtMost(999_999)
         ->S.last
         ->Option.map(S.once)
         ->Option.getWithDefault(S.empty),
@@ -774,7 +774,7 @@ let chunkBySizeTests = {
       (
         S.range(0, 9)
         ->S.cycle
-        ->S.take(1_000_000)
+        ->S.takeAtMost(1_000_000)
         ->S.chunkBySize(10)
         ->S.map(joinInts)
         ->S.last
@@ -1171,7 +1171,7 @@ let toArrayTests = [
         calls := calls.contents + 1
         i < 100 ? Some(i, i + 1) : None
       })
-      ->S.take(0)
+      ->S.takeAtMost(0)
       ->S.toArray
       ->ignore
       calls.contents
@@ -1565,7 +1565,7 @@ let memoizeTests = [
     ~title="cache",
     ~expectation="calculations only done once",
     () => {
-      let randoms = S.foreverWith(() => Js.Math.random())->S.take(4)->S.cache
+      let randoms = S.foreverWith(() => Js.Math.random())->S.takeAtMost(4)->S.cache
       let nums1 = randoms->S.toArray
       let nums2 = randoms->S.toArray
       let nums3 = randoms->S.toArray
@@ -1577,7 +1577,7 @@ let memoizeTests = [
     ~title="cache",
     ~expectation="all lazy; can cache foreverWith",
     () => {
-      let randoms = S.foreverWith(() => Js.Math.random())->S.cache->S.take(4)
+      let randoms = S.foreverWith(() => Js.Math.random())->S.cache->S.takeAtMost(4)
       let nums1 = randoms->S.toArray
       let nums2 = randoms->S.toArray
       let nums3 = randoms->S.toArray
@@ -1744,7 +1744,7 @@ let delayTests =
       (S.delay(() => S.empty), [], ""),
       (S.delay(() => S.once(1)), [1], ""),
       (S.delay(() => S.range(1, 5)), [1, 2, 3, 4, 5], ""),
-      (S.delay(() => Js.Exn.raiseError("boom!"))->S.take(0), [], ""),
+      (S.delay(() => Js.Exn.raiseError("boom!"))->S.takeAtMost(0), [], ""),
     ],
   )->Js.Array2.concat([
     willNotThrow(~title="delay", ~expectation="lazy", () => S.delay(throwIfInvoked)),
@@ -1778,7 +1778,8 @@ let chunkByTests = {
     seqEqual(
       ~title="chunkBy",
       ~expectation="millions of source items",
-      ~a=() => [1, 2]->S.fromArray->S.cycle->S.take(1_000_000)->parityCount->S.drop(999_998),
+      ~a=() =>
+        [1, 2]->S.fromArray->S.cycle->S.takeAtMost(1_000_000)->parityCount->S.dropAtMost(999_998),
       ~b=[("o", 1), ("e", 1)],
     ),
     willNotThrow(~title="chunkBy", ~expectation="lazy", () => death()->parityCount),
@@ -1896,7 +1897,7 @@ let (combinationTests, permutationTests) = {
         () =>
           callCountForever()
           ->S.map(i => i == 1 ? "a" : i == 2 ? "b" : i == 3 ? "c" : "x")
-          ->S.take(3)
+          ->S.takeAtMost(3)
           ->S.combinations(3)
           ->S.map(((_size, combo)) => combo)
           ->sortOutput,
@@ -1940,7 +1941,7 @@ let (combinationTests, permutationTests) = {
         () =>
           callCountForever()
           ->S.map(i => i == 1 ? "a" : i == 2 ? "b" : i == 3 ? "c" : "x")
-          ->S.take(3)
+          ->S.takeAtMost(3)
           ->S.permutations(3)
           ->S.map(((_size, combo)) => combo)
           ->sortOutput,
@@ -1955,24 +1956,24 @@ let (combinationTests, permutationTests) = {
     valueEqual(
       ~title,
       ~expectation="millions - take 10",
-      ~a=() => S.range(1, 1000)->f(1000)->S.take(10)->S.last->Belt.Option.isSome,
+      ~a=() => S.range(1, 1000)->f(1000)->S.takeAtMost(10)->S.last->Belt.Option.isSome,
       ~b=true,
     ),
     valueEqual(
       ~title,
       ~expectation="infinite - take 0",
-      ~a=() => S.foreverWith(() => 1)->f(1000)->S.take(0)->S.last,
+      ~a=() => S.foreverWith(() => 1)->f(1000)->S.takeAtMost(0)->S.last,
       ~b=None,
     ),
     valueEqual(
       ~title,
       ~expectation="infinite - take 1",
-      ~a=() => S.foreverWith(() => 1)->f(1000)->S.take(4)->S.last->Option.isSome,
+      ~a=() => S.foreverWith(() => 1)->f(1000)->S.takeAtMost(4)->S.last->Option.isSome,
       ~b=true,
     ),
     valueEqual(
       ~title,
-      ~a=() => S.replicateWith(3, throwIfInvoked)->f(1000)->S.take(0)->S.last,
+      ~a=() => S.replicateWith(3, throwIfInvoked)->f(1000)->S.takeAtMost(0)->S.last,
       ~b=None,
       ~expectation="totally lazy",
     ),
@@ -2098,7 +2099,7 @@ let tests =
     consumeTests,
     cycleTests,
     delayTests,
-    dropTests,
+    dropAtMostTests,
     dropUntilTests,
     dropWhileTests,
     emptyTests,
@@ -2166,7 +2167,7 @@ let tests =
     sortedMergeTests,
     sumTests,
     tailTests,
-    takeTests,
+    takeAtMostTests,
     takeUntilTests,
     takeWhileTests,
     tapTests,

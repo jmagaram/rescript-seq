@@ -3,10 +3,9 @@
 - Fixed bugs
   - `Seq.filterMap` didn't work with nested options
   - `Seq.tail` was not completely lazy
-  - `Seq.drop` was not completely lazy
+  - `Seq.dropAtMost` was not completely lazy
   - `Seq.findMap` didn't work with nested options
 - Rename
-  - `Seq.take` not `Seq.takeAtMost` since that is the TC39 proposal name and other packages use the same name. The name (and `drop`) is slightly inaccurate.
   - `repeat` to `replicate`; more common usage in other Seq libraries
   - `InvalidArgument` exception not `ArgumentOfOfRange` (spelled wrong)
   - `Seq.every` not `Seq.everyOrEmpty` to be less cumbersome and more like array
@@ -40,7 +39,7 @@
 
 ## Version 1.1.1
 
-- Fix bug in `Seq.take` where generator function was called 1 too many times; not lazy enough
+- Fix bug in `Seq.takeAtMost` where generator function was called 1 too many times; not lazy enough
 - `Seq.combinations`
 - `Seq.permutations`
 

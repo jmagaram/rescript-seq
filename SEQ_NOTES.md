@@ -1,6 +1,7 @@
-# Research and notes
+# Notes
 
-- [Notes, ideas, etc.](#notes)
+- [To do](#to-do)
+- [About indexed versions of functions](#indexed-versions-of-functions-like-mapi)
 - [TC39 Proposal](#tc39-proposal)
 - [OCaml](#ocaml)
 - [F#](#f)
@@ -13,34 +14,18 @@
 - [Haskell List](#haskell)
 - [Racket](#racket)
 
-## Notes
+## To do
 
-- Look again at `findMapi` and other indexers. Do we need them or just use `indexed` first?
 - Move Seq into a separate project?
 - Should any functions return a result rather than option?
 - Skip last done lazily?
 - `takeAtMost` and `dropAtMost`? Which name should be used?
-- `orElse` may not be best name though it is similar to `Option.orElse`. `orElseIfEmpty`, `ifEmptyThen`, `fallbackIfEmpty`.
 
-### About indexed versions of functions like `mapi`
+## Indexed versions of functions like `mapi`
 
-Sometimes it is useful to have the index of an item when performing a computation. This can be accomplished by calling the `indexed` function before calling the function that needs the index. This is how it is done in `F#`. `Rust` has an `enumerate` function. So indexed versions aren't as important as they would be with non-lazy `array` functions where adding the index regenerates the entire array. Indexed versions are useful in a few cases: (1) where developers expect it from experience with JavaScript `array` functions, (2) when the user is likely going to NOT want the index after they have performed some kind of transformation, because then they have to fist call `indexed`, and then after the transformation, do a `map(snd)` to get rid of it. This is the case with `filter`.
+Sometimes it is useful to have the index of an item when performing a computation. This can be accomplished by calling the `indexed` function before calling the function that needs the index. This is how it is done in `F#`. `Rust` has an `enumerate` function. So indexed versions aren't as important as they would be with non-lazy `array` functions where adding the index regenerates the entire array. Indexed versions are useful in a couple cases: (1) where developers expect it from experience with JavaScript `array` functions, (2) when the user is likely going to NOT want the index after they have performed some kind of transformation, because then they have to first call `indexed`, and then after the transformation, do a `map` to get rid of it. This is the case with `filter`.
 
-Indexed versions are especially uninteresting when the developer is going to discard the index quickly, like when a `map`. a For sequences then the indexer versions are mostly useful when the developer is going to discard the index
-
-### Naming of "uncons"
-
-`uncons` used in functional programming often and opposite of the `cons`. `headTail` is annoying to use. `match`? `splitAt`? Or how about `next` to indicate it is consuming one item?
-
-### Chunking and splitting
-
-Use cases for sorted sequences:
-
-- Chunk by key and then in each chunk, calculate minimum, length, or just an array of each. Could group by month, even/odd, status, etc.
-- Find sequences of increasing numbers
-- Find distinct adjacent values
-
-Implementation thoughts:
+## Chunking, grouping, splitting
 
 - Naming needs to distinguish between something that summarizes across entire sequence and adjacent chunks. `groupBy` probably implies the whole thing. Also, `partition` is used in Belt and OCaml Seq for the whole thing.
 - Very often helpful to see previous value when making a split decision. This value can be stored in the previous chunk, though, as a key perhaps.
@@ -52,7 +37,7 @@ Haskell has a `group` function that creates lists of lists such that if you conc
 
 Naming ideas: `chunkAndReduce`, `chunkReduce`, `split`, `splitReduce`, `groupAdjacent`, `adjacentGroupBy`, `groupAdjacent`, `reduceAdjacent`, `groupWith`. `group` is a great word. `divide`, `segment`, `collect`. `summarizeAdjacent`. `cluster`. `chunkInto`. `split` focuses on the act of splitting, not on what is left over. Maybe name the array chunk one separate like `arrayChunksBySize` and then have `chunkBy` and `chunkByKey`.
 
-### DistinctBy, other set operations
+## DistinctBy, other set operations
 
 Many useful functions like `union`, `intersect`, `distinct`, `except`, `countBy` could be built if we had a...
 
@@ -91,7 +76,7 @@ let distinctBy = (xx: t<'a>, compare: ('a, 'a) => int) => {
 
 ```
 
-### "sumBy" and "prefixSum"
+## "sumBy" and "prefixSum"
 
 `fold` is powerful since you can supply a default `zero` value and compute a type that is different than what you start with. But a simpler version, where the initial value is the first value, is useful too. F# has this. They call it `reduce` vs. `fold`. In JavaScript `Array.reduce` you can omit the initial parameter. Haskell and other packages have this simplified flavor of fold. Also, just like `fold` is related to `scan`, it is useful to have a function that returns running sums, an inclusive scan.
 

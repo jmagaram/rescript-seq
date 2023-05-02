@@ -221,10 +221,10 @@ items are discarded.
 let filterOk: t<result<'a, 'b>> => t<'a>
 
 /**
-`take(source, count)` is the sequence of the first `count` items of `source`, or
-fewer if `source` ends sooner. Remaining items are discarded.
+`takeAtMost(source, count)` is the sequence of the first `count` items of
+`source`, or fewer if `source` ends sooner. Remaining items are discarded.
 */
-let take: (t<'a>, int) => t<'a>
+let takeAtMost: (t<'a>, int) => t<'a>
 
 /**
 `takeWhile(source, predicate)` is the sequence that includes all items from the
@@ -241,11 +241,11 @@ beginning of `source` up to **and including** the first item where `predicate` i
 let takeUntil: (t<'a>, 'a => bool) => t<'a>
 
 /**
-`drop(source, count)` is the sequence that begins after the first `count` items
-are discarded from `source`. If the sequence has less than or equal to `count`
-items, the remaining sequence is empty. 
+`dropAtMost(source, count)` is the sequence that begins after the first `count`
+items are discarded from `source`. If the sequence has less than or equal to
+`count` items, the remaining sequence is empty. 
 */
-let drop: (t<'a>, int) => t<'a>
+let dropAtMost: (t<'a>, int) => t<'a>
 
 /**
 `dropWhile(source, predicate)` is the sequence that skips items from the
@@ -258,6 +258,7 @@ let dropWhile: (t<'a>, 'a => bool) => t<'a>
 `dropUntil(source, predicate)` is the sequence that skips items from the
 beginning of `source` and **starts** at the first item where predicate is
 `true`. See `dropWhile` to exclude the first `true` item.
+- `orElse` may not be best name though it is similar to `Option.orElse`. `orElseIfEmpty`, `ifEmptyThen`, `fallbackIfEmpty`.
 */
 let dropUntil: (t<'a>, 'a => bool) => t<'a>
 

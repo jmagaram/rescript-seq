@@ -209,10 +209,10 @@ let fromOption = opt =>
 
 let mapi = (xx, f) => xx->indexed->map(((x, inx)) => f(x, inx))
 
-let take = (xx, count) => {
+let takeAtMost = (xx, count) => {
   if count < 0 {
     InvalidArgument(
-      `take requires a count of 0 or more. You requested ${count->Belt.Int.toString}`,
+      `takeAtMost requires a count of 0 or more. You requested ${count->Belt.Int.toString}`,
     )->raise
   }
   let rec go = (xx, count) =>
@@ -230,24 +230,24 @@ let take = (xx, count) => {
 
 let headTails = xx => unfold(xx, xx => xx->uncons->Option.flatMap(((_, xx) as ht) => Some(ht, xx)))
 
-let rec dropEager = (xx, count) =>
+let rec dropAtMostEager = (xx, count) =>
   switch count {
   | 0 => xx
   | count =>
     switch xx->uncons {
     | None => empty
-    | Some(_, xx) => dropEager(xx, count - 1)
+    | Some(_, xx) => dropAtMostEager(xx, count - 1)
     }
   }
 
-let drop = (xx, count) =>
+let dropAtMost = (xx, count) =>
   switch count {
   | 0 => xx
   | count if count < 0 =>
     InvalidArgument(
-      `'drop' requires a count of zero or more but you asked for ${count->Belt.Int.toString}`,
+      `'dropAtMost' requires a count of zero or more but you asked for ${count->Belt.Int.toString}`,
     )->raise
-  | count => delay(() => dropEager(xx, count))
+  | count => delay(() => dropAtMostEager(xx, count))
   }
 
 let rec filter = (xx, f) =>
@@ -682,7 +682,7 @@ let windowBehind = (xx, size) => {
     sum->Js.Array2.push(i)->ignore
     sum
   })
-  ->drop(1)
+  ->dropAtMost(1)
 }
 
 let windowAhead = (xx, size) => {
@@ -700,7 +700,7 @@ let windowAhead = (xx, size) => {
     i->Option.forEach(i => sum->Js.Array2.push(i)->ignore)
     sum
   })
-  ->drop(size)
+  ->dropAtMost(size)
 }
 
 let everyOk = xx => {
