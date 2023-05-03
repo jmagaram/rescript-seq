@@ -751,7 +751,7 @@ let slidingWindows = (xx, maxSize) => {
 
 let windowBehind = (xx, size) => {
   if size <= 0 {
-    InvalidArgument(`windowBehind requires a size greater than zero.`)->raise
+    InvalidArgument(`windowBehind requires a size of 1 or or more.`)->raise
   }
   xx
   ->scan([], (sum, i) => {
@@ -766,10 +766,10 @@ let windowBehind = (xx, size) => {
 
 let windowAhead = (xx, size) => {
   if size <= 0 {
-    InvalidArgument(`windowAhead requires a size greater than zero.`)->raise
+    InvalidArgument(`windowAhead requires a size of 1 or more.`)->raise
   }
   xx
-  ->slidingWindows(size + 1)
+  ->slidingWindows(size)
   ->map(Array.copy)
   ->pairWithNext
   ->dropWhile(((curr, next)) =>
