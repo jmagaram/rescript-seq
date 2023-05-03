@@ -46,27 +46,6 @@ let uncons = xx =>
   }
 
 /**
-`consumeN(source, count)` attempts to remove at most `count` items from
-`source`. Returns an array of those items and the sequence of remaining items,
-which is possibly empty.
-*/
-let consumeN = (xx, n) => {
-  let rec go = (xx, found, n) =>
-    switch n == 0 {
-    | true => (found, xx)
-    | false =>
-      switch xx->nextNode {
-      | End => (found, empty)
-      | Next(x, xx) => {
-          found->Array.push(x)->ignore
-          go(xx, found, n - 1)
-        }
-      }
-    }
-  go(xx, [], n)
-}
-
-/**
 `findNode(source, predicate)` consumes items in the sequence looking for the
 first item that satisfies the predicate. This is the guts of the `find`
 function. It returns a `node`, which includes both the item in the sequence and
