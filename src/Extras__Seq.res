@@ -699,7 +699,24 @@ let pairWithPrevious = xx =>
   }
 
 let pairwise = xx =>
-  xx->pairWithPrevious->filterMap(((prev, curr)) => prev->Option.flatMap(prev => Some(prev, curr)))
+  (. ()) =>
+    switch xx->nextNode {
+    | End => End
+    | Next(a, xx) =>
+      switch xx->nextNode {
+      | End => End
+      | Next(b, xx) =>
+        cons(
+          (a, b),
+          unfold((b, xx), ((b, xx)) =>
+            switch xx->nextNode {
+            | End => None
+            | Next(x, xx) => Some((b, x), (x, xx))
+            }
+          ),
+        )->nextNode
+      }
+    }
 
 let isSortedBy = (xx, cmp) => xx->pairwise->every(((a, b)) => cmp(a, b) <= 0)
 
