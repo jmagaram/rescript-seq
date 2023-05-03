@@ -441,7 +441,7 @@ let dropWhile = (xx, f) =>
 let window = (xx, length) => {
   if length <= 0 {
     InvalidArgument(
-      `windowed requires a length > 0. You asked for ${length->Belt.Int.toString}`,
+      `window requires a length > 0. You asked for ${length->Belt.Int.toString}`,
     )->raise
   }
   xx
@@ -454,8 +454,6 @@ let window = (xx, length) => {
   })
   ->filter(i => Array.length(i) == length)
 }
-
-let pairwise = xx => xx->window(2)->map(i => (i->Array.unsafe_get(0), i->Array.unsafe_get(1)))
 
 let reduce = (xx, zero, concat) => {
   let sum = ref(zero)
@@ -674,8 +672,6 @@ let exactlyOne = xx =>
     }
   }
 
-let isSortedBy = (xx, cmp) => xx->pairwise->every(((a, b)) => cmp(a, b) <= 0)
-
 let pairWithNext = xx =>
   (. ()) => {
     switch xx->nextNode {
@@ -701,6 +697,11 @@ let pairWithPrevious = xx =>
     | Next(x, xx) => xx->scan((None, x), ((_, curr), i) => (Some(curr), i))->nextNode
     }
   }
+
+let pairwise = xx =>
+  xx->pairWithPrevious->filterMap(((prev, curr)) => prev->Option.flatMap(prev => Some(prev, curr)))
+
+let isSortedBy = (xx, cmp) => xx->pairwise->every(((a, b)) => cmp(a, b) <= 0)
 
 /**
 `slidingWindows(source, maxSize)` is the sequence of overlapping windows from
