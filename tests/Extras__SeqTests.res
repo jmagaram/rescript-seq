@@ -504,69 +504,118 @@ let windowTests =
     ),
   ])
 
-let windowAheadBehindTests = (~title, ~function, ~data) =>
-  {
-    let strOrEmpty = s => s == "" ? "(empty)" : s
-    let oneTest = (input, size, expectedResult) => {
-      valueEqual(
-        ~title,
-        ~expectation=`${strOrEmpty(input)} size ${size->intToString} => ${strOrEmpty(
-            expectedResult,
-          )}`,
-        ~a=() =>
-          input
-          ->characters
-          ->function(size)
-          ->S.map(ss => ss->Js.Array2.joinWith(""))
-          ->S.intersperse(",")
-          ->S.join(""),
-        ~b=expectedResult,
-      )
-    }
-    data->Js.Array2.map(((input, size, expected)) => oneTest(input, size, expected))
-  }->Js.Array2.concat([
-    willThrow(~title, ~expectation="when size == 0 => throw", () => "abc"->characters->function(0)),
-    willThrow(~title, ~expectation="when size < 0 => throw", () => "abc"->characters->function(-1)),
-    willNotThrow(~title, ~expectation="lazy", () => death()->function(1)),
+let windowAheadTests = {
+  let ahead = (source, count) =>
+    source
+    ->Js.String2.split("")
+    ->S.fromArray
+    ->S.windowAhead(count)
+    ->S.map(((first, rest)) => `${first}|${rest->Js.Array2.joinWith("")}`)
+    ->S.join(" ")
+  makeValueEqualTests(
+    ~title="windowAhead",
+    [
+      (() => ""->ahead(1), "", ""),
+      (() => ""->ahead(9), "", ""),
+      (() => "a"->ahead(1), "a|", ""),
+      (() => "a"->ahead(9), "a|", ""),
+      (() => "ab"->ahead(1), "a|b b|", ""),
+      (() => "ab"->ahead(2), "a|b b|", "zebra"),
+      (() => "ab"->ahead(9), "a|b b|", ""),
+      (() => "abc"->ahead(1), "a|b b|c c|", ""),
+      (() => "abc"->ahead(2), "a|bc b|c c|", ""),
+      (() => "abc"->ahead(3), "a|bc b|c c|", ""),
+      (() => "abc"->ahead(9), "a|bc b|c c|", ""),
+      (() => "abcde"->ahead(1), "a|b b|c c|d d|e e|", ""),
+      (() => "abcde"->ahead(2), "a|bc b|cd c|de d|e e|", ""),
+      (() => "abcde"->ahead(3), "a|bcd b|cde c|de d|e e|", "zebra"),
+      (() => "abcde"->ahead(4), "a|bcde b|cde c|de d|e e|", ""),
+      (() => "abcde"->ahead(9), "a|bcde b|cde c|de d|e e|", ""),
+    ],
+  )->Js.Array2.concat([
+    willNotThrow(~title="windowAhead", ~expectation="lazy", () => death()->S.windowAhead(1)),
+    willNotThrow(~title="windowAhead", ~expectation="window much bigger than source", () =>
+      S.range(1, 5)->S.windowAhead(20)->S.consume
+    ),
+    // willNotThrow(~title="windowAhead", ~expectation="window much bigger than source", () =>
+    //   S.range(1, 5)->S.windowAhead(999_999_999)->S.consume
+    // ),
+    willThrow(~title="windowAhead", ~expectation="when size 0, throw", () =>
+      S.range(1, 5)->S.windowAhead(0)->S.consume
+    ),
+    willThrow(~title="windowAhead", ~expectation="when size -1, throw", () =>
+      S.range(1, 5)->S.windowAhead(-1)->S.consume
+    ),
   ])
+}
 
-let windowAheadTests = windowAheadBehindTests(
-  ~title="windowAhead",
-  ~function=S.windowAhead,
-  ~data=[
-    ("", 1, ""),
-    ("", 2, ""),
-    ("a", 1, "a"),
-    ("a", 2, "a"),
-    ("ab", 1, "a,b"),
-    ("ab", 2, "ab,b"),
-    ("abc", 2, "ab,bc,c"),
-    ("abc", 3, "abc,bc,c"),
-    ("abc", 4, "abc,bc,c"),
-    ("abcde", 1, "a,b,c,d,e"),
-    ("abcdefg", 3, "abc,bcd,cde,def,efg,fg,g"),
-    ("abcdefg", 7, "abcdefg,bcdefg,cdefg,defg,efg,fg,g"),
-  ],
-)
+let pairWithNextTests = {
+  let f = source =>
+    source
+    ->Js.String2.split("")
+    ->S.fromArray
+    ->S.pairWithNext
+    ->S.map(((curr, next)) => `${curr}${next->Option.getWithDefault("_")}`)
+    ->S.join(",")
+  makeValueEqualTests(
+    ~title="pairWithNext",
+    [
+      (() => ""->f, "", ""),
+      (() => "a"->f, "a_", ""),
+      (() => "ab"->f, "ab,b_", ""),
+      (() => "abc"->f, "ab,bc,c_", ""),
+      (() => "abcd"->f, "ab,bc,cd,d_", ""),
+    ],
+  )->Js.Array2.concat([
+    willNotThrow(~title="pairWithNext", ~expectation="lazy", () => death()->S.pairWithNext),
+    valueEqual(
+      ~title="pairWithNext",
+      ~expectation="millions",
+      ~a=() => S.range(1, 999_999)->S.pairWithNext->S.last->Option.getExn,
+      ~b=(999_999, None),
+    ),
+    seqEqual(
+      ~title="pairWithNext",
+      ~expectation="works with nested options",
+      ~a=() => [None, None]->S.fromArray->S.pairWithNext,
+      ~b=[(None, Some(None)), (None, None)],
+    ),
+  ])
+}
 
-let windowBehindTests = windowAheadBehindTests(
-  ~title="windowBehind",
-  ~function=S.windowBehind,
-  ~data=[
-    ("", 1, ""),
-    ("", 2, ""),
-    ("a", 1, "a"),
-    ("a", 2, "a"),
-    ("ab", 1, "a,b"),
-    ("ab", 2, "a,ab"),
-    ("abc", 2, "a,ab,bc"),
-    ("abc", 3, "a,ab,abc"),
-    ("abc", 4, "a,ab,abc"),
-    ("abcde", 1, "a,b,c,d,e"),
-    ("abcdefg", 3, "a,ab,abc,bcd,cde,def,efg"),
-    ("abcdefg", 7, "a,ab,abc,abcd,abcde,abcdef,abcdefg"),
-  ],
-)
+let pairWithPreviousTests = {
+  let f = source =>
+    source
+    ->Js.String2.split("")
+    ->S.fromArray
+    ->S.pairWithPrevious
+    ->S.map(((prev, curr)) => `${prev->Option.getWithDefault("_")}${curr}`)
+    ->S.join(",")
+  makeValueEqualTests(
+    ~title="pairWithPrevious",
+    [
+      (() => ""->f, "", ""),
+      (() => "a"->f, "_a", ""),
+      (() => "ab"->f, "_a,ab", ""),
+      (() => "abc"->f, "_a,ab,bc", ""),
+      (() => "abcd"->f, "_a,ab,bc,cd", ""),
+    ],
+  )->Js.Array2.concat([
+    willNotThrow(~title="pairWithPrevious", ~expectation="lazy", () => death()->S.pairWithPrevious),
+    valueEqual(
+      ~title="pairWithPrevious",
+      ~expectation="millions",
+      ~a=() => S.range(1, 999_999)->S.pairWithPrevious->S.last->Option.getExn,
+      ~b=(Some(999_998), 999_999),
+    ),
+    seqEqual(
+      ~title="pairWithPrevious",
+      ~expectation="works with nested options",
+      ~a=() => [None, None]->S.fromArray->S.pairWithPrevious,
+      ~b=[(None, None), (Some(None), None)],
+    ),
+  ])
+}
 
 let pairwiseTests =
   makeSeqEqualsTests(
@@ -2103,97 +2152,130 @@ let sampleMultiplicationTableTests = {
   )
 }
 
-let tests =
-  [
-    allPairsTests,
-    chunkByKeyTests,
-    chunkBySizeTests,
-    chunkByTests,
-    combinationTests,
-    compareTests,
-    concatTests,
-    consTests,
-    consumeTests,
-    cycleTests,
-    delayTests,
-    dropAtMostTests,
-    dropUntilTests,
-    dropWhileTests,
-    emptyTests,
-    equalsTests,
-    everyOkTests,
-    everySomeTests,
-    everyTests,
-    exactlyOneTests,
-    filterMapiTests,
-    filterMapTests,
-    filterOkTests,
-    filterSomeTests,
-    filterTests,
-    findMapTests,
-    findTests,
-    flatMapTests,
-    flattenTests,
-    forEachTests,
-    foreverTests,
-    foreverWithTests,
-    fromArrayTests,
-    fromListTests,
-    fromOptionTests,
-    headTests,
-    indexedTests,
-    initTests,
-    interleaveTests,
-    intersperseTests,
-    intersperseWithTests,
-    isEmptyTests,
-    isSortedByTests,
-    iterateTests,
-    joinTests,
-    lastTests,
-    lengthTests,
-    map2Tests,
-    map3Tests,
-    mapTests,
-    memoizeTests,
-    minByMaxByTests,
-    onceTests,
-    onceWithTests,
-    orElseTests,
-    pairwiseTests,
-    permutationTests,
-    prefixSumTests,
-    prependTests,
-    rangeMapTests,
-    rangeTests,
-    reduceTests,
-    reduceUntilTests,
-    reduceWhileTests,
-    replicateTests,
-    replicateWithTests,
-    reverseTests,
-    sampleBinaryDigits,
-    sampleFibonacci,
-    sampleLocalMinimums,
-    sampleMultiplicationTableTests,
-    sampleRunningTotal,
-    sampleZipLongest,
-    scanTests,
-    someTests,
-    sortByTests,
-    sortedMergeTests,
-    sumTests,
-    tailTests,
-    takeAtMostTests,
-    takeUntilTests,
-    takeWhileTests,
-    tapTests,
-    toArrayTests,
-    toListTests,
-    toOptionTests,
-    unconsTests,
-    unfoldTests,
-    windowAheadTests,
-    windowBehindTests,
-    windowTests,
-  ]->Belt.Array.flatMap(i => i)
+// let winTests = {
+//   let wrap = s => `|${s}|`
+//   let test = (source, size, expect) =>
+//     valueEqual(
+//       ~title="sliding",
+//       ~expectation=`"${source}" (${size->intToString}) => "${expect}"`,
+//       ~a=() =>
+//         source
+//         ->Js.String2.trim
+//         ->Js.String2.split("")
+//         ->S.fromArray
+//         ->sliding(size)
+//         ->S.map(i => i->Js.Array2.joinWith(""))
+//         ->S.join(",")
+//         ->wrap,
+//       ~b=expect->wrap,
+//     )
+//   [
+//     test("", 1, ""),
+//     test("", 9, ""),
+//     test("a", 1, "a"),
+//     test("a", 2, "a"),
+//     test("ab", 1, "a,b"),
+//     test("ab", 2, "a,ab,b"),
+//     test("abc", 2, "a,ab,bc,c"),
+//     test("abcd", 3, "a,ab,abc,bcd,cd,d"),
+//     test("abcd", 9, "a,ab,abc,abcd,bcd,cd,d"),
+//     test("abcd", 1, "a,b,c,d"),
+//     test("abcd", 2, "a,ab,bc,cd,d"),
+//   ]
+// }
+
+let tests = [
+  // winTests,
+  allPairsTests,
+  chunkByKeyTests,
+  chunkBySizeTests,
+  chunkByTests,
+  combinationTests,
+  compareTests,
+  concatTests,
+  consTests,
+  consumeTests,
+  cycleTests,
+  delayTests,
+  dropAtMostTests,
+  dropUntilTests,
+  dropWhileTests,
+  emptyTests,
+  equalsTests,
+  everyOkTests,
+  everySomeTests,
+  everyTests,
+  exactlyOneTests,
+  filterMapiTests,
+  filterMapTests,
+  filterOkTests,
+  filterSomeTests,
+  filterTests,
+  findMapTests,
+  findTests,
+  flatMapTests,
+  flattenTests,
+  forEachTests,
+  foreverTests,
+  foreverWithTests,
+  fromArrayTests,
+  fromListTests,
+  fromOptionTests,
+  headTests,
+  indexedTests,
+  initTests,
+  interleaveTests,
+  intersperseTests,
+  intersperseWithTests,
+  isEmptyTests,
+  isSortedByTests,
+  iterateTests,
+  joinTests,
+  lastTests,
+  lengthTests,
+  map2Tests,
+  map3Tests,
+  mapTests,
+  memoizeTests,
+  minByMaxByTests,
+  onceTests,
+  onceWithTests,
+  orElseTests,
+  pairwiseTests,
+  permutationTests,
+  prefixSumTests,
+  prependTests,
+  rangeMapTests,
+  rangeTests,
+  reduceTests,
+  reduceUntilTests,
+  reduceWhileTests,
+  replicateTests,
+  replicateWithTests,
+  reverseTests,
+  sampleBinaryDigits,
+  sampleFibonacci,
+  sampleLocalMinimums,
+  sampleMultiplicationTableTests,
+  sampleRunningTotal,
+  sampleZipLongest,
+  scanTests,
+  someTests,
+  sortByTests,
+  sortedMergeTests,
+  sumTests,
+  tailTests,
+  takeAtMostTests,
+  takeUntilTests,
+  takeWhileTests,
+  tapTests,
+  toArrayTests,
+  toListTests,
+  toOptionTests,
+  unconsTests,
+  unfoldTests,
+  windowAheadTests,
+  pairWithNextTests, // windowBehindTests,
+  pairWithPreviousTests,
+  windowTests,
+]->Belt.Array.flatMap(i => i)

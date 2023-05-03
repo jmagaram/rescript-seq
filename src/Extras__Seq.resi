@@ -328,7 +328,7 @@ followed by at most `size-1` items.
 **Note:** Each window is returned as a shared array. Use `map` to copy each
 array to its own instance if necessary.
 */
-let windowAhead: (t<'a>, int) => t<array<'a>>
+let windowAhead: (t<'a>, int) => t<('a, array<'a>)>
 
 /**
 `allPairs(seq1, seq2)` contains all pairings of items from the first and second
@@ -733,3 +733,23 @@ first sorting the data by key. Or use `reduce` to convert the data to a
 dictionary.
 */
 let chunkByKey: (t<('k, 'a)>, ('k, 'k) => bool, 'a => 'b, ('b, 'a) => 'b) => t<('k, 'b)>
+
+/**
+`pairWithNext(source)` is the sequence of every item in `source` paired with the
+item that follows it.
+*/
+let pairWithNext: t<'a> => t<('a, option<'a>)>
+
+/**
+`pairWithPrevious(source)` is the sequence of every item in `source` paired with
+the item that precedes it.
+*/
+let pairWithPrevious: t<'a> => t<(option<'a>, 'a)>
+
+// let withNextN: (t<'a>, int) => t<('a, array<'a>)>
+// let withNext: t<'a> => t<('a, option<'a>)>
+// let withPreviousN: (t<'a>, int) => t<(array<'a>, 'a)>
+// let withPrevious: t<'a> => t<(option<'a>, 'a)>
+// let withNeighbors: t<'a> => t<(option<'a>, 'a, option<'a>)>
+// let withNeighborsN: (t<'a>, int) => t<(array<'a>, 'a, array<'a>)>
+// let windows: (t<'a>, int) => t<array<'a>>

@@ -1,6 +1,7 @@
 module Option = Belt.Option
 module OptionEx = Extras__Option
 module Result = Belt.Result
+module Array = Js.Array2
 
 exception InvalidArgument(string)
 
@@ -44,6 +45,33 @@ let uncons = xx =>
   | Next(x, xx) => Some(x, xx)
   }
 
+/**
+`consumeN(source, count)` attempts to remove at most `count` items from
+`source`. Returns an array of those items and the sequence of remaining items,
+which is possibly empty.
+*/
+let consumeN = (xx, n) => {
+  let rec go = (xx, found, n) =>
+    switch n == 0 {
+    | true => (found, xx)
+    | false =>
+      switch xx->nextNode {
+      | End => (found, empty)
+      | Next(x, xx) => {
+          found->Array.push(x)->ignore
+          go(xx, found, n - 1)
+        }
+      }
+    }
+  go(xx, [], n)
+}
+
+/**
+`findNode(source, predicate)` consumes items in the sequence looking for the
+first item that satisfies the predicate. This is the guts of the `find`
+function. It returns a `node`, which includes both the item in the sequence and
+the tail, in case it is needed.
+*/
 let rec findNode = (xx, f) =>
   switch xx->nextNode {
   | End => End
@@ -175,7 +203,7 @@ let fromArray = (~start=?, ~end=?, xx: array<'a>) => {
     )
     empty
   | false => {
-      let len = xx->Js.Array2.length
+      let len = xx->Array.length
       let start = start->Option.getWithDefault(0)
       let end = end->Option.getWithDefault(len - 1)
       if start < 0 || start > len - 1 {
@@ -188,7 +216,7 @@ let fromArray = (~start=?, ~end=?, xx: array<'a>) => {
           `The end index ${start->Belt.Int.toString} is outside the array bounds.`,
         )->raise
       }
-      range(start, end)->map(inx => xx->Js.Array2.unsafe_get(inx))
+      range(start, end)->map(inx => xx->Array.unsafe_get(inx))
     }
   }
 }
@@ -439,17 +467,16 @@ let window = (xx, length) => {
   }
   xx
   ->scan([], (sum, val) => {
-    if Js.Array2.length(sum) >= length {
-      sum->Js.Array2.shift->ignore
+    if Array.length(sum) >= length {
+      sum->Array.shift->ignore
     }
-    sum->Js.Array2.push(val)->ignore
+    sum->Array.push(val)->ignore
     sum
   })
-  ->filter(i => Js.Array2.length(i) == length)
+  ->filter(i => Array.length(i) == length)
 }
 
-let pairwise = xx =>
-  xx->window(2)->map(i => (i->Js.Array2.unsafe_get(0), i->Js.Array2.unsafe_get(1)))
+let pairwise = xx => xx->window(2)->map(i => (i->Array.unsafe_get(0), i->Array.unsafe_get(1)))
 
 let reduce = (xx, zero, concat) => {
   let sum = ref(zero)
@@ -528,7 +555,7 @@ let last = xx => xx->sumBy((_, i) => i)
 
 let toArray = xx =>
   xx->reduce([], (xx, i) => {
-    xx->Js.Array2.push(i)->ignore
+    xx->Array.push(i)->ignore
     xx
   })
 
@@ -670,38 +697,166 @@ let exactlyOne = xx =>
 
 let isSortedBy = (xx, cmp) => xx->pairwise->every(((a, b)) => cmp(a, b) <= 0)
 
+let pairWithNext = xx =>
+  (. ()) => {
+    switch xx->nextNode {
+    | End => End
+    | Next(x, xx) =>
+      unfold(Some(x, xx), nxt =>
+        switch nxt {
+        | None => None
+        | Some(x, xx) =>
+          switch xx->nextNode {
+          | End => Some((x, None), None)
+          | Next(x', xx) => Some((x, Some(x')), Some(x', xx))
+          }
+        }
+      )->nextNode
+    }
+  }
+
+let pairWithPrevious = xx =>
+  (. ()) => {
+    switch xx->nextNode {
+    | End => End
+    | Next(x, xx) => xx->scan((None, x), ((_, curr), i) => (Some(curr), i))->nextNode
+    }
+  }
+
+/**
+`slidingWindows(source, maxSize)` is the sequence of overlapping windows from
+size 1 to `maxSize`. Windows grow at the beginning until they reach `maxSize` or
+`source` is exhausted. Subsequent windows stay at `maxSize` and then shrink at
+the end. **Note:** For performance, each window shares the same array.
+
+Examples:
+```
+abcdef with maxSize 3 => a ab abc bcd cde def ef f
+ab with maxSize 10 => a ab b
+abcd with maxSize 1 => a b c d
+```
+*/
+let slidingWindows = (xx, maxSize) => {
+  if maxSize < 1 {
+    InvalidArgument(
+      `slidingWindows expects a maxSize of 1 or more but you asked for ${maxSize->Belt.Int.toString}`,
+    )->raise
+  }
+  unfold(([], Some(xx)), ((w, xx)) => {
+    switch xx {
+    | Some(xx) =>
+      switch xx->nextNode {
+      | Next(x, xx) =>
+        if w->Array.push(x) > maxSize {
+          w->Array.shift->ignore
+        }
+        Some(w, (w, Some(xx)))
+      | End =>
+        switch w->Array.length > 1 {
+        | false => None
+        | true =>
+          w->Array.shift->ignore
+          Some(w, (w, None))
+        }
+      }
+    | None =>
+      switch w->Array.length > 1 {
+      | true =>
+        w->Array.shift->ignore
+        Some(w, (w, None))
+      | false => None
+      }
+    }
+  })
+}
+
 let windowBehind = (xx, size) => {
   if size <= 0 {
     InvalidArgument(`windowBehind requires a size greater than zero.`)->raise
   }
   xx
   ->scan([], (sum, i) => {
-    if sum->Js.Array2.length === size {
-      sum->Js.Array2.shift->ignore
+    if sum->Array.length === size {
+      sum->Array.shift->ignore
     }
-    sum->Js.Array2.push(i)->ignore
+    sum->Array.push(i)->ignore
     sum
   })
   ->dropAtMost(1)
 }
 
-let windowAhead = (xx, size) => {
-  if size <= 0 {
-    InvalidArgument(`windowAhead requires a size greater than zero.`)->raise
-  }
-  xx
-  ->map(i => Some(i))
-  ->concat(replicate(size - 1, None))
-  ->indexed
-  ->scan([], (sum, (i, inx)) => {
-    if inx >= size {
-      sum->Js.Array2.shift->ignore
-    }
-    i->Option.forEach(i => sum->Js.Array2.push(i)->ignore)
-    sum
-  })
-  ->dropAtMost(size)
-}
+let windowAhead = (xx, size) => empty
+//  {
+//   if size <= 0 {
+//     InvalidArgument(`windowAhead requires a size greater than zero.`)->raise
+//   }
+//   xx->slidingWindows(size) // size 1 to 999,999
+// }
+
+// xx
+// ->map(i => Some(i))
+// ->concat(forever(None))
+// ->scan(([], None, false), ((sum, max, _), i) => {
+//   switch i {
+//   | None => {
+//       let max = max->Option.orElse(Some(sum->Array.length))
+//       sum->Array.shift->ignore
+//       (sum, max, true)
+//     }
+//   | Some(i) => {
+//       sum->Array.push(i)->ignore
+//       (sum, max, false)
+//     }
+//   }
+// })
+// ->dropAtMost(1)
+// ->takeWhile(((xx, _, _)) => xx->Array.length > 0)
+// ->filterMap(((xx, maxLen, unwinding)) =>
+//   // size is meaningless; max size?
+//   switch unwinding || (!unwinding && xx->Array.length == Js.Math.min_int(maxLen, size)) {
+//   | true => Some((xx->Array.unsafe_get(0), xx->Array.sliceFrom(1)))
+//   | false => None
+//   }
+// )
+// let windowAhead = (xx, size) => {
+//   if size <= 0 {
+//     InvalidArgument(`windowAhead requires a size greater than zero.`)->raise
+//   }
+//   let size = size + 1
+//   unfold(([], 0, Some(xx)), ((prev, pushed, xx)) =>
+//     switch xx {
+//     | Some(xx) =>
+//       switch xx->nextNode {
+//       | Next(x, xx) => {
+//           Js.log2("pushing", x)
+//           prev->Array.push(x)->ignore
+//           let pushed = pushed + 1
+//           if pushed > size {
+//             prev->Array.shift->ignore
+//           }
+//           Some(prev, (prev, pushed, Some(xx)))
+//         }
+//       | End =>
+//         switch prev->Array.shift {
+//         | None => None
+//         | Some(_) => Some(prev, (prev, pushed, None))
+//         }
+//       }
+//     | None =>
+//       switch prev {
+//       | [] => None
+//       | _ => {
+//           prev->Array.shift->ignore
+//           Some(prev, (prev, pushed, None))
+//         }
+//       }
+//     }
+//   )
+//   ->tap(i => Js.log(i))
+//   ->dropAtMost(size - 2)
+//   ->filter(i => i->Array.length > 0)
+//   ->map(prev => (prev->Array.unsafe_get(0), prev->Array.sliceFrom(1)))
+// }
 
 let everyOk = xx => {
   let concat = (sum, i) =>
@@ -748,16 +903,16 @@ let orElse = (xx, yy) =>
 let reverse = xx =>
   delay(() => {
     let xx = xx->toArray
-    switch xx->Js.Array2.length {
+    switch xx->Array.length {
     | 0 => empty
-    | _ => xx->fromArray(~start=xx->Js.Array2.length - 1, ~end=0)
+    | _ => xx->fromArray(~start=xx->Array.length - 1, ~end=0)
     }
   })
 
 let sortBy = (xx, compare) =>
   delay(() => {
     let xx = xx->toArray
-    xx->Js.Array2.sortInPlaceWith(compare)->ignore
+    xx->Array.sortInPlaceWith(compare)->ignore
     xx->fromArray
   })
 
@@ -850,10 +1005,10 @@ let chunkBySize = (xx, length) => {
   xx->chunkBy(
     i => [i],
     (sum, i) =>
-      switch sum->Js.Array2.length == length {
+      switch sum->Array.length == length {
       | true => None
       | false => {
-          sum->Js.Array2.push(i)->ignore
+          sum->Array.push(i)->ignore
           Some(sum)
         }
       },
