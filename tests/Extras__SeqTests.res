@@ -510,36 +510,33 @@ let windowAheadTests = {
     ->Js.String2.split("")
     ->S.fromArray
     ->S.windowAhead(count)
-    ->S.map(((first, rest)) => `${first}|${rest->Js.Array2.joinWith("")}`)
+    ->S.map(items => items->Js.Array2.joinWith(""))
     ->S.join(" ")
   makeValueEqualTests(
     ~title="windowAhead",
     [
       (() => ""->ahead(1), "", ""),
       (() => ""->ahead(9), "", ""),
-      (() => "a"->ahead(1), "a|", ""),
-      (() => "a"->ahead(9), "a|", ""),
-      (() => "ab"->ahead(1), "a|b b|", ""),
-      (() => "ab"->ahead(2), "a|b b|", "zebra"),
-      (() => "ab"->ahead(9), "a|b b|", ""),
-      (() => "abc"->ahead(1), "a|b b|c c|", ""),
-      (() => "abc"->ahead(2), "a|bc b|c c|", ""),
-      (() => "abc"->ahead(3), "a|bc b|c c|", ""),
-      (() => "abc"->ahead(9), "a|bc b|c c|", ""),
-      (() => "abcde"->ahead(1), "a|b b|c c|d d|e e|", ""),
-      (() => "abcde"->ahead(2), "a|bc b|cd c|de d|e e|", ""),
-      (() => "abcde"->ahead(3), "a|bcd b|cde c|de d|e e|", "zebra"),
-      (() => "abcde"->ahead(4), "a|bcde b|cde c|de d|e e|", ""),
-      (() => "abcde"->ahead(9), "a|bcde b|cde c|de d|e e|", ""),
+      (() => "a"->ahead(1), "a", ""),
+      (() => "a"->ahead(9), "a", ""),
+      (() => "ab"->ahead(1), "ab b", ""),
+      (() => "ab"->ahead(2), "ab b", ""),
+      (() => "ab"->ahead(9), "ab b", ""),
+      (() => "abc"->ahead(1), "ab bc c", ""),
+      (() => "abc"->ahead(2), "abc bc c", ""),
+      (() => "abc"->ahead(3), "abc bc c", ""),
+      (() => "abc"->ahead(9), "abc bc c", ""),
+      (() => "abcde"->ahead(1), "ab bc cd de e", ""),
+      (() => "abcde"->ahead(2), "abc bcd cde de e", ""),
+      (() => "abcde"->ahead(3), "abcd bcde cde de e", ""),
+      (() => "abcde"->ahead(4), "abcde bcde cde de e", ""),
+      (() => "abcde"->ahead(9), "abcde bcde cde de e", ""),
     ],
   )->Js.Array2.concat([
     willNotThrow(~title="windowAhead", ~expectation="lazy", () => death()->S.windowAhead(1)),
     willNotThrow(~title="windowAhead", ~expectation="window much bigger than source", () =>
-      S.range(1, 5)->S.windowAhead(20)->S.consume
+      S.range(1, 5)->S.windowAhead(999_999_999)->S.consume
     ),
-    // willNotThrow(~title="windowAhead", ~expectation="window much bigger than source", () =>
-    //   S.range(1, 5)->S.windowAhead(999_999_999)->S.consume
-    // ),
     willThrow(~title="windowAhead", ~expectation="when size 0, throw", () =>
       S.range(1, 5)->S.windowAhead(0)->S.consume
     ),

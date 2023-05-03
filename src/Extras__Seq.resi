@@ -307,11 +307,10 @@ array.
 let window: (t<'a>, int) => t<array<'a>>
 
 /**
-`windowBehind(source, size)` is useful for performing computations on each item
-in a sequence and some of its predecessors. This function returns a sequence of
-sliding overlapping windows of items drawn from `source` containing at most
-`size` items. Each item in `source` is the **last** item in each window and is
-preceded by at most `size-1` items.
+`windowBehind(source, size)` returns a sequence of sliding overlapping windows
+of items drawn from `source` containing at most `size` items. Each item in
+`source` becomes the **last** item in each window, and is preceded by at most
+`size-1` items. 
 
 **Note:** Each window is returned as a shared array. Use `map` to copy each
 array to its own instance if necessary.
@@ -319,16 +318,15 @@ array to its own instance if necessary.
 let windowBehind: (t<'a>, int) => t<array<'a>>
 
 /**
-`windowAhead(source, size)` is useful for performing computations on each item
-in a sequence and some of the items that follow it. This function returns a sequence of
-sliding overlapping windows of items drawn from `source` containing at most
-`size` items. Each item in `source` is the **first** item in each window and is
-followed by at most `size-1` items.
+`windowAhead(source, size)` returns a sequence of sliding overlapping windows of
+items drawn from `source` containing at most `size` items. Each item in `source`
+becomes the **first** item in each window, and is followed by at most `size-1`
+items.
 
 **Note:** Each window is returned as a shared array. Use `map` to copy each
 array to its own instance if necessary.
 */
-let windowAhead: (t<'a>, int) => t<('a, array<'a>)>
+let windowAhead: (t<'a>, int) => t<array<'a>>
 
 /**
 `allPairs(seq1, seq2)` contains all pairings of items from the first and second

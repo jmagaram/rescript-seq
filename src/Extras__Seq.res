@@ -785,78 +785,22 @@ let windowBehind = (xx, size) => {
   ->dropAtMost(1)
 }
 
-let windowAhead = (xx, size) => empty
-//  {
-//   if size <= 0 {
-//     InvalidArgument(`windowAhead requires a size greater than zero.`)->raise
-//   }
-//   xx->slidingWindows(size) // size 1 to 999,999
-// }
-
-// xx
-// ->map(i => Some(i))
-// ->concat(forever(None))
-// ->scan(([], None, false), ((sum, max, _), i) => {
-//   switch i {
-//   | None => {
-//       let max = max->Option.orElse(Some(sum->Array.length))
-//       sum->Array.shift->ignore
-//       (sum, max, true)
-//     }
-//   | Some(i) => {
-//       sum->Array.push(i)->ignore
-//       (sum, max, false)
-//     }
-//   }
-// })
-// ->dropAtMost(1)
-// ->takeWhile(((xx, _, _)) => xx->Array.length > 0)
-// ->filterMap(((xx, maxLen, unwinding)) =>
-//   // size is meaningless; max size?
-//   switch unwinding || (!unwinding && xx->Array.length == Js.Math.min_int(maxLen, size)) {
-//   | true => Some((xx->Array.unsafe_get(0), xx->Array.sliceFrom(1)))
-//   | false => None
-//   }
-// )
-// let windowAhead = (xx, size) => {
-//   if size <= 0 {
-//     InvalidArgument(`windowAhead requires a size greater than zero.`)->raise
-//   }
-//   let size = size + 1
-//   unfold(([], 0, Some(xx)), ((prev, pushed, xx)) =>
-//     switch xx {
-//     | Some(xx) =>
-//       switch xx->nextNode {
-//       | Next(x, xx) => {
-//           Js.log2("pushing", x)
-//           prev->Array.push(x)->ignore
-//           let pushed = pushed + 1
-//           if pushed > size {
-//             prev->Array.shift->ignore
-//           }
-//           Some(prev, (prev, pushed, Some(xx)))
-//         }
-//       | End =>
-//         switch prev->Array.shift {
-//         | None => None
-//         | Some(_) => Some(prev, (prev, pushed, None))
-//         }
-//       }
-//     | None =>
-//       switch prev {
-//       | [] => None
-//       | _ => {
-//           prev->Array.shift->ignore
-//           Some(prev, (prev, pushed, None))
-//         }
-//       }
-//     }
-//   )
-//   ->tap(i => Js.log(i))
-//   ->dropAtMost(size - 2)
-//   ->filter(i => i->Array.length > 0)
-//   ->map(prev => (prev->Array.unsafe_get(0), prev->Array.sliceFrom(1)))
-// }
+let windowAhead = (xx, size) => {
+  if size <= 0 {
+    InvalidArgument(`windowAhead requires a size greater than zero.`)->raise
+  }
+  xx
+  ->slidingWindows(size + 1)
+  ->map(Array.copy)
+  ->pairWithNext
+  ->dropWhile(((curr, next)) =>
+    switch next {
+    | None => false
+    | Some(n) => n->Array.length > curr->Array.length
+    }
+  )
+  ->map(((prev, _)) => prev)
+}
 
 let everyOk = xx => {
   let concat = (sum, i) =>
