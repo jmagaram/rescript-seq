@@ -694,7 +694,16 @@ let pairWithPrevious = xx =>
   (. ()) => {
     switch xx->nextNode {
     | End => End
-    | Next(x, xx) => xx->scan((None, x), ((_, curr), i) => (Some(curr), i))->nextNode
+    | Next(a, xx) =>
+      cons(
+        (None, a),
+        unfold((a, xx), ((a, xx)) =>
+          switch xx->nextNode {
+          | End => None
+          | Next(b, xx) => Some((Some(a), b), (b, xx))
+          }
+        ),
+      )->nextNode
     }
   }
 
