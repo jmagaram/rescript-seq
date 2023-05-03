@@ -496,6 +496,9 @@ let windowTests =
   ->S.toArray
   ->Js.Array2.concat([
     willNotThrow(~title="window", ~expectation="lazy", () => death()->S.window(5)),
+    willNotThrow(~title="window", ~expectation="when size much bigger than sequence", () =>
+      S.range(1, 100)->S.window(999_999)->S.consume
+    ),
     willThrow(~title="window", ~expectation="when size = 0 => throw", () =>
       S.range(1, 5)->S.window(0)->S.consume
     ),
