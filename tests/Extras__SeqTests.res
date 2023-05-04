@@ -662,6 +662,40 @@ let pairWithPreviousTests = {
   ])
 }
 
+let neighborsTests = {
+  let f = source =>
+    source
+    ->Js.String2.split("")
+    ->S.fromArray
+    ->S.neighbors
+    ->S.map(((a, b, c)) => `${a->Option.getWithDefault("_")}${b}${c->Option.getWithDefault("_")}`)
+    ->S.join(",")
+  makeValueEqualTests(
+    ~title="neighbors",
+    [
+      (() => ""->f, "", ""),
+      (() => "a"->f, "_a_", ""),
+      (() => "ab"->f, "_ab,ab_", ""),
+      (() => "abc"->f, "_ab,abc,bc_", ""),
+      (() => "abcd"->f, "_ab,abc,bcd,cd_", ""),
+    ],
+  )->Js.Array2.concat([
+    willNotThrow(~title="neighbors", ~expectation="lazy", () => death()->S.neighbors),
+    valueEqual(
+      ~title="neighbors",
+      ~expectation="millions",
+      ~a=() => S.range(1, 999_999)->S.neighbors->S.last->Option.getExn,
+      ~b=(Some(999_998), 999_999, None),
+    ),
+    seqEqual(
+      ~title="neighbors",
+      ~expectation="works with nested options",
+      ~a=() => [None, None]->S.fromArray->S.neighbors,
+      ~b=[(None, None, Some(None)), (Some(None), None, None)],
+    ),
+  ])
+}
+
 let pairwiseTests =
   makeSeqEqualsTests(
     ~title="pairwise",
@@ -2197,38 +2231,6 @@ let sampleMultiplicationTableTests = {
   )
 }
 
-// let winTests = {
-//   let wrap = s => `|${s}|`
-//   let test = (source, size, expect) =>
-//     valueEqual(
-//       ~title="sliding",
-//       ~expectation=`"${source}" (${size->intToString}) => "${expect}"`,
-//       ~a=() =>
-//         source
-//         ->Js.String2.trim
-//         ->Js.String2.split("")
-//         ->S.fromArray
-//         ->sliding(size)
-//         ->S.map(i => i->Js.Array2.joinWith(""))
-//         ->S.join(",")
-//         ->wrap,
-//       ~b=expect->wrap,
-//     )
-//   [
-//     test("", 1, ""),
-//     test("", 9, ""),
-//     test("a", 1, "a"),
-//     test("a", 2, "a"),
-//     test("ab", 1, "a,b"),
-//     test("ab", 2, "a,ab,b"),
-//     test("abc", 2, "a,ab,bc,c"),
-//     test("abcd", 3, "a,ab,abc,bcd,cd,d"),
-//     test("abcd", 9, "a,ab,abc,abcd,bcd,cd,d"),
-//     test("abcd", 1, "a,b,c,d"),
-//     test("abcd", 2, "a,ab,bc,cd,d"),
-//   ]
-// }
-
 let tests =
   [
     allPairsTests,
@@ -2283,6 +2285,7 @@ let tests =
     mapTests,
     memoizeTests,
     minByMaxByTests,
+    neighborsTests,
     onceTests,
     onceWithTests,
     orElseTests,

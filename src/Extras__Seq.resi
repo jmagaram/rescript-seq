@@ -740,6 +740,12 @@ the item that precedes it.
 */
 let pairWithPrevious: t<'a> => t<(option<'a>, 'a)>
 
+/**
+`neighbors(source)` is the sequence of each item in `source` with the
+items that immediately precede and follow it.
+*/
+let neighbors: t<'a> => t<(option<'a>, 'a, option<'a>)>
+
 // let pairBehind
 // let pairAhead
 // let pairwise

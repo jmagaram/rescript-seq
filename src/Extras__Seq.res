@@ -727,6 +727,40 @@ let pairwise = xx =>
       }
     }
 
+/**
+Ugly but more efficient than using `window` of 3
+*/
+let neighbors = xx =>
+  (. ()) =>
+    switch xx->nextNode {
+    | End => End
+    | Next(a, xx) =>
+      switch xx->nextNode {
+      | End => Next((None, a, None), empty)
+      | Next(b, xx) =>
+        switch xx->nextNode {
+        | End => Next((None, a, Some(b)), (Some(a), b, None)->once)
+        | Next(c, xx) =>
+          cons(
+            (None, a, Some(b)),
+            cons(
+              (Some(a), b, Some(c)),
+              unfold(Some(b, c, xx), state =>
+                switch state {
+                | None => None
+                | Some(b, c, xx) =>
+                  switch xx->nextNode {
+                  | End => Some((Some(b), c, None), None)
+                  | Next(d, xx) => Some((Some(b), c, Some(d)), Some(c, d, xx))
+                  }
+                }
+              ),
+            ),
+          )->nextNode
+        }
+      }
+    }
+
 let isSortedBy = (xx, cmp) => xx->pairwise->every(((a, b)) => cmp(a, b) <= 0)
 
 /**
