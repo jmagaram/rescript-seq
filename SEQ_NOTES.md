@@ -1,7 +1,12 @@
 # Notes
 
+General:
+
 - [To do](#to-do)
-- [About indexed versions of functions](#indexed-versions-of-functions-like-mapi)
+- [Miscellaneous notes](#miscellaneous-notes)
+
+Other sequence/iterable packages:
+
 - [TC39 Proposal](#tc39-proposal)
 - [OCaml](#ocaml)
 - [F#](#f)
@@ -16,11 +21,11 @@
 
 ## To do
 
-- Should some functions have labels? Look them all over.
-- Make final look through functions and see if anything is not totally obvious, like `orElse` or `fromOption`.
 - Move Seq into a separate project?
 
-## Terminology for `concat`
+## Miscellaneous notes
+
+### Terminology for `concat`
 
 - F# `concat` is flatten and `append` is just 1
 - OCaml `concat` is flatten and `append` is just 1
@@ -31,13 +36,13 @@
 
 Ok, sticking with `concat` for JavaScript familiarity, even though it conflicts with sequences in other functional languages. But adding synonym of `append` for since it goes nicely with `prepend`.
 
-## Indexed versions of functions like `mapi`
+### Indexed versions of functions like `mapi`
 
 Sometimes it is useful to have the index of an item when performing a computation. This can be accomplished by calling the `indexed` function before calling the function that needs the index. This is how it is done in `F#`. `Rust` has an `enumerate` function. So indexed versions aren't as important as they would be with non-lazy `array` functions where adding the index regenerates the entire array. Indexed versions are useful in a couple cases: (1) where developers expect it from experience with JavaScript `array` functions, (2) when the user is likely going to NOT want the index after they have performed some kind of transformation, because then they have to first call `indexed`, and then after the transformation, do a `map` to get rid of it. This is the case with `filter`.
 
-## DistinctBy, other set operations
+### DistinctBy, other set operations
 
-Many useful functions like `union`, `intersect`, `distinct`, `except`, `countBy` could be built if we had a...
+There are many useful "set-based" functions like `union`, `intersect`, `distinct`, `except`, `countBy` that could be built if we had a...
 
 ```rescript
   type set<'a, 'b> = {
@@ -47,48 +52,9 @@ Many useful functions like `union`, `intersect`, `distinct`, `except`, `countBy`
   }
 ```
 
-It is generally useful to filter out duplicate elements on demand. I got this working where the user provides a comparison function `('a,'a)=>int` which is really easy to do. The code relies on `Belt.Set` under-the-hood. `Belt.Set` relies on a hardcoded module for each type you want to put in the set, so I made it a type `unknown` and did some `Obj.magic` to make it work. There are some things to think about.
+Also it is useful to summarize the entire data set with a `groupBy`, do `join`, etc.
 
-My implementation was hardcoded to a specific equality test. Better performance might be possible using hash equality or the built-in JavaScript `Set`. But adding this level of customization is messy. We'd need separate functions for each kind of test, like `distinctByHash`, `distinctByComparison`, etc. Or one `distinctBy` that takes an `equality<'a>` to determine what path to take.
-
-It only works with `Belt.Set` because that is an immutable set. I generated unique items on demand, which is pretty cool. If a mutable set it used, the sequence can't be iterated more than once and it is probably better to generate all unique items at once.
-
-`F#` has this feature. They eagerly consume all the items and use a mutable set.
-
-```rescript
-let distinctBy = (xx: t<'a>, compare: ('a, 'a) => int) => {
-  module Set = Belt.Set
-  module Comparator = Belt.Id.MakeComparable({
-    type t = unknown
-    let cmp = (a: unknown, b: unknown) => compare((a->Obj.magic: 'a), (b->Obj.magic: 'a))
-  })
-  xx
-  ->scan((None, Set.make(~id=module(Comparator))), ((_, set), x) => {
-    switch set->Set.has((x->Obj.magic: unknown)) {
-    | true => (None, set)
-    | false => (Some(x), set->Set.add((x->Obj.magic: unknown)))
-    }
-  })
-  ->filterMap(((x, _set)) => x)
-}
-
-```
-
-## "sumBy" and "prefixSum"
-
-`fold` is powerful since you can supply a default `zero` value and compute a type that is different than what you start with. But a simpler version, where the initial value is the first value, is useful too. F# has this. They call it `reduce` vs. `fold`. In JavaScript `Array.reduce` you can omit the initial parameter. Haskell and other packages have this simplified flavor of fold. Also, just like `fold` is related to `scan`, it is useful to have a function that returns running sums, an inclusive scan.
-
-Don't want the term to be too number-focused, since you can accumulate strings, arrays, etc.
-
-`minBy` and `maxBy` already exist. The result type is the same as the source type.
-
-Possible names for complete sum: `reduceFromFirst`, `sumBy`, `totalBy`.
-
-Possible names for running sum: `prefixSum`, `cumulativeSum`, `runningTotal`, `partialSums`, `cumsum` (used in MATLAB, R, and Julia), `accumulate`.
-
-In F#, `sumBy` allows you to turn each item into a number, and then adds them up using the default zero. Sometimes `By` suffix means a projection, but in this case you'd want to use `reduce`.
-
-See [prefix sum](https://en.wikipedia.org/wiki/Prefix_sum)
+I got a lazy distinctBy working where the user provides a comparison function `('a,'a)=>int`. The code relies on `Belt.Set` under-the-hood. `Belt.Set` relies on a hardcoded module for each type you want to put in the set, so I made it a type `unknown` and did some `Obj.magic` to make it work. My implementation was hardcoded to a specific set and equality test. Better performance might be possible using hash equality or the built-in JavaScript `Set`. Also if the function is meant to be lazy, an immutable set is helpful.
 
 ## TC39 Proposal
 
