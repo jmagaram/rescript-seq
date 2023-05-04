@@ -48,9 +48,9 @@ Seq.init(3, inx => inx * 2) // [0, 2, 4]
 let init: (int, int => 'a) => t<'a>
 
 /**
-`replicate(count, item)` is the sequence of `item` repeated exacly `count` times.
+`replicate(item, count)` is the sequence of `item` repeated exacly `count` times.
 */
-let replicate: (int, 'a) => t<'a>
+let replicate: ('a, int) => t<'a>
 
 /**
 `replicateWith(count, f)` is the sequence of length `count` where `f()` is called
@@ -745,6 +745,10 @@ let pairWithPrevious: t<'a> => t<(option<'a>, 'a)>
 items that immediately precede and follow it.
 */
 let neighbors: t<'a> => t<(option<'a>, 'a, option<'a>)>
+
+// surroundedBy
+// adjacents
+// neighbors
 
 // let pairBehind
 // let pairAhead

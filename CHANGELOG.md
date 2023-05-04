@@ -6,6 +6,7 @@
   - `Seq.dropAtMost` was not completely lazy
   - `Seq.findMap` didn't work with nested options
   - `Seq.windowAhead` would hang if window size was enormous
+  - `Seq.replicate` argument order was not data-first
 - Add
   - `Seq.reduceUntil` to short-circuit a reduce operation
   - `Seq.reduceWhile` to short-circuit a reduce operation

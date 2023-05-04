@@ -344,7 +344,7 @@ let flatMapTests =
     ~title="flatMap",
     [
       (S.empty->S.flatMap(i => S.replicate(i, i)), [], ""),
-      (S.once(2)->S.flatMap(i => S.replicate(i, 6)), [6, 6], ""),
+      (S.once(2)->S.flatMap(i => S.replicate(6, i)), [6, 6], ""),
       (S.once(2)->S.flatMap(_ => S.empty), [], ""),
       (S.range(1, 3)->S.flatMap(i => S.replicate(i, i)), [1, 2, 2, 3, 3, 3], ""),
       (S.range(1, 3)->S.flatMap(_ => S.empty), [], ""),
@@ -355,7 +355,7 @@ let flatMapTests =
       ~title="flatMap",
       ~expectation="million won't overflow",
       ~a=() =>
-        S.replicate(1000, 1)->S.flatMap(_ => S.replicate(1000, 1))->S.concat(S.once(999))->S.last,
+        S.replicate(1, 1000)->S.flatMap(_ => S.replicate(1, 1000))->S.concat(S.once(999))->S.last,
       ~b=Some(999),
     ),
   ])
@@ -772,10 +772,10 @@ let fromArrayTests = {
 let replicateTests = makeSeqEqualsTests(
   ~title="replicate",
   [
-    (S.replicate(0, "x"), [], ""),
-    (S.replicate(1, "x"), ["x"], "x"),
-    (S.replicate(2, "x"), ["x", "x"], ""),
-    (S.replicate(3, "x"), ["x", "x", "x"], ""),
+    (S.replicate("x", 0), [], ""),
+    (S.replicate("x", 1), ["x"], "x"),
+    (S.replicate("x", 2), ["x", "x"], ""),
+    (S.replicate("x", 3), ["x", "x", "x"], ""),
   ],
 )
 
@@ -1164,7 +1164,7 @@ let filterTests =
     seqEqual(
       ~title="filteri",
       ~expectation="when skipping millions => no stack problem",
-      ~a=() => S.replicate(999_999, 1)->S.concat(2->S.once)->S.filteri((value, _) => value != 1),
+      ~a=() => S.replicate(1, 999_999)->S.concat(2->S.once)->S.filteri((value, _) => value != 1),
       ~b=[2],
     ),
   ])
@@ -1335,7 +1335,7 @@ let lengthTests = [
   valueEqual(
     ~title="length",
     ~expectation="millions",
-    ~a=() => S.replicate(999_999, 1)->S.length,
+    ~a=() => S.replicate(1, 999_999)->S.length,
     ~b=999_999,
   ),
 ]
@@ -1921,7 +1921,7 @@ let chunkByTests = {
     seqEqual(
       ~title="chunkBy",
       ~expectation="millions in an output group",
-      ~a=() => S.concat(S.replicate(500_000, 1), S.replicate(500_000, 0))->parityCount,
+      ~a=() => S.concat(S.replicate(1, 500_000), S.replicate(0, 500_000))->parityCount,
       ~b=[("o", 500_000), ("e", 500_000)],
     ),
     seqEqual(

@@ -18,7 +18,7 @@ let aa = Seq.range(1, 100)
 let bb = Seq.rangeMap(99, 1, i => i * 3)
 let cc = Seq.iterate(2, i => i * 2)->Seq.takeWhile(i => i < 1000)
 let dd = Seq.foreverWith(() => Js.Math.random())
-let ee = Seq.replicate(100, "x")
+let ee = Seq.replicate("x", 100)
 
 /**
 Pointless number crunching to see how it flows. Unlike arrays, each
