@@ -198,9 +198,9 @@ which the `mapper` callback returns `Some`.
 let filterMap: (t<'a>, 'a => option<'b>) => t<'b>
 
 /**
-`filterMap(source, mapper)` builds a new sequence containing only the items
-in `source` for which the `mapper` callback returns `Some`. The callback
-receives the zero-based index of each item.
+`filterMap(source, mapper)` builds a new sequence containing only the items for
+which the `mapper` callback returns `Some`. The callback receives the zero-based
+index of each item.
 */
 let filterMapi: (t<'a>, ('a, int) => option<'b>) => t<'b>
 
