@@ -5,7 +5,6 @@
   - `Seq.tail` was not completely lazy
   - `Seq.drop` was not completely lazy
   - `Seq.findMap` didn't work with nested options
-  - `Seq.windowAhead` would hang if window size was enormous
   - `Seq.replicate` and `Seq.replicateWith` argument order was not data-first
 - Add
   - `Seq.reduceUntil` to short-circuit a reduce operation
@@ -32,6 +31,7 @@
   - `Array.exactlyOne` not `Array.exactlyOneValue` like `Seq.exactlyOne`
   - `Array.of1` not `Array.fromOneValue`
 - Remove
+  - `Seq.windowAhead` and `Seq.windowBehind`; tricky code here. It worked but not sure it is useful enough. `windowAhead` would hang if window size was enormous; fixed that before removing it.
   - `Array.fromSeed`; use Seq module instead
   - `Array.pairs`; use Seq module instead
   - `Array.filterSomeWith`; use Seq module instead

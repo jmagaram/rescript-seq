@@ -513,93 +513,6 @@ let windowTests =
     ),
   ])
 
-let windowAheadTests = {
-  let f = (source, count) =>
-    source
-    ->Js.String2.split("")
-    ->S.fromArray
-    ->S.windowAhead(count)
-    ->S.map(items => items->Js.Array2.joinWith(""))
-    ->S.join(" ")
-  makeValueEqualTests(
-    ~title="windowAhead",
-    [
-      (() => ""->f(1), "", ""),
-      (() => ""->f(9), "", ""),
-      (() => "a"->f(1), "a", ""),
-      (() => "a"->f(9), "a", ""),
-      (() => "ab"->f(1), "a b", ""),
-      (() => "ab"->f(2), "ab b", ""),
-      (() => "ab"->f(3), "ab b", ""),
-      (() => "ab"->f(9), "ab b", ""),
-      (() => "abc"->f(1), "a b c", ""),
-      (() => "abc"->f(2), "ab bc c", ""),
-      (() => "abc"->f(3), "abc bc c", ""),
-      (() => "abc"->f(4), "abc bc c", ""),
-      (() => "abc"->f(9), "abc bc c", ""),
-      (() => "abcde"->f(1), "a b c d e", ""),
-      (() => "abcde"->f(2), "ab bc cd de e", ""),
-      (() => "abcde"->f(3), "abc bcd cde de e", ""),
-      (() => "abcde"->f(4), "abcd bcde cde de e", ""),
-      (() => "abcde"->f(5), "abcde bcde cde de e", ""),
-      (() => "abcde"->f(9), "abcde bcde cde de e", ""),
-    ],
-  )->Js.Array2.concat([
-    willNotThrow(~title="windowAhead", ~expectation="lazy", () => death()->S.windowAhead(1)),
-    willNotThrow(~title="windowAhead", ~expectation="millions for size", () =>
-      S.range(1, 5)->S.windowAhead(999_999_999)->S.consume
-    ),
-    willThrow(~title="windowAhead", ~expectation="when size 0, throw", () =>
-      S.range(1, 5)->S.windowAhead(0)->S.consume
-    ),
-    willThrow(~title="windowAhead", ~expectation="when size -1, throw", () =>
-      S.range(1, 5)->S.windowAhead(-1)->S.consume
-    ),
-  ])
-}
-
-let windowBehindTests = {
-  let f = (source, count) =>
-    source
-    ->Js.String2.split("")
-    ->S.fromArray
-    ->S.windowBehind(count)
-    ->S.map(items => items->Js.Array2.joinWith(""))
-    ->S.join(" ")
-  makeValueEqualTests(
-    ~title="windowBehind",
-    [
-      (() => ""->f(1), "", ""),
-      (() => ""->f(9), "", ""),
-      (() => "a"->f(1), "a", ""),
-      (() => "a"->f(9), "a", ""),
-      (() => "ab"->f(1), "a b", ""),
-      (() => "ab"->f(2), "a ab", ""),
-      (() => "ab"->f(9), "a ab", ""),
-      (() => "abc"->f(1), "a b c", ""),
-      (() => "abc"->f(2), "a ab bc", ""),
-      (() => "abc"->f(3), "a ab abc", ""),
-      (() => "abc"->f(9), "a ab abc", ""),
-      (() => "abcde"->f(1), "a b c d e", ""),
-      (() => "abcde"->f(2), "a ab bc cd de", ""),
-      (() => "abcde"->f(3), "a ab abc bcd cde", ""),
-      (() => "abcde"->f(4), "a ab abc abcd bcde", ""),
-      (() => "abcde"->f(9), "a ab abc abcd abcde", ""),
-    ],
-  )->Js.Array2.concat([
-    willNotThrow(~title="windowBehind", ~expectation="lazy", () => death()->S.windowBehind(1)),
-    willNotThrow(~title="windowBehind", ~expectation="window much bigger than source", () =>
-      S.range(1, 5)->S.windowBehind(999_999_999)->S.consume
-    ),
-    willThrow(~title="windowBehind", ~expectation="when size 0, throw", () =>
-      S.range(1, 5)->S.windowBehind(0)->S.consume
-    ),
-    willThrow(~title="windowBehind", ~expectation="when size -1, throw", () =>
-      S.range(1, 5)->S.windowBehind(-1)->S.consume
-    ),
-  ])
-}
-
 let pairWithNextTests = {
   let f = source =>
     source
@@ -2380,7 +2293,5 @@ let tests =
     toOptionTests,
     unconsTests,
     unfoldTests,
-    windowAheadTests,
-    windowBehindTests,
     windowTests,
   ]->Belt.Array.flatMap(i => i)

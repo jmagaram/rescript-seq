@@ -86,8 +86,6 @@ let takeUntil: (t<'a>, 'a => bool) => t<'a>
 let takeWhile: (t<'a>, 'a => bool) => t<'a>
 let tap: (t<'a>, 'a => unit) => t<'a>
 let window: (t<'a>, int) => t<array<'a>>
-let windowAhead: (t<'a>, int) => t<array<'a>>
-let windowBehind: (t<'a>, int) => t<array<'a>>
 
 // Combine
 

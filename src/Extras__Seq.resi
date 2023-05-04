@@ -309,25 +309,6 @@ calling `map` to copy each window if you need distinct array instances.
 let window: (t<'a>, int) => t<array<'a>>
 
 /**
-`windowBehind(source, size)` returns a sequence of sliding overlapping windows
-of items drawn from `source` containing at most `size` items. Each item in
-`source` becomes the **last** item in each window, and is preceded by at most
-`size-1` items. 
-
-**Note:** Each window is returned as a shared array. Use `map` to copy each
-array to its own instance if necessary.
-*/
-let windowBehind: (t<'a>, int) => t<array<'a>>
-
-/**
-`windowAhead(source, size)` returns a sequence of sliding overlapping windows of
-items drawn from `source` containing at most `size` items. Each item in `source`
-becomes the **first** item in each window, and is followed by at most `size-1`
-items. Each window is returned as a separate array.
-*/
-let windowAhead: (t<'a>, int) => t<array<'a>>
-
-/**
 `allPairs(seq1, seq2)` contains all pairings of items from the first and second
 sequences.
 */
