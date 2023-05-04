@@ -554,11 +554,16 @@ let findMapi = (xx, f) => {
 }
 
 let findMap = (xx, f) => {
-  let found = xx->map(f)->find(Option.isSome)
-  switch found {
-  | None => None
-  | Some(x) => x
-  }
+  let rec go = xx =>
+    switch xx->next {
+    | End => None
+    | Next(x, xx) =>
+      switch f(x) {
+      | Some(x) => Some(x)
+      | None => go(xx)
+      }
+    }
+  go(xx)
 }
 
 let rec map2 = (xx, yy, f) =>
