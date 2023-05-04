@@ -155,7 +155,7 @@ let flatten: t<t<'a>> => t<'a>
 /**
 `flatMap(source, mapper)` creates a sequence by calling the `mapper` callback on
 each item in `source` and then concatenating every item produced. Also known as
-`bind`. Analogous to `Array.flatMap` in JavaScript.
+`bind` or `selectMany`. Analogous to `Array.flatMap` in JavaScript.
 */
 let flatMap: (t<'a>, 'a => t<'b>) => t<'b>
 
