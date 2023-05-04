@@ -416,8 +416,7 @@ let interleave: (t<'a>, t<'a>) => t<'a>
 item in `source`, starting with the `zero` value, and returns the final result.
 
 Reducing (also known as folding) is useful when you have a collection of
-something and want to produce a single value from it. This function is analogous
-to `Array.reduce` in JavaScript when an initial value is provided.
+something and want to produce a single value from it. 
 */
 let reduce: (t<'a>, 'b, ('b, 'a) => 'b) => 'b
 
