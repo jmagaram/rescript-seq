@@ -239,7 +239,7 @@ let takeUntil: (t<'a>, 'a => bool) => t<'a>
 /**
 `drop(source, count)` is the sequence that begins after the first `count`
 items are discarded from `source`. If the sequence has less than or equal to
-`count` items, the remaining sequence is empty. 
+`count` items, returns an empty sequence. 
 */
 let drop: (t<'a>, int) => t<'a>
 
