@@ -649,6 +649,17 @@ let tail = xx =>
     | Some(_, xx) => xx->nextNode
     }
 
+let tails = xx =>
+  cons(
+    xx,
+    unfold(xx, xx =>
+      switch xx->nextNode {
+      | End => None
+      | Next(_, xx) => Some(xx, xx)
+      }
+    ),
+  )
+
 let minBy = (xx, cmp) => xx->sumBy((sum, i) => cmp(i, sum) < 0 ? i : sum)
 
 let maxBy = (xx, cmp) => xx->sumBy((sum, i) => cmp(i, sum) > 0 ? i : sum)
@@ -726,6 +737,26 @@ let pairwise = xx =>
         )->nextNode
       }
     }
+
+let dropLast = (xx, n) => {
+  switch n <= 0 {
+  | true => xx
+  | false =>
+    (. ()) =>
+      xx
+      ->scan([], (sum, i) => {
+        switch sum->Array.push(i) {
+        | size if size > n + 1 => sum->Array.shift->ignore
+        | _ => ()
+        }
+        sum
+      })
+      ->dropUntil(i => i->Array.length == n + 1)
+      ->takeWhile(i => i->Array.length > n)
+      ->map(i => i->Array.unsafe_get(0))
+      ->nextNode
+  }
+}
 
 /**
 Ugly but more efficient than using `window` of 3

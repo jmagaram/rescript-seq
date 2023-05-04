@@ -2141,6 +2141,62 @@ let toListTests = makeValueEqualTests(
   ],
 )
 
+let tailsTests = makeSeqEqualsTests(
+  ~title="tails",
+  [
+    (S.empty->S.tails->S.map(S.toArray), [[]], ""),
+    (S.once(1)->S.tails->S.map(S.toArray), [[1], []], ""),
+    (S.range(1, 3)->S.tails->S.map(S.toArray), [[1, 2, 3], [2, 3], [3], []], ""),
+  ],
+)
+
+let dropLastTests = {
+  let test = (source, count, result) => {
+    valueEqual(
+      ~title="dropLast",
+      ~expectation=`[${source}] ${count->intToString} => [${result}]`,
+      ~a=() => source->Js.String2.split("")->S.fromArray->S.dropLast(count)->S.join(""),
+      ~b=result,
+    )
+  }
+  [
+    test("", 1, ""),
+    test("", 99, ""),
+    test("a", 1, ""),
+    test("a", 99, ""),
+    test("ab", 1, "a"),
+    test("ab", 2, ""),
+    test("ab", 99, ""),
+    test("abc", 1, "ab"),
+    test("abc", 2, "a"),
+    test("abc", 3, ""),
+    test("abc", 99, ""),
+    test("abcdefg", 1, "abcdef"),
+  ]->Array.append([
+    willNotThrow(~title="dropLast", ~expectation="lazy", () => death()->S.dropLast(10)),
+    valueEqual(
+      ~title="dropLast",
+      ~expectation="when count < 0 return same instance",
+      ~a=() => {
+        let source = S.range(1, 5)
+        let result = source->S.dropLast(-1)
+        source === result
+      },
+      ~b=true,
+    ),
+    valueEqual(
+      ~title="dropLast",
+      ~expectation="when count = 0 return same instance",
+      ~a=() => {
+        let source = S.range(1, 5)
+        let result = source->S.dropLast(0)
+        source === result
+      },
+      ~b=true,
+    ),
+  ])
+}
+
 let sampleFibonacci = {
   let fib = Extras__SeqSamples.fibonacci
   makeSeqEqualsTests(
@@ -2245,6 +2301,7 @@ let tests =
     cycleTests,
     delayTests,
     dropAtMostTests,
+    dropLastTests,
     dropUntilTests,
     dropWhileTests,
     emptyTests,
@@ -2314,6 +2371,7 @@ let tests =
     sortByTests,
     sortedMergeTests,
     sumTests,
+    tailsTests,
     tailTests,
     takeAtMostTests,
     takeUntilTests,

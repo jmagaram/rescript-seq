@@ -578,6 +578,25 @@ Equivalent to `drop` with `1`.
 let tail: t<'a> => t<'a>
 
 /**
+`tails` is the sequence of all tails of a sequence, from longest to shortest,
+starting with the original list itself. **Note:** The empty sequence is the last
+(and obviously shortest) item in the sequence.
+
+```rescript
+tails([]) // [[]]
+tails([1, 2, 3]) // [[1, 2, 3], [2,3], [3], []]
+```
+*/
+let tails: t<'a> => t<t<'a>>
+
+/**
+`dropLast(source, count)` contains the items from `source` with the last `count`
+items omitted. If `count` is not a positive number, `source` is returned without
+any modifications. 
+*/
+let dropLast: (t<'a>, int) => t<'a>
+
+/**
 `uncons` splits ("un-constructs") the the sequence into its head (first item)
 and the tail, which is possibly empty. If the sequence is empty, it returns
 `None`.
