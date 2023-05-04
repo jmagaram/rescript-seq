@@ -730,7 +730,7 @@ let pairwise = xx =>
 let isSortedBy = (xx, cmp) => xx->pairwise->every(((a, b)) => cmp(a, b) <= 0)
 
 /**
-`slidingWindows(source, maxSize)` is the sequence of overlapping windows from
+`windowsCore(source, maxSize)` is the sequence of overlapping windows from
 size 1 to `maxSize`. Windows grow at the beginning until they reach `maxSize` or
 `source` is exhausted. Subsequent windows stay at `maxSize` and then shrink at
 the end. **Note:** For performance, each window shares the same array.
@@ -742,7 +742,7 @@ ab with maxSize 10 => a ab b
 abcd with maxSize 1 => a b c d
 ```
 */
-let slidingWindows = (xx, maxSize) => {
+let windowsCore = (xx, maxSize) => {
   if maxSize < 1 {
     InvalidArgument(
       `slidingWindows expects a maxSize of 1 or more but you asked for ${maxSize->Belt.Int.toString}`,
@@ -753,10 +753,12 @@ let slidingWindows = (xx, maxSize) => {
     | Some(xx) =>
       switch xx->nextNode {
       | Next(x, xx) =>
-        if w->Array.push(x) > maxSize {
+        switch w->Array.push(x) > maxSize {
+        | true =>
           w->Array.shift->ignore
+          Some(w, (w, Some(xx)))
+        | false => Some(w, (w, Some(xx)))
         }
-        Some(w, (w, Some(xx)))
       | End =>
         switch w->Array.length > 1 {
         | false => None
@@ -796,16 +798,13 @@ let windowAhead = (xx, size) => {
     InvalidArgument(`windowAhead requires a size of 1 or more.`)->raise
   }
   xx
-  ->slidingWindows(size)
-  ->map(Array.copy)
+  ->windowsCore(size)
+  ->concat([]->once)
+  ->map(window => window->Array.copy)
   ->pairWithNext
-  ->dropWhile(((curr, next)) =>
-    switch next {
-    | None => false
-    | Some(n) => n->Array.length > curr->Array.length
-    }
-  )
-  ->map(((prev, _)) => prev)
+  ->dropWhile(((a, b)) => b->Option.mapWithDefault(false, b => b->Array.length > a->Array.length))
+  ->map(Pervasives.fst)
+  ->takeWhile(i => i->Array.length > 0)
 }
 
 let everyOk = xx => {

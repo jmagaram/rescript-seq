@@ -320,10 +320,7 @@ let windowBehind: (t<'a>, int) => t<array<'a>>
 `windowAhead(source, size)` returns a sequence of sliding overlapping windows of
 items drawn from `source` containing at most `size` items. Each item in `source`
 becomes the **first** item in each window, and is followed by at most `size-1`
-items.
-
-**Note:** Each window is returned as a shared array. Use `map` to copy each
-array to its own instance if necessary.
+items. Each window is returned as a separate array.
 */
 let windowAhead: (t<'a>, int) => t<array<'a>>
 
@@ -743,10 +740,28 @@ the item that precedes it.
 */
 let pairWithPrevious: t<'a> => t<(option<'a>, 'a)>
 
+// let pairBehind
+// let pairAhead
+// let pairwise
+
+// and why a fresh array? inconsistent
+// `window` function is inefficient toward the end
+
+// withNextN
+// withPreviousN
+// withN
+// pairwise
+// pairAhead
+// pairBehind
+// pairNext
+// pairPrevious
+// windowNext
+// windowPrevious
 // let withNextN: (t<'a>, int) => t<('a, array<'a>)>
 // let withNext: t<'a> => t<('a, option<'a>)>
 // let withPreviousN: (t<'a>, int) => t<(array<'a>, 'a)>
 // let withPrevious: t<'a> => t<(option<'a>, 'a)>
 // let withNeighbors: t<'a> => t<(option<'a>, 'a, option<'a>)>
 // let withNeighborsN: (t<'a>, int) => t<(array<'a>, 'a, array<'a>)>
+
 // let windows: (t<'a>, int) => t<array<'a>>

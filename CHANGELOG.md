@@ -5,6 +5,7 @@
   - `Seq.tail` was not completely lazy
   - `Seq.dropAtMost` was not completely lazy
   - `Seq.findMap` didn't work with nested options
+  - `Seq.windowAhead` would hang if window size was enormous
 - Add
   - `Seq.reduceUntil` to short-circuit a reduce operation
   - `Seq.reduceWhile` to short-circuit a reduce operation
