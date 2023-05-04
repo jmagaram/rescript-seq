@@ -290,6 +290,8 @@ let chunkBySize: (t<'a>, int) => t<array<'a>>
 `pairwise` is the sequence of each element and its predecessor, with the
 exception of the first element that is only returned as the predecessor of the
 second. Returns the empty sequence if the source only has a single item.
+
+Also see `pairAhead` and `pairBehind`.
 */
 let pairwise: t<'a> => t<('a, 'a)>
 
