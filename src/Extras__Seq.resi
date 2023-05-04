@@ -761,20 +761,3 @@ let pairBehind: t<'a> => t<(option<'a>, 'a)>
 items that immediately precede and follow it.
 */
 let neighbors: t<'a> => t<(option<'a>, 'a, option<'a>)>
-
-// pairNext
-// pairPrevious
-// pairAhead
-// pairBehind
-// pairwise
-// pairAhead
-// pairBack
-
-// pairwise
-// pairWithNext
-// pairWithPrevious
-
-// pairBack (from the end of the sequence? or reversing the order)
-
-// adjacents
-// neighbors

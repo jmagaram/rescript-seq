@@ -75,6 +75,7 @@ let intersperse: (t<'a>, 'a) => t<'a>
 let intersperseWith: (t<'a>, unit => 'a) => t<'a>
 let map: (t<'a>, 'a => 'b) => t<'b>
 let mapi: (t<'a>, ('a, int) => 'b) => t<'b>
+let neighbors: t<'a> => t<(option<'a>, 'a, option<'a>)>
 let pairAhead: t<'a> => t<('a, option<'a>)>
 let pairBehind: t<'a> => t<(option<'a>, 'a)>
 let pairwise: t<'a> => t<('a, 'a)>
