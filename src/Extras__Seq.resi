@@ -301,8 +301,7 @@ let pairwise: t<'a> => t<('a, 'a)>
 /**
 `window(source, size)` returns a sequence of sliding overlapping windows of the
 specified size containing elements drawn from `source`. If `size` is longer than
-`source`, no windows are returned. Each window is returned as a separate, fresh
-array.
+`source`, no windows are returned. Each window is returned as a separate array.
 */
 let window: (t<'a>, int) => t<array<'a>>
 
