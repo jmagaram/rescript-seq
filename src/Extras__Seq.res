@@ -38,12 +38,12 @@ end it latches on to the very last item in the sequence rather than the result
 of everything that came before.
 */
 @inline
-let nextNode = (xx: t<'a>) => xx(.)
+let next = (xx: t<'a>) => xx(.)
 
 let intToString = Belt.Int.toString
 
 let uncons = xx =>
-  switch xx->nextNode {
+  switch xx->next {
   | End => None
   | Next(x, xx) => Some(x, xx)
   }
@@ -55,7 +55,7 @@ function. It returns a `node`, which includes both the item in the sequence and
 the tail, in case it is needed.
 */
 let rec findNode = (xx, f) =>
-  switch xx->nextNode {
+  switch xx->next {
   | End => End
   | Next(x, xx) as nxt =>
     switch f(x) {
@@ -72,8 +72,8 @@ let find = (xx, f) =>
 
 let rec concat = (xx, yy) =>
   (. ()) => {
-    switch xx->nextNode {
-    | End => yy->nextNode
+    switch xx->next {
+    | End => yy->next
     | Next(x, xx) => Next(x, concat(xx, yy))
     }
   }
@@ -82,28 +82,28 @@ let rec concat = (xx, yy) =>
 
 let rec flatMap = (xx, f) =>
   (. ()) =>
-    switch xx->nextNode {
+    switch xx->next {
     | End => End
     | Next(x, xx) => concat(f(x), flatMap(xx, f))(.)
     }
 
 let rec flatten = xxx =>
   (. ()) =>
-    switch xxx->nextNode {
+    switch xxx->next {
     | End => End
-    | Next(xx, xxx) => concat(xx, flatten(xxx))->nextNode
+    | Next(xx, xxx) => concat(xx, flatten(xxx))->next
     }
 
 let rec map = (xx, f) =>
   (. ()) => {
-    switch xx->nextNode {
+    switch xx->next {
     | End => End
     | Next(x, xx) => Next(f(x), map(xx, f))
     }
   }
 
 let head = xx =>
-  switch xx->nextNode {
+  switch xx->next {
   | End => None
   | Next(x, _) => Some(x)
   }
@@ -111,7 +111,7 @@ let head = xx =>
 let indexed = xx => {
   let rec go = (xx, index) =>
     (. ()) =>
-      switch xx->nextNode {
+      switch xx->next {
       | End => End
       | Next(x, xx) => Next((x, index), go(xx, index + 1))
       }
@@ -158,7 +158,7 @@ let rangeMap = (start, end, f) => range(start, end)->map(f)
 
 let rec tap = (xx, f) =>
   (. ()) =>
-    switch xx->nextNode {
+    switch xx->next {
     | End => End
     | Next(x, xx) => {
         f(x)
@@ -166,13 +166,13 @@ let rec tap = (xx, f) =>
       }
     }
 
-let rec cycleNonEmpty = xx => (. ()) => concat(xx, cycleNonEmpty(xx))->nextNode
+let rec cycleNonEmpty = xx => (. ()) => concat(xx, cycleNonEmpty(xx))->next
 
 let cycle = xx =>
   (. ()) =>
     switch xx->uncons {
     | None => End
-    | Some(x, xx') => cons(x, xx')->concat(cycleNonEmpty(xx))->nextNode
+    | Some(x, xx') => cons(x, xx')->concat(cycleNonEmpty(xx))->next
     }
 
 let fromArray = (~start=?, ~end=?, xx: array<'a>) => {
@@ -228,7 +228,7 @@ let take = (xx, count) => {
       switch count {
       | 0 => End
       | count =>
-        switch xx->nextNode {
+        switch xx->next {
         | End => End
         | Next(x, xx) => Next(x, go(xx, count - 1))
         }
@@ -260,7 +260,7 @@ let drop = (xx, count) =>
 
 let rec filter = (xx, f) =>
   (. ()) => {
-    switch xx->nextNode {
+    switch xx->next {
     | End => End
     | Next(x, xx) =>
       switch f(x) {
@@ -278,7 +278,7 @@ let filteri = (xx, f) => xx->indexed->filter(((x, inx)) => f(x, inx))->map(((v, 
 
 let rec takeWhile = (xx, f) =>
   (. ()) => {
-    switch xx->nextNode {
+    switch xx->next {
     | End => End
     | Next(x, xx) =>
       switch f(x) {
@@ -290,7 +290,7 @@ let rec takeWhile = (xx, f) =>
 
 let rec takeUntil = (xx, f) =>
   (. ()) => {
-    switch xx->nextNode {
+    switch xx->next {
     | End => End
     | Next(x, xx) =>
       switch f(x) {
@@ -350,7 +350,7 @@ let filterOk = xx =>
 let scan = (xx, zero, f) => {
   let rec go = (xx, sum) =>
     (. ()) =>
-      switch xx->nextNode {
+      switch xx->next {
       | End => End
       | Next(x, xx) => {
           let sum = f(sum, x)
@@ -380,13 +380,13 @@ let rec sortedMerge = (xx, yy, cmp) => {
 let intersperseWith = (xx, separator) => {
   let rec beforeEach = (xx, separator) =>
     (. ()) => {
-      switch xx->nextNode {
+      switch xx->next {
       | End => End
       | Next(x, xx) => Next(separator(), cons(x, beforeEach(xx, separator)))
       }
     }
   (. ()) =>
-    switch xx->nextNode {
+    switch xx->next {
     | End => End
     | Next(x, xx) => Next(x, beforeEach(xx, separator))
     }
@@ -412,7 +412,7 @@ module Cache = {
 
 let rec cache = xx =>
   Cache.make((. ()) =>
-    switch xx->nextNode {
+    switch xx->next {
     | End => End
     | Next(x, xx) => Next(x, cache(xx))
     }
@@ -517,7 +517,7 @@ let prefixSum = (xx, accumulator) =>
             }
           }
         ),
-      )->nextNode
+      )->next
     }
   }
 
@@ -636,7 +636,7 @@ let compare = (xx, yy, cmp) => {
 let length = xx => xx->reduce(0, (sum, _) => sum + 1)
 
 let isEmpty = xx =>
-  switch xx->nextNode {
+  switch xx->next {
   | End => true
   | _ => false
   }
@@ -645,14 +645,14 @@ let tail = xx =>
   (. ()) =>
     switch xx->uncons {
     | None => End
-    | Some(_, xx) => xx->nextNode
+    | Some(_, xx) => xx->next
     }
 
 let tails = xx =>
   cons(
     xx,
     unfold(xx, xx =>
-      switch xx->nextNode {
+      switch xx->next {
       | End => None
       | Next(_, xx) => Some(xx, xx)
       }
@@ -665,8 +665,8 @@ let maxBy = (xx, cmp) => xx->sumBy((sum, i) => cmp(i, sum) > 0 ? i : sum)
 
 let rec interleave = (xx, yy) => {
   (. ()) => {
-    switch xx->nextNode {
-    | End => yy->nextNode
+    switch xx->next {
+    | End => yy->next
     | Next(x, xx) => Next(x, interleave(yy, xx))
     }
   }
@@ -684,56 +684,56 @@ let exactlyOne = xx =>
 
 let pairWithNext = xx =>
   (. ()) => {
-    switch xx->nextNode {
+    switch xx->next {
     | End => End
     | Next(x, xx) =>
       unfold(Some(x, xx), nxt =>
         switch nxt {
         | None => None
         | Some(x, xx) =>
-          switch xx->nextNode {
+          switch xx->next {
           | End => Some((x, None), None)
           | Next(x', xx) => Some((x, Some(x')), Some(x', xx))
           }
         }
-      )->nextNode
+      )->next
     }
   }
 
 let pairWithPrevious = xx =>
   (. ()) => {
-    switch xx->nextNode {
+    switch xx->next {
     | End => End
     | Next(a, xx) =>
       cons(
         (None, a),
         unfold((a, xx), ((a, xx)) =>
-          switch xx->nextNode {
+          switch xx->next {
           | End => None
           | Next(b, xx) => Some((Some(a), b), (b, xx))
           }
         ),
-      )->nextNode
+      )->next
     }
   }
 
 let pairwise = xx =>
   (. ()) =>
-    switch xx->nextNode {
+    switch xx->next {
     | End => End
     | Next(a, xx) =>
-      switch xx->nextNode {
+      switch xx->next {
       | End => End
       | Next(b, xx) =>
         cons(
           (a, b),
           unfold((b, xx), ((b, xx)) =>
-            switch xx->nextNode {
+            switch xx->next {
             | End => None
             | Next(x, xx) => Some((b, x), (x, xx))
             }
           ),
-        )->nextNode
+        )->next
       }
     }
 
@@ -757,7 +757,7 @@ let dropLast = (xx, n) => {
       ->dropUntil(i => i->Array.length == n + 1)
       ->takeWhile(i => i->Array.length > n)
       ->map(i => i->Array.unsafe_get(0))
-      ->nextNode
+      ->next
   }
 }
 
@@ -766,13 +766,13 @@ Ugly but more efficient than using `window` of 3
 */
 let neighbors = xx =>
   (. ()) =>
-    switch xx->nextNode {
+    switch xx->next {
     | End => End
     | Next(a, xx) =>
-      switch xx->nextNode {
+      switch xx->next {
       | End => Next((None, a, None), empty)
       | Next(b, xx) =>
-        switch xx->nextNode {
+        switch xx->next {
         | End => Next((None, a, Some(b)), (Some(a), b, None)->once)
         | Next(c, xx) =>
           cons(
@@ -783,14 +783,14 @@ let neighbors = xx =>
                 switch state {
                 | None => None
                 | Some(b, c, xx) =>
-                  switch xx->nextNode {
+                  switch xx->next {
                   | End => Some((Some(b), c, None), None)
                   | Next(d, xx) => Some((Some(b), c, Some(d)), Some(c, d, xx))
                   }
                 }
               ),
             ),
-          )->nextNode
+          )->next
         }
       }
     }
@@ -819,7 +819,7 @@ let windowsCore = (xx, maxSize) => {
   unfold(([], Some(xx)), ((w, xx)) => {
     switch xx {
     | Some(xx) =>
-      switch xx->nextNode {
+      switch xx->next {
       | Next(x, xx) =>
         switch w->Array.push(x) > maxSize {
         | true =>
@@ -910,7 +910,7 @@ let everySome = xx => {
 }
 
 let toOption = xx =>
-  switch xx->nextNode {
+  switch xx->next {
   | End => None
   | Next(x, xx) => Some(cons(x, xx))
   }
@@ -919,8 +919,8 @@ let consume = xx => xx->forEach(_ => ())
 
 let orElse = (xx, yy) =>
   (. ()) => {
-    switch xx->nextNode {
-    | End => yy->nextNode
+    switch xx->next {
+    | End => yy->next
     | Next(_, _) as nxt => nxt
     }
   }
@@ -1016,7 +1016,7 @@ let chunkBy = (xx, init, acc) => {
   (. ()) => {
     switch xx->uncons {
     | None => End
-    | Some(x, xx) => unfold(Some(init(x), xx), unfolder)->nextNode
+    | Some(x, xx) => unfold(Some(init(x), xx), unfolder)->next
     }
   }
 }
