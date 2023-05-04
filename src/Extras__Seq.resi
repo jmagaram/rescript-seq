@@ -307,7 +307,9 @@ let window: (t<'a>, int) => t<array<'a>>
 
 /**
 `allPairs(seq1, seq2)` contains all pairings of items from the first and second
-sequences.
+sequences. This is also known as a `cartesian product`.
+
+To combine sequences item-by-item until one sequence ends, see `zip` and `map2`.
 */
 let allPairs: (t<'a>, t<'b>) => t<('a, 'b)>
 
