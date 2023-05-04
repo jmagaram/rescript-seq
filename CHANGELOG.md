@@ -37,6 +37,7 @@
 - Remove
   - `Seq.windowAhead` and `Seq.windowBehind`; tricky code here. It worked but not sure it is useful enough. `windowAhead` would hang if window size was enormous; fixed that before removing it.
   - `Seq.findMapi`
+  - `Seq.fromOption`; not sure this will get used
   - `Array.fromSeed`; use Seq module instead
   - `Array.pairs`; use Seq module instead
   - `Array.filterSomeWith`; use Seq module instead

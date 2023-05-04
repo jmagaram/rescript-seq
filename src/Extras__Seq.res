@@ -215,12 +215,6 @@ let rec fromList = xx => {
     }
 }
 
-let fromOption = opt =>
-  switch opt {
-  | None => empty
-  | Some(x) => once(x)
-  }
-
 let mapi = (xx, f) => xx->indexed->map(((x, inx)) => f(x, inx))
 
 let take = (xx, count) => {

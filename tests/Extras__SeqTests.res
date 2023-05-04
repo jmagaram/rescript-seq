@@ -215,22 +215,6 @@ let consTests = [
   ),
 ]
 
-let fromOptionTests =
-  makeSeqEqualsTests(
-    ~title="fromOption",
-    [
-      (None->S.fromOption, [], "if none => empty"),
-      (Some(1)->S.fromOption, [1], "if some => sequence with one item"),
-    ],
-  )->Js.Array2.concat([
-    seqEqual(
-      ~title="fromOption",
-      ~expectation="array is not flattened",
-      ~a=() => Some([1, 2, 3])->S.fromOption,
-      ~b=[[1, 2, 3]],
-    ),
-  ])
-
 let fromListTests = makeSeqEqualsTests(
   ~title="fromList",
   [
@@ -2218,7 +2202,6 @@ let tests =
     foreverWithTests,
     fromArrayTests,
     fromListTests,
-    fromOptionTests,
     headTests,
     indexedTests,
     initTests,

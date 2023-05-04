@@ -40,7 +40,6 @@ let forever: 'a => t<'a>
 let foreverWith: (unit => 'a) => t<'a>
 let fromArray: (~start: int=?, ~end: int=?, array<'a>) => t<'a>
 let fromList: list<'a> => t<'a>
-let fromOption: option<'a> => t<'a>
 let init: (int, int => 'a) => t<'a>
 let iterate: ('a, 'a => 'a) => t<'a>
 let once: 'a => t<'a>

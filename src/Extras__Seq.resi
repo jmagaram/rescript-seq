@@ -96,7 +96,7 @@ let range: (int, int) => t<int>
 
 /**
 `rangeMap(start, end, mapper)` is the sequence from that results from calling
-`mapper` on each integer from `start` to `end` (inclusive). If `start` is
+`mapper` on each integer from `start` to `end` inclusive. If `start` is
 greater than `end` the numbers descend.
 */
 let rangeMap: (int, int, int => 'a) => t<'a>
@@ -111,19 +111,6 @@ let fromArray: (~start: int=?, ~end: int=?, array<'a>) => t<'a>
 `fromList` generates a sequence from a list.
 */
 let fromList: list<'a> => t<'a>
-
-/**
-`fromOption(opt)` create an empty sequence if the option is `None`, and a
-sequence with one item otherwise.
-
-## Examples
-
-```rescript
-Some(1)->Seq.fromOption // [1]
-None->Seq.fromOption // []
-```
-*/
-let fromOption: option<'a> => t<'a>
 
 /**
 `cons(head, tail)` constructs the sequence that begins with the element `head`
