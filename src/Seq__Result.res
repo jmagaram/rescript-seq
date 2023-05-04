@@ -1,23 +1,3 @@
-open Belt
-
-let fromArrayMap = (xs, f) => {
-  let oks = []
-  let rec go = inx =>
-    switch xs->Array.get(inx) {
-    | None => Ok(oks)
-    | Some(x) =>
-      switch f(x) {
-      | Ok(ok) =>
-        oks->Array.push(ok)
-        go(inx + 1)
-      | Error(_) as err => err
-      }
-    }
-  go(0)
-}
-
-let fromArray = xs => xs->fromArrayMap(i => i)
-
 let mapError = (r, f) =>
   switch r {
   | Ok(_) as ok => ok
@@ -39,10 +19,4 @@ let toOption = r =>
   switch r {
   | Ok(ok) => Some(ok)
   | Error(_) => None
-  }
-
-let getError = r =>
-  switch r {
-  | Ok(_) => None
-  | Error(e) => Some(e)
   }
