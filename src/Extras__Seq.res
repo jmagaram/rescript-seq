@@ -545,14 +545,6 @@ let some = (xx, f) => xx->find(f)->Option.isSome
 
 let every = (xx, f) => xx->find(i => !f(i))->Option.isNone
 
-let findMapi = (xx, f) => {
-  let found = xx->indexed->map(((x, inx)) => f(x, inx))->find(Option.isSome)
-  switch found {
-  | None => None
-  | Some(x) => x
-  }
-}
-
 let findMap = (xx, f) => {
   let rec go = xx =>
     switch xx->next {
@@ -565,6 +557,8 @@ let findMap = (xx, f) => {
     }
   go(xx)
 }
+
+let findMapi = (xx, f) => xx->indexed->findMap(((x, inx)) => f(x, inx))
 
 let rec map2 = (xx, yy, f) =>
   (. ()) => {
