@@ -326,6 +326,11 @@ let concatTests = makeSeqEqualsTests(
     (S.concat(S.empty, S.range(1, 3)), [1, 2, 3], ""),
     (S.concat(S.range(1, 3), S.empty), [1, 2, 3], ""),
     (S.concat(S.empty, S.empty), [], ""),
+    // synonym
+    (S.append(S.range(1, 3), S.range(4, 6)), [1, 2, 3, 4, 5, 6], ""),
+    (S.append(S.empty, S.range(1, 3)), [1, 2, 3], ""),
+    (S.append(S.range(1, 3), S.empty), [1, 2, 3], ""),
+    (S.append(S.empty, S.empty), [], ""),
   ],
 )
 

@@ -90,6 +90,7 @@ let window: (t<'a>, int) => t<array<'a>>
 // Combine
 
 let allPairs: (t<'a>, t<'b>) => t<('a, 'b)>
+let append: (t<'a>, t<'a>) => t<'a>
 let concat: (t<'a>, t<'a>) => t<'a>
 let interleave: (t<'a>, t<'a>) => t<'a>
 let map2: (t<'a>, t<'b>, ('a, 'b) => 'c) => t<'c>

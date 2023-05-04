@@ -144,10 +144,18 @@ let cons: ('a, t<'a>) => t<'a>
 let prepend: (t<'a>, t<'a>) => t<'a>
 
 /**
-`concat(xx, yy)` is all items in `xx` followed by all items in `yy`. See
-`prepend` for the same behavior but the arguments reversed.
+`concat(xx, yy)` is all items in `xx` followed by all items in `yy`. This is a
+synonym for `append`. See `prepend` for the same behavior but the arguments
+reversed.
 */
 let concat: (t<'a>, t<'a>) => t<'a>
+
+/**
+`append(xx, yy)` is all items in `xx` followed by all items in `yy`. This is a
+synonym for `concat`. See `prepend` for the same behavior but the arguments
+reversed.
+*/
+let append: (t<'a>, t<'a>) => t<'a>
 
 /**
 `flatten` creates a sequence by concatenating every item in each sub-sequence.

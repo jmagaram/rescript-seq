@@ -78,6 +78,8 @@ let rec concat = (xx, yy) =>
     }
   }
 
+let append = concat
+
 @inline let prepend = (xx, yy) => concat(yy, xx)
 
 let rec flatMap = (xx, f) =>
