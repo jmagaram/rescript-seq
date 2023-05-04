@@ -505,6 +505,12 @@ let windowTests =
     willThrow(~title="window", ~expectation="when size < 0 => throw", () =>
       S.range(1, 5)->S.window(-1)->S.consume
     ),
+    valueEqual(
+      ~title="window",
+      ~expectation="each window shares same instance",
+      ~a=() => S.range(1, 5)->S.window(2)->S.pairwise->S.every(((a, b)) => a === b),
+      ~b=true,
+    ),
   ])
 
 let windowAheadTests = {

@@ -761,9 +761,6 @@ let dropLast = (xx, n) => {
   }
 }
 
-/**
-Ugly but more efficient than using `window` of 3
-*/
 let neighbors = xx =>
   (. ()) =>
     switch xx->next {
