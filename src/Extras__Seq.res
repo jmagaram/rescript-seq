@@ -182,7 +182,7 @@ let cycle = xx =>
     }
 
 let fromArray = (~start=?, ~end=?, xx: array<'a>) => {
-  switch xx->Extras__Array.isEmpty {
+  switch xx->Array.length == 0 {
   | true =>
     start
     ->Option.orElse(end)
