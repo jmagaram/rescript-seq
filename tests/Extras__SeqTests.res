@@ -1854,12 +1854,12 @@ let delayTests =
     willNotThrow(~title="delay", ~expectation="lazy", () => S.delay(throwIfInvoked)),
   ])
 
-let chunkByTests = {
+let splitTests = {
   let kind = n => mod(n, 2) == 0 ? "e" : "o"
   let parityCount = xx =>
-    xx->S.chunkBy(n => (kind(n), 1), ((k, count), n) => kind(n) == k ? Some(k, count + 1) : None)
+    xx->S.split(n => (kind(n), 1), ((k, count), n) => kind(n) == k ? Some(k, count + 1) : None)
   makeSeqEqualsTests(
-    ~title="chunkBy",
+    ~title="split",
     [
       ([]->S.fromArray->parityCount, [], ""),
       ([1]->S.fromArray->parityCount, [("o", 1)], ""),
@@ -1874,18 +1874,18 @@ let chunkByTests = {
     ],
   )->Js.Array2.concat([
     seqEqual(
-      ~title="chunkBy",
+      ~title="split",
       ~expectation="millions in an output group",
       ~a=() => S.concat(S.replicate(1, 500_000), S.replicate(0, 500_000))->parityCount,
       ~b=[("o", 500_000), ("e", 500_000)],
     ),
     seqEqual(
-      ~title="chunkBy",
+      ~title="split",
       ~expectation="millions of source items",
       ~a=() => [1, 2]->S.fromArray->S.cycle->S.take(1_000_000)->parityCount->S.drop(999_998),
       ~b=[("o", 1), ("e", 1)],
     ),
-    willNotThrow(~title="chunkBy", ~expectation="lazy", () => death()->parityCount),
+    willNotThrow(~title="split", ~expectation="lazy", () => death()->parityCount),
   ])
 }
 
@@ -2239,7 +2239,6 @@ let tests =
     allPairsTests,
     chunkByKeyTests,
     chunkBySizeTests,
-    chunkByTests,
     combinationTests,
     compareTests,
     concatTests,
@@ -2247,8 +2246,8 @@ let tests =
     consumeTests,
     cycleTests,
     delayTests,
-    dropTests,
     dropLastTests,
+    dropTests,
     dropUntilTests,
     dropWhileTests,
     emptyTests,
@@ -2262,10 +2261,10 @@ let tests =
     filterOkTests,
     filterSomeTests,
     filterTests,
-    findMapTests,
-    findMapLastTests,
-    findTests,
     findLastTests,
+    findMapLastTests,
+    findMapTests,
+    findTests,
     flatMapTests,
     flattenTests,
     forEachTests,
@@ -2295,9 +2294,9 @@ let tests =
     onceTests,
     onceWithTests,
     orElseTests,
-    pairwiseTests,
     pairAheadTests,
     pairBehindTests,
+    pairwiseTests,
     permutationTests,
     prefixSumTests,
     prependTests,
@@ -2319,6 +2318,7 @@ let tests =
     someTests,
     sortByTests,
     sortedMergeTests,
+    splitTests,
     sumTests,
     tailsTests,
     tailTests,

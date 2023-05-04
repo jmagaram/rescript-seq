@@ -926,7 +926,7 @@ let (combinations, permutations) = {
 
 let toList = xx => xx->reverse->reduce(list{}, Belt.List.add)
 
-let chunkBy = (xx, init, acc) => {
+let split = (xx, init, acc) => {
   let rec unfolder = state =>
     switch state {
     | None => None
@@ -954,7 +954,7 @@ let chunkBySize = (xx, length) => {
       `chunkBySize requires a length > 0. You asked for ${length->intToString}`,
     )->raise
   }
-  xx->chunkBy(
+  xx->split(
     i => [i],
     (sum, i) =>
       switch sum->Array.length == length {
@@ -974,5 +974,5 @@ let chunkByKey = (xx, equals, init, accumulator) => {
     | true => Some((kSum, accumulator(sum, i)))
     | false => None
     }
-  chunkBy(xx, init, acc)
+  split(xx, init, acc)
 }

@@ -710,7 +710,7 @@ tuple.
 let permutations: (t<'a>, int) => t<(int, t<'a>)>
 
 /**
-`chunkBy(source, init, accumulator)` divides `source` into non-overlapping
+`split(source, init, accumulator)` divides `source` into non-overlapping
 groups of adjacent items, computes (via reduce) a "total" of some kind for each
 group, and then returns a sequence of group "totals".
 
@@ -724,7 +724,7 @@ group is then created using the `init` function.
 data across the entire sequence. If you want to summarize all the data, consider
 first sorting the data. Or use `reduce` to convert the data to a dictionary.
 */
-let chunkBy: (t<'a>, 'a => 'b, ('b, 'a) => option<'b>) => t<'b>
+let split: (t<'a>, 'a => 'b, ('b, 'a) => option<'b>) => t<'b>
 
 /**
 `chunkByKey(source, equals, init, accumulator)` divides a sequence of  
@@ -761,3 +761,22 @@ let pairBehind: t<'a> => t<(option<'a>, 'a)>
 items that immediately precede and follow it.
 */
 let neighbors: t<'a> => t<(option<'a>, 'a, option<'a>)>
+
+// window
+// arrayChunksBySize
+// arrayChunksByKey
+// chunks
+// groupReduce
+// chunkReduce
+//
+// arrayChunks
+// split
+// splitByKey
+
+// groupAdjacent
+// splitReduce
+
+// IMPORTANT
+// Partition means dividing into TWO groups
+// Splitting is a bit more clear
+// Might want to make a distinction between window and chunk? The chunk is ephemeral though.

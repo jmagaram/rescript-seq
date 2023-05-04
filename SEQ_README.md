@@ -14,7 +14,7 @@ Highlights:
 - Comprehensive test suite
 - Written 100% in ReScript; you can look at the code to see how it works.
 - **Create sequences** using `fromArray`, `range`, `unfold`, `cycle`, `permutations`, `replicate` and others. This enables functionality similar to [JavaScript generators](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Generator).
-- **Transform** sequences with `map`, `filter`, `chunkByKey`, `takeUntil`, `scan`, `tap`, `pairwise`...
+- **Transform** sequences with `map`, `filter`, `split`, `takeUntil`, `scan`, `tap`, `pairwise`...
 - **Combine** sequences with `zip`, `map3`, `allPairs`, `sortedMerge`, `interleave`...
 - **Calculate** values with `reduce`, `maxBy`, `every`, `findMap`, `isSortedBy`, `toArray`...
 
@@ -55,7 +55,6 @@ let unfold: ('a, 'a => option<('b, 'a)>) => t<'b>
 // Transform
 
 let cache: t<'a> => t<'a>
-let chunkBy: (t<'a>, 'a => 'b, ('b, 'a) => option<'b>) => t<'b>
 let chunkBySize: (t<'a>, int) => t<array<'a>>
 let chunkByKey: (t<('k, 'a)>, ('k, 'k) => bool, 'a => 'b, ('b, 'a) => 'b) => t<('k, 'b)>
 let drop: (t<'a>, int) => t<'a>
@@ -83,6 +82,7 @@ let prefixSum: (t<'a>, ('a, 'a) => 'a) => t<'a>
 let reverse: t<'a> => t<'a>
 let scan: (t<'a>, 'b, ('b, 'a) => 'b) => t<'b>
 let sortBy: (t<'a>, ('a, 'a) => int) => t<'a>
+let split: (t<'a>, 'a => 'b, ('b, 'a) => option<'b>) => t<'b>
 let tail: t<'a> => t<'a>
 let tails: t<'a> => t<t<'a>>
 let take: (t<'a>, int) => t<'a>
