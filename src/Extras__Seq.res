@@ -560,6 +560,19 @@ let findMap = (xx, f) => {
 
 let findMapi = (xx, f) => xx->indexed->findMap(((x, inx)) => f(x, inx))
 
+let findMapLast = (xx, f) => {
+  let rec go = (xx, last) =>
+    switch xx->next {
+    | End => last
+    | Next(x, xx) =>
+      switch f(x) {
+      | Some(_) as found => go(xx, found)
+      | None => go(xx, last)
+      }
+    }
+  go(xx, None)
+}
+
 let rec map2 = (xx, yy, f) =>
   (. ()) => {
     let xx = xx->uncons

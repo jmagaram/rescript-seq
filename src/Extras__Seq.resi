@@ -525,6 +525,12 @@ let findLast: (t<'a>, 'a => bool) => option<'a>
 let findMap: (t<'a>, 'a => option<'b>) => option<'b>
 
 /**
+`findMapLast(source, mapper)` tries to find the last item where `mapper` returns
+`Some`. Returns `None` for an empty sequence or if no such item can be found.
+*/
+let findMapLast: (t<'a>, 'a => option<'b>) => option<'b>
+
+/**
 `findMapi(source, mapper)` tries to find the first item where `mapper` returns
 `Some`. The callback receives the zero-based index of each item. Returns `None`
 for an empty sequence or if no such item can be found.

@@ -1180,6 +1180,21 @@ let everyTests = makeValueEqualTests(
   ],
 )
 
+let findMapLastTests = makeValueEqualTests(
+  ~title="findMapLast",
+  [
+    (() => S.range(1, 6)->S.findMapLast(i => i < 4 ? Some(i * 2) : None), Some(6), ""),
+    (() => S.range(1, 6)->S.findMapLast(i => i < 7 ? Some(i * 2) : None), Some(12), ""),
+    (() => S.range(1, 6)->S.findMapLast(i => i < 2 ? Some(i + 10) : None), Some(11), ""),
+    (() => S.range(1, 6)->S.findMapLast(_ => None), None, ""),
+    (
+      () => S.range(1, 999_999)->S.findMapLast(i => i == 999_999 ? Some(1_000_000) : None),
+      Some(1_000_000),
+      "",
+    ),
+  ],
+)
+
 let findMapTests = makeValueEqualTests(
   ~title="findMap",
   [
@@ -2254,6 +2269,7 @@ let tests =
     filterSomeTests,
     filterTests,
     findMapTests,
+    findMapLastTests,
     findTests,
     findLastTests,
     flatMapTests,

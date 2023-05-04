@@ -119,6 +119,7 @@ let find: (t<'a>, 'a => bool) => option<'a>
 let findLast: (t<'a>, 'a => bool) => option<'a>
 let findMap: (t<'a>, 'a => option<'b>) => option<'b>
 let findMapi: (t<'a>, ('a, int) => option<'b>) => option<'b>
+let findMapLast: (t<'a>, 'a => option<'b>) => option<'b>
 let forEach: (t<'a>, 'a => unit) => unit
 let forEachi: (t<'a>, ('a, int) => unit) => unit
 let head: t<'a> => option<'a>

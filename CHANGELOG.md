@@ -18,6 +18,7 @@
   - `Seq.append` as synonym for `concat`
   - `Seq.dropLast`
   - `Seq.findLast`
+  - `Seq.findMapLast`
   - `NonEmptyArray.of1`, `of2`, `of3` and `ofMany`, all zero-cost bindings to `Array.of`.
   - In the test framework, enable displaying detailed messages when a test fails. Provide `Test.fromResult` and `Test.fromPredicate`. Also `expectThrow` and `expectsNotThrow`. The expectation text is optional.
 - Rename
