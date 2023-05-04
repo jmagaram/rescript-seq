@@ -160,8 +160,8 @@ each item in `source` and then concatenating every item produced. Also known as
 let flatMap: (t<'a>, 'a => t<'b>) => t<'b>
 
 /**
-`map(source, mapper)` is the sequence that results by calling the `mapper` callback on
-each item in `source`.
+`map(source, mapper)` is the sequence that results by calling the `mapper`
+callback on each item in `source`.
 */
 let map: (t<'a>, 'a => 'b) => t<'b>
 
