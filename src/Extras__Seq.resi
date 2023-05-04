@@ -254,7 +254,6 @@ let dropWhile: (t<'a>, 'a => bool) => t<'a>
 `dropUntil(source, predicate)` is the sequence that skips items from the
 beginning of `source` and **starts** at the first item where predicate is
 `true`. See `dropWhile` to exclude the first `true` item.
-- `orElse` may not be best name though it is similar to `Option.orElse`. `orElseIfEmpty`, `ifEmptyThen`, `fallbackIfEmpty`.
 */
 let dropUntil: (t<'a>, 'a => bool) => t<'a>
 
