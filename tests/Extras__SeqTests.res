@@ -1241,12 +1241,6 @@ let findMapTests = makeValueEqualTests(
       ->Option.getExn,
     ~b=None,
   ),
-  valueEqual(
-    ~title="findMapi",
-    ~expectation="",
-    ~a=() => S.range(1, 5)->S.findMapi((n, inx) => n == 3 && inx == 2 ? Some("x") : None),
-    ~b=Some("x"),
-  ),
 ])
 
 let toArrayTests = [

@@ -531,13 +531,6 @@ let findMap: (t<'a>, 'a => option<'b>) => option<'b>
 let findMapLast: (t<'a>, 'a => option<'b>) => option<'b>
 
 /**
-`findMapi(source, mapper)` tries to find the first item where `mapper` returns
-`Some`. The callback receives the zero-based index of each item. Returns `None`
-for an empty sequence or if no such item can be found.
-*/
-let findMapi: (t<'a>, ('a, int) => option<'b>) => option<'b>
-
-/**
 `length` returns the number of items in the sequence. **Note:** This requires
 eagerly iterating through every item.
 */

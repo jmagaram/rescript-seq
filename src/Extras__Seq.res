@@ -558,8 +558,6 @@ let findMap = (xx, f) => {
   go(xx)
 }
 
-let findMapi = (xx, f) => xx->indexed->findMap(((x, inx)) => f(x, inx))
-
 let findMapLast = (xx, f) => {
   let rec go = (xx, last) =>
     switch xx->next {
