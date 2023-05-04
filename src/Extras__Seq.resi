@@ -179,22 +179,21 @@ the input sequence paired with the zero-based integer index of each item.
 let indexed: t<'a> => t<('a, int)>
 
 /**
-`filter` builds a new sequence containing only the items of the source for
-which the given predicate returns "true". Similar to `Array.filter` in
-JavaScript.
+`filter` builds a new sequence containing only the items for which the given
+predicate returns "true". Similar to `Array.filter` in JavaScript.
 */
 let filter: (t<'a>, 'a => bool) => t<'a>
 
 /**
-`filteri` builds a new sequence containing only the items of the source for
-which the given predicate returns "true". The callback receives the zero-based
-index of each item.
+`filteri` builds a new sequence containing only the items for which the given
+predicate returns "true". The callback receives the zero-based index of each
+item.
 */
 let filteri: (t<'a>, ('a, int) => bool) => t<'a>
 
 /**
-`filterMap(source, mapper)` builds a new sequence containing only the items
-in `source` for which the `mapper` callback returns `Some`.
+`filterMap(source, mapper)` builds a new sequence containing only the items for
+which the `mapper` callback returns `Some`.
 */
 let filterMap: (t<'a>, 'a => option<'b>) => t<'b>
 
