@@ -1,7 +1,7 @@
 open Belt
 
-module T = Extras__Test
-module R = Extras__Result
+module T = Seq__Test
+module R = Seq__Result
 
 let expectEqual = (~title, ~expectation, ~a, ~b) =>
   T.fromPredicate(~category="Result", ~title, ~expectation, () => a() == b)

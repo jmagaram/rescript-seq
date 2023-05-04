@@ -1,7 +1,7 @@
-module T = Extras__Test
-module Task = Extras__Task
+module T = Seq__Test
+module Task = Seq__Task
 module Promise = Js.Promise2
-module ResultEx = Extras__Result
+module ResultEx = Seq__Result
 
 exception OutOfRange(int)
 

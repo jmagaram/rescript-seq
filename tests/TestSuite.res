@@ -1,7 +1,7 @@
 open Belt
-module Test = Extras__Test
-module Task = Extras__Task
-module Ex = Extras
+module Test = Seq__Test
+module Task = Seq__Task
+module Q = Seq
 module Promise = Js.Promise2
 
 let isLocalDevelopment = () => {
@@ -19,16 +19,13 @@ let throwOnFailure = !isLocalDevelopment()
 
 let tests =
   [
-    Extras__OptionTests.tests,
-    Extras__ResultTests.allTests,
-    Extras__TaskTest.tests,
-    Extras__SeqTests.tests,
+    Seq__OptionTests.tests,
+    Seq__ResultTests.allTests,
+    Seq__TaskTest.tests,
+    Seq__SeqTests.tests,
   ]->Array.concatMany
 
-Task.Result.make(
-  ~promise=() => Ex.Test.runSuite(tests, ~filter, ~onlyShowFailures),
-  ~onError=e => e,
-)
+Task.Result.make(~promise=() => Q.Test.runSuite(tests, ~filter, ~onlyShowFailures), ~onError=e => e)
 ->Task.forEach(s =>
   switch (s, throwOnFailure) {
   | (Ok(s), true) if s.fail > 0 => Js.Exn.raiseError(`Tests failed: ${s.fail->Int.toString}`)

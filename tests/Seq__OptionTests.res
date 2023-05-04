@@ -1,8 +1,8 @@
 let expectEq = (~title, ~expectation, ~a, ~b) =>
-  Extras__Test.fromPredicate(~category="Option", ~title, ~expectation, () => a() == b)
+  Seq__Test.fromPredicate(~category="Option", ~title, ~expectation, () => a() == b)
 
-module T = Extras__Test
-module O = Extras__Option
+module T = Seq__Test
+module O = Seq__Option
 
 let add = (a, b) => a + b
 let add3 = (a, b, c) => a + b + c

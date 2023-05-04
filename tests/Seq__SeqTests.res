@@ -1,7 +1,7 @@
-module T = Extras__Test
-module S = Extras__Seq
-module R = Extras__Result
-module Ex = Extras
+module T = Seq__Test
+module S = Seq__Seq
+module R = Seq__Result
+module Q = Seq
 module Option = Belt.Option
 module Result = Belt.Result
 module String = Js.String2
@@ -142,7 +142,7 @@ Creates a test that passes if the provided function does NOT throw an exception.
 */
 let willNotThrow = (~title, ~expectation, f) =>
   T.fromPredicate(~category="Seq", ~title, ~expectation, () =>
-    Ex.Result.fromTryCatch(f)->Result.isOk
+    Q.Result.fromTryCatch(f)->Result.isOk
   )
 
 /**
@@ -1615,10 +1615,10 @@ let (everyOkTests, everySomeTests) = {
           input
           ->S.fromArray
           ->S.map(validate)
-          ->S.map(Ex.Result.toOption)
+          ->S.map(Q.Result.toOption)
           ->S.everySome
           ->Option.map(i => i->S.toArray),
-        ~b=expected->Ex.Result.toOption,
+        ~b=expected->Q.Result.toOption,
       )
     )
   }
@@ -2076,7 +2076,7 @@ let dropLastTests = {
 }
 
 let sampleFibonacci = {
-  let fib = Extras__SeqSamples.fibonacci
+  let fib = Seq__SeqSamples.fibonacci
   makeSeqEqualsTests(
     ~title="sampleFibonacci",
     [(fib(12)->S.fromArray, [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89], "")],
@@ -2084,7 +2084,7 @@ let sampleFibonacci = {
 }
 
 let sampleZipLongest = {
-  let z = Extras__SeqSamples.zipLongest
+  let z = Seq__SeqSamples.zipLongest
   let compute = (xx, yy) => z(xx->S.fromArray, yy->S.fromArray)
   makeSeqEqualsTests(
     ~title="sampleZipLongest",
@@ -2100,7 +2100,7 @@ let sampleZipLongest = {
 }
 
 let sampleBinaryDigits = {
-  let getDigits = Extras__SeqSamples.binary
+  let getDigits = Seq__SeqSamples.binary
   makeSeqEqualsTests(
     ~title="sampleBinaryDigits",
     [
@@ -2116,7 +2116,7 @@ let sampleBinaryDigits = {
 }
 
 let sampleLocalMinimums = {
-  let getMins = Extras__SeqSamples.localMinimums
+  let getMins = Seq__SeqSamples.localMinimums
   [
     valueEqual(
       ~title="sampleLocalMinimums",
@@ -2140,7 +2140,7 @@ let sampleLocalMinimums = {
 }
 
 let sampleRunningTotal = {
-  let f = Extras__SeqSamples.runningTotal
+  let f = Seq__SeqSamples.runningTotal
   makeSeqEqualsTests(
     ~title="sampleRunningTotal",
     [
@@ -2152,7 +2152,7 @@ let sampleRunningTotal = {
 }
 
 let sampleMultiplicationTableTests = {
-  let tbl = Extras__SeqSamples.multiplicationTable
+  let tbl = Seq__SeqSamples.multiplicationTable
   makeValueEqualTests(
     ~title="sampleMultiplicationTable",
     [

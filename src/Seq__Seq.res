@@ -1,5 +1,5 @@
 module Option = Belt.Option
-module OptionEx = Extras__Option
+module OptionEx = Seq__Option
 module Result = Belt.Result
 module Array = Js.Array2
 module String = Js.String2

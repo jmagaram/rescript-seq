@@ -18,7 +18,7 @@ Highlights:
 - **Combine** sequences with `zip`, `map3`, `allPairs`, `sortedMerge`, `interleave`...
 - **Calculate** values with `reduce`, `maxBy`, `every`, `findMap`, `isSortedBy`, `toArray`...
 
-See code [examples](src/Extras__SeqSamples.res) to get a sense for how `Seq` is used and what is possible.
+See code [examples](src/Seq__SeqSamples.res) to get a sense for how `Seq` is used and what is possible.
 
 ## To install
 
