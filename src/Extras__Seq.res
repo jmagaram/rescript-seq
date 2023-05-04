@@ -48,27 +48,18 @@ let uncons = xx =>
   | Next(x, xx) => Some(x, xx)
   }
 
-/**
-`findNode(source, predicate)` consumes items in the sequence looking for the
-first item that satisfies the predicate. This is the guts of the `find`
-function. It returns a `node`, which includes both the item in the sequence and
-the tail, in case it is needed.
-*/
-let rec findNode = (xx, f) =>
-  switch xx->next {
-  | End => End
-  | Next(x, xx) as nxt =>
-    switch f(x) {
-    | true => nxt
-    | false => findNode(xx, f)
+let find = (xx, f) => {
+  let rec go = xx =>
+    switch xx->next {
+    | End => None
+    | Next(x, xx) =>
+      switch f(x) {
+      | true => Some(x)
+      | false => go(xx)
+      }
     }
-  }
-
-let find = (xx, f) =>
-  switch xx->findNode(f) {
-  | End => None
-  | Next(x, _) => Some(x)
-  }
+  go(xx)
+}
 
 let findLast = (xx, f) => {
   let rec go = (xx, last) =>
