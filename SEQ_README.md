@@ -59,6 +59,7 @@ let chunkBy: (t<'a>, 'a => 'b, ('b, 'a) => option<'b>) => t<'b>
 let chunkBySize: (t<'a>, int) => t<array<'a>>
 let chunkByKey: (t<('k, 'a)>, ('k, 'k) => bool, 'a => 'b, ('b, 'a) => 'b) => t<('k, 'b)>
 let drop: (t<'a>, int) => t<'a>
+let dropLast: (t<'a>, int) => t<'a>
 let dropUntil: (t<'a>, 'a => bool) => t<'a>
 let dropWhile: (t<'a>, 'a => bool) => t<'a>
 let filter: (t<'a>, 'a => bool) => t<'a>
