@@ -808,8 +808,7 @@ let windowAhead = (xx, size) => {
   }
   xx
   ->windowsCore(size)
-  ->concat([]->once)
-  ->map(window => window->Array.copy)
+  ->map(Array.copy)
   ->pairWithNext
   ->dropWhile(((a, b)) => b->Option.mapWithDefault(false, b => b->Array.length > a->Array.length))
   ->map(Pervasives.fst)
