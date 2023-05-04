@@ -18,8 +18,7 @@
   "author": "Justin Magaram",
   "license": "ISC",
   "dependencies": {
-    "rescript": "^10.1.4",
-    "rescript-struct": "^4.0.0"
+    "rescript": "^10.1.4"
   },
   "files": [
     "bsconfig.json",

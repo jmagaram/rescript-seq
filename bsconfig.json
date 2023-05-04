@@ -11,7 +11,7 @@
     }
   ],
   "suffix": ".bs.js",
-  "bs-dev-dependencies": ["rescript-struct"],
+  "bs-dev-dependencies": [],
   "gentypeconfig": {
     "language": "typescript",
     "shims": {},
