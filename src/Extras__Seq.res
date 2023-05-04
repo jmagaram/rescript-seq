@@ -793,6 +793,15 @@ let windowBehind = (xx, size) => {
   ->dropAtMost(1)
 }
 
+/**
+This is pretty easy to write if you map every item in source to `Some` and then
+pad the end of the source with `None`. Just scan ahead `size` items and put all
+the `Some` values into the result. Stop when you're about `size` items into the
+first `None`. This implementation is kind of fancy because if `size` is
+millions, the memory allocation never gets much bigger than the size of the
+source. It is difficult to know when to return the first window without looking
+to see what comes after it.
+*/
 let windowAhead = (xx, size) => {
   if size <= 0 {
     InvalidArgument(`windowAhead requires a size of 1 or more.`)->raise
