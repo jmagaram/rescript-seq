@@ -30,6 +30,7 @@ let nums =
   ->Seq.drop(33)
   ->Seq.map(n => mod(n * 3, 7))
   ->Seq.pairwise
+  ->Seq.dropLast(2)
   ->Seq.filterMap(((a, b)) => a < b ? Some(a + b) : None)
   ->Seq.take(623)
   ->Seq.tap(n => {
@@ -47,12 +48,15 @@ The `split` function permits grouping adjacent items by any criteria, and then
 reducing all the items within each group.
 */
 type summary = {empId: string, sales: int, revenue: int}
+
 type sale = {empId: string, amount: int}
+
 let sortByEmployee = (a, b) => {
   let a = a.empId
   let b = b.empId
   a < b ? -1 : a > b ? 1 : 0
 }
+
 let salesSummary = sales => {
   sales
   ->Js.Array2.sortInPlaceWith(sortByEmployee)
