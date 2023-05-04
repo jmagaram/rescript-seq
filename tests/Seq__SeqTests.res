@@ -141,9 +141,7 @@ let willThrow = (~title, ~expectation=?, f) =>
 Creates a test that passes if the provided function does NOT throw an exception.
 */
 let willNotThrow = (~title, ~expectation, f) =>
-  T.fromPredicate(~category="Seq", ~title, ~expectation, () =>
-    Q.Result.fromTryCatch(f)->Result.isOk
-  )
+  T.fromPredicate(~category="Seq", ~title, ~expectation, () => R.fromTryCatch(f)->Result.isOk)
 
 /**
 Makes a series of sequence equal tests when fed an array of tuples. The tuple
@@ -1615,10 +1613,10 @@ let (everyOkTests, everySomeTests) = {
           input
           ->S.fromArray
           ->S.map(validate)
-          ->S.map(Q.Result.toOption)
+          ->S.map(R.toOption)
           ->S.everySome
           ->Option.map(i => i->S.toArray),
-        ~b=expected->Q.Result.toOption,
+        ~b=expected->R.toOption,
       )
     )
   }

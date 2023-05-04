@@ -25,7 +25,7 @@ let tests =
     Seq__SeqTests.tests,
   ]->Array.concatMany
 
-Task.Result.make(~promise=() => Q.Test.runSuite(tests, ~filter, ~onlyShowFailures), ~onError=e => e)
+Task.Result.make(~promise=() => Test.runSuite(tests, ~filter, ~onlyShowFailures), ~onError=e => e)
 ->Task.forEach(s =>
   switch (s, throwOnFailure) {
   | (Ok(s), true) if s.fail > 0 => Js.Exn.raiseError(`Tests failed: ${s.fail->Int.toString}`)
