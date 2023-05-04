@@ -126,8 +126,9 @@ cons(1, []) // [1]
 let cons: ('a, t<'a>) => t<'a>
 
 /**
-`prepend(xx, yy)` is all items in `yy` followed by all items in `xx`. See
-`concat` for the same behavior but the arguments reversed.
+`prepend(yy, xx)` is all items in `xx`, the second argument, followed by all
+items in `yy`, the first argument. See `concat` for the same behavior but the
+arguments reversed.
 */
 let prepend: (t<'a>, t<'a>) => t<'a>
 
