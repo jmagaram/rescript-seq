@@ -698,7 +698,7 @@ let exactlyOne = xx =>
     }
   }
 
-let pairWithNext = xx =>
+let pairAhead = xx =>
   (. ()) => {
     switch xx->next {
     | End => End
@@ -716,7 +716,7 @@ let pairWithNext = xx =>
     }
   }
 
-let pairWithPrevious = xx =>
+let pairBehind = xx =>
   (. ()) => {
     switch xx->next {
     | End => End

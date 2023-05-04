@@ -745,16 +745,16 @@ dictionary.
 let chunkByKey: (t<('k, 'a)>, ('k, 'k) => bool, 'a => 'b, ('b, 'a) => 'b) => t<('k, 'b)>
 
 /**
-`pairWithNext(source)` is the sequence of every item in `source` paired with the
+`pairAhead(source)` is the sequence of every item in `source` paired with the
 item that follows it.
 */
-let pairWithNext: t<'a> => t<('a, option<'a>)>
+let pairAhead: t<'a> => t<('a, option<'a>)>
 
 /**
-`pairWithPrevious(source)` is the sequence of every item in `source` paired with
+`pairBehind(source)` is the sequence of every item in `source` paired with
 the item that precedes it.
 */
-let pairWithPrevious: t<'a> => t<(option<'a>, 'a)>
+let pairBehind: t<'a> => t<(option<'a>, 'a)>
 
 /**
 `neighbors(source)` is the sequence of each item in `source` with the
@@ -762,32 +762,19 @@ items that immediately precede and follow it.
 */
 let neighbors: t<'a> => t<(option<'a>, 'a, option<'a>)>
 
-// surroundedBy
-// adjacents
-// neighbors
-
-// let pairBehind
-// let pairAhead
-// let pairwise
-
-// and why a fresh array? inconsistent
-// `window` function is inefficient toward the end
-
-// withNextN
-// withPreviousN
-// withN
-// pairwise
-// pairAhead
-// pairBehind
 // pairNext
 // pairPrevious
-// windowNext
-// windowPrevious
-// let withNextN: (t<'a>, int) => t<('a, array<'a>)>
-// let withNext: t<'a> => t<('a, option<'a>)>
-// let withPreviousN: (t<'a>, int) => t<(array<'a>, 'a)>
-// let withPrevious: t<'a> => t<(option<'a>, 'a)>
-// let withNeighbors: t<'a> => t<(option<'a>, 'a, option<'a>)>
-// let withNeighborsN: (t<'a>, int) => t<(array<'a>, 'a, array<'a>)>
+// pairAhead
+// pairBehind
+// pairwise
+// pairAhead
+// pairBack
 
-// let windows: (t<'a>, int) => t<array<'a>>
+// pairwise
+// pairWithNext
+// pairWithPrevious
+
+// pairBack (from the end of the sequence? or reversing the order)
+
+// adjacents
+// neighbors

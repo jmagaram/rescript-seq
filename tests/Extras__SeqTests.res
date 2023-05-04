@@ -518,16 +518,16 @@ let windowTests =
     ),
   ])
 
-let pairWithNextTests = {
+let pairAheadTests = {
   let f = source =>
     source
     ->Js.String2.split("")
     ->S.fromArray
-    ->S.pairWithNext
+    ->S.pairAhead
     ->S.map(((curr, next)) => `${curr}${next->Option.getWithDefault("_")}`)
     ->S.join(",")
   makeValueEqualTests(
-    ~title="pairWithNext",
+    ~title="pairAhead",
     [
       (() => ""->f, "", ""),
       (() => "a"->f, "a_", ""),
@@ -536,32 +536,32 @@ let pairWithNextTests = {
       (() => "abcd"->f, "ab,bc,cd,d_", ""),
     ],
   )->Js.Array2.concat([
-    willNotThrow(~title="pairWithNext", ~expectation="lazy", () => death()->S.pairWithNext),
+    willNotThrow(~title="pairAhead", ~expectation="lazy", () => death()->S.pairAhead),
     valueEqual(
-      ~title="pairWithNext",
+      ~title="pairAhead",
       ~expectation="millions",
-      ~a=() => S.range(1, 999_999)->S.pairWithNext->S.last->Option.getExn,
+      ~a=() => S.range(1, 999_999)->S.pairAhead->S.last->Option.getExn,
       ~b=(999_999, None),
     ),
     seqEqual(
-      ~title="pairWithNext",
+      ~title="pairAhead",
       ~expectation="works with nested options",
-      ~a=() => [None, None]->S.fromArray->S.pairWithNext,
+      ~a=() => [None, None]->S.fromArray->S.pairAhead,
       ~b=[(None, Some(None)), (None, None)],
     ),
   ])
 }
 
-let pairWithPreviousTests = {
+let pairBehindTests = {
   let f = source =>
     source
     ->Js.String2.split("")
     ->S.fromArray
-    ->S.pairWithPrevious
+    ->S.pairBehind
     ->S.map(((prev, curr)) => `${prev->Option.getWithDefault("_")}${curr}`)
     ->S.join(",")
   makeValueEqualTests(
-    ~title="pairWithPrevious",
+    ~title="pairBehind",
     [
       (() => ""->f, "", ""),
       (() => "a"->f, "_a", ""),
@@ -570,17 +570,17 @@ let pairWithPreviousTests = {
       (() => "abcd"->f, "_a,ab,bc,cd", ""),
     ],
   )->Js.Array2.concat([
-    willNotThrow(~title="pairWithPrevious", ~expectation="lazy", () => death()->S.pairWithPrevious),
+    willNotThrow(~title="pairBehind", ~expectation="lazy", () => death()->S.pairBehind),
     valueEqual(
-      ~title="pairWithPrevious",
+      ~title="pairBehind",
       ~expectation="millions",
-      ~a=() => S.range(1, 999_999)->S.pairWithPrevious->S.last->Option.getExn,
+      ~a=() => S.range(1, 999_999)->S.pairBehind->S.last->Option.getExn,
       ~b=(Some(999_998), 999_999),
     ),
     seqEqual(
-      ~title="pairWithPrevious",
+      ~title="pairBehind",
       ~expectation="works with nested options",
-      ~a=() => [None, None]->S.fromArray->S.pairWithPrevious,
+      ~a=() => [None, None]->S.fromArray->S.pairBehind,
       ~b=[(None, None), (Some(None), None)],
     ),
   ])
@@ -2296,8 +2296,8 @@ let tests =
     onceWithTests,
     orElseTests,
     pairwiseTests,
-    pairWithNextTests,
-    pairWithPreviousTests,
+    pairAheadTests,
+    pairBehindTests,
     permutationTests,
     prefixSumTests,
     prependTests,
