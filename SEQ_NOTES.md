@@ -16,26 +16,24 @@
 
 ## To do
 
+- Should some functions have labels? Look them all over.
+- Make final look through functions and see if anything is not totally obvious, like `orElse` or `fromOption`.
 - Move Seq into a separate project?
-- Should any functions return a result rather than option?
-- Skip last done lazily?
-- `takeAtMost` and `dropAtMost`? Which name should be used?
+
+## Terminology for `concat`
+
+- F# `concat` is flatten and `append` is just 1
+- OCaml `concat` is flatten and `append` is just 1
+- Haskell `concat` is flatten and `+` is just 1
+- JavaScript arrays `concat` is one or more, and separate `flat` function
+- .net Enumerable `concat` is just one
+- Rust is `flatten` for many and `chain` for just one
+
+Ok, sticking with `concat` for JavaScript familiarity, even though it conflicts with sequences in other functional languages. But adding synonym of `append` for since it goes nicely with `prepend`.
 
 ## Indexed versions of functions like `mapi`
 
 Sometimes it is useful to have the index of an item when performing a computation. This can be accomplished by calling the `indexed` function before calling the function that needs the index. This is how it is done in `F#`. `Rust` has an `enumerate` function. So indexed versions aren't as important as they would be with non-lazy `array` functions where adding the index regenerates the entire array. Indexed versions are useful in a couple cases: (1) where developers expect it from experience with JavaScript `array` functions, (2) when the user is likely going to NOT want the index after they have performed some kind of transformation, because then they have to first call `indexed`, and then after the transformation, do a `map` to get rid of it. This is the case with `filter`.
-
-## Chunking, grouping, splitting
-
-- Naming needs to distinguish between something that summarizes across entire sequence and adjacent chunks. `groupBy` probably implies the whole thing. Also, `partition` is used in Belt and OCaml Seq for the whole thing.
-- Very often helpful to see previous value when making a split decision. This value can be stored in the previous chunk, though, as a key perhaps.
-- Maximum number of splits might be useful and is part of `MoreLINQ`
-
-F# has a `chunkBySize`. In F# `groupBy` digests the entire sequence into unique keys.
-
-Haskell has a `group` function that creates lists of lists such that if you concatenate them all together you end up with the original.
-
-Naming ideas: `chunkAndReduce`, `chunkReduce`, `split`, `splitReduce`, `groupAdjacent`, `adjacentGroupBy`, `groupAdjacent`, `reduceAdjacent`, `groupWith`. `group` is a great word. `divide`, `segment`, `collect`. `summarizeAdjacent`. `cluster`. `chunkInto`. `split` focuses on the act of splitting, not on what is left over. Maybe name the array chunk one separate like `arrayChunksBySize` and then have `chunkBy` and `chunkByKey`.
 
 ## DistinctBy, other set operations
 
@@ -168,11 +166,11 @@ count, compress, groupby, islice, starmap, tee, combinations_with_replacement, r
 
 ### Supported
 
-range, drop, dropWhile, enumerate, filter, flat, flatMap, interpose, map, prepend, take, takeWhile, tap, window, batch, collate, concat, join, zip, deepEqual, every, find, findBest, first, isEmpty, reduce, size, some, takeLast, fork, arrayFrom, forEach, toString, toArray, firstHighest, firstLowest, repeat, reverse, roundRobin, windowBehind, windowAhead, isSorted
+range, drop, dropWhile, enumerate, filter, flat, flatMap, interpose, map, prepend, take, takeWhile, tap, window, batch, collate, concat, join, zip, deepEqual, every, find, findBest, first, isEmpty, reduce, size, some, takeLast, fork, arrayFrom, forEach, toString, toArray, firstHighest, firstLowest, repeat, reverse, roundRobin, isSorted
 
 ### Not supported
 
-range (with step), objectEntries, objectKeys, objectValues, append (one value), distinct, interposeSeq, slice, takeSorted, bisect, split, splitGroups, splitOn, splitWhen, compress, joinWith, firstOr, includes, includesAny, **many async flavors**, startsWith, startsWithAny, str, takeLastOr, objectFrom, toObject, lastHighest, lastLowest, zipAll
+range (with step), objectEntries, objectKeys, objectValues, append (one value), distinct, interposeSeq, slice, takeSorted, bisect, split, splitGroups, splitOn, splitWhen, compress, joinWith, firstOr, includes, includesAny, **many async flavors**, startsWith, startsWithAny, str, takeLastOr, objectFrom, toObject, lastHighest, lastLowest, zipAll, windowAhead, windowBehind
 
 ## MoreLINQ
 
