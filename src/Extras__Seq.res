@@ -2,6 +2,7 @@ module Option = Belt.Option
 module OptionEx = Extras__Option
 module Result = Belt.Result
 module Array = Js.Array2
+module String = Js.String2
 
 exception InvalidArgument(string)
 
@@ -523,7 +524,7 @@ let prefixSum = (xx, accumulator) =>
   }
 
 let join = (xx, separator) =>
-  switch separator->Js.String2.length {
+  switch separator->String.length {
   | 0 => xx
   | _ => xx->intersperse(separator)
   }->reduce("", (total, i) => total ++ i)
@@ -739,9 +740,13 @@ let pairwise = xx =>
     }
 
 let dropLast = (xx, n) => {
-  switch n <= 0 {
-  | true => xx
-  | false =>
+  switch n {
+  | 0 => xx
+  | n if n < 0 =>
+    InvalidArgument(
+      `dropLast requires a count of 0 or more. You requested ${n->Belt.Int.toString}`,
+    )->raise
+  | n =>
     (. ()) =>
       xx
       ->scan([], (sum, i) => {

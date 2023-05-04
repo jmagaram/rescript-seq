@@ -2174,15 +2174,8 @@ let dropLastTests = {
     test("abcdefg", 1, "abcdef"),
   ]->Array.append([
     willNotThrow(~title="dropLast", ~expectation="lazy", () => death()->S.dropLast(10)),
-    valueEqual(
-      ~title="dropLast",
-      ~expectation="when count < 0 return same instance",
-      ~a=() => {
-        let source = S.range(1, 5)
-        let result = source->S.dropLast(-1)
-        source === result
-      },
-      ~b=true,
+    willThrow(~title="dropLast", ~expectation="when count < 0, throw", () =>
+      S.range(1, 5)->S.dropLast(-1)
     ),
     valueEqual(
       ~title="dropLast",

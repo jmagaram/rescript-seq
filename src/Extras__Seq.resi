@@ -591,8 +591,8 @@ let tails: t<'a> => t<t<'a>>
 
 /**
 `dropLast(source, count)` contains the items from `source` with the last `count`
-items omitted. If `count` is not a positive number, `source` is returned without
-any modifications. 
+items omitted. If `count` is zero, `source` is returned without any
+modifications. 
 */
 let dropLast: (t<'a>, int) => t<'a>
 
