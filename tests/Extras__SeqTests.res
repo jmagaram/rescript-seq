@@ -1681,6 +1681,28 @@ let findTests = [
   )
 )
 
+let findLastTests = [
+  (() => S.empty, _ => true, None, "when empty and predicate true"),
+  (() => S.empty, _ => false, None, "when empty and predicate false"),
+  (() => 1->S.once, i => i == 1, Some(1), "when once and found"),
+  (() => 1->S.once, _ => false, None, "when once and predicate false"),
+  (() => [1, 2, 3, 4, 5, 6]->S.fromArray, i => mod(i, 2) == 0, Some(6), "when many and is last"),
+  (() => [1, 2, 3, 4]->S.fromArray, i => mod(i, 2) == 1, Some(3), "when many and is in middle"),
+  (() => [1, 2, 3]->S.fromArray, i => i == 1, Some(1), "when many and is last"),
+  (() => [1, 2, 3]->S.fromArray, _ => false, None, "when many and predicate false"),
+  (() => S.range(1, 999_999), i => i == 999_999, Some(999_999), "when million"),
+  (() => S.range(1, 999_999), _ => false, None, "when million"),
+]->Js.Array2.mapi(((source, predicate, result, note), index) =>
+  T.fromPredicate(
+    ~category="Seq",
+    ~title="findLast",
+    ~expectation=`${index->intToString} ${note}`,
+    () => {
+      source()->S.findLast(predicate) == result
+    },
+  )
+)
+
 let map2Tests = {
   let test = (xs, ys, expected) => {
     T.fromPredicate(
@@ -2233,6 +2255,7 @@ let tests =
     filterTests,
     findMapTests,
     findTests,
+    findLastTests,
     flatMapTests,
     flattenTests,
     forEachTests,

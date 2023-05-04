@@ -513,6 +513,12 @@ let every: (t<'a>, 'a => bool) => bool
 let find: (t<'a>, 'a => bool) => option<'a>
 
 /**
+`findLast(source, predicate)` tries to find the last item where `predicate` is
+`true`. Returns `None` for an empty sequence or if no such item can be found.
+*/
+let findLast: (t<'a>, 'a => bool) => option<'a>
+
+/**
 `findMap(source, mapper)` tries to find the first item where `mapper` returns
 `Some`. Returns `None` for an empty sequence or if no such item can be found.
 */

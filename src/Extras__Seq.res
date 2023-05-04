@@ -70,6 +70,19 @@ let find = (xx, f) =>
   | Next(x, _) => Some(x)
   }
 
+let findLast = (xx, f) => {
+  let rec go = (xx, last) =>
+    switch xx->next {
+    | End => last
+    | Next(x, xx) =>
+      switch f(x) {
+      | true => go(xx, Some(x))
+      | false => go(xx, last)
+      }
+    }
+  go(xx, None)
+}
+
 let rec concat = (xx, yy) =>
   (. ()) => {
     switch xx->next {

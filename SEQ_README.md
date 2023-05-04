@@ -116,6 +116,7 @@ let everyOk: t<result<'a, 'b>> => result<t<'a>, 'b>
 let everySome: t<option<'a>> => option<t<'a>>
 let exactlyOne: t<'a> => option<'a>
 let find: (t<'a>, 'a => bool) => option<'a>
+let findLast: (t<'a>, 'a => bool) => option<'a>
 let findMap: (t<'a>, 'a => option<'b>) => option<'b>
 let findMapi: (t<'a>, ('a, int) => option<'b>) => option<'b>
 let forEach: (t<'a>, 'a => unit) => unit
