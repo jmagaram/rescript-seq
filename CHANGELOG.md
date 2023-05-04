@@ -1,6 +1,56 @@
+## Version 2.0.0
+
+- Fixed
+  - `Seq.filterMap` didn't work with nested options
+  - `Seq.tail` was not completely lazy
+  - `Seq.drop` was not completely lazy
+  - `Seq.findMap` didn't work with nested options
+  - `Seq.replicate` and `Seq.replicateWith` argument order was not data-first
+- Add
+  - `Seq.reduceUntil` to short-circuit a reduce operation
+  - `Seq.reduceWhile` to short-circuit a reduce operation
+  - `Seq.split` to reduce adjacent items
+  - `Seq.sumBy` (like `Seq.reduce` but no initial parameter)
+  - `Seq.prefixSum` (like `scan` but does not take an initial parameter)
+  - `Seq.toList`
+  - `Seq.tails`
+  - `Seq.append` as synonym for `concat`
+  - `Seq.dropLast`
+  - `Seq.findLast`
+  - `Seq.findMapLast`
+  - `Seq.pairAhead` and `Seq.pairBehind`
+  - `Seq.neighbors`
+  - `NonEmptyArray.of1`, `of2`, `of3` and `ofMany`, all zero-cost bindings to `Array.of`.
+  - In the test framework, enable displaying detailed messages when a test fails. Provide `Test.fromResult` and `Test.fromPredicate`. Also `expectThrow` and `expectsNotThrow`. The expectation text is optional.
+- Rename
+  - `repeat` to `replicate`; more like other Seq libraries
+  - `InvalidArgument` exception not `ArgumentOfOfRange` (spelled wrong)
+  - `Seq.takeAtMost` to `Seq.take`
+  - `Seq.every` not `Seq.everyOrEmpty`; less cumbersome and more like array
+  - `Seq.everyOk` not `Seq.allSome` (using `every` not `forAll`)
+  - `Seq.everySome` not `Seq.allSome` (using `every` not `forAll`)
+  - `Seq.join` like `Array.join` rather than `Seq.joinString`. Also require a separator character.
+  - `Seq.headTail` to `Seq.uncons`; less cumbersome and used in other libraries.
+  - `Seq.once` not `Seq.singleton`; like Rust. Also provide `Seq.onceWith`
+  - `Array.exactlyOne` not `Array.exactlyOneValue` like `Seq.exactlyOne`
+  - `Array.of1` not `Array.fromOneValue`
+- Remove
+  - `Seq.windowAhead` and `Seq.windowBehind`; tricky code here. It worked but not sure it is useful enough. `windowAhead` would hang if window size was enormous; fixed that before removing it.
+  - `Seq.findMapi`
+  - `Seq.fromOption`; not sure this will get used
+  - `Array.fromSeed`; use Seq module instead
+  - `Array.pairs`; use Seq module instead
+  - `Array.filterSomeWith`; use Seq module instead
+  - `Seq.characters`; many ways to split a string and with Core it will feel better since you can do `String.split` not `Js.String2.split`.
+  - `Seq.startWith` and `Seq.endWith`; use `concat` and `prepend` with `Seq.once`.
+  - `Seq.scani`; just call `indexed` beforehand if index is needed. The mapping within scan removes the index if it isn't desired, unlike `filteri`.
+  - `Seq.reducei`; just call `indexed` beforehand if index is needed. The mapping within reduce removes the index if it isn't desired, unlike `filteri`.
+- Other
+  - Cleanup lots of code
+
 ## Version 1.1.1
 
-- Fix bug in `Seq.takeAtMost` where generator function was called 1 too many times; not lazy enough
+- Fix bug in `Seq.take` where generator function was called 1 too many times; not lazy enough
 - `Seq.combinations`
 - `Seq.permutations`
 

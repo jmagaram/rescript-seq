@@ -1,22 +1,8 @@
 module T = Extras__Test
 module A = Extras__Array
 
-let fromSeed = {
-  let make = (expectation, seed, generator, expected) =>
-    T.make(~category="Array", ~title="fromSeed", ~expectation, ~predicate=() =>
-      seed->A.fromSeed(generator) == expected
-    )
-  [
-    ("multiplicative", 1, i => i < 100 ? Some(i, i * 2) : None, [1, 2, 4, 8, 16, 32, 64]),
-    ("multiplicative", 28, i => i < 100 ? Some(i, i * 2) : None, [28, 56]),
-    ("multiplicative", 101, i => i < 100 ? Some(i, i * 2) : None, []),
-    ("simple range up", 5, i => i <= 20 ? Some(i, i + 5) : None, [5, 10, 15, 20]),
-    ("simple range down", 20, i => i > 15 ? Some(i, i - 1) : None, [20, 19, 18, 17, 16]),
-  ]->Belt.Array.map(((expectation, seed, f, goal)) => make(expectation, seed, f, goal))
-}
-
 let test = (~title, ~expect, ~a, ~b) =>
-  T.make(~category="Array", ~title, ~expectation=expect, ~predicate=() => {
+  T.fromPredicate(~category="Array", ~title, ~expectation=expect, () => {
     let m = a()
     let n = b
     if m != n {
@@ -33,14 +19,11 @@ let concatSort = (xxs: array<array<'a>>, stringify: 'a => string) =>
   ->Js.Array2.map(xs => xs->Js.Array2.map(stringify)->Js.Array2.joinWith(""))
   ->Js.Array2.sortInPlace
 
-let others = {
+let tests = {
   [
-    test(
-      ~title="fromOneValue",
-      ~expect="wrap item in an array",
-      ~a=() => [1, 2, 3]->A.fromOneValue,
-      ~b=[[1, 2, 3]],
-    ),
+    test(~title="of1", ~expect="wrap item in an array", ~a=() => 1->A.of1, ~b=[1]),
+    test(~title="of1", ~expect="wrap array in array", ~a=() => [1, 2, 3]->A.of1, ~b=[[1, 2, 3]]),
+    test(~title="of1", ~expect="wrap None in array", ~a=() => None->A.of1, ~b=[None]),
     test(~title="fromOption", ~expect="if None => empty", ~a=() => None->A.fromOption, ~b=[]),
     test(
       ~title="fromOption",
@@ -70,36 +53,22 @@ let others = {
       ~b=Some(0),
     ),
     test(~title="lastIndex", ~expect="when empty, return None", ~a=() => []->A.lastIndex, ~b=None),
-    test(~title="pairs", ~expect="when empty, return empty", ~a=() => []->A.pairs, ~b=[]),
-    test(~title="pairs", ~expect="when one item, return empty", ~a=() => [1]->A.pairs, ~b=[]),
-    test(
-      ~title="pairs",
-      ~expect="when two items, return one pair",
-      ~a=() => [1, 2]->A.pairs,
-      ~b=[(1, 2)],
-    ),
-    test(
-      ~title="pairs",
-      ~expect="when many items, return all pairs",
-      ~a=() => [1, 2, 3, 4]->A.pairs,
-      ~b=[(1, 2), (2, 3), (3, 4)],
-    ),
     test(
       ~title="exactlyOneValue",
       ~expect="when empty => None",
-      ~a=() => []->A.exactlyOneValue,
+      ~a=() => []->A.exactlyOne,
       ~b=None,
     ),
     test(
       ~title="exactlyOneValue",
       ~expect="when one value => Some",
-      ~a=() => [3]->A.exactlyOneValue,
+      ~a=() => [3]->A.exactlyOne,
       ~b=Some(3),
     ),
     test(
       ~title="exactlyOneValue",
       ~expect="when empty => None",
-      ~a=() => [1, 2]->A.exactlyOneValue,
+      ~a=() => [1, 2]->A.exactlyOne,
       ~b=None,
     ),
     test(
@@ -122,19 +91,5 @@ let others = {
       ~a=() => [None, Some(1), Some(2), None]->A.filterSome,
       ~b=[1, 2],
     ),
-    test(
-      ~title="filterSomeWith",
-      ~expect="can filter by index",
-      ~a=() => ["a", "b", "c"]->A.filterSomeWith((_, inx) => inx === 1 ? Some("bb") : None),
-      ~b=["bb"],
-    ),
-    test(
-      ~title="filterSomeWith",
-      ~expect="can filter by value",
-      ~a=() => ["a", "b", "c"]->A.filterSomeWith((value, _) => value === "b" ? Some("bb") : None),
-      ~b=["bb"],
-    ),
   ]
 }
-
-let tests = [others, fromSeed]->Belt.Array.concatMany

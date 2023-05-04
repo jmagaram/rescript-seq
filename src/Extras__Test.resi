@@ -1,19 +1,37 @@
 @genType
 type t
 
-let make: (~category: string, ~title: string, ~expectation: string, ~predicate: unit => bool) => t
+let fromResult: (
+  ~category: string,
+  ~title: string,
+  ~expectation: string=?,
+  unit => result<unit, string>,
+) => t
+
+let fromPredicate: (~category: string, ~title: string, ~expectation: string=?, unit => bool) => t
+
+let expectThrow: (~category: string, ~title: string, ~expectation: string=?, unit => 'a) => t
+
+let expectNotThrow: (~category: string, ~title: string, ~expectation: string=?, unit => 'a) => t
+
+let fromPredicateAsync: (
+  ~category: string,
+  ~title: string,
+  ~expectation: string=?,
+  unit => promise<bool>,
+) => t
+
+let fromResultAsync: (
+  ~category: string,
+  ~title: string,
+  ~expectation: string=?,
+  unit => promise<result<unit, string>>,
+) => t
 
 let category: t => string
 let title: t => string
-let expectation: t => string
+let expectation: t => option<string>
 let hasKeyword: (t, string) => bool
-
-let makeAsync: (
-  ~category: string,
-  ~title: string,
-  ~expectation: string,
-  ~predicate: unit => promise<bool>,
-) => t
 
 type summary = {
   pass: int,

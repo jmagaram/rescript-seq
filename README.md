@@ -71,7 +71,7 @@ An array that must have at least one item in it. Include many of the usual funct
 
 ## Array
 
-Generate an array from a generator function using **`fromSeed`**, similar to `unfold` in other standard libraries. Includes various utilities like **`pairwise`**, **`tail`**, **`head`**, **`tail`**, **`lastIndex`**, **`isEmpty`**, **`prepend`**, and **`fromOneValue`**
+Generate an array from a generator function using **`fromSeed`**, similar to `unfold` in other standard libraries. Includes various utilities like **`pairwise`**, **`tail`**, **`head`**, **`tail`**, **`lastIndex`**, **`isEmpty`**, and **`prepend`**.
 
 ## Result
 

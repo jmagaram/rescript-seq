@@ -8,7 +8,7 @@ module Literal = Extras__Literal
 // ================================================================================
 
 let isTypeOfTest = (~title, ~guard, ~ok, ~invalid1, ~invalid2, ~invalid3) =>
-  Test.make(~category="Patterns", ~title, ~expectation="isTypeOf", ~predicate=() =>
+  Test.fromPredicate(~category="Patterns", ~title, ~expectation="isTypeOf", () =>
     true == ok->Js.Array2.every(i => i->Unknown.make->guard) &&
     false == invalid1->Unknown.make->guard &&
     false == invalid2->Unknown.make->guard &&
@@ -16,12 +16,12 @@ let isTypeOfTest = (~title, ~guard, ~ok, ~invalid1, ~invalid2, ~invalid3) =>
   )
 
 let areEqual = (~title, ~equals, ~expectation, ~a, ~b) =>
-  Test.make(~category="Patterns", ~title=`${title} equals`, ~expectation, ~predicate=() =>
+  Test.fromPredicate(~category="Patterns", ~title=`${title} equals`, ~expectation, () =>
     equals(a, b) && equals(b, a)
   )
 
 let areNotEqual = (~title, ~equals, ~expectation, ~a, ~b) =>
-  Test.make(~category="Patterns", ~title=`${title} equals`, ~expectation, ~predicate=() =>
+  Test.fromPredicate(~category="Patterns", ~title=`${title} equals`, ~expectation, () =>
     !equals(a, b) && !equals(b, a)
   )
 
@@ -209,11 +209,11 @@ let tests = {
       ~b=Js.Nullable.null,
       ~equals=NullableString.equals,
     ),
-    Test.make(
+    Test.fromPredicate(
       ~category="Patterns",
       ~title="MakeNullable (string)",
       ~expectation="null != undefined != abc for built-in Js.Nullable using == or ===",
-      ~predicate=() => {
+      () => {
         let a: Js.Nullable.t<string> = Js.null->Obj.magic
         let b: Js.Nullable.t<string> = Js.undefined->Obj.magic
         let c = Js.Nullable.return("abc")

@@ -16,7 +16,10 @@ external fromArrayUnsafe: array<'a> => t<'a> = "%identity"
 
 let fromArrayExn = xs => xs->fromArray->O.getExn
 
-let fromOneValue = v => [v]->fromArrayUnsafe
+@val external of1: 'a => t<'a> = "Array.of"
+@val external of2: ('a, 'a) => t<'a> = "Array.of"
+@val external of3: ('a, 'a, 'a) => t<'a> = "Array.of"
+@variadic @val external ofMany: ('a, array<'a>) => t<'a> = "Array.of"
 
 external toArray: t<'a> => array<'a> = "%identity"
 
