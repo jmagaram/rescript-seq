@@ -120,6 +120,7 @@ followed by the sequence `tail`.
 
 ```rescript
 cons(1, [2, 3, 4]) // [1, 2, 3, 4]
+cons(1, []) // [1]
 ```
 */
 let cons: ('a, t<'a>) => t<'a>
