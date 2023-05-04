@@ -12,7 +12,7 @@ module String = Js.String2
 
 let intToString = Belt.Int.toString
 
-let intCmp = Ex.Cmp.int
+let intCmp = (a: int, b: int) => a < b ? -1 : a > b ? 1 : 0
 let intOptionCmp = (a, b) => Belt.Option.cmp(a, b, intCmp)
 let stringCmp = (a: string, b: string) => a < b ? -1 : a > b ? 1 : 0
 
@@ -1295,7 +1295,7 @@ let compareTests = [
     ~a=() => {
       let xs = xs->characters
       let ys = ys->characters
-      S.compare(xs, ys, Ex.Cmp.string)
+      S.compare(xs, ys, stringCmp)
     },
     ~b=expected,
   )
@@ -1348,25 +1348,25 @@ let minByMaxByTests = [
   valueEqual(
     ~title="minBy",
     ~expectation="when no items => None",
-    ~a=() => S.empty->S.minBy(Ex.Cmp.int),
+    ~a=() => S.empty->S.minBy(intCmp),
     ~b=None,
   ),
   valueEqual(
     ~title="minBy",
     ~expectation="when items => Some",
-    ~a=() => [6, 7, 8, 3, 1, 3, 5, 8]->S.fromArray->S.minBy(Ex.Cmp.int),
+    ~a=() => [6, 7, 8, 3, 1, 3, 5, 8]->S.fromArray->S.minBy(intCmp),
     ~b=Some(1),
   ),
   valueEqual(
     ~title="maxBy",
     ~expectation="when no items => None",
-    ~a=() => S.empty->S.maxBy(Ex.Cmp.int),
+    ~a=() => S.empty->S.maxBy(intCmp),
     ~b=None,
   ),
   valueEqual(
     ~title="maxBy",
     ~expectation="when items => Some",
-    ~a=() => [6, 7, 8, 3, 1, 3, 5, 7]->S.fromArray->S.maxBy(Ex.Cmp.int),
+    ~a=() => [6, 7, 8, 3, 1, 3, 5, 7]->S.fromArray->S.maxBy(intCmp),
     ~b=Some(8),
   ),
 ]
@@ -1412,10 +1412,10 @@ let exactlyOneTests = makeValueEqualTests(
 let isSortedByTests = makeValueEqualTests(
   ~title="isSortedBy",
   [
-    (() => S.empty->S.isSortedBy(Ex.Cmp.int), true, ""),
-    (() => S.once(3)->S.isSortedBy(Ex.Cmp.int), true, ""),
-    (() => [1, 4, 4, 6, 7, 8, 9, 10]->S.fromArray->S.isSortedBy(Ex.Cmp.int), true, ""),
-    (() => [1, 4, 4, 6, 7, 8, 0, 10]->S.fromArray->S.isSortedBy(Ex.Cmp.int), false, ""),
+    (() => S.empty->S.isSortedBy(intCmp), true, ""),
+    (() => S.once(3)->S.isSortedBy(intCmp), true, ""),
+    (() => [1, 4, 4, 6, 7, 8, 9, 10]->S.fromArray->S.isSortedBy(intCmp), true, ""),
+    (() => [1, 4, 4, 6, 7, 8, 0, 10]->S.fromArray->S.isSortedBy(intCmp), false, ""),
   ],
 )
 

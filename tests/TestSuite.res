@@ -19,7 +19,6 @@ let throwOnFailure = !isLocalDevelopment()
 
 let tests =
   [
-    Extras__CmpTests.tests,
     Extras__OptionTests.tests,
     Extras__ResultTests.allTests,
     Extras__TaskTest.tests,
