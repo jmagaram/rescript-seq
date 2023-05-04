@@ -485,14 +485,14 @@ let forEachi: (t<'a>, ('a, int) => unit) => unit
 /**
 `some(source, predicate)` returns `true` if there exists at least one item where
 the supplied predicate is `true`. Returns `false` for an empty sequence or when
-no item satisfies the predicate. Analogous to `Array.some` in JavaScript.
+no item satisfies the predicate.
 */
 let some: (t<'a>, 'a => bool) => bool
 
 /**
 `every(source, predicate)` returns `true` if the input sequence is empty or the
 supplied predicate is `true` for every item. Analogous to the `for all`
-existential quantifier in mathematics and `Array.every` in JavaScript.
+existential quantifier in mathematics.
 */
 let every: (t<'a>, 'a => bool) => bool
 
