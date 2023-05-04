@@ -53,10 +53,10 @@ let init: (int, int => 'a) => t<'a>
 let replicate: ('a, int) => t<'a>
 
 /**
-`replicateWith(count, f)` is the sequence of length `count` where `f()` is called
+`replicateWith(f, count)` is the sequence of length `count` where `f()` is called
 to generate each item.
 */
-let replicateWith: (int, unit => 'a) => t<'a>
+let replicateWith: (unit => 'a, int) => t<'a>
 
 /**
 `forever(item)` is the sequence of `item` repeated forever.

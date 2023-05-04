@@ -49,7 +49,7 @@ let permutations: (t<'a>, int) => t<(int, t<'a>)>
 let range: (int, int) => t<int>
 let rangeMap: (int, int, int => 'a) => t<'a>
 let replicate: ('a, int) => t<'a>
-let replicateWith: (int, unit => 'a) => t<'a>
+let replicateWith: (unit => 'a, int) => t<'a>
 let unfold: ('a, 'a => option<('b, 'a)>) => t<'b>
 
 // Transform

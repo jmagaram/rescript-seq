@@ -290,7 +290,7 @@ let allPairsTests = makeSeqEqualsTests(
       "",
     ),
     (
-      S.allPairs(S.replicateWith(2, countdown(2)), S.replicateWith(2, countdown(2))),
+      S.allPairs(S.replicateWith(countdown(2), 2), S.replicateWith(countdown(2), 2)),
       [(2, 2), (2, 1), (1, 2), (1, 1)],
       "cached!",
     ),
@@ -782,10 +782,10 @@ let replicateTests = makeSeqEqualsTests(
 let replicateWithTests = makeSeqEqualsTests(
   ~title="replicateWith",
   [
-    (S.replicateWith(0, () => "x"), [], ""),
-    (S.replicateWith(1, () => "x"), ["x"], "x"),
-    (S.replicateWith(2, () => "x"), ["x", "x"], ""),
-    (S.replicateWith(3, () => "x"), ["x", "x", "x"], ""),
+    (S.replicateWith(() => "x", 0), [], ""),
+    (S.replicateWith(() => "x", 1), ["x"], "x"),
+    (S.replicateWith(() => "x", 2), ["x", "x"], ""),
+    (S.replicateWith(() => "x", 3), ["x", "x", "x"], ""),
   ],
 )
 
@@ -2118,7 +2118,7 @@ let (combinationTests, permutationTests) = {
     ),
     valueEqual(
       ~title,
-      ~a=() => S.replicateWith(3, throwIfInvoked)->f(1000)->S.takeAtMost(0)->S.last,
+      ~a=() => S.replicateWith(throwIfInvoked, 3)->f(1000)->S.takeAtMost(0)->S.last,
       ~b=None,
       ~expectation="totally lazy",
     ),
