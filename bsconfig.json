@@ -1,5 +1,5 @@
 {
-  "name": "@jmagaram/rescript-extras",
+  "name": "@jmagaram/rescript-seq",
   "sources": [
     { "dir": "src", "subdirs": true },
     { "dir": "tests", "subdirs": true, "type": "dev" }

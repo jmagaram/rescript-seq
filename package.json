@@ -1,5 +1,5 @@
 {
-  "name": "@jmagaram/rescript-extras",
+  "name": "@jmagaram/rescript-seq",
   "version": "2.0.0",
   "module": "",
   "description": "Useful general-purpose utility functions and modules for ReScript projects.",
