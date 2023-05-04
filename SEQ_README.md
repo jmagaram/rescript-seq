@@ -20,9 +20,21 @@ Highlights:
 
 See code [examples](src/Extras__SeqSamples.res) to get a sense for how `Seq` is used and what is possible.
 
-## Install
+## To install
 
-This is part of the [rescript-extras package](README.md) right now; see install instructions there.
+```sh
+npm install @jmagaram/rescript-seq
+```
+
+Add to your `bsconfig.json`...
+
+```diff
+{
+  ...
++ "bs-dependencies": ["@jmagaram/rescript-seq"]
++ "bsc-flags": ["-open @jmagaram/rescript-seq"],
+}
+```
 
 ## Functions
 
