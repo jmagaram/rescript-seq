@@ -174,7 +174,7 @@ let mapi: (t<'a>, ('a, int) => 'b) => t<'b>
 
 /**
 `indexed` builds a new sequence whose elements are the corresponding items of
-the input sequence paired with the integer index (from 0) of each item.
+the input sequence paired with the zero-based integer index of each item.
 */
 let indexed: t<'a> => t<('a, int)>
 
