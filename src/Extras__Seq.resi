@@ -727,24 +727,6 @@ first sorting the data. Or use `reduce` to convert the data to a dictionary.
 let split: (t<'a>, 'a => 'b, ('b, 'a) => option<'b>) => t<'b>
 
 /**
-`chunkByKey(source, equals, init, accumulator)` divides a sequence of  
-`(key, value)` into non-overlapping groups of adjacent items based on `key`,
-computes (via reduce) a "total" of some kind for each group, and then returns a
-sequence of `(key, total)`.
-
-The first group is created by passing the first `value` in `source` to `init`.
-The `accumulator` is then called with subsequent adjacent items that share the
-same `key`. When the key changes, based on the `equals` function, a new group is
-created with the `init` function.
-
-**Note:** This function lazily operates on adjacent items. It does not summarize
-data across the entire sequence. If you want to summarize all the data, consider
-first sorting the data by key. Or use `reduce` to convert the data to a
-dictionary.
-*/
-let chunkByKey: (t<('k, 'a)>, ('k, 'k) => bool, 'a => 'b, ('b, 'a) => 'b) => t<('k, 'b)>
-
-/**
 `pairAhead(source)` is the sequence of every item in `source` paired with the
 item that follows it.
 */
@@ -761,22 +743,3 @@ let pairBehind: t<'a> => t<(option<'a>, 'a)>
 items that immediately precede and follow it.
 */
 let neighbors: t<'a> => t<(option<'a>, 'a, option<'a>)>
-
-// window
-// arrayChunksBySize
-// arrayChunksByKey
-// chunks
-// groupReduce
-// chunkReduce
-//
-// arrayChunks
-// split
-// splitByKey
-
-// groupAdjacent
-// splitReduce
-
-// IMPORTANT
-// Partition means dividing into TWO groups
-// Splitting is a bit more clear
-// Might want to make a distinction between window and chunk? The chunk is ephemeral though.

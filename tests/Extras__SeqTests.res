@@ -1889,59 +1889,6 @@ let splitTests = {
   ])
 }
 
-let chunkByKeyTests = {
-  let parity = n => mod(n, 2) == 0 ? "e" : "o"
-  let concatSeqByParity = xx =>
-    xx
-    ->S.map(x => (parity(x), x))
-    ->S.chunkByKey((a, b) => a === b, intToString, (sum, i) => `${sum},${i->intToString}`)
-  let concatByParity = xx => xx->S.fromArray->concatSeqByParity
-  makeSeqEqualsTests(
-    ~title="chunkByKey",
-    [
-      ([]->concatByParity, [], ""),
-      ([1]->concatByParity, [("o", "1")], ""),
-      ([1, 1]->concatByParity, [("o", "1,1")], ""),
-      ([1, 2]->concatByParity, [("o", "1"), ("e", "2")], ""),
-      ([1, 2, 2]->concatByParity, [("o", "1"), ("e", "2,2")], ""),
-      ([1, 2, 2, 1]->concatByParity, [("o", "1"), ("e", "2,2"), ("o", "1")], ""),
-      (
-        [1, 2, 2, 2, 3, 3, 2, 1]->concatByParity,
-        [("o", "1"), ("e", "2,2,2"), ("o", "3,3"), ("e", "2"), ("o", "1")],
-        "",
-      ),
-    ],
-  )->Js.Array2.concat([
-    willNotThrow(~title="chunkByKey", ~expectation="lazy", () => [1, 2, 3]->concatByParity),
-    willNotThrow(~title="chunkByKey", ~expectation="accumulator not called if one item", () =>
-      S.chunkByKey(S.once(("key", 1)), (a, b) => a == b, i => i, (_, _) => throwIfInvoked())
-    ),
-    willNotThrow(~title="chunkByKey", ~expectation="equals not called if one item", () =>
-      S.chunkByKey(S.once(("key", 1)), (_, _) => throwIfInvoked(), i => i, (_, i) => i)
-    ),
-    seqEqual(
-      ~title="chunkByKey",
-      ~expectation="equals compares keys",
-      ~a=() =>
-        S.rangeMap(1, 5, i => (i, i))->S.chunkByKey(
-          (i, j) => Js.Math.abs_int(i - j) <= 2,
-          i => i,
-          (sum, i) => sum + i,
-        ),
-      ~b=[(1, 1 + 2 + 3), (4, 4 + 5)],
-    ),
-    valueEqual(
-      ~title="chunkByKey",
-      ~expectation="millions",
-      ~a=() =>
-        S.rangeMap(1, 999_999, i => ("x", i))
-        ->S.chunkByKey((a, b) => a == b, i => i, (_, i) => i)
-        ->S.toArray,
-      ~b=[("x", 999_999)],
-    ),
-  ])
-}
-
 let (combinationTests, permutationTests) = {
   let sortLetters = w =>
     w->String.split("")->Belt.SortArray.stableSortBy(stringCmp)->Js.Array2.joinWith("")
@@ -2237,7 +2184,6 @@ let sampleMultiplicationTableTests = {
 let tests =
   [
     allPairsTests,
-    chunkByKeyTests,
     chunkBySizeTests,
     combinationTests,
     compareTests,

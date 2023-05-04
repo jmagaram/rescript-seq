@@ -10,7 +10,6 @@
   - `Seq.reduceUntil` to short-circuit a reduce operation
   - `Seq.reduceWhile` to short-circuit a reduce operation
   - `Seq.split` to reduce adjacent items
-  - `Seq.chunkByKey` to reduce adjacent (key, value) pairs by key
   - `Seq.sumBy` (like `Seq.reduce` but no initial parameter)
   - `Seq.prefixSum` (like `scan` but does not take an initial parameter)
   - `Seq.toList`

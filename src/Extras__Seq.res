@@ -966,13 +966,3 @@ let chunkBySize = (xx, length) => {
       },
   )
 }
-
-let chunkByKey = (xx, equals, init, accumulator) => {
-  let init = ((k, v)) => (k, init(v))
-  let acc = ((kSum, sum), (kItem, i)) =>
-    switch equals(kSum, kItem) {
-    | true => Some((kSum, accumulator(sum, i)))
-    | false => None
-    }
-  split(xx, init, acc)
-}
