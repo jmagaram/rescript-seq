@@ -40,6 +40,8 @@ of everything that came before.
 @inline
 let nextNode = (xx: t<'a>) => xx(.)
 
+let intToString = Belt.Int.toString
+
 let uncons = xx =>
   switch xx->nextNode {
   | End => None
@@ -179,7 +181,9 @@ let fromArray = (~start=?, ~end=?, xx: array<'a>) => {
     start
     ->Option.orElse(end)
     ->Option.forEach(_ =>
-      InvalidArgument("The array is empty but you provided start and/or end indexes.")->raise
+      InvalidArgument(
+        "'fromArray' was invoked with am empty array, but you provided start and/or end indexes.",
+      )->raise
     )
     empty
   | false => {
@@ -187,14 +191,10 @@ let fromArray = (~start=?, ~end=?, xx: array<'a>) => {
       let start = start->Option.getWithDefault(0)
       let end = end->Option.getWithDefault(len - 1)
       if start < 0 || start > len - 1 {
-        InvalidArgument(
-          `The start index ${start->Belt.Int.toString} is outside the array bounds.`,
-        )->raise
+        InvalidArgument(`The start index ${start->intToString} is outside the array bounds.`)->raise
       }
       if end < 0 || end > len - 1 {
-        InvalidArgument(
-          `The end index ${start->Belt.Int.toString} is outside the array bounds.`,
-        )->raise
+        InvalidArgument(`The end index ${start->intToString} is outside the array bounds.`)->raise
       }
       range(start, end)->map(inx => xx->Array.unsafe_get(inx))
     }
@@ -217,10 +217,10 @@ let fromOption = opt =>
 
 let mapi = (xx, f) => xx->indexed->map(((x, inx)) => f(x, inx))
 
-let takeAtMost = (xx, count) => {
+let take = (xx, count) => {
   if count < 0 {
     InvalidArgument(
-      `takeAtMost requires a count of 0 or more. You requested ${count->Belt.Int.toString}`,
+      `'take' requires a count of 0 or more. You requested ${count->intToString}`,
     )->raise
   }
   let rec go = (xx, count) =>
@@ -238,24 +238,24 @@ let takeAtMost = (xx, count) => {
 
 let headTails = xx => unfold(xx, xx => xx->uncons->Option.flatMap(((_, xx) as ht) => Some(ht, xx)))
 
-let rec dropAtMostEager = (xx, count) =>
+let rec dropEager = (xx, count) =>
   switch count {
   | 0 => xx
   | count =>
     switch xx->uncons {
     | None => empty
-    | Some(_, xx) => dropAtMostEager(xx, count - 1)
+    | Some(_, xx) => dropEager(xx, count - 1)
     }
   }
 
-let dropAtMost = (xx, count) =>
+let drop = (xx, count) =>
   switch count {
   | 0 => xx
   | count if count < 0 =>
     InvalidArgument(
-      `'dropAtMost' requires a count of zero or more but you asked for ${count->Belt.Int.toString}`,
+      `'drop' requires a count of zero or more but you asked for ${count->intToString}`,
     )->raise
-  | count => delay(() => dropAtMostEager(xx, count))
+  | count => delay(() => dropEager(xx, count))
   }
 
 let rec filter = (xx, f) =>
@@ -441,9 +441,7 @@ let dropWhile = (xx, f) =>
 
 let window = (xx, length) => {
   if length <= 0 {
-    InvalidArgument(
-      `window requires a length > 0. You asked for ${length->Belt.Int.toString}`,
-    )->raise
+    InvalidArgument(`'window' requires a length > 0. You asked for ${length->intToString}`)->raise
   }
   xx
   ->scan([], (sum, val) => {
@@ -744,7 +742,7 @@ let dropLast = (xx, n) => {
   | 0 => xx
   | n if n < 0 =>
     InvalidArgument(
-      `dropLast requires a count of 0 or more. You requested ${n->Belt.Int.toString}`,
+      `dropLast requires a count of 0 or more. You requested ${n->intToString}`,
     )->raise
   | n =>
     (. ()) =>
@@ -815,7 +813,7 @@ abcd with maxSize 1 => a b c d
 let windowsCore = (xx, maxSize) => {
   if maxSize < 1 {
     InvalidArgument(
-      `slidingWindows expects a maxSize of 1 or more but you asked for ${maxSize->Belt.Int.toString}`,
+      `slidingWindows expects a maxSize of 1 or more but you asked for ${maxSize->intToString}`,
     )->raise
   }
   unfold(([], Some(xx)), ((w, xx)) => {
@@ -860,7 +858,7 @@ let windowBehind = (xx, size) => {
     sum->Array.push(i)->ignore
     sum
   })
-  ->dropAtMost(1)
+  ->drop(1)
 }
 
 /**
@@ -973,7 +971,7 @@ let distribute = (xx, item) => {
 let (combinations, permutations) = {
   let helper = (xx, maxSize, f) => {
     if maxSize <= 0 {
-      InvalidArgument(`Size must be 1 or more. You asked for ${maxSize->Belt.Int.toString}.`)->raise
+      InvalidArgument(`Size must be 1 or more. You asked for ${maxSize->intToString}.`)->raise
     }
     unfold((empty, xx), ((sum, xx)) =>
       switch xx->uncons {
@@ -1026,7 +1024,7 @@ let chunkBy = (xx, init, acc) => {
 let chunkBySize = (xx, length) => {
   if length <= 0 {
     InvalidArgument(
-      `chunkBySize requires a length > 0. You asked for ${length->Belt.Int.toString}`,
+      `chunkBySize requires a length > 0. You asked for ${length->intToString}`,
     )->raise
   }
   xx->chunkBy(

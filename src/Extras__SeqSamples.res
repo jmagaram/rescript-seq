@@ -27,11 +27,11 @@ only time work is done is with the final `forEach`.
 */
 let nums =
   Seq.range(1, 999_999)
-  ->Seq.dropAtMost(33)
+  ->Seq.drop(33)
   ->Seq.map(n => mod(n * 3, 7))
   ->Seq.pairwise
   ->Seq.filterMap(((a, b)) => a < b ? Some(a + b) : None)
-  ->Seq.takeAtMost(623)
+  ->Seq.take(623)
   ->Seq.tap(n => {
     if n == 100 {
       Js.log(`Saw 100; interesting!`)
@@ -96,7 +96,7 @@ Calculate the fibonacci sequence.
 let fibonacci = count =>
   Seq.unfold((0, 1), ((a, b)) => a + b <= 100 ? Some(a + b, (b, a + b)) : None)
   ->Seq.prepend([0, 1]->Seq.fromArray)
-  ->Seq.takeAtMost(count)
+  ->Seq.take(count)
   ->Seq.toArray
 
 /**

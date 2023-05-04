@@ -221,10 +221,10 @@ items are discarded.
 let filterOk: t<result<'a, 'b>> => t<'a>
 
 /**
-`takeAtMost(source, count)` is the sequence of the first `count` items of
-`source`, or fewer if `source` ends sooner. Remaining items are discarded.
+`take(source, count)` is the sequence of the first `count` items of `source`, or
+fewer if `source` ends sooner. Remaining items are discarded.
 */
-let takeAtMost: (t<'a>, int) => t<'a>
+let take: (t<'a>, int) => t<'a>
 
 /**
 `takeWhile(source, predicate)` is the sequence that includes all items from the
@@ -241,11 +241,11 @@ beginning of `source` up to **and including** the first item where `predicate` i
 let takeUntil: (t<'a>, 'a => bool) => t<'a>
 
 /**
-`dropAtMost(source, count)` is the sequence that begins after the first `count`
+`drop(source, count)` is the sequence that begins after the first `count`
 items are discarded from `source`. If the sequence has less than or equal to
 `count` items, the remaining sequence is empty. 
 */
-let dropAtMost: (t<'a>, int) => t<'a>
+let drop: (t<'a>, int) => t<'a>
 
 /**
 `dropWhile(source, predicate)` is the sequence that skips items from the

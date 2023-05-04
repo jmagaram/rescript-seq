@@ -3,7 +3,7 @@
 - Fixed
   - `Seq.filterMap` didn't work with nested options
   - `Seq.tail` was not completely lazy
-  - `Seq.dropAtMost` was not completely lazy
+  - `Seq.drop` was not completely lazy
   - `Seq.findMap` didn't work with nested options
   - `Seq.windowAhead` would hang if window size was enormous
   - `Seq.replicate` and `Seq.replicateWith` argument order was not data-first
@@ -22,6 +22,7 @@
 - Rename
   - `repeat` to `replicate`; more like other Seq libraries
   - `InvalidArgument` exception not `ArgumentOfOfRange` (spelled wrong)
+  - `Seq.takeAtMost` to `Seq.take`
   - `Seq.every` not `Seq.everyOrEmpty`; less cumbersome and more like array
   - `Seq.everyOk` not `Seq.allSome` (using `every` not `forAll`)
   - `Seq.everySome` not `Seq.allSome` (using `every` not `forAll`)
@@ -43,7 +44,7 @@
 
 ## Version 1.1.1
 
-- Fix bug in `Seq.takeAtMost` where generator function was called 1 too many times; not lazy enough
+- Fix bug in `Seq.take` where generator function was called 1 too many times; not lazy enough
 - `Seq.combinations`
 - `Seq.permutations`
 

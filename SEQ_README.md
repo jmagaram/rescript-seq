@@ -58,7 +58,7 @@ let cache: t<'a> => t<'a>
 let chunkBy: (t<'a>, 'a => 'b, ('b, 'a) => option<'b>) => t<'b>
 let chunkBySize: (t<'a>, int) => t<array<'a>>
 let chunkByKey: (t<('k, 'a)>, ('k, 'k) => bool, 'a => 'b, ('b, 'a) => 'b) => t<('k, 'b)>
-let dropAtMost: (t<'a>, int) => t<'a>
+let drop: (t<'a>, int) => t<'a>
 let dropUntil: (t<'a>, 'a => bool) => t<'a>
 let dropWhile: (t<'a>, 'a => bool) => t<'a>
 let filter: (t<'a>, 'a => bool) => t<'a>
@@ -81,7 +81,7 @@ let scan: (t<'a>, 'b, ('b, 'a) => 'b) => t<'b>
 let sortBy: (t<'a>, ('a, 'a) => int) => t<'a>
 let tail: t<'a> => t<'a>
 let tails: t<'a> => t<t<'a>>
-let takeAtMost: (t<'a>, int) => t<'a>
+let take: (t<'a>, int) => t<'a>
 let takeUntil: (t<'a>, 'a => bool) => t<'a>
 let takeWhile: (t<'a>, 'a => bool) => t<'a>
 let tap: (t<'a>, 'a => unit) => t<'a>
