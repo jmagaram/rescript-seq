@@ -21,8 +21,6 @@ Other sequence/iterable packages:
 
 ## To do
 
-- Move Seq into a separate project?
-
 ## Miscellaneous notes
 
 ### Terminology for `concat`
