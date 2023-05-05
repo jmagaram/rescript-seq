@@ -1,24 +1,22 @@
 # Lazy Sequences for ReScript
 
-A _sequence_ is a list whose elements are computed only on demand, similar to [JavaScript iterables](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols). Sequences are produced and transformed lazily (one element at a time) rather than eagerly (all at once). This allows constructing conceptually infinite sequences. When your data is an `array`, calling `fromArray` creates a sequence, which is nothing more than a lightweight function that iterates over its values. And then you can use the sequence functions to analyze and transform it with far more flexibility and power than what is possible using the built-in array functions. Sequences can sometimes provide better performance than an `array` when not all elements are used.
+A _sequence_ is a list whose elements are computed only on demand, similar to [JavaScript iterables](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols). Sequences are produced and transformed lazily (one element at a time) rather than eagerly (all at once). This allows constructing conceptually infinite sequences. When your data is an `array`, call `fromArray` to create a sequence, which is just a lightweight function that iterates over its values. And then you can use the sequence functions to analyze and transform it with far more flexibility and power than what is possible with the built-in array functions. Sequences can sometimes provide better performance than an `array` when not all elements are used.
 
-Sequences are an important part of **standard libraries** of [F#](https://fsharp.github.io/fsharp-core-docs/reference/fsharp-collections-seqmodule.html), [OCaml](https://v2.ocaml.org/api/Seq.html), [Rust](https://doc.rust-lang.org/std/iter/trait.Iterator.html), [.net](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1?view=net-8.0), [Haskell](https://hackage.haskell.org/package/base-4.18.0.0/docs/Data-List.html), and [Python](https://docs.python.org/3/library/itertools.html). There are [JavaScript libraries](https://www.npmjs.com/package/itertools) to consume iterables, and a [Stage 3 TC39 proposal](https://github.com/tc39/proposal-iterator-helpers) to add iterator helpers.
+Sequences are in the **standard libraries** of [F#](https://fsharp.github.io/fsharp-core-docs/reference/fsharp-collections-seqmodule.html), [OCaml](https://v2.ocaml.org/api/Seq.html), [Rust](https://doc.rust-lang.org/std/iter/trait.Iterator.html), [.net](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1?view=net-8.0), [Haskell](https://hackage.haskell.org/package/base-4.18.0.0/docs/Data-List.html), and [Python](https://docs.python.org/3/library/itertools.html). There are [JavaScript libraries](https://www.npmjs.com/package/itertools) to consume iterables, and a [Stage 3 TC39 proposal](https://github.com/tc39/proposal-iterator-helpers) to add iterator helpers.
 
-**This is a full-featured library to create and consume sequences in ReScript.**
-
-Highlights:
+**This is a full-featured package to create and consume sequences in ReScript.** Highlights:
 
 - Enables more elegant and concise solutions than using imperative code and arrays
-- Full [suite of > 100 functions](#functions), chosen by researching the best from other libraries
+- [Suite of > 100 functions](#functions), chosen by researching the best from other libraries
 - API documentation
 - Comprehensive test suite
 - Written 100% in ReScript; you can look at the code to see how it works.
-- **Create sequences** using `fromArray`, `range`, `unfold`, `cycle`, `permutations`, `replicate` and others. This enables functionality similar to [JavaScript generators](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Generator).
-- **Transform** sequences with `map`, `filter`, `split`, `takeUntil`, `scan`, `tap`, `pairwise`...
-- **Combine** sequences with `zip`, `map3`, `allPairs`, `sortedMerge`, `interleave`...
-- **Calculate** values with `reduce`, `maxBy`, `every`, `findMap`, `isSortedBy`, `toArray`...
+- **Create sequences** with `fromArray`, `range`, `unfold`, `cycle`, `permutations`, `replicate`, ...
+- **Transform** with `map`, `filter`, `split`, `takeUntil`, `scan`, `tap`, `pairwise`...
+- **Combine** with `zip`, `map3`, `allPairs`, `sortedMerge`, `interleave`...
+- **Calculate** with `reduceUntil`, `maxBy`, `every`, `findMap`, `isSortedBy`, `toArray`...
 
-See code [examples](src/Seq__SeqSamples.res) to get a sense for how `Seq` is used.
+See [code examples](src/Seq__SeqSamples.res).
 
 ## To install
 
@@ -50,7 +48,7 @@ All functions are in the `Seq` module. See other [examples](src/Seq__SeqSamples.
 ## Functions
 
 ```rescript
-type t<'a> // A lazy sequence of `'a`
+type t<'a> // A lazy sequence of 'a
 
 // Construct
 
