@@ -2163,6 +2163,19 @@ let sampleMultiplicationTableTests = {
   )
 }
 
+let sampleRemoveDups = {
+  let f = Seq__SeqSamples.removeDups
+  makeSeqEqualsTests(
+    ~title="sampleRemoveDups",
+    [
+      ([1, 2, 2, 3, 3, 3]->f, [1, 2, 3], ""),
+      ([1]->f, [1], ""),
+      ([]->f, [], ""),
+      ([1, 1, 2, 2, 2, 3, 3, 3, 3]->f, [1, 2, 3], ""),
+    ],
+  )
+}
+
 let tests =
   [
     allPairsTests,
@@ -2239,6 +2252,7 @@ let tests =
     sampleFibonacci,
     sampleLocalMinimums,
     sampleMultiplicationTableTests,
+    sampleRemoveDups,
     sampleRunningTotal,
     sampleZipLongest,
     scanTests,

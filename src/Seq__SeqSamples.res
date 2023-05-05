@@ -32,7 +32,7 @@ let nums =
   ->Seq.pairwise
   ->Seq.dropLast(2)
   ->Seq.filterMap(((a, b)) => a < b ? Some(a + b) : None)
-  ->Seq.take(623)
+  ->Seq.takeUntil(i => i > 200)
   ->Seq.tap(n => {
     if n == 100 {
       Js.log(`Saw 100; interesting!`)
@@ -43,9 +43,41 @@ let nums =
   ->Seq.forEach(Js.log)
 
 /**
-Given an array of sales, compute the sale count and total revenue per employee.
-The `split` function permits grouping adjacent items by any criteria, and then
-reducing all the items within each group.
+`scan` is similar to `reduce` but returns intermediate results. This computes a
+running total. For example, the running total of [1, 2, 3, 4] is
+[0, 1, 3, 6, 10] 
+*/
+let runningTotal = nums => nums->Seq.fromArray->Seq.scan(0, (sum, i) => sum + i)
+
+/**
+The `split` function allows you to group adjacent items however you want, and
+then reduce each group however you want. This counts adjacent evens and odds. 
+*/
+let parity = n => mod(n, 2) == 0 ? "even" : "odd"
+
+let evensAndOdds = nums =>
+  nums->Seq.split(
+    i => {"parity": parity(i), "count": 1},
+    (sum, i) =>
+      switch parity(i) == sum["parity"] {
+      | true => Some({"parity": sum["parity"], "count": sum["count"] + 1})
+      | false => None // parity different so start a new group
+      },
+  )
+
+/**
+`pairBehind` groups items into adjacent pairs. This removes sequential duplicates.
+*/
+let removeDups = xx =>
+  xx
+  ->Seq.fromArray
+  ->Seq.pairBehind
+  ->Seq.filter(((a, b)) => a->Option.mapWithDefault(true, a => a != b))
+  ->Seq.map(((_, b)) => b)
+
+/**
+A fancier usage of `split`. Here it takes an array of sales, and computes the
+sale count and total revenue per employee.
 */
 type summary = {empId: string, sales: int, revenue: int}
 
@@ -90,16 +122,15 @@ let validate = (docs, isValidEmail) =>
   }
 
 /**
-Calculate the binary digits in a number.
+`unfold` creates a new sequence from a seed value, like the opposite of
+`reduce`. Here it calculates all the binary digits of a number and the following
+one makes the fibonacci.
 */
 let binary = n =>
   Seq.unfold(n, value => value > 0 ? Some(mod(value, 2), value / 2) : None)
   ->Seq.toArray
   ->Js.Array2.reverseInPlace
 
-/**
-Calculate the fibonacci sequence.
-*/
 let fibonacci = count =>
   Seq.unfold((0, 1), ((a, b)) => a + b <= 100 ? Some(a + b, (b, a + b)) : None)
   ->Seq.prepend([0, 1]->Seq.fromArray)
@@ -108,7 +139,7 @@ let fibonacci = count =>
 
 /**
 There is a `zip` function that combines corresponding items from two sequences.
-It stops when either input sequences ends. But what if we want a zipLongest? 
+It stops when either input sequences ends. Here is a `zipLongest`. 
 */
 let zipLongest = (xx, yy) => {
   let optionForever = ss => ss->Seq.map(x => Some(x))->Seq.concat(None->Seq.forever)
@@ -118,7 +149,8 @@ let zipLongest = (xx, yy) => {
 }
 
 /**
-Calculates the local minimum points in an array, converts each to a string, and
+The `window` function shows sliding overlapping windows of your data. This
+calculates the local minimum points in an array, converts each to a string, and
 concatenates them with a comma between each.
 */
 module Point = {
@@ -140,14 +172,8 @@ let localMinimums = points =>
   ->Option.getWithDefault("There are no local minimums.")
 
 /**
-Computes the running total of integers in an array. `scan` is conceptually
-similar to `reduce` but returns intermediate results. For example, the running
-total of [1, 2, 3, 4] is [0, 1, 3, 6, 10] 
-*/
-let runningTotal = nums => nums->Seq.fromArray->Seq.scan(0, (sum, i) => sum + i)
-
-/**
-Create a 2d array and fills it with the multiplication table. 
+It is super easy to initialize arrays. This creates a 2d array and fills it with
+the multiplication table. 
 */
 let multiplicationTable = {
   open Seq
