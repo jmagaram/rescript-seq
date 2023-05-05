@@ -7,7 +7,7 @@ Sequences are in the **standard libraries** of [F#](https://fsharp.github.io/fsh
 **This is a full-featured package to create and consume sequences in ReScript.** Highlights:
 
 - Enables more elegant and concise solutions than using imperative code and arrays
-- [Suite of > 100 functions](#functions), chosen by researching the best from other libraries
+- [100+ functions](#functions), chosen by researching the best from other libraries
 - API documentation
 - Comprehensive test suite
 - Written 100% in ReScript; you can look at the code to see how it works.
