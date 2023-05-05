@@ -4,7 +4,10 @@
   "module": "",
   "description": "Lazy sequences for ReScript.",
   "keywords": [
-    "rescript"
+    "rescript",
+    "sequences",
+    "iterables",
+    "Seq"
   ],
   "main": "index.js",
   "scripts": {
