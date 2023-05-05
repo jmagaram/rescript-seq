@@ -32,8 +32,19 @@ Add to your `bsconfig.json`...
 {
   ...
 + "bs-dependencies": ["@jmagaram/rescript-seq"]
-+ "bsc-flags": ["-open @jmagaram/rescript-seq"],
++ "bsc-flags": ["-open Seq"],
 }
+```
+
+All functions are in the `Seq` module. See [examples](src/Seq__SeqSamples.res).
+
+```rescript
+  ["a", "b", "c", "d"]
+  ->Seq.fromArray
+  ->Seq.combinations(4)
+  ->Seq.map(((_, combo)) => combo->Seq.join(""))
+  ->Seq.join(", ")
+  ->Js.log
 ```
 
 ## Functions
