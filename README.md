@@ -10,7 +10,7 @@ Sequences are in the **standard libraries** of [F#](https://fsharp.github.io/fsh
 - [100+ functions](#functions), chosen by researching the best from other libraries
 - API documentation
 - Comprehensive test suite
-- Written 100% in ReScript; you can look at the code to see how it works.
+- Written 100% in ReScript; look at the code and tests to see how it works.
 - **Create sequences** with `fromArray`, `range`, `unfold`, `cycle`, `permutations`, `replicate`, ...
 - **Transform** with `map`, `filter`, `split`, `takeUntil`, `scan`, `tap`, `pairwise`...
 - **Combine** with `zip`, `map3`, `allPairs`, `sortedMerge`, `interleave`...
@@ -39,7 +39,7 @@ All functions are in the `Seq` module. See other [examples](src/Seq__SeqSamples.
 ```rescript
   ["a", "b", "c", "d"]
   ->Seq.fromArray
-  ->Seq.combinations(4)
+  ->Seq.combinations(4) // max length
   ->Seq.map(((_, combo)) => combo->Seq.join(""))
   ->Seq.join(", ")
   ->Js.log
