@@ -39,10 +39,10 @@ All functions are in the `Seq` module. See other [examples](src/Seq__SeqSamples.
 ```rescript
   ["a", "b", "c", "d"]
   ->Seq.fromArray
-  ->Seq.combinations(4) // max length of each
+  ->Seq.combinations(3)
   ->Seq.map(((_, combo)) => combo->Seq.join(""))
   ->Seq.join(", ")
-  ->Js.log
+  ->Js.log // a, b, ba, c, ca, cb, cba, d, da, db, dba, dc, dca, dcb
 ```
 
 ## Functions
