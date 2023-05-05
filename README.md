@@ -18,7 +18,7 @@ Highlights:
 - **Combine** sequences with `zip`, `map3`, `allPairs`, `sortedMerge`, `interleave`...
 - **Calculate** values with `reduce`, `maxBy`, `every`, `findMap`, `isSortedBy`, `toArray`...
 
-See code [examples](src/Seq__SeqSamples.res) to get a sense for how `Seq` is used and what is possible.
+See code [examples](src/Seq__SeqSamples.res) to get a sense for how `Seq` is used.
 
 ## To install
 
@@ -36,7 +36,7 @@ Add to your `bsconfig.json`...
 }
 ```
 
-All functions are in the `Seq` module. See [examples](src/Seq__SeqSamples.res).
+All functions are in the `Seq` module. See other [examples](src/Seq__SeqSamples.res).
 
 ```rescript
   ["a", "b", "c", "d"]
