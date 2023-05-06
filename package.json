@@ -31,5 +31,10 @@
   ],
   "devDependencies": {
     "nodemon": "^2.0.22"
+  },
+  "homepage": "https://github.com/jmagaram/rescript-seq#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jmagaram/rescript-seq.git"
   }
 }
