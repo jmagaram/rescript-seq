@@ -1,4 +1,3 @@
-module Seq = Seq__Seq
 module Option = Belt.Option
 let intToString = Belt.Int.toString
 

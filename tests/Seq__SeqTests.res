@@ -1,5 +1,5 @@
 module T = Seq__Test
-module S = Seq__Seq
+module S = Seq
 module R = Seq__Result
 module Q = Seq
 module Option = Belt.Option
