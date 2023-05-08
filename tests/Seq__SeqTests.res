@@ -1,7 +1,6 @@
 module T = Seq__Test
 module S = Seq
 module R = Seq__Result
-module Q = Seq
 module Option = Belt.Option
 module Result = Belt.Result
 module String = Js.String2
