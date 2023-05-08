@@ -30,7 +30,7 @@ Add to your `bsconfig.json`...
 {
   ...
 + "bs-dependencies": ["@jmagaram/rescript-seq"]
-+ "bsc-flags": ["-open RescriptSeq"],
++ "bsc-flags": ["-open RescriptSeq2"],
 }
 ```
 
