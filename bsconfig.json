@@ -1,6 +1,5 @@
 {
   "name": "@jmagaram/rescript-seq",
-  "namespace": "RescriptSeq",
   "sources": [
     { "dir": "src", "subdirs": true },
     { "dir": "tests", "subdirs": true, "type": "dev" }
