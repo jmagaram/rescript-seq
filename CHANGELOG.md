@@ -1,3 +1,9 @@
+## Version 4.0.0
+
+- Upgrade to V11 compiler
+- Still using curried mode
+- Not using @rescript/core yet
+
 ## Version 2.0.0
 
 - Fixed
