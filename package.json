@@ -24,7 +24,7 @@
     "rescript": "^11.0.1"
   },
   "files": [
-    "bsconfig.json",
+    "rescript.json",
     "src/**/*.res",
     "src/**/*.resi",
     "src/**/*.gen.tsx"
