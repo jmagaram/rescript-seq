@@ -12,7 +12,7 @@ let isLocalDevelopment = () => {
 }
 
 let onlyShowFailures = false
-let filter = test => [""]->Array.every(word => test->Test.hasKeyword(word))
+let filter = test => []->Array.every(word => test->Test.hasKeyword(word))
 let throwOnFailure = !isLocalDevelopment()
 
 let tests =
