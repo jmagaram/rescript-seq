@@ -888,7 +888,7 @@ let (combinations, permutations) = {
   (combinations, permutations)
 }
 
-let toList = xx => xx->reverse->reduce(list{}, (list, f) => List.add(list, f))
+let toList = xx => xx->reverse->reduce(list{}, List.add)
 
 let split = (xx, init, acc) => {
   let rec unfolder = state =>
