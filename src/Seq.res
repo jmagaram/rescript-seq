@@ -16,20 +16,23 @@ performant code for sequences that wrap arrays. Note that the `unfold` function
 is nearly identical to this implementation, so not much flexibility is lost by
 hiding the implementation.
 */
-type rec t<'a> = (. unit) => node<'a>
+type rec t<'a> = unit => node<'a>
 and node<'a> =
   | End
   | Next('a, t<'a>)
 
-let delay = generator => (. ()) => generator()(.)
+let delay = (generator: unit => t<'a>) => {
+  let delayedGenerator: t<'a> = () => generator()()
+  delayedGenerator
+}
 
-let empty = (. ()) => End
+let empty = () => End
 
-let once = x => (. ()) => Next(x, empty)
+let once = x => () => Next(x, empty)
 
-let onceWith = f => (. ()) => Next(f(), empty)
+let onceWith = f => () => Next(f(), empty)
 
-let cons = (x, xx) => (. ()) => Next(x, xx)
+let cons = (x, xx) => () => Next(x, xx)
 
 /**
 Internal helper function to generate the next node in a sequence. It is
@@ -38,7 +41,7 @@ end it latches on to the very last item in the sequence rather than the result
 of everything that came before.
 */
 @inline
-let next = (xx: t<'a>) => xx(.)
+let next = (xx: t<'a>) => xx()
 
 let intToString = Belt.Int.toString
 
@@ -74,39 +77,35 @@ let findLast = (xx, f) => {
   go(xx, None)
 }
 
-let rec concat = (xx, yy) =>
-  (. ()) => {
-    switch xx->next {
-    | End => yy->next
-    | Next(x, xx) => Next(x, concat(xx, yy))
-    }
+let rec concat = (xx, yy) => () => {
+  switch xx->next {
+  | End => yy->next
+  | Next(x, xx) => Next(x, concat(xx, yy))
   }
+}
 
 let append = concat
 
 @inline let prepend = (xx, yy) => concat(yy, xx)
 
-let rec flatMap = (xx, f) =>
-  (. ()) =>
-    switch xx->next {
-    | End => End
-    | Next(x, xx) => concat(f(x), flatMap(xx, f))(.)
-    }
-
-let rec flatten = xxx =>
-  (. ()) =>
-    switch xxx->next {
-    | End => End
-    | Next(xx, xxx) => concat(xx, flatten(xxx))->next
-    }
-
-let rec map = (xx, f) =>
-  (. ()) => {
-    switch xx->next {
-    | End => End
-    | Next(x, xx) => Next(f(x), map(xx, f))
-    }
+let rec flatMap = (xx, f) => () =>
+  switch xx->next {
+  | End => End
+  | Next(x, xx) => concat(f(x), flatMap(xx, f))()
   }
+
+let rec flatten = xxx => () =>
+  switch xxx->next {
+  | End => End
+  | Next(xx, xxx) => concat(xx, flatten(xxx))->next
+  }
+
+let rec map = (xx, f) => () => {
+  switch xx->next {
+  | End => End
+  | Next(x, xx) => Next(f(x), map(xx, f))
+  }
+}
 
 let head = xx =>
   switch xx->next {
@@ -115,12 +114,11 @@ let head = xx =>
   }
 
 let indexed = xx => {
-  let rec go = (xx, index) =>
-    (. ()) =>
-      switch xx->next {
-      | End => End
-      | Next(x, xx) => Next((x, index), go(xx, index + 1))
-      }
+  let rec go = (xx, index) => () =>
+    switch xx->next {
+    | End => End
+    | Next(x, xx) => Next((x, index), go(xx, index + 1))
+    }
   go(xx, 0)
 }
 
@@ -135,12 +133,11 @@ let rec forEach = (xx, f) =>
 
 let forEachi = (xx, f) => xx->indexed->forEach(((x, inx)) => f(x, inx))
 
-let rec unfold = (seed, f) =>
-  (. ()) =>
-    switch f(seed) {
-    | None => End
-    | Some(x, seed) => Next(x, unfold(seed, f))
-    }
+let rec unfold = (seed, f) => () =>
+  switch f(seed) {
+  | None => End
+  | Some(x, seed) => Next(x, unfold(seed, f))
+  }
 
 let init = (count, f) => unfold(0, i => i < count ? Some(f(i), i + 1) : None)
 
@@ -148,9 +145,9 @@ let replicate = (value, count) => unfold(0, i => i < count ? Some(value, i + 1) 
 
 let replicateWith = (value, count) => unfold(1, i => i <= count ? Some(value(), i + 1) : None)
 
-let rec forever = value => (. ()) => Next(value, forever(value))
+let rec forever = value => () => Next(value, forever(value))
 
-let rec foreverWith = f => (. ()) => Next(f(), foreverWith(f))
+let rec foreverWith = f => () => Next(f(), foreverWith(f))
 
 let iterate = (seed, f) => unfold(seed, i => Some(i, f(i)))
 
@@ -162,24 +159,22 @@ let range = (start, end) => {
 
 let rangeMap = (start, end, f) => range(start, end)->map(f)
 
-let rec tap = (xx, f) =>
-  (. ()) =>
-    switch xx->next {
-    | End => End
-    | Next(x, xx) => {
-        f(x)
-        Next(x, tap(xx, f))
-      }
+let rec tap = (xx, f) => () =>
+  switch xx->next {
+  | End => End
+  | Next(x, xx) => {
+      f(x)
+      Next(x, tap(xx, f))
     }
+  }
 
-let rec cycleNonEmpty = xx => (. ()) => concat(xx, cycleNonEmpty(xx))->next
+let rec cycleNonEmpty = xx => () => concat(xx, cycleNonEmpty(xx))->next
 
-let cycle = xx =>
-  (. ()) =>
-    switch xx->uncons {
-    | None => End
-    | Some(x, xx') => cons(x, xx')->concat(cycleNonEmpty(xx))->next
-    }
+let cycle = xx => () =>
+  switch xx->uncons {
+  | None => End
+  | Some(x, xx') => cons(x, xx')->concat(cycleNonEmpty(xx))->next
+  }
 
 let fromArray = (~start=?, ~end=?, xx: array<'a>) => {
   switch xx->Array.length == 0 {
@@ -208,7 +203,7 @@ let fromArray = (~start=?, ~end=?, xx: array<'a>) => {
 }
 
 let rec fromList = xx => {
-  (. ()) =>
+  () =>
     switch xx {
     | list{} => End
     | list{x, ...xx} => Next(x, fromList(xx))
@@ -223,16 +218,15 @@ let take = (xx, count) => {
       `'take' requires a count of 0 or more. You requested ${count->intToString}`,
     )->raise
   }
-  let rec go = (xx, count) =>
-    (. ()) =>
-      switch count {
-      | 0 => End
-      | count =>
-        switch xx->next {
-        | End => End
-        | Next(x, xx) => Next(x, go(xx, count - 1))
-        }
+  let rec go = (xx, count) => () =>
+    switch count {
+    | 0 => End
+    | count =>
+      switch xx->next {
+      | End => End
+      | Next(x, xx) => Next(x, go(xx, count - 1))
       }
+    }
   go(xx, count)
 }
 
@@ -258,47 +252,44 @@ let drop = (xx, count) =>
   | count => delay(() => dropEager(xx, count))
   }
 
-let rec filter = (xx, f) =>
-  (. ()) => {
-    switch xx->next {
-    | End => End
-    | Next(x, xx) =>
-      switch f(x) {
-      | true => Next(x, filter(xx, f))
-      | false =>
-        switch xx->headTails->find(((x, _)) => f(x)) {
-        | None => End
-        | Some((x, xx)) => Next(x, filter(xx, f))
-        }
+let rec filter = (xx, f) => () => {
+  switch xx->next {
+  | End => End
+  | Next(x, xx) =>
+    switch f(x) {
+    | true => Next(x, filter(xx, f))
+    | false =>
+      switch xx->headTails->find(((x, _)) => f(x)) {
+      | None => End
+      | Some((x, xx)) => Next(x, filter(xx, f))
       }
     }
   }
+}
 
 let filteri = (xx, f) => xx->indexed->filter(((x, inx)) => f(x, inx))->map(((v, _)) => v)
 
-let rec takeWhile = (xx, f) =>
-  (. ()) => {
-    switch xx->next {
-    | End => End
-    | Next(x, xx) =>
-      switch f(x) {
-      | true => Next(x, takeWhile(xx, f))
-      | false => End
-      }
+let rec takeWhile = (xx, f) => () => {
+  switch xx->next {
+  | End => End
+  | Next(x, xx) =>
+    switch f(x) {
+    | true => Next(x, takeWhile(xx, f))
+    | false => End
     }
   }
+}
 
-let rec takeUntil = (xx, f) =>
-  (. ()) => {
-    switch xx->next {
-    | End => End
-    | Next(x, xx) =>
-      switch f(x) {
-      | true => Next(x, empty)
-      | false => Next(x, takeUntil(xx, f))
-      }
+let rec takeUntil = (xx, f) => () => {
+  switch xx->next {
+  | End => End
+  | Next(x, xx) =>
+    switch f(x) {
+    | true => Next(x, empty)
+    | false => Next(x, takeUntil(xx, f))
     }
   }
+}
 
 let filterMapi = (xx, f) => {
   let rec go = xx =>
@@ -348,21 +339,20 @@ let filterOk = xx =>
   )
 
 let scan = (xx, zero, f) => {
-  let rec go = (xx, sum) =>
-    (. ()) =>
-      switch xx->next {
-      | End => End
-      | Next(x, xx) => {
-          let sum = f(sum, x)
-          Next(sum, go(xx, sum))
-        }
+  let rec go = (xx, sum) => () =>
+    switch xx->next {
+    | End => End
+    | Next(x, xx) => {
+        let sum = f(sum, x)
+        Next(sum, go(xx, sum))
       }
+    }
   concat(once(zero), go(xx, zero))
 }
 
 let rec sortedMerge = (xx, yy, cmp) => {
-  (. ()) =>
-    switch (xx(.), yy(.)) {
+  () =>
+    switch (xx(), yy()) {
     | (End, Next(_, _) as yy) => yy
     | (Next(_, _) as xx, End) => xx
     | (Next(x, xx), Next(y, yy)) => {
@@ -378,14 +368,13 @@ let rec sortedMerge = (xx, yy, cmp) => {
 }
 
 let intersperseWith = (xx, separator) => {
-  let rec beforeEach = (xx, separator) =>
-    (. ()) => {
-      switch xx->next {
-      | End => End
-      | Next(x, xx) => Next(separator(), cons(x, beforeEach(xx, separator)))
-      }
+  let rec beforeEach = (xx, separator) => () => {
+    switch xx->next {
+    | End => End
+    | Next(x, xx) => Next(separator(), cons(x, beforeEach(xx, separator)))
     }
-  (. ()) =>
+  }
+  () =>
     switch xx->next {
     | End => End
     | Next(x, xx) => Next(x, beforeEach(xx, separator))
@@ -395,23 +384,23 @@ let intersperseWith = (xx, separator) => {
 let intersperse = (xx, separator) => xx->intersperseWith(() => separator)
 
 module Cache = {
-  type t<'a> = (. unit) => 'a
+  type t<'a> = unit => 'a
 
   type toLazy<'a> = t<'a> => Lazy.t<'a>
   let toLazy: toLazy<'a> = (f: t<'a>) => {
-    let g = () => f(.)
+    let g = () => f()
     Lazy.from_fun(g)
   }
 
   type fromLazy<'a> = Lazy.t<'a> => t<'a>
-  let fromLazy: fromLazy<'a> = f => (. ()) => Lazy.force(f)
+  let fromLazy: fromLazy<'a> = f => () => Lazy.force(f)
 
   type make<'a> = t<'a> => t<'a>
   let make: make<'a> = f => f->toLazy->fromLazy
 }
 
 let rec cache = xx =>
-  Cache.make((. ()) =>
+  Cache.make(() =>
     switch xx->next {
     | End => End
     | Next(x, xx) => Next(x, cache(xx))
@@ -423,21 +412,19 @@ let allPairs = (xx, yy) => {
   xx->flatMap(x => yy->map(y => (x, y)))
 }
 
-let dropUntil = (xx, f) =>
-  (. ()) =>
-    xx
-    ->headTails
-    ->find(((x, _)) => f(x))
-    ->Option.map(((x, xx)) => Next(x, xx))
-    ->Option.getWithDefault(End)
+let dropUntil = (xx, f) => () =>
+  xx
+  ->headTails
+  ->find(((x, _)) => f(x))
+  ->Option.map(((x, xx)) => Next(x, xx))
+  ->Option.getWithDefault(End)
 
-let dropWhile = (xx, f) =>
-  (. ()) =>
-    xx
-    ->headTails
-    ->find(((x, _)) => false == f(x))
-    ->Option.map(((x, xx)) => Next(x, xx))
-    ->Option.getWithDefault(End)
+let dropWhile = (xx, f) => () =>
+  xx
+  ->headTails
+  ->find(((x, _)) => false == f(x))
+  ->Option.map(((x, xx)) => Next(x, xx))
+  ->Option.getWithDefault(End)
 
 let window = (xx, length) => {
   if length <= 0 {
@@ -501,25 +488,24 @@ let sumBy = (xx, concat) =>
     }
   }
 
-let prefixSum = (xx, accumulator) =>
-  (. ()) => {
-    switch xx->uncons {
-    | None => End
-    | Some(x, xx) =>
-      cons(
-        x,
-        unfold((x, xx), ((sum, xx)) =>
-          switch xx->uncons {
-          | None => None
-          | Some(x, xx) => {
-              let sum' = accumulator(sum, x)
-              Some(sum', (sum', xx))
-            }
+let prefixSum = (xx, accumulator) => () => {
+  switch xx->uncons {
+  | None => End
+  | Some(x, xx) =>
+    cons(
+      x,
+      unfold((x, xx), ((sum, xx)) =>
+        switch xx->uncons {
+        | None => None
+        | Some(x, xx) => {
+            let sum' = accumulator(sum, x)
+            Some(sum', (sum', xx))
           }
-        ),
-      )->next
-    }
+        }
+      ),
+    )->next
   }
+}
 
 let join = (xx, separator) =>
   switch separator->String.length {
@@ -565,51 +551,47 @@ let findMapLast = (xx, f) => {
   go(xx, None)
 }
 
-let rec map2 = (xx, yy, f) =>
-  (. ()) => {
-    let xx = xx->uncons
-    let yy = yy->uncons
-    OptionEx.map2(xx, yy, ((x, xx), (y, yy)) => Next(
-      f(x, y),
-      map2(xx, yy, f),
-    ))->Option.getWithDefault(End)
-  }
+let rec map2 = (xx, yy, f) => () => {
+  let xx = xx->uncons
+  let yy = yy->uncons
+  OptionEx.map2(xx, yy, ((x, xx), (y, yy)) => Next(
+    f(x, y),
+    map2(xx, yy, f),
+  ))->Option.getWithDefault(End)
+}
 
-let rec map3 = (xx, yy, zz, f) =>
-  (. ()) => {
-    let xx = xx->uncons
-    let yy = yy->uncons
-    let zz = zz->uncons
-    OptionEx.map3(xx, yy, zz, ((x, xx), (y, yy), (z, zz)) => Next(
-      f(x, y, z),
-      map3(xx, yy, zz, f),
-    ))->Option.getWithDefault(End)
-  }
+let rec map3 = (xx, yy, zz, f) => () => {
+  let xx = xx->uncons
+  let yy = yy->uncons
+  let zz = zz->uncons
+  OptionEx.map3(xx, yy, zz, ((x, xx), (y, yy), (z, zz)) => Next(
+    f(x, y, z),
+    map3(xx, yy, zz, f),
+  ))->Option.getWithDefault(End)
+}
 
-let rec map4 = (xx, yy, zz, qq, f) =>
-  (. ()) => {
-    let xx = xx->uncons
-    let yy = yy->uncons
-    let zz = zz->uncons
-    let qq = qq->uncons
-    OptionEx.map4(xx, yy, zz, qq, ((x, xx), (y, yy), (z, zz), (q, qq)) => Next(
-      f(x, y, z, q),
-      map4(xx, yy, zz, qq, f),
-    ))->Option.getWithDefault(End)
-  }
+let rec map4 = (xx, yy, zz, qq, f) => () => {
+  let xx = xx->uncons
+  let yy = yy->uncons
+  let zz = zz->uncons
+  let qq = qq->uncons
+  OptionEx.map4(xx, yy, zz, qq, ((x, xx), (y, yy), (z, zz), (q, qq)) => Next(
+    f(x, y, z, q),
+    map4(xx, yy, zz, qq, f),
+  ))->Option.getWithDefault(End)
+}
 
-let rec map5 = (xx, yy, zz, qq, mm, f) =>
-  (. ()) => {
-    let xx = xx->uncons
-    let yy = yy->uncons
-    let zz = zz->uncons
-    let qq = qq->uncons
-    let mm = mm->uncons
-    OptionEx.map5(xx, yy, zz, qq, mm, ((x, xx), (y, yy), (z, zz), (q, qq), (m, mm)) => Next(
-      f(x, y, z, q, m),
-      map5(xx, yy, zz, qq, mm, f),
-    ))->Option.getWithDefault(End)
-  }
+let rec map5 = (xx, yy, zz, qq, mm, f) => () => {
+  let xx = xx->uncons
+  let yy = yy->uncons
+  let zz = zz->uncons
+  let qq = qq->uncons
+  let mm = mm->uncons
+  OptionEx.map5(xx, yy, zz, qq, mm, ((x, xx), (y, yy), (z, zz), (q, qq), (m, mm)) => Next(
+    f(x, y, z, q, m),
+    map5(xx, yy, zz, qq, mm, f),
+  ))->Option.getWithDefault(End)
+}
 
 let zip = (xx, yy) => map2(xx, yy, (x, y) => (x, y))
 let zip3 = (xx, yy, zz) => map3(xx, yy, zz, (x, y, z) => (x, y, z))
@@ -651,12 +633,11 @@ let isEmpty = xx =>
   | _ => false
   }
 
-let tail = xx =>
-  (. ()) =>
-    switch xx->uncons {
-    | None => End
-    | Some(_, xx) => xx->next
-    }
+let tail = xx => () =>
+  switch xx->uncons {
+  | None => End
+  | Some(_, xx) => xx->next
+  }
 
 let tails = xx =>
   cons(
@@ -674,7 +655,7 @@ let minBy = (xx, cmp) => xx->sumBy((sum, i) => cmp(i, sum) < 0 ? i : sum)
 let maxBy = (xx, cmp) => xx->sumBy((sum, i) => cmp(i, sum) > 0 ? i : sum)
 
 let rec interleave = (xx, yy) => {
-  (. ()) => {
+  () => {
     switch xx->next {
     | End => yy->next
     | Next(x, xx) => Next(x, interleave(yy, xx))
@@ -692,60 +673,57 @@ let exactlyOne = xx =>
     }
   }
 
-let pairAhead = xx =>
-  (. ()) => {
-    switch xx->next {
-    | End => End
-    | Next(x, xx) =>
-      unfold(Some(x, xx), nxt =>
-        switch nxt {
-        | None => None
-        | Some(x, xx) =>
-          switch xx->next {
-          | End => Some((x, None), None)
-          | Next(x', xx) => Some((x, Some(x')), Some(x', xx))
-          }
+let pairAhead = xx => () => {
+  switch xx->next {
+  | End => End
+  | Next(x, xx) =>
+    unfold(Some(x, xx), nxt =>
+      switch nxt {
+      | None => None
+      | Some(x, xx) =>
+        switch xx->next {
+        | End => Some((x, None), None)
+        | Next(x', xx) => Some((x, Some(x')), Some(x', xx))
         }
-      )->next
-    }
+      }
+    )->next
   }
+}
 
-let pairBehind = xx =>
-  (. ()) => {
+let pairBehind = xx => () => {
+  switch xx->next {
+  | End => End
+  | Next(a, xx) =>
+    cons(
+      (None, a),
+      unfold((a, xx), ((a, xx)) =>
+        switch xx->next {
+        | End => None
+        | Next(b, xx) => Some((Some(a), b), (b, xx))
+        }
+      ),
+    )->next
+  }
+}
+
+let pairwise = xx => () =>
+  switch xx->next {
+  | End => End
+  | Next(a, xx) =>
     switch xx->next {
     | End => End
-    | Next(a, xx) =>
+    | Next(b, xx) =>
       cons(
-        (None, a),
-        unfold((a, xx), ((a, xx)) =>
+        (a, b),
+        unfold((b, xx), ((b, xx)) =>
           switch xx->next {
           | End => None
-          | Next(b, xx) => Some((Some(a), b), (b, xx))
+          | Next(x, xx) => Some((b, x), (x, xx))
           }
         ),
       )->next
     }
   }
-
-let pairwise = xx =>
-  (. ()) =>
-    switch xx->next {
-    | End => End
-    | Next(a, xx) =>
-      switch xx->next {
-      | End => End
-      | Next(b, xx) =>
-        cons(
-          (a, b),
-          unfold((b, xx), ((b, xx)) =>
-            switch xx->next {
-            | End => None
-            | Next(x, xx) => Some((b, x), (x, xx))
-            }
-          ),
-        )->next
-      }
-    }
 
 let dropLast = (xx, n) => {
   switch n {
@@ -755,7 +733,7 @@ let dropLast = (xx, n) => {
       `dropLast requires a count of 0 or more. You requested ${n->intToString}`,
     )->raise
   | n =>
-    (. ()) =>
+    () =>
       xx
       ->scan([], (sum, i) => {
         switch sum->Array.push(i) {
@@ -771,36 +749,35 @@ let dropLast = (xx, n) => {
   }
 }
 
-let neighbors = xx =>
-  (. ()) =>
+let neighbors = xx => () =>
+  switch xx->next {
+  | End => End
+  | Next(a, xx) =>
     switch xx->next {
-    | End => End
-    | Next(a, xx) =>
+    | End => Next((None, a, None), empty)
+    | Next(b, xx) =>
       switch xx->next {
-      | End => Next((None, a, None), empty)
-      | Next(b, xx) =>
-        switch xx->next {
-        | End => Next((None, a, Some(b)), (Some(a), b, None)->once)
-        | Next(c, xx) =>
+      | End => Next((None, a, Some(b)), (Some(a), b, None)->once)
+      | Next(c, xx) =>
+        cons(
+          (None, a, Some(b)),
           cons(
-            (None, a, Some(b)),
-            cons(
-              (Some(a), b, Some(c)),
-              unfold(Some(b, c, xx), state =>
-                switch state {
-                | None => None
-                | Some(b, c, xx) =>
-                  switch xx->next {
-                  | End => Some((Some(b), c, None), None)
-                  | Next(d, xx) => Some((Some(b), c, Some(d)), Some(c, d, xx))
-                  }
+            (Some(a), b, Some(c)),
+            unfold(Some(b, c, xx), state =>
+              switch state {
+              | None => None
+              | Some(b, c, xx) =>
+                switch xx->next {
+                | End => Some((Some(b), c, None), None)
+                | Next(d, xx) => Some((Some(b), c, Some(d)), Some(c, d, xx))
                 }
-              ),
+              }
             ),
-          )->next
-        }
+          ),
+        )->next
       }
     }
+  }
 
 let isSortedBy = (xx, cmp) => xx->pairwise->every(((a, b)) => cmp(a, b) <= 0)
 
@@ -814,7 +791,7 @@ let everyOk = xx => {
       | Ok(ok) => Ok(oks->concat(ok->once))
       }
     }
-  xx->reduceUntil(Ok(empty), concat, Result.isError)
+  xx->reduceUntil(Ok(empty), concat, Result.isError(_))
 }
 
 let everySome = xx => {
@@ -827,7 +804,7 @@ let everySome = xx => {
       | Some(some) => Some(somes->concat(some->once))
       }
     }
-  xx->reduceUntil(Some(empty), concat, Option.isNone)
+  xx->reduceUntil(Some(empty), concat, Option.isNone(_))
 }
 
 let toOption = xx =>
@@ -838,13 +815,12 @@ let toOption = xx =>
 
 let consume = xx => xx->forEach(_ => ())
 
-let orElse = (xx, yy) =>
-  (. ()) => {
-    switch xx->next {
-    | End => yy->next
-    | Next(_, _) as nxt => nxt
-    }
+let orElse = (xx, yy) => () => {
+  switch xx->next {
+  | End => yy->next
+  | Next(_, _) as nxt => nxt
   }
+}
 
 let reverse = xx =>
   delay(() => {
@@ -858,7 +834,7 @@ let reverse = xx =>
 let sortBy = (xx, compare) =>
   delay(() => {
     let xx = xx->toArray
-    xx->Array.sortInPlaceWith(compare)->ignore
+    xx->Array.sortInPlaceWith((a, b) => compare(a, b))->ignore
     xx->fromArray
   })
 
@@ -918,7 +894,7 @@ let (combinations, permutations) = {
   (combinations, permutations)
 }
 
-let toList = xx => xx->reverse->reduce(list{}, Belt.List.add)
+let toList = xx => xx->reverse->reduce(list{}, (list, f) => Belt.List.add(list, f))
 
 let split = (xx, init, acc) => {
   let rec unfolder = state =>
@@ -934,7 +910,7 @@ let split = (xx, init, acc) => {
         }
       }
     }
-  (. ()) => {
+  () => {
     switch xx->uncons {
     | None => End
     | Some(x, xx) => unfold(Some(init(x), xx), unfolder)->next

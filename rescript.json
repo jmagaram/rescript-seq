@@ -11,7 +11,7 @@
     }
   ],
   "suffix": ".bs.js",
-  "bs-dev-dependencies": [],
+  "bs-dev-dependencies": ["@rescript/core"],
   "gentypeconfig": {
     "language": "typescript",
     "shims": {},
@@ -22,5 +22,6 @@
       "basic": false
     }
   },
-  "uncurried": false
+  "uncurried": true,
+  "bsc-flags": []
 }

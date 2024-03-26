@@ -292,11 +292,11 @@ let rangeTests = makeSeqEqualsTests(
 let rangeMapTests = makeSeqEqualsTests(
   ~title="rangeMap",
   [
-    (S.rangeMap(1, 1, intToString), ["1"], ""),
-    (S.rangeMap(1, 2, intToString), ["1", "2"], ""),
-    (S.rangeMap(4, 6, intToString), ["4", "5", "6"], ""),
-    (S.rangeMap(6, 1, intToString), ["6", "5", "4", "3", "2", "1"], ""),
-    (S.rangeMap(-3, 3, intToString), ["-3", "-2", "-1", "0", "1", "2", "3"], ""),
+    (S.rangeMap(1, 1, intToString(_)), ["1"], ""),
+    (S.rangeMap(1, 2, intToString(_)), ["1", "2"], ""),
+    (S.rangeMap(4, 6, intToString(_)), ["4", "5", "6"], ""),
+    (S.rangeMap(6, 1, intToString(_)), ["6", "5", "4", "3", "2", "1"], ""),
+    (S.rangeMap(-3, 3, intToString(_)), ["-3", "-2", "-1", "0", "1", "2", "3"], ""),
   ],
 )
 
@@ -745,26 +745,25 @@ let takeTests = makeSeqEqualsTests(
   ),
 ])
 
-let foreverWithTests =
-  makeSeqEqualsTests(
-    ~title="foreverWith",
-    [
-      (callCountForever()->S.take(0), [], ""),
-      (callCountForever()->S.take(1), [1], ""),
-      (callCountForever()->S.take(5), [1, 2, 3, 4, 5], ""),
-      (
-        callCountForever()
-        ->S.take(999_999)
-        ->S.last
-        ->Option.map(S.once)
-        ->Option.getWithDefault(S.empty),
-        [999_999],
-        "",
-      ),
-    ],
-  )->Js.Array2.concat([
-    willNotThrow(~title="foreverWith", ~expectation="lazy", () => S.foreverWith(throwIfInvoked)),
-  ])
+let foreverWithTests = makeSeqEqualsTests(
+  ~title="foreverWith",
+  [
+    (callCountForever()->S.take(0), [], ""),
+    (callCountForever()->S.take(1), [1], ""),
+    (callCountForever()->S.take(5), [1, 2, 3, 4, 5], ""),
+    (
+      callCountForever()
+      ->S.take(999_999)
+      ->S.last
+      ->Option.map(S.once)
+      ->Option.getWithDefault(S.empty),
+      [999_999],
+      "",
+    ),
+  ],
+)->Js.Array2.concat([
+  willNotThrow(~title="foreverWith", ~expectation="lazy", () => S.foreverWith(throwIfInvoked)),
+])
 
 let unfoldTests =
   makeSeqEqualsTests(
@@ -866,7 +865,7 @@ let scanTests = {
       (
         S.range(1, 999_999)
         ->S.scan(-1, (_, i) => i)
-        ->S.map(intToString)
+        ->S.map(intToString(_))
         ->S.last
         ->Option.map(s => S.once(s))
         ->Option.getWithDefault(S.once("")),
@@ -914,7 +913,7 @@ let intersperseTests = makeSeqEqualsTests(
 )
 
 let intersperseWithTests = {
-  let f = () => S.range(1, 100)->S.map(intToString)->toDispenser
+  let f = () => S.range(1, 100)->S.map(intToString(_))->toDispenser
   makeSeqEqualsTests(
     ~title="intersperseWith",
     [

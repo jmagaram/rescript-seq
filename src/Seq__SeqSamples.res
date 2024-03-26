@@ -39,7 +39,7 @@ let nums =
   })
   ->Seq.flatMap(n => Seq.rangeMap(1, n, i => i * 2))
   ->Seq.filter(n => n > 100)
-  ->Seq.forEach(Js.log)
+  ->Seq.forEach(Js.log(_))
 
 /**
 `scan` is similar to `reduce` but returns intermediate results. This computes a
