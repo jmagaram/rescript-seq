@@ -24,7 +24,7 @@ See [code examples](src/Seq__SeqSamples.res).
 npm install @jmagaram/rescript-seq
 ```
 
-Add to your `bsconfig.json`...
+Add to your `rescript.json`...
 
 ```diff
 {
