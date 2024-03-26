@@ -14,8 +14,8 @@
     "test": "node tests/TestSuite.bs.js",
     "test:local": "NODE_ENV=development node tests/TestSuite.bs.js",
     "test:watch": "nodemon --exec \"NODE_ENV=development node\" tests/TestSuite.bs.js",
-    "res:build": "rescript build -with-deps",
-    "res:dev": "rescript build -with-deps -w",
+    "res:build": "rescript build",
+    "res:dev": "rescript build -w",
     "res:clean": "rescript clean"
   },
   "author": "Justin Magaram",
