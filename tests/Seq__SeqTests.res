@@ -1,25 +1,16 @@
 module T = Seq__Test
 module S = Seq
 module R = Seq__Result
-module Option = Belt.Option
-module Result = Belt.Result
-module String = Js.String2
 
 // =============================
 // Utilities to help write tests
 // =============================
 
-let intToString = Belt.Int.toString
+let characters = s => s->String.split("")->S.fromArray
 
-let intCmp = (a: int, b: int) => a < b ? -1 : a > b ? 1 : 0
-let intOptionCmp = (a, b) => Belt.Option.cmp(a, b, intCmp)
-let stringCmp = (a: string, b: string) => a < b ? -1 : a > b ? 1 : 0
+let joinInts = xs => xs->Array.map(Int.toString)->Array.joinWith("")
 
-let characters = s => s->Js.String2.split("")->S.fromArray
-
-let joinInts = xs => xs->Js.Array2.map(intToString)->Js.Array2.joinWith("")
-
-let shorten = s => Js.String2.slice(s, ~from=0, ~to_=1000)
+let shorten = s => String.slice(s, ~start=0, ~end=1000)
 
 let trueAlways = _ => true
 let falseAlways = _ => false
@@ -110,9 +101,7 @@ let seqEqual = (~title, ~expectation, ~a, ~b) =>
     switch a == b {
     | true => Ok()
     | false =>
-      Error(
-        `Actual:   ${a->Js.Array2.toString->shorten}\nExpected: ${b->Js.Array2.toString->shorten}`,
-      )
+      Error(`Actual:   ${a->Array.toString->shorten}\nExpected: ${b->Array.toString->shorten}`)
     }
   })
 
@@ -150,8 +139,8 @@ type. Sequences are converted to arrays and then the ReScript array comparision
 function is used.
 */
 let makeSeqEqualsTests = (~title, xs) =>
-  xs->Js.Array2.mapi(((source, result, note), inx) =>
-    seqEqual(~title, ~expectation=`index ${inx->intToString} ${note}`, ~a=() => source, ~b=result)
+  xs->Array.mapWithIndex(((source, result, note), inx) =>
+    seqEqual(~title, ~expectation=`index ${inx->Int.toString} ${note}`, ~a=() => source, ~b=result)
   )
 
 /**
@@ -160,8 +149,8 @@ parameters are (1) a lazy value, (2) the expected value, and (3) a note. Uses
 the ReScript recursive equality test.
 */
 let makeValueEqualTests = (~title, tests) =>
-  tests->Js.Array2.mapi(((lazyA, b, note), index) =>
-    valueEqual(~title, ~a=lazyA, ~b, ~expectation=`Index ${index->intToString} ${note}`)
+  tests->Array.mapWithIndex(((lazyA, b, note), index) =>
+    valueEqual(~title, ~a=lazyA, ~b, ~expectation=`Index ${index->Int.toString} ${note}`)
   )
 
 // =============================================================================
@@ -239,12 +228,12 @@ let cycleTests = makeSeqEqualsTests(
       "can use cache to cycle values, not the process.",
     ),
   ],
-)->Js.Array2.concat([
+)->Array.concat([
   valueEqual(
     ~title="cycle",
     ~expectation="empty determination is lazy",
     ~a=() => {
-      S.foreverWith(throwIfInvoked)->S.tap(_ => Js.log("hmm..."))->S.cycle->ignore
+      S.foreverWith(throwIfInvoked)->S.tap(_ => Console.log("hmm..."))->S.cycle->ignore
       1
     },
     ~b=1,
@@ -292,11 +281,11 @@ let rangeTests = makeSeqEqualsTests(
 let rangeMapTests = makeSeqEqualsTests(
   ~title="rangeMap",
   [
-    (S.rangeMap(1, 1, intToString(_)), ["1"], ""),
-    (S.rangeMap(1, 2, intToString(_)), ["1", "2"], ""),
-    (S.rangeMap(4, 6, intToString(_)), ["4", "5", "6"], ""),
-    (S.rangeMap(6, 1, intToString(_)), ["6", "5", "4", "3", "2", "1"], ""),
-    (S.rangeMap(-3, 3, intToString(_)), ["-3", "-2", "-1", "0", "1", "2", "3"], ""),
+    (S.rangeMap(1, 1, Int.toString), ["1"], ""),
+    (S.rangeMap(1, 2, Int.toString), ["1", "2"], ""),
+    (S.rangeMap(4, 6, Int.toString), ["4", "5", "6"], ""),
+    (S.rangeMap(6, 1, Int.toString), ["6", "5", "4", "3", "2", "1"], ""),
+    (S.rangeMap(-3, 3, Int.toString), ["-3", "-2", "-1", "0", "1", "2", "3"], ""),
   ],
 )
 
@@ -336,7 +325,7 @@ let flatMapTests =
       (S.range(1, 3)->S.flatMap(_ => S.empty), [], ""),
       (S.range(1, 3)->S.flatMap(i => S.once(i)), [1, 2, 3], ""),
     ],
-  )->Js.Array2.concat([
+  )->Array.concat([
     valueEqual(
       ~title="flatMap",
       ~expectation="million won't overflow",
@@ -389,7 +378,7 @@ let dropTests = makeSeqEqualsTests(
     (S.once(4)->S.drop(0), [4], ""),
     (S.once(4)->S.drop(1), [], ""),
   ],
-)->Js.Array2.concat([
+)->Array.concat([
   willNotThrow(~title="drop", ~expectation="lazy", () => death()->S.drop(1)),
   valueEqual(
     ~title="drop",
@@ -422,7 +411,7 @@ let sortedMergeTests = {
     seqEqual(
       ~title="sortedMerge",
       ~expectation="",
-      ~a=() => S.sortedMerge(nums1->S.fromArray, nums2->S.fromArray, intCmp),
+      ~a=() => S.sortedMerge(nums1->S.fromArray, nums2->S.fromArray, Int.compare),
       ~b=nums3,
     )
   [
@@ -441,12 +430,12 @@ let tapTests = [
     ~expectation="can inspect every value",
     ~a=() => {
       let seen = []
-      S.range(1, 5)->S.tap(i => seen->Js.Array2.push(i)->ignore)->S.consume
+      S.range(1, 5)->S.tap(i => seen->Array.push(i)->ignore)->S.consume
       seen
     },
     ~b=[1, 2, 3, 4, 5],
   ),
-  willNotThrow(~title="tap", ~expectation="lazy", () => death()->S.tap(_ => Js.log("Boom!"))),
+  willNotThrow(~title="tap", ~expectation="lazy", () => death()->S.tap(_ => Console.log("Boom!"))),
 ]
 
 let windowTests =
@@ -472,7 +461,7 @@ let windowTests =
             ~title="window",
             ~a=() => S.equals(result, expected, (a, b) => a == b),
             ~b=true,
-            ~expectation=`source length ${sourceLength->intToString}, window size ${windowSize->intToString}`,
+            ~expectation=`source length ${sourceLength->Int.toString}, window size ${windowSize->Int.toString}`,
           )
         }
       }
@@ -480,7 +469,7 @@ let windowTests =
   )
   ->S.flatten
   ->S.toArray
-  ->Js.Array2.concat([
+  ->Array.concat([
     willNotThrow(~title="window", ~expectation="lazy", () => death()->S.window(5)),
     willNotThrow(~title="window", ~expectation="millions for size", () =>
       S.range(1, 100)->S.window(999_999)->S.consume
@@ -502,10 +491,10 @@ let windowTests =
 let pairAheadTests = {
   let f = source =>
     source
-    ->Js.String2.split("")
+    ->String.split("")
     ->S.fromArray
     ->S.pairAhead
-    ->S.map(((curr, next)) => `${curr}${next->Option.getWithDefault("_")}`)
+    ->S.map(((curr, next)) => `${curr}${next->Option.getOr("_")}`)
     ->S.join(",")
   makeValueEqualTests(
     ~title="pairAhead",
@@ -516,7 +505,7 @@ let pairAheadTests = {
       (() => "abc"->f, "ab,bc,c_", ""),
       (() => "abcd"->f, "ab,bc,cd,d_", ""),
     ],
-  )->Js.Array2.concat([
+  )->Array.concat([
     willNotThrow(~title="pairAhead", ~expectation="lazy", () => death()->S.pairAhead),
     valueEqual(
       ~title="pairAhead",
@@ -536,10 +525,10 @@ let pairAheadTests = {
 let pairBehindTests = {
   let f = source =>
     source
-    ->Js.String2.split("")
+    ->String.split("")
     ->S.fromArray
     ->S.pairBehind
-    ->S.map(((prev, curr)) => `${prev->Option.getWithDefault("_")}${curr}`)
+    ->S.map(((prev, curr)) => `${prev->Option.getOr("_")}${curr}`)
     ->S.join(",")
   makeValueEqualTests(
     ~title="pairBehind",
@@ -550,7 +539,7 @@ let pairBehindTests = {
       (() => "abc"->f, "_a,ab,bc", ""),
       (() => "abcd"->f, "_a,ab,bc,cd", ""),
     ],
-  )->Js.Array2.concat([
+  )->Array.concat([
     willNotThrow(~title="pairBehind", ~expectation="lazy", () => death()->S.pairBehind),
     valueEqual(
       ~title="pairBehind",
@@ -570,10 +559,10 @@ let pairBehindTests = {
 let neighborsTests = {
   let f = source =>
     source
-    ->Js.String2.split("")
+    ->String.split("")
     ->S.fromArray
     ->S.neighbors
-    ->S.map(((a, b, c)) => `${a->Option.getWithDefault("_")}${b}${c->Option.getWithDefault("_")}`)
+    ->S.map(((a, b, c)) => `${a->Option.getOr("_")}${b}${c->Option.getOr("_")}`)
     ->S.join(",")
   makeValueEqualTests(
     ~title="neighbors",
@@ -584,7 +573,7 @@ let neighborsTests = {
       (() => "abc"->f, "_ab,abc,bc_", ""),
       (() => "abcd"->f, "_ab,abc,bcd,cd_", ""),
     ],
-  )->Js.Array2.concat([
+  )->Array.concat([
     willNotThrow(~title="neighbors", ~expectation="lazy", () => death()->S.neighbors),
     valueEqual(
       ~title="neighbors",
@@ -610,9 +599,7 @@ let pairwiseTests =
       (S.range(1, 2)->S.pairwise, [(1, 2)], ""),
       (S.range(1, 5)->S.pairwise, [(1, 2), (2, 3), (3, 4), (4, 5)], ""),
     ],
-  )->Js.Array2.concat([
-    willNotThrow(~title="pairwise", ~expectation="lazy", () => death()->S.pairwise),
-  ])
+  )->Array.concat([willNotThrow(~title="pairwise", ~expectation="lazy", () => death()->S.pairwise)])
 
 let interleaveTests = makeSeqEqualsTests(
   ~title="interleave",
@@ -637,7 +624,7 @@ let iterateTests = makeSeqEqualsTests(
       "millions",
     ),
   ],
-)->Js.Array2.concat([
+)->Array.concat([
   willNotThrow(~title="iterate", ~expectation="lazy", () =>
     S.iterate(0, i => {
       Js.Exn.raiseError("Boom!")->raise->ignore
@@ -671,7 +658,7 @@ let fromArrayTests = {
     throws(() => [1, 2, 3]->S.fromArray(~end=3)),
     throws(() => []->S.fromArray(~end=0)),
   ]
-  Js.Array2.concat(basicTests, throwsTests)
+  Array.concat(basicTests, throwsTests)
 }
 
 let replicateTests = makeSeqEqualsTests(
@@ -717,7 +704,7 @@ let takeTests = makeSeqEqualsTests(
     (S.range(1, 5)->S.take(5), [1, 2, 3, 4, 5], ""),
     (S.range(1, 5)->S.take(6), [1, 2, 3, 4, 5], ""),
   ],
-)->Js.Array2.concat([
+)->Array.concat([
   valueEqual(
     ~title="take",
     ~expectation="millions",
@@ -756,12 +743,12 @@ let foreverWithTests = makeSeqEqualsTests(
       ->S.take(999_999)
       ->S.last
       ->Option.map(S.once)
-      ->Option.getWithDefault(S.empty),
+      ->Option.getOr(S.empty),
       [999_999],
       "",
     ),
   ],
-)->Js.Array2.concat([
+)->Array.concat([
   willNotThrow(~title="foreverWith", ~expectation="lazy", () => S.foreverWith(throwIfInvoked)),
 ])
 
@@ -780,7 +767,7 @@ let unfoldTests =
         "fibonacci",
       ),
     ],
-  )->Js.Array2.concat([
+  )->Array.concat([
     valueEqual(
       ~title="unfold",
       ~expectation="millions",
@@ -797,7 +784,7 @@ let initTests =
       (S.init(2, inx => inx * 2), [0, 2], ""),
       (S.init(3, inx => inx * 2), [0, 2, 4], ""),
     ],
-  )->Js.Array2.concat([
+  )->Array.concat([
     valueEqual(
       ~title="init",
       ~expectation="tens",
@@ -832,12 +819,12 @@ let chunkBySizeTests = {
         ->S.map(joinInts)
         ->S.last
         ->Option.map(S.once)
-        ->Option.getWithDefault(""->S.once),
+        ->Option.getOr(""->S.once),
         ["0123456789"],
         "",
       ),
     ],
-  )->Js.Array2.concat([
+  )->Array.concat([
     willThrow(~title="chunkBySize", ~expectation="when size == 0", () =>
       S.range(1, 5)->S.chunkBySize(0)
     ),
@@ -850,8 +837,8 @@ let chunkBySizeTests = {
 
 let scanTests = {
   let push = (sum, x) => {
-    let copied = sum->Js.Array2.copy
-    copied->Js.Array2.push(x)->ignore
+    let copied = sum->Array.copy
+    copied->Array.push(x)->ignore
     copied
   }
   let scanConcat = xs => xs->S.scan([0], push)->S.map(joinInts)
@@ -865,10 +852,10 @@ let scanTests = {
       (
         S.range(1, 999_999)
         ->S.scan(-1, (_, i) => i)
-        ->S.map(intToString(_))
+        ->S.map(Int.toString)
         ->S.last
         ->Option.map(s => S.once(s))
-        ->Option.getWithDefault(S.once("")),
+        ->Option.getOr(S.once("")),
         ["999999"],
         "",
       ),
@@ -895,7 +882,7 @@ let takeUntilTests = makeSeqEqualsTests(
       ->S.takeUntil(i => i == 999_999)
       ->S.last
       ->Option.map(S.once)
-      ->Option.getWithDefault(S.empty),
+      ->Option.getOr(S.empty),
       [999_999],
       "millions",
     ),
@@ -913,7 +900,7 @@ let intersperseTests = makeSeqEqualsTests(
 )
 
 let intersperseWithTests = {
-  let f = () => S.range(1, 100)->S.map(intToString(_))->toDispenser
+  let f = () => S.range(1, 100)->S.map(Int.toString)->toDispenser
   makeSeqEqualsTests(
     ~title="intersperseWith",
     [
@@ -940,10 +927,10 @@ let dropWhileTests =
     (S.range(1, 99), i => i != 99, [99], "tens"),
     (S.range(1, 9_999), i => i != 9_999, [9_999], "thousands"),
     (S.range(1, 999_999), i => i != 999_999, [999_999], "millions"),
-  ]->Js.Array2.mapi(((source, predicate, result, note), inx) =>
+  ]->Array.mapWithIndex(((source, predicate, result, note), inx) =>
     seqEqual(
       ~title="dropWhile",
-      ~expectation=`index ${inx->intToString} ${note}`,
+      ~expectation=`index ${inx->Int.toString} ${note}`,
       ~a=() => source->S.dropWhile(predicate),
       ~b=result,
     )
@@ -982,15 +969,15 @@ let filterMapTests =
     (S.range(1, 5), i => i == 1 || i == 3 ? Some(i * 2) : None, [2, 6], ""),
     (S.range(1, 999_999), i => i == 999_999 ? Some(-i) : None, [-999_999], "millions"),
   ]
-  ->Js.Array2.mapi(((source, f, result, note), inx) =>
+  ->Array.mapWithIndex(((source, f, result, note), inx) =>
     seqEqual(
       ~title="filterMap",
-      ~expectation=`index ${inx->intToString} ${note}`,
+      ~expectation=`index ${inx->Int.toString} ${note}`,
       ~a=() => source->S.filterMap(f),
       ~b=result,
     )
   )
-  ->Js.Array2.concat({
+  ->Array.concat({
     let items = [Some(Some(1)), None, Some(None), Some(Some(2)), None, Some(None)]
     [
       valueEqual(
@@ -1001,7 +988,7 @@ let filterMapTests =
           ->S.fromArray
           ->S.filterMap(i => i)
           ->S.equals([Some(1), None, Some(2), None]->S.fromArray, (a, b) =>
-            intOptionCmp(a, b) == 0
+            Option.compare(a, b, Int.compare) == 0.0
           ),
         ~b=true,
       ),
@@ -1020,7 +1007,7 @@ let filterMapiTests = makeSeqEqualsTests(
       "",
     ),
   ],
-)->Js.Array2.concat({
+)->Array.concat({
   let items = [Some(Some(1)), None, Some(None), Some(Some(2)), None, Some(None)]
   [
     valueEqual(
@@ -1030,7 +1017,9 @@ let filterMapiTests = makeSeqEqualsTests(
         items
         ->S.fromArray
         ->S.filterMapi((value, _inx) => value)
-        ->S.equals([Some(1), None, Some(2), None]->S.fromArray, (a, b) => intOptionCmp(a, b) == 0),
+        ->S.equals([Some(1), None, Some(2), None]->S.fromArray, (a, b) =>
+          Option.compare(a, b, Int.compare) == 0.0
+        ),
       ~b=true,
     ),
   ]
@@ -1050,15 +1039,15 @@ let filterTests =
     (S.range(1, 5), i => i == 1 || i == 3, [1, 3], ""),
     (S.range(1, 999_999), i => i == 999_999, [999_999], "millions"),
   ]
-  ->Js.Array2.mapi(((source, predicate, result, note), inx) =>
+  ->Array.mapWithIndex(((source, predicate, result, note), inx) =>
     seqEqual(
       ~title="filter",
-      ~expectation=`index ${inx->intToString} ${note}`,
+      ~expectation=`index ${inx->Int.toString} ${note}`,
       ~a=() => source->S.filter(predicate),
       ~b=result,
     )
   )
-  ->Js.Array.concat([
+  ->Array.concat([
     seqEqual(
       ~title="filteri",
       ~expectation="",
@@ -1086,10 +1075,10 @@ let dropUntilTests =
     (S.range(1, 5), i => i == 5, [5], ""),
     (S.range(1, 5), i => i == 1, [1, 2, 3, 4, 5], ""),
     (S.range(1, 999_999), i => i == 999_999, [999_999], "millions"),
-  ]->Js.Array2.mapi(((source, predicate, result, note), inx) =>
+  ]->Array.mapWithIndex(((source, predicate, result, note), inx) =>
     seqEqual(
       ~title="dropUntil",
-      ~expectation=`index ${inx->intToString} ${note}`,
+      ~expectation=`index ${inx->Int.toString} ${note}`,
       ~a=() => source->S.dropUntil(predicate),
       ~b=result,
     )
@@ -1101,7 +1090,7 @@ let forEachTests = [
     ~expectation="every value is enumerated",
     ~a=() => {
       let result = []
-      S.range(1, 5)->S.forEach(i => result->Js.Array2.push(i)->ignore)
+      S.range(1, 5)->S.forEach(i => result->Array.push(i)->ignore)
       result
     },
     ~b=[1, 2, 3, 4, 5],
@@ -1131,7 +1120,7 @@ let forEachTests = [
     ~expectation="",
     ~a=() => {
       let result = []
-      S.range(1, 5)->S.forEachi((n, inx) => result->Js.Array2.push((n, inx))->ignore)
+      S.range(1, 5)->S.forEachi((n, inx) => result->Array.push((n, inx))->ignore)
       result
     },
     ~b=[(1, 0), (2, 1), (3, 2), (4, 3), (5, 4)],
@@ -1182,7 +1171,7 @@ let findMapTests = makeValueEqualTests(
     (() => S.range(1, 5)->S.findMap(_ => None), None, "if not found, none"),
     (() => S.range(1, 99_999)->S.findMap(i => i == 99_999 ? Some("x") : None), Some("x"), "big"),
   ],
-)->Js.Array2.concat([
+)->Array.concat([
   valueEqual(
     ~title="findMap",
     ~expectation="nested options - find Some(Some(_))",
@@ -1262,7 +1251,7 @@ let equalsTests = [
   ("aa", "a", false),
   ("aa", "aa", true),
   ("aa", "aaa", false),
-]->Js.Array2.map(((xs, ys, expected)) =>
+]->Array.map(((xs, ys, expected)) =>
   valueEqual(
     ~title="equals",
     ~expectation=`${xs},${ys} => ${expected ? "true" : "false"}`,
@@ -1284,16 +1273,16 @@ let compareTests = [
   ("aa", "a", 1),
   ("aa", "aa", 0),
   ("aa", "aaa", -1),
-]->Js.Array2.map(((xs, ys, expected)) =>
+]->Array.map(((xs, ys, expected)) =>
   valueEqual(
     ~title="compare",
-    ~expectation=`${xs},${ys} => ${expected->intToString}`,
+    ~expectation=`${xs},${ys} => ${expected->Int.toString}`,
     ~a=() => {
       let xs = xs->characters
       let ys = ys->characters
-      S.compare(xs, ys, stringCmp)
+      S.compare(xs, ys, String.localeCompare)
     },
-    ~b=expected,
+    ~b=expected->Int.toFloat,
   )
 )
 
@@ -1344,25 +1333,25 @@ let minByMaxByTests = [
   valueEqual(
     ~title="minBy",
     ~expectation="when no items => None",
-    ~a=() => S.empty->S.minBy(intCmp),
+    ~a=() => S.empty->S.minBy(Int.compare),
     ~b=None,
   ),
   valueEqual(
     ~title="minBy",
     ~expectation="when items => Some",
-    ~a=() => [6, 7, 8, 3, 1, 3, 5, 8]->S.fromArray->S.minBy(intCmp),
+    ~a=() => [6, 7, 8, 3, 1, 3, 5, 8]->S.fromArray->S.minBy(Int.compare),
     ~b=Some(1),
   ),
   valueEqual(
     ~title="maxBy",
     ~expectation="when no items => None",
-    ~a=() => S.empty->S.maxBy(intCmp),
+    ~a=() => S.empty->S.maxBy(Int.compare),
     ~b=None,
   ),
   valueEqual(
     ~title="maxBy",
     ~expectation="when items => Some",
-    ~a=() => [6, 7, 8, 3, 1, 3, 5, 7]->S.fromArray->S.maxBy(intCmp),
+    ~a=() => [6, 7, 8, 3, 1, 3, 5, 7]->S.fromArray->S.maxBy(Int.compare),
     ~b=Some(8),
   ),
 ]
@@ -1408,10 +1397,10 @@ let exactlyOneTests = makeValueEqualTests(
 let isSortedByTests = makeValueEqualTests(
   ~title="isSortedBy",
   [
-    (() => S.empty->S.isSortedBy(intCmp), true, ""),
-    (() => S.once(3)->S.isSortedBy(intCmp), true, ""),
-    (() => [1, 4, 4, 6, 7, 8, 9, 10]->S.fromArray->S.isSortedBy(intCmp), true, ""),
-    (() => [1, 4, 4, 6, 7, 8, 0, 10]->S.fromArray->S.isSortedBy(intCmp), false, ""),
+    (() => S.empty->S.isSortedBy(Int.compare), true, ""),
+    (() => S.once(3)->S.isSortedBy(Int.compare), true, ""),
+    (() => [1, 4, 4, 6, 7, 8, 9, 10]->S.fromArray->S.isSortedBy(Int.compare), true, ""),
+    (() => [1, 4, 4, 6, 7, 8, 0, 10]->S.fromArray->S.isSortedBy(Int.compare), false, ""),
   ],
 )
 
@@ -1425,13 +1414,13 @@ let toOptionTests = [
   valueEqual(
     ~title="toOption",
     ~expectation="when once => Some",
-    ~a=() => S.once(1)->S.toOption->Option.getWithDefault(S.empty)->S.toArray,
+    ~a=() => S.once(1)->S.toOption->Option.getOr(S.empty)->S.toArray,
     ~b=[1],
   ),
   valueEqual(
     ~title="toOption",
     ~expectation="when many items => Some",
-    ~a=() => S.range(1, 3)->S.toOption->Option.getWithDefault(S.empty)->S.toArray,
+    ~a=() => S.range(1, 3)->S.toOption->Option.getOr(S.empty)->S.toArray,
     ~b=[1, 2, 3],
   ),
 ]
@@ -1443,11 +1432,11 @@ let reduceTests = {
     (() => S.empty->S.reduce(-1, add), -1),
     (() => S.once(99)->S.reduce(1, add), 100),
     (() => S.range(1, 3)->S.reduce(1, add), 7),
-    (() => S.range(1, 99)->S.reduce(None, lastSeen)->Option.getWithDefault(-1), 99),
-    (() => S.range(1, 9999)->S.reduce(None, lastSeen)->Option.getWithDefault(-1), 9999),
-    (() => S.range(1, 999_999)->S.reduce(None, lastSeen)->Option.getWithDefault(-1), 999_999),
-  ]->Js.Array2.mapi(((a, b), index) =>
-    valueEqual(~title="reduce", ~expectation=`index ${index->intToString}`, ~a, ~b)
+    (() => S.range(1, 99)->S.reduce(None, lastSeen)->Option.getOr(-1), 99),
+    (() => S.range(1, 9999)->S.reduce(None, lastSeen)->Option.getOr(-1), 9999),
+    (() => S.range(1, 999_999)->S.reduce(None, lastSeen)->Option.getOr(-1), 999_999),
+  ]->Array.mapWithIndex(((a, b), index) =>
+    valueEqual(~title="reduce", ~expectation=`index ${index->Int.toString}`, ~a, ~b)
   )
 }
 
@@ -1551,7 +1540,7 @@ let prefixSumTests = {
       ([1, 2]->S.fromArray->S.prefixSum(add), [1, 3], ""),
       ([1, 2, 3, 4, 5]->S.fromArray->S.prefixSum(add), [1, 3, 6, 10, 15], ""),
     ],
-  )->Js.Array2.concat([
+  )->Array.concat([
     valueEqual(
       ~title="prefixSum",
       ~expectation="millions",
@@ -1570,10 +1559,10 @@ let lastTests = {
     (S.range(1, 99), Some(99)),
     (S.range(1, 999), Some(999)),
     (S.range(1, 999999), Some(999999)),
-  ]->Js.Array2.mapi(((xs, result), index) =>
+  ]->Array.mapWithIndex(((xs, result), index) =>
     valueEqual(
       ~title="last",
-      ~expectation=`index ${index->intToString}`,
+      ~expectation=`index ${index->Int.toString}`,
       ~a=() => xs->S.last,
       ~b=result,
     )
@@ -1590,10 +1579,10 @@ let (everyOkTests, everySomeTests) = {
     ("when mix, return first error", [1, 2, 14, 3, 4], Error("14")),
   ]
 
-  let validate = n => n < 10 ? Ok(n * 2) : Error(n->intToString)
+  let validate = n => n < 10 ? Ok(n * 2) : Error(n->Int.toString)
 
   let everyOkTests =
-    validationTests->Belt.Array.map(((expectation, input, expected)) =>
+    validationTests->Array.map(((expectation, input, expected)) =>
       valueEqual(
         ~title="everyOk",
         ~expectation,
@@ -1603,7 +1592,7 @@ let (everyOkTests, everySomeTests) = {
     )
 
   let everySomeTests = {
-    validationTests->Belt.Array.map(((expectation, input, expected)) =>
+    validationTests->Array.map(((expectation, input, expected)) =>
       valueEqual(
         ~title="everySome",
         ~expectation,
@@ -1627,7 +1616,7 @@ let memoizeTests = [
     ~title="cache",
     ~expectation="calculations only done once",
     () => {
-      let randoms = S.foreverWith(() => Js.Math.random())->S.take(4)->S.cache
+      let randoms = S.foreverWith(() => Math.random())->S.take(4)->S.cache
       let nums1 = randoms->S.toArray
       let nums2 = randoms->S.toArray
       let nums3 = randoms->S.toArray
@@ -1639,7 +1628,7 @@ let memoizeTests = [
     ~title="cache",
     ~expectation="all lazy; can cache foreverWith",
     () => {
-      let randoms = S.foreverWith(() => Js.Math.random())->S.cache->S.take(4)
+      let randoms = S.foreverWith(() => Math.random())->S.cache->S.take(4)
       let nums1 = randoms->S.toArray
       let nums2 = randoms->S.toArray
       let nums3 = randoms->S.toArray
@@ -1659,11 +1648,11 @@ let findTests = [
   (() => [1, 2, 3]->S.fromArray, _ => false, None, "when many and predicate false"),
   (() => S.range(1, 999_999), i => i == 999_999, Some(999_999), "when million"),
   (() => S.range(1, 999_999), _ => false, None, "when million"),
-]->Js.Array2.mapi(((source, predicate, result, note), index) =>
+]->Array.mapWithIndex(((source, predicate, result, note), index) =>
   T.fromPredicate(
     ~category="Seq",
     ~title="find",
-    ~expectation=`${index->intToString} ${note}`,
+    ~expectation=`${index->Int.toString} ${note}`,
     () => {
       source()->S.find(predicate) == result
     },
@@ -1681,11 +1670,11 @@ let findLastTests = [
   (() => [1, 2, 3]->S.fromArray, _ => false, None, "when many and predicate false"),
   (() => S.range(1, 999_999), i => i == 999_999, Some(999_999), "when million"),
   (() => S.range(1, 999_999), _ => false, None, "when million"),
-]->Js.Array2.mapi(((source, predicate, result, note), index) =>
+]->Array.mapWithIndex(((source, predicate, result, note), index) =>
   T.fromPredicate(
     ~category="Seq",
     ~title="findLast",
-    ~expectation=`${index->intToString} ${note}`,
+    ~expectation=`${index->Int.toString} ${note}`,
     () => {
       source()->S.findLast(predicate) == result
     },
@@ -1701,7 +1690,7 @@ let map2Tests = {
       () => {
         let xs = xs->characters
         let ys = ys->characters
-        let expected = expected == "" ? S.empty : expected->Js.String2.split(",")->S.fromArray
+        let expected = expected == "" ? S.empty : expected->String.split(",")->S.fromArray
         let actual = S.map2(xs, ys, (x, y) => x ++ y)
         S.equals(expected, actual, (i, j) => i == j)
       },
@@ -1730,7 +1719,7 @@ let map3Tests = {
         let xs = xs->characters
         let ys = ys->characters
         let zs = zs->characters
-        let expected = expected == "" ? S.empty : expected->Js.String2.split(",")->S.fromArray
+        let expected = expected == "" ? S.empty : expected->String.split(",")->S.fromArray
         let actual = S.map3(xs, ys, zs, (x, y, z) => x ++ y ++ z)
         S.equals(expected, actual, (i, j) => i == j)
       },
@@ -1771,7 +1760,7 @@ let reverseTests =
       (S.once(1)->S.reverse, [1], ""),
       (S.range(1, 5)->S.reverse, [5, 4, 3, 2, 1], ""),
     ],
-  )->Js.Array2.concat([
+  )->Array.concat([
     willNotThrow(~title="reverse", ~expectation="lazy; not reversed until iterated", () =>
       death()->S.reverse
     ),
@@ -1790,17 +1779,17 @@ let orElseTests = makeSeqEqualsTests(
 let sortByTests = makeSeqEqualsTests(
   ~title="sortBy",
   [
-    (S.empty->S.sortBy(intCmp), [], ""),
-    (S.once(1)->S.sortBy(intCmp), [1], ""),
-    ([1, 5, 2, 9, 7, 3]->S.fromArray->S.sortBy(intCmp), [1, 2, 3, 5, 7, 9], ""),
+    (S.empty->S.sortBy(Int.compare), [], ""),
+    (S.once(1)->S.sortBy(Int.compare), [1], ""),
+    ([1, 5, 2, 9, 7, 3]->S.fromArray->S.sortBy(Int.compare), [1, 2, 3, 5, 7, 9], ""),
   ],
-)->Js.Array2.concat([
-  willNotThrow(~title="sortBy", ~expectation="lazy", () => death()->S.sortBy(intCmp)),
+)->Array.concat([
+  willNotThrow(~title="sortBy", ~expectation="lazy", () => death()->S.sortBy(Int.compare)),
   T.fromPredicate(~category="Seq", ~title="sortBy", ~expectation="stable", () => {
     let sortByFirst = (a, b) => {
       let (afst, _) = a
       let (bfst, _) = b
-      intCmp(afst, bfst)
+      Int.compare(afst, bfst)
     }
     let data = [
       (2, "x"),
@@ -1817,7 +1806,7 @@ let sortByTests = makeSeqEqualsTests(
       (4, "z"),
     ]
     let sorted = data->S.fromArray->S.sortBy(sortByFirst)->S.map(((_, letter)) => letter)->S.toArray
-    sorted == "xyzxyzxyzxyz"->Js.String2.split("")
+    sorted == "xyzxyzxyzxyz"->String.split("")
   }),
 ])
 
@@ -1830,7 +1819,7 @@ let delayTests =
       (S.delay(() => S.range(1, 5)), [1, 2, 3, 4, 5], ""),
       (S.delay(() => Js.Exn.raiseError("boom!"))->S.take(0), [], ""),
     ],
-  )->Js.Array2.concat([
+  )->Array.concat([
     willNotThrow(~title="delay", ~expectation="lazy", () => S.delay(throwIfInvoked)),
   ])
 
@@ -1852,7 +1841,7 @@ let splitTests = {
         "",
       ),
     ],
-  )->Js.Array2.concat([
+  )->Array.concat([
     seqEqual(
       ~title="split",
       ~expectation="millions in an output group",
@@ -1871,19 +1860,19 @@ let splitTests = {
 
 let (combinationTests, permutationTests) = {
   let sortLetters = w =>
-    w->String.split("")->Belt.SortArray.stableSortBy(stringCmp)->Js.Array2.joinWith("")
+    w->String.split("")->Array.toSorted(String.localeCompare)->Array.joinWith("")
   let sortOutput = combos =>
     combos
     ->S.map(combo => combo->S.reduce("", (sum, i) => sum ++ i)->sortLetters)
-    ->S.sortBy(stringCmp)
+    ->S.sortBy(String.localeCompare)
     ->S.toArray
-    ->Js.Array2.joinWith(",")
+    ->Array.joinWith(",")
   let sort = words =>
     words
-    ->Js.String2.split(",")
-    ->Js.Array2.map(sortLetters)
-    ->Belt.SortArray.stableSortBy(stringCmp)
-    ->Js.Array2.joinWith(",")
+    ->String.split(",")
+    ->Array.map(sortLetters)
+    ->Array.toSorted(String.localeCompare)
+    ->Array.joinWith(",")
   let combos = (letters, k) => letters->String.split("")->S.fromArray->S.combinations(k)
   let comboString = (letters, k) => combos(letters, k)->S.map(((_, combo)) => combo)->sortOutput
   let permutes = (letters, k) => letters->String.split("")->S.fromArray->S.permutations(k)
@@ -1982,7 +1971,7 @@ let (combinationTests, permutationTests) = {
     valueEqual(
       ~title,
       ~expectation="millions - take 10",
-      ~a=() => S.range(1, 1000)->f(1000)->S.take(10)->S.last->Belt.Option.isSome,
+      ~a=() => S.range(1, 1000)->f(1000)->S.take(10)->S.last->Option.isSome,
       ~b=true,
     ),
     valueEqual(
@@ -2005,9 +1994,9 @@ let (combinationTests, permutationTests) = {
     ),
   ]
   let combinationTests =
-    [comboSamples, miscellaneous("combinations", S.combinations)]->Belt.Array.flatMap(i => i)
+    [comboSamples, miscellaneous("combinations", S.combinations)]->Array.flatMap(i => i)
   let permutationTests =
-    [permuteSamples, miscellaneous("permutations", S.permutations)]->Belt.Array.flatMap(i => i)
+    [permuteSamples, miscellaneous("permutations", S.permutations)]->Array.flatMap(i => i)
   (combinationTests, permutationTests)
 }
 
@@ -2018,7 +2007,7 @@ let toListTests = makeValueEqualTests(
     (() => S.once(1)->S.toList, list{1}, ""),
     (() => [1, 2]->S.fromArray->S.toList, list{1, 2}, ""),
     (() => [1, 2, 3]->S.fromArray->S.toList, list{1, 2, 3}, ""),
-    (() => S.range(1, 9_999)->S.toList->Belt.List.drop(9_998)->Option.getExn, list{9_999}, ""),
+    (() => S.range(1, 9_999)->S.toList->List.drop(9_998)->Option.getExn, list{9_999}, ""),
   ],
 )
 
@@ -2035,8 +2024,8 @@ let dropLastTests = {
   let test = (source, count, result) => {
     valueEqual(
       ~title="dropLast",
-      ~expectation=`[${source}] ${count->intToString} => [${result}]`,
-      ~a=() => source->Js.String2.split("")->S.fromArray->S.dropLast(count)->S.join(""),
+      ~expectation=`[${source}] ${count->Int.toString} => [${result}]`,
+      ~a=() => source->String.split("")->S.fromArray->S.dropLast(count)->S.join(""),
       ~b=result,
     )
   }
@@ -2053,7 +2042,7 @@ let dropLastTests = {
     test("abc", 3, ""),
     test("abc", 99, ""),
     test("abcdefg", 1, "abcdef"),
-  ]->Array.append([
+  ]->Array.concat([
     willNotThrow(~title="dropLast", ~expectation="lazy", () => death()->S.dropLast(10)),
     willThrow(~title="dropLast", ~expectation="when count < 0, throw", () =>
       S.range(1, 5)->S.dropLast(-1)
@@ -2152,11 +2141,11 @@ let sampleMultiplicationTableTests = {
   makeValueEqualTests(
     ~title="sampleMultiplicationTable",
     [
-      (() => tbl[1][4], 4, ""),
-      (() => tbl[8][9], 72, ""),
-      (() => tbl[8][9], 72, ""),
-      (() => tbl[2][5], 10, ""),
-      (() => tbl[9][2], 18, ""),
+      (() => tbl->Array.getUnsafe(1)->Array.getUnsafe(4), 4, ""),
+      (() => tbl->Array.getUnsafe(8)->Array.getUnsafe(9), 72, ""),
+      (() => tbl->Array.getUnsafe(8)->Array.getUnsafe(9), 72, ""),
+      (() => tbl->Array.getUnsafe(2)->Array.getUnsafe(5), 10, ""),
+      (() => tbl->Array.getUnsafe(9)->Array.getUnsafe(2), 18, ""),
     ],
   )
 }
@@ -2271,4 +2260,4 @@ let tests =
     unconsTests,
     unfoldTests,
     windowTests,
-  ]->Belt.Array.flatMap(i => i)
+  ]->Array.flatMap(i => i)

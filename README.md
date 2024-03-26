@@ -41,7 +41,7 @@ All functions are in the `Seq` module. See other [examples](src/Seq__SeqSamples.
   ->Seq.combinations(3)
   ->Seq.map(((_, combo)) => combo->Seq.join(""))
   ->Seq.join(", ")
-  ->Js.log // a, b, ba, c, ca, cb, cba, d, da, db, dba, dc, dca, dcb
+  ->Console.log // a, b, ba, c, ca, cb, cba, d, da, db, dba, dc, dca, dcb
 ```
 
 ## Functions
@@ -99,7 +99,7 @@ let pairwise: t<'a> => t<('a, 'a)>
 let prefixSum: (t<'a>, ('a, 'a) => 'a) => t<'a>
 let reverse: t<'a> => t<'a>
 let scan: (t<'a>, 'b, ('b, 'a) => 'b) => t<'b>
-let sortBy: (t<'a>, ('a, 'a) => int) => t<'a>
+let sortBy: (t<'a>, ('a, 'a) => float) => t<'a>
 let split: (t<'a>, 'a => 'b, ('b, 'a) => option<'b>) => t<'b>
 let tail: t<'a> => t<'a>
 let tails: t<'a> => t<t<'a>>
@@ -121,7 +121,7 @@ let map4: (t<'a>, t<'b>, t<'c>, t<'d>, ('a, 'b, 'c, 'd) => 'e) => t<'e>
 let map5: (t<'a>, t<'b>, t<'c>, t<'d>, t<'e>, ('a, 'b, 'c, 'd, 'e) => 'f) => t<'f>
 let orElse: (t<'a>, t<'a>) => t<'a>
 let prepend: (t<'a>, t<'a>) => t<'a>
-let sortedMerge: (t<'a>, t<'a>, ('a, 'a) => int) => t<'a>
+let sortedMerge: (t<'a>, t<'a>, ('a, 'a) => float) => t<'a>
 let zip: (t<'a>, t<'b>) => t<('a, 'b)>
 let zip3: (t<'a>, t<'b>, t<'c>) => t<('a, 'b, 'c)>
 let zip4: (t<'a>, t<'b>, t<'c>, t<'d>) => t<('a, 'b, 'c, 'd)>
@@ -144,12 +144,12 @@ let forEach: (t<'a>, 'a => unit) => unit
 let forEachi: (t<'a>, ('a, int) => unit) => unit
 let head: t<'a> => option<'a>
 let isEmpty: t<'a> => bool
-let isSortedBy: (t<'a>, ('a, 'a) => int) => bool
+let isSortedBy: (t<'a>, ('a, 'a) => float) => bool
 let join: t<string> => string
 let last: t<'a> => option<'a>
 let length: t<'a> => int
-let maxBy: (t<'a>, ('a, 'a) => int) => option<'a>
-let minBy: (t<'a>, ('a, 'a) => int) => option<'a>
+let maxBy: (t<'a>, ('a, 'a) => float) => option<'a>
+let minBy: (t<'a>, ('a, 'a) => float) => option<'a>
 let reduce: (t<'a>, 'b, ('b, 'a) => 'b) => 'b
 let reduceUntil: (t<'a>, 'b, ('b, 'a) => 'b, 'b => bool) => 'b
 let reduceWhile: (t<'a>, 'b, ('b, 'a) => 'b, 'b => bool) => option<'b>

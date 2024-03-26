@@ -1,4 +1,3 @@
-open Belt
 module Test = Seq__Test
 module Task = Seq__Task
 module Q = Seq
@@ -14,7 +13,7 @@ let isLocalDevelopment = () => {
 }
 
 let onlyShowFailures = false
-let filter = test => []->Js.Array2.every(word => test->Test.hasKeyword(word))
+let filter = test => []->Array.every(word => test->Test.hasKeyword(word))
 let throwOnFailure = !isLocalDevelopment()
 
 let tests =
@@ -23,7 +22,7 @@ let tests =
     Seq__ResultTests.allTests,
     Seq__TaskTest.tests,
     Seq__SeqTests.tests,
-  ]->Array.concatMany
+  ]->Array.flat
 
 Task.Result.make(~promise=() => Test.runSuite(tests, ~filter, ~onlyShowFailures), ~onError=e => e)
 ->Task.forEach(s =>

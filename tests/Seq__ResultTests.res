@@ -1,23 +1,8 @@
-open Belt
-
 module T = Seq__Test
 module R = Seq__Result
 
 let expectEqual = (~title, ~expectation, ~a, ~b) =>
   T.fromPredicate(~category="Result", ~title, ~expectation, () => a() == b)
-
-let mapError =
-  [
-    ("when Error, map the error", Error(3), Error(6)),
-    ("when Ok, return Ok", Ok("a"), Ok("a")),
-  ]->Array.map(((expectation, input, expected)) =>
-    expectEqual(
-      ~title="mapError",
-      ~expectation,
-      ~a=() => input->R.mapError(i => i * 2),
-      ~b=expected,
-    )
-  )
 
 let fromTryCatch = [
   T.fromPredicate(
@@ -59,4 +44,4 @@ let toOption = [
   ),
 ]
 
-let allTests = [toOption, fromTryCatch, mapError]->Array.concatMany
+let allTests = [toOption, fromTryCatch]->Array.flat

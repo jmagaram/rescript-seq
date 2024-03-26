@@ -1,8 +1,4 @@
-module Option = Belt.Option
 module OptionEx = Seq__Option
-module Result = Belt.Result
-module Array = Js.Array2
-module String = Js.String2
 
 exception InvalidArgument(string)
 
@@ -42,8 +38,6 @@ of everything that came before.
 */
 @inline
 let next = (xx: t<'a>) => xx()
-
-let intToString = Belt.Int.toString
 
 let uncons = xx =>
   switch xx->next {
@@ -189,15 +183,17 @@ let fromArray = (~start=?, ~end=?, xx: array<'a>) => {
     empty
   | false => {
       let len = xx->Array.length
-      let start = start->Option.getWithDefault(0)
-      let end = end->Option.getWithDefault(len - 1)
+      let start = start->Option.getOr(0)
+      let end = end->Option.getOr(len - 1)
       if start < 0 || start > len - 1 {
-        InvalidArgument(`The start index ${start->intToString} is outside the array bounds.`)->raise
+        InvalidArgument(
+          `The start index ${start->Int.toString} is outside the array bounds.`,
+        )->raise
       }
       if end < 0 || end > len - 1 {
-        InvalidArgument(`The end index ${start->intToString} is outside the array bounds.`)->raise
+        InvalidArgument(`The end index ${start->Int.toString} is outside the array bounds.`)->raise
       }
-      range(start, end)->map(inx => xx->Array.unsafe_get(inx))
+      range(start, end)->map(inx => xx->Array.getUnsafe(inx))
     }
   }
 }
@@ -215,7 +211,7 @@ let mapi = (xx, f) => xx->indexed->map(((x, inx)) => f(x, inx))
 let take = (xx, count) => {
   if count < 0 {
     InvalidArgument(
-      `'take' requires a count of 0 or more. You requested ${count->intToString}`,
+      `'take' requires a count of 0 or more. You requested ${count->Int.toString}`,
     )->raise
   }
   let rec go = (xx, count) => () =>
@@ -247,7 +243,7 @@ let drop = (xx, count) =>
   | 0 => xx
   | count if count < 0 =>
     InvalidArgument(
-      `'drop' requires a count of zero or more but you asked for ${count->intToString}`,
+      `'drop' requires a count of zero or more but you asked for ${count->Int.toString}`,
     )->raise
   | count => delay(() => dropEager(xx, count))
   }
@@ -357,7 +353,7 @@ let rec sortedMerge = (xx, yy, cmp) => {
     | (Next(_, _) as xx, End) => xx
     | (Next(x, xx), Next(y, yy)) => {
         let order = cmp(x, y)
-        if order <= 0 {
+        if order <= 0.0 {
           Next(x, sortedMerge(xx, concat(y->once, yy), cmp))
         } else {
           Next(y, sortedMerge(concat(x->once, xx), yy, cmp))
@@ -417,18 +413,18 @@ let dropUntil = (xx, f) => () =>
   ->headTails
   ->find(((x, _)) => f(x))
   ->Option.map(((x, xx)) => Next(x, xx))
-  ->Option.getWithDefault(End)
+  ->Option.getOr(End)
 
 let dropWhile = (xx, f) => () =>
   xx
   ->headTails
   ->find(((x, _)) => false == f(x))
   ->Option.map(((x, xx)) => Next(x, xx))
-  ->Option.getWithDefault(End)
+  ->Option.getOr(End)
 
 let window = (xx, length) => {
   if length <= 0 {
-    InvalidArgument(`'window' requires a length > 0. You asked for ${length->intToString}`)->raise
+    InvalidArgument(`'window' requires a length > 0. You asked for ${length->Int.toString}`)->raise
   }
   xx
   ->scan([], (sum, val) => {
@@ -554,10 +550,7 @@ let findMapLast = (xx, f) => {
 let rec map2 = (xx, yy, f) => () => {
   let xx = xx->uncons
   let yy = yy->uncons
-  OptionEx.map2(xx, yy, ((x, xx), (y, yy)) => Next(
-    f(x, y),
-    map2(xx, yy, f),
-  ))->Option.getWithDefault(End)
+  OptionEx.map2(xx, yy, ((x, xx), (y, yy)) => Next(f(x, y), map2(xx, yy, f)))->Option.getOr(End)
 }
 
 let rec map3 = (xx, yy, zz, f) => () => {
@@ -567,7 +560,7 @@ let rec map3 = (xx, yy, zz, f) => () => {
   OptionEx.map3(xx, yy, zz, ((x, xx), (y, yy), (z, zz)) => Next(
     f(x, y, z),
     map3(xx, yy, zz, f),
-  ))->Option.getWithDefault(End)
+  ))->Option.getOr(End)
 }
 
 let rec map4 = (xx, yy, zz, qq, f) => () => {
@@ -578,7 +571,7 @@ let rec map4 = (xx, yy, zz, qq, f) => () => {
   OptionEx.map4(xx, yy, zz, qq, ((x, xx), (y, yy), (z, zz), (q, qq)) => Next(
     f(x, y, z, q),
     map4(xx, yy, zz, qq, f),
-  ))->Option.getWithDefault(End)
+  ))->Option.getOr(End)
 }
 
 let rec map5 = (xx, yy, zz, qq, mm, f) => () => {
@@ -590,7 +583,7 @@ let rec map5 = (xx, yy, zz, qq, mm, f) => () => {
   OptionEx.map5(xx, yy, zz, qq, mm, ((x, xx), (y, yy), (z, zz), (q, qq), (m, mm)) => Next(
     f(x, y, z, q, m),
     map5(xx, yy, zz, qq, mm, f),
-  ))->Option.getWithDefault(End)
+  ))->Option.getOr(End)
 }
 
 let zip = (xx, yy) => map2(xx, yy, (x, y) => (x, y))
@@ -616,13 +609,13 @@ let compare = (xx, yy, cmp) => {
   map2(xx, yy, (x, y) =>
     switch (x, y) {
     | (Some(x), Some(y)) => cmp(x, y)
-    | (None, Some(_)) => -1
-    | (Some(_), None) => 1
-    | (None, None) => 0
+    | (None, Some(_)) => -1.0
+    | (Some(_), None) => 1.0
+    | (None, None) => 0.0
     }
   )
-  ->find(i => i !== 0)
-  ->Option.getWithDefault(0)
+  ->find(i => i !== 0.0)
+  ->Option.getOr(0.0)
 }
 
 let length = xx => xx->reduce(0, (sum, _) => sum + 1)
@@ -650,9 +643,9 @@ let tails = xx =>
     ),
   )
 
-let minBy = (xx, cmp) => xx->sumBy((sum, i) => cmp(i, sum) < 0 ? i : sum)
+let minBy = (xx, cmp) => xx->sumBy((sum, i) => cmp(i, sum) < 0.0 ? i : sum)
 
-let maxBy = (xx, cmp) => xx->sumBy((sum, i) => cmp(i, sum) > 0 ? i : sum)
+let maxBy = (xx, cmp) => xx->sumBy((sum, i) => cmp(i, sum) > 0.0 ? i : sum)
 
 let rec interleave = (xx, yy) => {
   () => {
@@ -730,13 +723,14 @@ let dropLast = (xx, n) => {
   | 0 => xx
   | n if n < 0 =>
     InvalidArgument(
-      `dropLast requires a count of 0 or more. You requested ${n->intToString}`,
+      `dropLast requires a count of 0 or more. You requested ${n->Int.toString}`,
     )->raise
   | n =>
     () =>
       xx
       ->scan([], (sum, i) => {
-        switch sum->Array.push(i) {
+        sum->Array.push(i)
+        switch sum->Array.length {
         | size if size > n + 1 => sum->Array.shift->ignore
         | _ => ()
         }
@@ -744,7 +738,7 @@ let dropLast = (xx, n) => {
       })
       ->dropUntil(i => i->Array.length == n + 1)
       ->takeWhile(i => i->Array.length > n)
-      ->map(i => i->Array.unsafe_get(0))
+      ->map(i => i->Array.getUnsafe(0))
       ->next
   }
 }
@@ -779,7 +773,7 @@ let neighbors = xx => () =>
     }
   }
 
-let isSortedBy = (xx, cmp) => xx->pairwise->every(((a, b)) => cmp(a, b) <= 0)
+let isSortedBy = (xx, cmp) => xx->pairwise->every(((a, b)) => cmp(a, b) <= 0.0)
 
 let everyOk = xx => {
   let concat = (sum, i) =>
@@ -834,7 +828,7 @@ let reverse = xx =>
 let sortBy = (xx, compare) =>
   delay(() => {
     let xx = xx->toArray
-    xx->Array.sortInPlaceWith((a, b) => compare(a, b))->ignore
+    xx->Array.sort(compare)->ignore
     xx->fromArray
   })
 
@@ -868,7 +862,7 @@ let distribute = (xx, item) => {
 let (combinations, permutations) = {
   let helper = (xx, maxSize, f) => {
     if maxSize <= 0 {
-      InvalidArgument(`Size must be 1 or more. You asked for ${maxSize->intToString}.`)->raise
+      InvalidArgument(`Size must be 1 or more. You asked for ${maxSize->Int.toString}.`)->raise
     }
     unfold((empty, xx), ((sum, xx)) =>
       switch xx->uncons {
@@ -894,7 +888,7 @@ let (combinations, permutations) = {
   (combinations, permutations)
 }
 
-let toList = xx => xx->reverse->reduce(list{}, (list, f) => Belt.List.add(list, f))
+let toList = xx => xx->reverse->reduce(list{}, (list, f) => List.add(list, f))
 
 let split = (xx, init, acc) => {
   let rec unfolder = state =>
@@ -921,7 +915,7 @@ let split = (xx, init, acc) => {
 let chunkBySize = (xx, length) => {
   if length <= 0 {
     InvalidArgument(
-      `chunkBySize requires a length > 0. You asked for ${length->intToString}`,
+      `chunkBySize requires a length > 0. You asked for ${length->Int.toString}`,
     )->raise
   }
   xx->split(

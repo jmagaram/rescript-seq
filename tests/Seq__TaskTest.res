@@ -64,7 +64,7 @@ let taskTests = {
         succeedsTask(~success=2, ~onError=-99)
         ->Task.map(i => i * 2)
         ->Task.map(i => i * 3)
-        ->Task.map(i => `It is ${i->Belt.Int.toString}`),
+        ->Task.map(i => `It is ${i->Int.toString}`),
       ~b="It is 12",
     ),
     T.fromPredicateAsync(
@@ -227,4 +227,4 @@ let taskResultTests = {
   ]
 }
 
-let tests = Js.Array2.concat(taskTests, taskResultTests)
+let tests = Array.concat(taskTests, taskResultTests)

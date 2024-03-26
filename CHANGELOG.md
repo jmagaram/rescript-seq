@@ -1,3 +1,9 @@
+## Version 4.1.0
+
+- Ordering callback functions must return a float not an int, like Core
+- Use the V11 with the default uncurried mode
+- Use Core library not Js and Belt
+
 ## Version 4.0.0
 
 - Upgrade to V11 compiler
@@ -44,7 +50,7 @@
   - `Seq.windowAhead` and `Seq.windowBehind`; tricky code here. It worked but not sure it is useful enough. `windowAhead` would hang if window size was enormous; fixed that before removing it.
   - `Seq.findMapi`
   - `Seq.fromOption`; not sure this will get used
-  - `Seq.characters`; many ways to split a string and with Core it will feel better since you can do `String.split` not `Js.String2.split`.
+  - `Seq.characters`; many ways to split a string and with Core it will feel better since you can do `String.split` not `String.split`.
   - `Seq.startWith` and `Seq.endWith`; use `concat` and `prepend` with `Seq.once`.
   - `Seq.scani`; just call `indexed` beforehand if index is needed.
   - `Seq.reducei`; just call `indexed` beforehand if index is needed.

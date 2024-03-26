@@ -1,6 +1,4 @@
-open Belt
 module Promise = Js.Promise2
-module String = Js.String2
 
 type t = {
   category: string,
@@ -17,11 +15,11 @@ let hasKeyword = (i, word) => {
   let match = (~text, ~word) => {
     let text = text->String.trim->String.toLocaleLowerCase
     let keyword = word->String.trim->String.toLocaleLowerCase
-    text->Js.String2.includes(keyword)
+    text->String.includes(keyword)
   }
   match(~text=i->category, ~word) ||
   match(~text=i->title, ~word) ||
-  i->expectation->Option.mapWithDefault(false, expectation => match(~text=expectation, ~word))
+  i->expectation->Option.mapOr(false, expectation => match(~text=expectation, ~word))
 }
 
 type summary = {
@@ -30,7 +28,7 @@ type summary = {
   ran: int,
 }
 
-let stringCmp = (x: string, y: string) => x < y ? -1 : x > y ? 1 : 0
+let stringCmp = (x: string, y: string) => x < y ? -1.0 : x > y ? 1.0 : 0.0
 let cmp = (a, b) => stringCmp(a.category ++ a.title, b.category ++ b.title)
 
 let fromResult = (~category, ~title, ~expectation=?, predicate) => {
@@ -116,24 +114,24 @@ let toDetailString = (i, message) => {
 }
 
 let runSuite = async (~filter=_ => true, ~onlyShowFailures=false, tests) => {
-  let log = Js.Console.log
+  let log = Console.log
   let logSection = n => {
     log("")
     log(`==== ${n} ====`)
   }
   let results =
     await tests
-    ->Array.keep(filter)
-    ->SortArray.stableSortBy(cmp)
+    ->Array.filter(filter)
+    ->Array.toSorted(cmp)
     ->Array.map(i => i->run)
     ->Promise.all
-  let succeeded = results->Array.keepMap(((r, t)) =>
+  let succeeded = results->Array.filterMap(((r, t)) =>
     switch r {
     | Ok(_) => Some(t)
     | Error(_) => None
     }
   )
-  let failed = results->Array.keepMap(((r, t)) =>
+  let failed = results->Array.filterMap(((r, t)) =>
     switch r {
     | Ok(_) => None
     | Error(message) => Some(t, message)

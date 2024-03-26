@@ -1,6 +1,3 @@
-module Option = Belt.Option
-let intToString = Belt.Int.toString
-
 // Wrap any array in a sequence and then use 100+ functions to filter, group,
 // map, reduce, and analyze it. The sequence does NOT copy the array; it is just
 // a lightweight function to iterate through it.
@@ -16,7 +13,7 @@ Create sequences from scratch, like JavaScript generators.
 let aa = Seq.range(1, 100)
 let bb = Seq.rangeMap(99, 1, i => i * 3)
 let cc = Seq.iterate(2, i => i * 2)->Seq.takeWhile(i => i < 1000)
-let dd = Seq.foreverWith(() => Js.Math.random())
+let dd = Seq.foreverWith(() => Math.random())
 let ee = Seq.replicate("x", 100)
 
 /**
@@ -34,12 +31,12 @@ let nums =
   ->Seq.takeUntil(i => i > 200)
   ->Seq.tap(n => {
     if n == 100 {
-      Js.log(`Saw 100; interesting!`)
+      Console.log(`Saw 100; interesting!`)
     }
   })
   ->Seq.flatMap(n => Seq.rangeMap(1, n, i => i * 2))
   ->Seq.filter(n => n > 100)
-  ->Seq.forEach(Js.log(_))
+  ->Seq.forEach(Console.log)
 
 /**
 `scan` is similar to `reduce` but returns intermediate results. This computes a
@@ -71,7 +68,7 @@ let removeDups = xx =>
   xx
   ->Seq.fromArray
   ->Seq.pairBehind
-  ->Seq.filter(((a, b)) => a->Option.mapWithDefault(true, a => a != b))
+  ->Seq.filter(((a, b)) => a->Option.mapOr(true, a => a != b))
   ->Seq.map(((_, b)) => b)
 
 /**
@@ -85,12 +82,12 @@ type sale = {empId: string, amount: int}
 let sortByEmployee = (a, b) => {
   let a = a.empId
   let b = b.empId
-  a < b ? -1 : a > b ? 1 : 0
+  String.localeCompare(a, b)
 }
 
 let salesSummary = sales => {
   sales
-  ->Js.Array2.sortInPlaceWith(sortByEmployee)
+  ->Array.toSorted(sortByEmployee)
   ->Seq.fromArray
   ->Seq.split(
     i => {empId: i.empId, sales: 1, revenue: i.amount},
@@ -112,12 +109,12 @@ let validate = (docs, isValidEmail) =>
   ->Seq.map(doc =>
     switch doc["email"]->isValidEmail {
     | false => Error(`The email is invalid for document: ${doc["title"]}`)
-    | true => Ok(doc["title"]->Js.String2.trim)
+    | true => Ok(doc["title"]->String.trim)
     }
   )
   ->Seq.everyOk {
-  | Ok(titles) => titles->Seq.forEach(t => Js.log(`Is valid: ${t}`))
-  | Error(title) => Js.log(`Document with title ${title} is not valid.`)
+  | Ok(titles) => titles->Seq.forEach(t => Console.log(`Is valid: ${t}`))
+  | Error(title) => Console.log(`Document with title ${title} is not valid.`)
   }
 
 /**
@@ -128,7 +125,7 @@ one makes the fibonacci.
 let binary = n =>
   Seq.unfold(n, value => value > 0 ? Some(mod(value, 2), value / 2) : None)
   ->Seq.toArray
-  ->Js.Array2.reverseInPlace
+  ->Array.toReversed
 
 let fibonacci = count =>
   Seq.unfold((0, 1), ((a, b)) => a + b <= 100 ? Some(a + b, (b, a + b)) : None)
@@ -156,19 +153,22 @@ module Point = {
   type t = (int, int)
   let x = ((x, _)) => x
   let y = ((_, y)) => y
-  let toString = ((x, y)) => `(${x->intToString}, ${y->intToString})`
+  let toString = ((x, y)) => `(${x->Int.toString}, ${y->Int.toString})`
 }
 let localMinimums = points =>
   points
   ->Seq.fromArray
   ->Seq.window(3)
   ->Seq.filterMap(pp =>
-    pp[1]->Point.y < pp[0]->Point.y && pp[1]->Point.y < pp[2]->Point.y ? Some(pp[1]) : None
+    pp->Array.getUnsafe(1)->Point.y < pp->Array.getUnsafe(0)->Point.y &&
+      pp->Array.getUnsafe(1)->Point.y < pp->Array.getUnsafe(2)->Point.y
+      ? Some(pp->Array.getUnsafe(1))
+      : None
   )
   ->Seq.map(Point.toString)
   ->Seq.toOption
   ->Option.map(pp => pp->Seq.join(", "))
-  ->Option.getWithDefault("There are no local minimums.")
+  ->Option.getOr("There are no local minimums.")
 
 /**
 It is super easy to initialize arrays. This creates a 2d array and fills it with

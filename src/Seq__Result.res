@@ -1,9 +1,3 @@
-let mapError = (r, f) =>
-  switch r {
-  | Ok(_) as ok => ok
-  | Error(e) => Error(f(e))
-  }
-
 let fromTryCatchWith = (f, m) => {
   try {
     let ok = f()

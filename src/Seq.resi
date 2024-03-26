@@ -402,7 +402,7 @@ them into a single **sorted** sequence based on the `compare` function. Once one
 of the sequences are exhaused, all the remaining items from the other sequence
 are included. 
 */
-let sortedMerge: (t<'a>, t<'a>, ('a, 'a) => int) => t<'a>
+let sortedMerge: (t<'a>, t<'a>, ('a, 'a) => float) => t<'a>
 
 /**
 `interleave(seq1, seq2)` is the sequence built by alternately taking items from `seq1`
@@ -535,7 +535,7 @@ let isEmpty: t<'a> => bool
 `isSortedBy(source, compare)` determines if the sequence is sorted according to
 the provided compare function. Returns `true` for an empty sequence.
 */
-let isSortedBy: (t<'a>, ('a, 'a) => int) => bool
+let isSortedBy: (t<'a>, ('a, 'a) => float) => bool
 
 /**
 `equals(seq1, seq2, areEqual)` determines if two sequences have exactly the same
@@ -550,7 +550,7 @@ function, item by item. Returns the first non-zero result. If the end of a
 sequence is reached it return -1 if the first sequence is shorter and 1 if the
 second sequence is shorter.
 */
-let compare: (t<'a>, t<'a>, ('a, 'a) => int) => int
+let compare: (t<'a>, t<'a>, ('a, 'a) => float) => float
 
 /**
 `head` is the first item in the sequence. Returns `None` if the sequence is
@@ -596,14 +596,14 @@ let uncons: t<'a> => option<('a, t<'a>)>
 minimum item according to the `compare` function. Returns `None` if the
 sequence is empty.
 */
-let minBy: (t<'a>, ('a, 'a) => int) => option<'a>
+let minBy: (t<'a>, ('a, 'a) => float) => option<'a>
 
 /**
 `maxBy(seq, compare)` eagerly consumes the entire sequence and returns the
 maximum item according to the `compare` function. Returns `None` if the
 sequence is empty.
 */
-let maxBy: (t<'a>, ('a, 'a) => int) => option<'a>
+let maxBy: (t<'a>, ('a, 'a) => float) => option<'a>
 
 /**
 `last` eagerly consumes the entire sequence and returns a `Some` for the last
@@ -682,7 +682,7 @@ sequence is iterated. As such it should not be used with large or infinite
 sequences. The function uses a stable sort (the original order of equal elements
 is preserved) based on the provided `compare` function.
 */
-let sortBy: (t<'a>, ('a, 'a) => int) => t<'a>
+let sortBy: (t<'a>, ('a, 'a) => float) => t<'a>
 
 /**
 `combinations(source, size)` generates all combinations of items in `source`,
