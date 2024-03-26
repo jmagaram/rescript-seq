@@ -1,17 +1,14 @@
 module T = Seq__Test
 module Task = Seq__Task
-module Promise = Js.Promise2
 module ResultEx = Seq__Result
 
 exception OutOfRange(int)
-
-@get external errorMessage: 'a => option<string> = "message"
 
 let failsOutOfRange = (~success, ~outOfRange) =>
   Promise.resolve(success)->Promise.then(_ => raise(OutOfRange(outOfRange)))
 
 let failsJsException = (~success, ~msg) =>
-  Promise.resolve(success)->Promise.then(_ => Js.Exn.raiseError(msg))
+  Promise.resolve(success)->Promise.then(_ => Exn.raiseError(msg))
 
 let taskTests = {
   let succeedsTask = (~success, ~onError) =>
@@ -34,7 +31,7 @@ let taskTests = {
       ~expectation="when fails with ReScript exception, return value after onError processes exn",
       ~a=() =>
         Task.make(
-          ~promise=() => failsOutOfRange(~success=99, ~outOfRange=4),
+          ~promise=() => failsOutOfRange(~success="ok", ~outOfRange=4),
           ~onError=e =>
             switch e {
             | OutOfRange(n) => n * 2
@@ -48,14 +45,14 @@ let taskTests = {
       ~expectation="when fails with JavaScript exception, return value after onError processes exn",
       ~a=() =>
         Task.make(
-          ~promise=() => failsJsException(~success=99, ~msg="failure!"),
+          ~promise=() => failsJsException(~success=99, ~msg="failure"),
           ~onError=e =>
-            switch e->errorMessage {
-            | Some("failure!") => "caught"
-            | _ => "not caught"
+            switch e {
+            | Exn.Error(e) => e->Exn.message->Option.getOr("no message in exception")
+            | _ => "exception was not caught"
             },
         ),
-      ~b="caught",
+      ~b="failure",
     ),
     makeTest(
       ~title="map",
@@ -132,29 +129,29 @@ let taskResultTests = {
       ~expectation="when fails with JavaScript exception, return Error with onError processing exn",
       ~a=() =>
         Task.Result.make(
-          ~promise=() => failsJsException(~success="abc", ~msg="failure!"),
+          ~promise=() => failsJsException(~success="success", ~msg="failure"),
           ~onError=e =>
-            switch e->errorMessage {
-            | Some("failure!") => "caught!"
-            | _ => "not caught"
+            switch e {
+            | Exn.Error(e) => e->Exn.message->Option.getOr("no message in exception")
+            | _ => "exception was not caught"
             },
         ),
-      ~b=Error("caught!"),
+      ~b=Error("failure"),
     ),
     makeTest(
       ~title="make",
       ~expectation="when fails with JavaScript exception, can map error later",
       ~a=() =>
         Task.Result.make(
-          ~promise=() => failsJsException(~success="abc", ~msg="failure!"),
+          ~promise=() => failsJsException(~success="abc", ~msg="failure"),
           ~onError=e => e,
         )->Task.Result.mapError(e =>
-          switch e->errorMessage {
-          | Some("failure!") => "caught"
-          | _ => "not caught"
+          switch e {
+          | Exn.Error(e) => e->Exn.message->Option.mapOr(false, i => i == "failure")
+          | _ => false
           }
         ),
-      ~b=Error("caught"),
+      ~b=Error(true),
     ),
     makeTest(
       ~title="mapOk",

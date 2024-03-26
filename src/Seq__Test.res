@@ -1,4 +1,3 @@
-module Promise = Js.Promise2
 
 type t = {
   category: string,

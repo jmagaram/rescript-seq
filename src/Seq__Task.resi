@@ -2,7 +2,7 @@
 /**
 A `Task.t` is a lazy promise that never fails. You can transform the task before
 execution using various functions like `map`, `forEach`, `mapOk`, and
-`toOption`. When you're read to execute the promise, call the `toPromise`
+`toOption`. When you're ready to execute the promise, call the `toPromise`
 function.
 */
 type t<'a> = unit => promise<'a>

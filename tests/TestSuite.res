@@ -1,7 +1,6 @@
 module Test = Seq__Test
 module Task = Seq__Task
 module Q = Seq
-module Promise = Js.Promise2
 
 let isLocalDevelopment = () => {
   try {
@@ -13,7 +12,7 @@ let isLocalDevelopment = () => {
 }
 
 let onlyShowFailures = false
-let filter = test => []->Array.every(word => test->Test.hasKeyword(word))
+let filter = test => [""]->Array.every(word => test->Test.hasKeyword(word))
 let throwOnFailure = !isLocalDevelopment()
 
 let tests =
@@ -27,8 +26,8 @@ let tests =
 Task.Result.make(~promise=() => Test.runSuite(tests, ~filter, ~onlyShowFailures), ~onError=e => e)
 ->Task.forEach(s =>
   switch (s, throwOnFailure) {
-  | (Ok(s), true) if s.fail > 0 => Js.Exn.raiseError(`Tests failed: ${s.fail->Int.toString}`)
-  | (Error(_), true) => Js.Exn.raiseError("Could not complete the test suite.")
+  | (Ok(s), true) if s.fail > 0 => Exn.raiseError(`Tests failed: ${s.fail->Int.toString}`)
+  | (Error(_), true) => Exn.raiseError("Could not complete the test suite.")
   | _ => ()
   }
 )

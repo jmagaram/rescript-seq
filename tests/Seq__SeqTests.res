@@ -42,8 +42,7 @@ let callCountForever = () => {
 /**
 `throwIfInvoked` is a test helper function that throw if it is ever called.
 */
-let throwIfInvoked = () =>
-  Js.Exn.raiseError("Tried to invoke a testing function that always fails.")
+let throwIfInvoked = () => Exn.raiseError("Tried to invoke a testing function that always fails.")
 
 /**
 `death` defines a sequence that throws an exception if it is ever iterated.
@@ -60,7 +59,7 @@ let toDispenser = xx => {
   let xx = ref(xx)
   () => {
     switch xx.contents->S.uncons {
-    | None => Js.Exn.raiseError("You are attempting to consume a value past the end of a sequence.")
+    | None => Exn.raiseError("You are attempting to consume a value past the end of a sequence.")
     | Some(x, xx') => {
         xx := xx'
         x
@@ -82,9 +81,7 @@ let countdown = n => {
   let count = ref(n)
   () => {
     if count.contents == 0 {
-      Js.Exn.raiseError(
-        "Attempted to consume a value from the countdown after it had been exhausted.",
-      )
+      Exn.raiseError("Attempted to consume a value from the countdown after it had been exhausted.")
     }
     count := count.contents - 1
     count.contents + 1
@@ -627,7 +624,7 @@ let iterateTests = makeSeqEqualsTests(
 )->Array.concat([
   willNotThrow(~title="iterate", ~expectation="lazy", () =>
     S.iterate(0, i => {
-      Js.Exn.raiseError("Boom!")->raise->ignore
+      Exn.raiseError("Boom!")->raise->ignore
       i
     })
   ),
@@ -1817,7 +1814,7 @@ let delayTests =
       (S.delay(() => S.empty), [], ""),
       (S.delay(() => S.once(1)), [1], ""),
       (S.delay(() => S.range(1, 5)), [1, 2, 3, 4, 5], ""),
-      (S.delay(() => Js.Exn.raiseError("boom!"))->S.take(0), [], ""),
+      (S.delay(() => Exn.raiseError("boom!"))->S.take(0), [], ""),
     ],
   )->Array.concat([
     willNotThrow(~title="delay", ~expectation="lazy", () => S.delay(throwIfInvoked)),

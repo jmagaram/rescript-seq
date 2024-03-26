@@ -10,12 +10,12 @@ let fromTryCatch = [
     ~title="fromTryCatch",
     ~expectation="when throw, return as Error",
     () => {
-      let r = R.fromTryCatch(() => Js.Exn.raiseError("banana"))
+      let r = R.fromTryCatch(() => Exn.raiseError("banana"))
       switch r {
       | Ok(_) => false
       | Error(e) =>
-        switch e->Js.Exn.asJsExn {
-        | Some(err) => err->Js.Exn.message == Some("banana")
+        switch e->Exn.asJsExn {
+        | Some(err) => err->Exn.message == Some("banana")
         | _ => false
         }
       }
