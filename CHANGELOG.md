@@ -1,8 +1,8 @@
 ## Version 4.1.0
 
 - Ordering callback functions must return a float not an int, like Core
-- Use the V11 with the default uncurried mode
-- Use Core library not Js and Belt
+- Use V11 with the default uncurried mode
+- Use Core library instead of Js and Belt
 
 ## Version 4.0.0
 
