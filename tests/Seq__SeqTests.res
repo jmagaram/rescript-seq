@@ -1566,6 +1566,29 @@ let lastTests = {
   )
 }
 
+let atTests = {
+  [
+    ((S.empty, -1), None),
+    ((S.empty, 0), None),
+    ((S.empty, 1), None),
+    ((1->S.once, -1), None),
+    ((1->S.once, 0), Some(1)),
+    ((1->S.once, 1), None),
+    ((S.range(0, 9), 0), Some(0)),
+    ((S.range(0, 9), 1), Some(1)),
+    ((S.range(0, 9), 9), Some(9)),
+    ((S.range(0, 9), 10), None),
+    ((S.range(0, 999999), 9999), Some(9999)),
+  ]->Array.mapWithIndex((((xs, inx), result), index) =>
+    valueEqual(
+      ~title="at",
+      ~expectation=`index ${index->Int.toString}`,
+      ~a=() => xs->S.at(inx),
+      ~b=result,
+    )
+  )
+}
+
 let (everyOkTests, everySomeTests) = {
   let validationTests = [
     ("when empty, return empty", [], Ok([])),
@@ -2162,6 +2185,7 @@ let sampleRemoveDups = {
 
 let tests =
   [
+    atTests,
     allPairsTests,
     chunkBySizeTests,
     combinationTests,

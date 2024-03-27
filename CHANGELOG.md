@@ -1,3 +1,7 @@
+## Version 4.2.0
+
+- `Seq.at` returns the item at a specified zero-based index.
+
 ## Version 4.1.0
 
 - Ordering callback functions must return a float not an int, like Core

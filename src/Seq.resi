@@ -102,8 +102,9 @@ greater than `end` the numbers descend.
 let rangeMap: (int, int, int => 'a) => t<'a>
 
 /**
-`fromArray(start, end)` generates a sequence from an array. `start` and `end`
-indexes can optionally be provided.
+`fromArray(start, end)` generates a sequence from an array. Valid `start` and
+`end` indexes can optionally be provided. If `start` or `end` is invalid an
+exception is thrown.
 */
 let fromArray: (~start: int=?, ~end: int=?, array<'a>) => t<'a>
 
@@ -734,3 +735,9 @@ let pairBehind: t<'a> => t<(option<'a>, 'a)>
 items that immediately precede and follow it.
 */
 let neighbors: t<'a> => t<(option<'a>, 'a, option<'a>)>
+
+/**
+`at` returns the item at the specified zero-based index. Returns `None` if the
+index is negative or larger than the index of the last item in the sequence.
+*/
+let at: (t<'a>, int) => option<'a>

@@ -930,3 +930,5 @@ let chunkBySize = (xx, length) => {
       },
   )
 }
+
+let at = (xx, inx) => xx->indexed->findMap(((item, i)) => i == inx ? Some(item) : None)

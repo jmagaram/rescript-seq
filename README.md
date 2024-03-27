@@ -129,6 +129,7 @@ let zip5: (t<'a>, t<'b>, t<'c>, t<'d>, t<'e>) => t<('a, 'b, 'c, 'd, 'e)>
 
 // Reduce, consume, and calculate
 
+let at: (t<'a>, int) => option<'a>
 let compare: (t<'a>, t<'b>, ('a, 'b) => int) => int
 let consume: t<'a> => unit
 let equals: (t<'a>, t<'b>, ('a, 'b) => bool) => bool
