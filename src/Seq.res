@@ -931,4 +931,15 @@ let chunkBySize = (xx, length) => {
   )
 }
 
-let at = (xx, inx) => xx->indexed->findMap(((item, i)) => i == inx ? Some(item) : None)
+let at = (xx, inx) => {
+  let rec go = (xx, inxCurrent) =>
+    switch xx->next {
+    | End => None
+    | Next(x, xx) =>
+      switch inxCurrent == inx {
+      | true => Some(x)
+      | false => go(xx, inxCurrent + 1)
+      }
+    }
+  go(xx, 0)
+}
