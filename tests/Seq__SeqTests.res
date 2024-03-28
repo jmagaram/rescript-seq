@@ -624,11 +624,35 @@ let iterateTests = makeSeqEqualsTests(
 )->Array.concat([
   willNotThrow(~title="iterate", ~expectation="lazy", () =>
     S.iterate(0, i => {
-      Exn.raiseError("Boom!")->raise->ignore
+      Exn.raiseError("Boom!")->ignore
       i
     })
   ),
 ])
+
+let iterateWhileTests = {
+  let increment = (max, seed) => {
+    let next = seed + 1
+    next <= max ? Some(next) : None
+  }
+  makeSeqEqualsTests(
+    ~title="iterateWhile",
+    [
+      (S.iterateWhile(4, increment(10, _)), [4, 5, 6, 7, 8, 9, 10], ""),
+      (S.iterateWhile(9, increment(10, _)), [9, 10], ""),
+      (S.iterateWhile(10, increment(10, _)), [10], ""),
+      (S.iterateWhile(999, increment(10, _)), [999], "Always includes seed"),
+      (S.iterateWhile(1, increment(1_000_000, _))->Seq.drop(999_998), [999_999, 1_000_000], ""),
+    ],
+  )->Array.concat([
+    willNotThrow(~title="iterateWhile", ~expectation="lazy", () =>
+      S.iterateWhile(0, i => {
+        Exn.raiseError("Boom!")->ignore
+        Some(i)
+      })
+    ),
+  ])
+}
 
 let fromArrayTests = {
   let basicTests = makeSeqEqualsTests(
@@ -2230,6 +2254,7 @@ let tests =
     isEmptyTests,
     isSortedByTests,
     iterateTests,
+    iterateWhileTests,
     joinTests,
     lastTests,
     lengthTests,

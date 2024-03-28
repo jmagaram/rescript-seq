@@ -943,3 +943,12 @@ let at = (xx, inx) => {
     }
   go(xx, 0)
 }
+
+let iterateWhile = (seed, f) => () => {
+  let rec go = seed => () =>
+    switch f(seed) {
+    | None => End
+    | Some(seed) => Next(seed, go(seed))
+    }
+  Next(seed, go(seed))
+}

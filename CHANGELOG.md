@@ -1,3 +1,7 @@
+## Version 4.3.0
+
+- `Seq.iterateWhile` generates a sequence until the interation function returns `None`.
+
 ## Version 4.2.0
 
 - `Seq.at` returns the item at a specified zero-based index.
