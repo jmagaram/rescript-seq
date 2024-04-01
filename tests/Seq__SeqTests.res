@@ -797,6 +797,42 @@ let unfoldTests =
     ),
   ])
 
+let expandTests = {
+  // for a given seed string, return each character and a new seed which is all
+  // the characters that follow it
+  let combos = s => {
+    s
+    ->String.split("")
+    ->Seq.fromArray
+    ->Seq.indexed
+    ->Seq.map(((char, inx)) => (char, s->String.sliceToEnd(~start=inx + 1)))
+  }
+
+  let format = xxx =>
+    xxx
+    ->Seq.map(xx => xx->Seq.toArray->Array.joinWith(""))
+    ->Seq.toArray
+    ->Seq.fromArray
+
+  makeSeqEqualsTests(
+    ~title="expand",
+    [
+      (S.expand("abcd", combos)->format, ["abcd", "abd", "acd", "ad", "bcd", "bd", "cd", "d"], ""),
+      (S.expand("abc", combos)->format, ["abc", "ac", "bc", "c"], ""),
+      (S.expand("ab", combos)->format, ["ab", "b"], ""),
+      (S.expand("a", combos)->format, ["a"], ""),
+      (
+        S.expand("abcdefghijklmnopqrstuv", combos)
+        ->Seq.last
+        ->Option.map(s => s->Seq.once->format)
+        ->Option.getExn,
+        ["v"],
+        "millions",
+      ),
+    ],
+  )
+}
+
 let initTests =
   makeSeqEqualsTests(
     ~title="init",
@@ -2229,6 +2265,7 @@ let tests =
     everySomeTests,
     everyTests,
     exactlyOneTests,
+    expandTests,
     filterMapiTests,
     filterMapTests,
     filterOkTests,

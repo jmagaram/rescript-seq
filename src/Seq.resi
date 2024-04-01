@@ -36,6 +36,12 @@ Seq.unfold(1, i => i < 100 ? Some(i, i * 2) : None) // [1, 2, 4, 8, 16, 32, 64]
 let unfold: ('seed, 'seed => option<('a, 'seed)>) => t<'a>
 
 /**
+`expand(seed, f)` creates a sequence of sequences through a recursive
+computation. Similar to `unfold`.
+*/
+let expand: ('seed, 'seed => t<('a, 'seed)>) => t<t<'a>>
+
+/**
 `init(count, f)` initializes a sequence based on a `count` and a function `f`
 that is provided index values from 0 up to `count-1`.
 

@@ -1,3 +1,7 @@
+## Version 4.4.0
+
+- `Seq.expand` is new and similar to `Seq.unfold` but recursively generates a sequence of sequences.
+
 ## Version 4.3.0
 
 - `Seq.iterateWhile` generates a sequence until the interation function returns `None`.

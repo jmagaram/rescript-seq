@@ -56,6 +56,7 @@ let cons: ('a, t<'a>) => t<'a>
 let cycle: t<'a> => t<'a>
 let delay: (unit => t<'a>) => t<'a>
 let empty: t<'a>
+let expand: ('a, 'a => t<('b, 'a)>) => t<t<'b>>
 let forever: 'a => t<'a>
 let foreverWith: (unit => 'a) => t<'a>
 let fromArray: (~start: int=?, ~end: int=?, array<'a>) => t<'a>

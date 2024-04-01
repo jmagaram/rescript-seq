@@ -1,6 +1,6 @@
 {
   "name": "@jmagaram/rescript-seq",
-  "version": "4.3.0",
+  "version": "4.4.0",
   "module": "",
   "description": "Lazy sequences for ReScript.",
   "keywords": [
