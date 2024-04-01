@@ -797,7 +797,7 @@ let unfoldTests =
     ),
   ])
 
-let expandTests = {
+let unfoldManyTests = {
   // for a given seed string, return each character and a new seed which is all
   // the characters that follow it
   let combos = s => {
@@ -815,14 +815,19 @@ let expandTests = {
     ->Seq.fromArray
 
   makeSeqEqualsTests(
-    ~title="expand",
+    ~title="unfoldMany",
     [
-      (S.expand("abcd", combos)->format, ["abcd", "abd", "acd", "ad", "bcd", "bd", "cd", "d"], ""),
-      (S.expand("abc", combos)->format, ["abc", "ac", "bc", "c"], ""),
-      (S.expand("ab", combos)->format, ["ab", "b"], ""),
-      (S.expand("a", combos)->format, ["a"], ""),
       (
-        S.expand("abcdefghijklmnopqrstuv", combos)
+        S.unfoldMany("abcd", combos)->format,
+        ["abcd", "abd", "acd", "ad", "bcd", "bd", "cd", "d"],
+        "",
+      ),
+      (S.unfoldMany("abc", combos)->format, ["abc", "ac", "bc", "c"], ""),
+      (S.unfoldMany("ab", combos)->format, ["ab", "b"], ""),
+      (S.unfoldMany("a", combos)->format, ["a"], ""),
+      (S.unfoldMany("", combos)->format, [""], ""),
+      (
+        S.unfoldMany("abcdefghijklmnopqrstuv", combos)
         ->Seq.last
         ->Option.map(s => s->Seq.once->format)
         ->Option.getExn,
@@ -2265,7 +2270,7 @@ let tests =
     everySomeTests,
     everyTests,
     exactlyOneTests,
-    expandTests,
+    unfoldManyTests,
     filterMapiTests,
     filterMapTests,
     filterOkTests,

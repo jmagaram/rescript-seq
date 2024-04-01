@@ -1,6 +1,6 @@
-## Version 4.4.0
+## Version 4.4.1
 
-- `Seq.expand` is new and similar to `Seq.unfold` but recursively generates a sequence of sequences.
+- `Seq.unfoldMany` is new and similar to `Seq.unfold` but recursively generates a sequence of sequences.
 
 ## Version 4.3.0
 

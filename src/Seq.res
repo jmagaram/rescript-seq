@@ -953,8 +953,8 @@ let iterateWhile = (seed, f) => () => {
   Next(seed, go(seed))
 }
 
-let rec expand = (seed, f) =>
+let rec unfoldMany = (seed, f) =>
   seed
   ->f
-  ->flatMap(((n, seed)) => expand(seed, f)->map(result => cons(n, result)))
+  ->flatMap(((n, seed)) => unfoldMany(seed, f)->map(result => cons(n, result)))
   ->orElse(empty->once)
